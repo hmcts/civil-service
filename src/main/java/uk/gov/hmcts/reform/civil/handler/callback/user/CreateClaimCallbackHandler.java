@@ -394,6 +394,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
             dataBuilder.respondent2OrgRegistered(YES);
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            if (references.isPresent()) {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                    .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
+                    .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            }
+            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
+            dataBuilder
+                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor2ServiceAddress());
         }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
