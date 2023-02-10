@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -1078,6 +1079,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldCopyRespondent1SolicitorReferenceSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondentSolicitor2Reference = response.getData().get("solicitorReferences");
+            var respondentSolicitor2ServiceAddressRequired = response.getData().get(
+                "respondentSolicitor2ServiceAddressRequired");
+            var respondentSolicitor2ServiceAddress =
+                response.getData().get("respondentSolicitor2ServiceAddress");
+
+            assertThat(respondentSolicitor2Reference)
+                .extracting("respondentSolicitor2Reference").isEqualTo("6789");
+            assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
+            assertThat(respondentSolicitor2ServiceAddress).isNull();
         }
 
         @Test

@@ -397,6 +397,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             if (references.isPresent()) {
                 SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
+                    .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
                     .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
                     .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
