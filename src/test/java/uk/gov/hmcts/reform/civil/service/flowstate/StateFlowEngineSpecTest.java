@@ -97,6 +97,32 @@ class StateFlowEngineSpecTest {
         );
     }
 
+    static Stream<Arguments> caseDataStreamOneRespondentClaimFeePaymentSuccessful() {
+        return Stream.of(
+            //AC1 - Payment Successful in 1v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1PaymentSuccessful().build()),
+            //AC3 - Payment Successful in 1v2 case (same solicitor - both represented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful().build()),
+            //AC5 - Payment Succesful in 1v2 case (different solicitor - one unrepresented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful().build())
+        );
+    }
+
+    static Stream<Arguments> caseDataStreamOneRespondentClaimFeePaymentFailure() {
+        return Stream.of(
+            //AC 2 - Payment Failed in 1v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1PaymentFailed().build()),
+            //AC4 - Payment Failed in 1v2 case (different solicitor- both represented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed().build()),
+            //AC6 - Payment Failed in 2v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1PaymentFailure().build())
+
+        );
+    }
+
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from SPEC_DRAFT to CLAIM_SUBMITTED")
     @MethodSource("caseDataStream")
     void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
@@ -195,21 +221,40 @@ class StateFlowEngineSpecTest {
 
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_SUBMITTED"
                         + " to CLAIM_ISSUED_PAYMENT_SUCCESSFUL")
-    @MethodSource("caseDataStream")
+    @MethodSource("caseDataStreamOneRespondentClaimFeePaymentSuccessful")
     void shouldReturnClaimIssuedPaymentSuccessful_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
         // When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        // Then Claim will go through state SPEC_DRAFT and finish at state CLAIM_SUBMITTED
+        // Then Claim will go through state CLAIM_SUBMITTED and finish at state CLAIM_ISSUED_PAYMENT_SUCCESSFUL
         assertThat(stateFlow.getState())
             .extracting(State::getName)
             .isNotNull()
             .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
         assertThat(stateFlow.getStateHistory())
-            .hasSize(2)
+            .hasSize(3)
             .extracting(State::getName)
             .containsExactly(
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+    }
+
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_SUBMITTED"
+        + " to CLAIM_ISSUED_PAYMENT_FAILED")
+    @MethodSource("caseDataStreamOneRespondentClaimFeePaymentFailure")
+    void shouldReturnClaimIssuedPaymentFailed_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then Claim will go through state CLAIM_SUBMITTED and finish at state CLAIM_ISSUED_PAYMENT_SUCCESSFUL
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(3)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
     }
 }
 
