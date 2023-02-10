@@ -706,15 +706,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isResponseFullAdmitAndPayImmediately(){
-      return isResponseFullAdmission()
-          && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == defenceAdmitPartPaymentTimeRouteRequired;
+    public boolean isResponseFullAdmitAndPayImmediately() {
+        return isResponseSpecFullAdmission()
+            && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == defenceAdmitPartPaymentTimeRouteRequired;
     }
 
     @JsonIgnore
     public boolean isResponseFullAdmitAndPayBySetDate() {
-     return isResponseFullAdmission()
-         && RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE == defenceAdmitPartPaymentTimeRouteRequired;
+        return isResponseSpecFullAdmission()
+            && RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE == defenceAdmitPartPaymentTimeRouteRequired;
     }
 
     @JsonIgnore
@@ -724,26 +724,33 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPayByInstallment() {
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired ==
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+    }
+
+    @JsonIgnore
     public LocalDate getDateForRepayment() {
-       return Optional.ofNullable(respondToClaimAdmitPartLRspec)
-           .map(response -> response.getWhenWillThisAmountBePaid()).orElse(null);
+        return Optional.ofNullable(respondToClaimAdmitPartLRspec)
+            .map(response -> response.getWhenWillThisAmountBePaid()).orElse(null);
     }
 
     @JsonIgnore
     public boolean isResponseFullAdmitAndPayByInstallments() {
-        return isResponseFullAdmission()
+        return isResponseSpecFullAdmission()
             && isPayBySetDate();
     }
 
     @JsonIgnore
-    public boolean hasBreathingSpace(){
+    public boolean hasBreathingSpace() {
         return getBreathing() != null && getBreathing().getEnter() != null
             && getBreathing().getEnter().getExpectedEnd().isBefore(LocalDate.now());
     }
 
-    private boolean isResponseFullAdmission(){
-        return respondent1ClaimResponseType != null
-            && respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION;
+    private boolean isResponseSpecFullAdmission() {
+        return respondent1ClaimResponseTypeForSpec != null
+            && respondent1ClaimResponseTypeForSpec == RespondentResponseTypeSpec.FULL_ADMISSION;
     }
 
 
