@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +14,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderSpec;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -36,8 +35,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
@@ -47,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
     StateFlowEngine.class,
     CaseDetailsConverter.class,
     DeadlineExtensionValidator.class,
-    DeadlinesCalculator.class,
+    DeadlinesCalculator.class
 })
 class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -81,11 +82,34 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @Test
-    void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+    @Nested
+    class AboutToStartCallback {
+
+        @BeforeEach
+        void setup() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
+
+        @Test
+        void shouldSetRespondent1FlagToYes_whenOneRespondentRepresentative() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("isRespondent1").isEqualTo("Yes");
+        }
     }
 
     @Nested
