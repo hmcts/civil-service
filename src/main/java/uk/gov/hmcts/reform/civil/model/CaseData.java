@@ -112,7 +112,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
 @SuperBuilder(toBuilder = true)
@@ -745,10 +744,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasBreathingSpace() {
-        return getBusinessProcess() != null
-            && getBusinessProcess().getCamundaEvent() != null
-            && getBusinessProcess().getCamundaEvent().equals(ENTER_BREATHING_SPACE_SPEC)
-            && getBusinessProcess().isFinished();
+        return getBreathing() != null
+            && getBreathing().getEnter() != null
+            && getBreathing().getLift() == null;
     }
 
     private boolean isResponseSpecFullAdmission() {
