@@ -21,13 +21,10 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_DEFENDANT_REFERENCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_OR_TRIAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.addTrialOrHearing;
 
 @SpringBootTest(classes = {
     TrialReadyApplicantNotificationHandler.class,
@@ -68,10 +65,8 @@ class TrialReadyApplicantNotificationHandlerTest extends BaseCallbackHandlerTest
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                HEARING_OR_TRIAL, addTrialOrHearing(caseData),
                 HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
     }

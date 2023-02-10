@@ -9,7 +9,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
@@ -28,9 +27,6 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
                         .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now()
                                                                        .atTime(LocalTime.MIN)
                                                                        .toString()))
-                        .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
-            .should(boolQuery()
-                        .mustNot(existsQuery("data.hearingFee"))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))));
         return new Query(query, List.of("reference"), fromValue);
     }

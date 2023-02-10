@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
@@ -167,7 +167,7 @@ public class InitiateGeneralApplicationService {
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
-        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
@@ -315,7 +315,7 @@ public class InitiateGeneralApplicationService {
         return respondentCaseRoles;
     }
 
-    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+    private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
             if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
                 if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
@@ -337,7 +337,7 @@ public class InitiateGeneralApplicationService {
             }
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            CaseLocation courtLocation = CaseLocation.builder()
+            CaseLocationCivil courtLocation = CaseLocationCivil.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
@@ -350,16 +350,16 @@ public class InitiateGeneralApplicationService {
         return !statesBeforeSDO.contains(state);
     }
 
-    private CaseLocation getClaimant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getClaimant1PreferredLocation(CaseData caseData) {
         if (caseData.getApplicant1DQ() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getCourtLocation().getCaseLocation().getRegion())
                 .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
                 .build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
@@ -373,13 +373,13 @@ public class InitiateGeneralApplicationService {
                 && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
     }
 
-    private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendant1PreferredLocation(CaseData caseData) {
         if (caseData.getRespondent1DQ() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -387,11 +387,11 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private CaseLocation getDefendantPreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
         if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -399,14 +399,14 @@ public class InitiateGeneralApplicationService {
                 .build();
         } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
             || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                   .getCaseLocation().getBaseLocation())
                 .build();
         } else {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
     }
 }

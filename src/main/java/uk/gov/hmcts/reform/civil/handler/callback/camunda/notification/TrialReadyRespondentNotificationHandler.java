@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.addTrialOrHearing;
 
 @Service
 @RequiredArgsConstructor
@@ -94,10 +93,8 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
             }
         }
         return Map.of(
-            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_DEFENDANT_REFERENCE, defRefNumber
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
 
     }

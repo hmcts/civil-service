@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -10,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
@@ -119,11 +118,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 })
 class FlowStateAllowedEventServiceTest {
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @MockBean
+    private FeatureToggleService toggleService;
 
     static class GetFlowStateArguments implements ArgumentsProvider {
 
@@ -574,6 +573,12 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[]{
+                        CASE_PROCEEDS_IN_CASEMAN
+                    }
+                ),
+                of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
@@ -825,9 +830,6 @@ class FlowStateAllowedEventServiceTest {
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
         void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
-            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
-                .isEmpty();
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
@@ -927,11 +929,6 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class IsEventAllowedOnCaseDetails {
 
-        @BeforeEach
-        void enableSpec() {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        }
-
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
         void shouldReturnValidStates_whenCaseEventIsGiven(
@@ -958,8 +955,6 @@ class FlowStateAllowedEventServiceTest {
             CaseDetails caseDetails,
             CaseEvent caseEvent
         ) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }
