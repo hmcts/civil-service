@@ -1,6 +1,6 @@
 # civil-service
 
-Civil CCD Callback Service. hnl_unspec_1v2_same_sol
+Civil CCD Callback Service. hnl_unspec_1v2_same_sols
 
 ### Contents:
 
