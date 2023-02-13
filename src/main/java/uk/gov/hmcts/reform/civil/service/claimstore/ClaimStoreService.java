@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service.claimstore;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.citizenui.CmcStatusDashboardBuilder;
+import uk.gov.hmcts.reform.civil.model.citizenui.CmcStatusDashboardFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class ClaimStoreService {
 
     private final ClaimStoreApi claimStoreApi;
+    private final CmcStatusDashboardFactory cmcStatusDashboardFactory;
 
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
@@ -33,8 +34,7 @@ public class ClaimStoreService {
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
             .ocmc(true)
-            .status(new CmcStatusDashboardBuilder()
-                                         .buildDashboardClaimStatus(cmcClaim))
+            .status(cmcStatusDashboardFactory.getDashboardClaimStatus(cmcClaim))
             .build()
         ).collect(Collectors.toList());
     }

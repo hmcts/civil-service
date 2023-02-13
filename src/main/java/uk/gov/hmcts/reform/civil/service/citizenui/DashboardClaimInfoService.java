@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CcdClaimStatusDashboardBuilder;
+import uk.gov.hmcts.reform.civil.model.citizenui.CcdClaimStatusDashboardFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -29,6 +29,7 @@ public class DashboardClaimInfoService {
     private final ClaimStoreService claimStoreService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CcdClaimStatusDashboardFactory ccdClaimStatusDashboardFactory;
 
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
@@ -63,8 +64,7 @@ public class DashboardClaimInfoService {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
             .claimAmount(caseData.getTotalClaimAmount())
-            .status(new CcdClaimStatusDashboardBuilder()
-                                         .buildDashboardClaimStatus(caseData))
+            .status(ccdClaimStatusDashboardFactory.getDashboardClaimStatus(caseData))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());

@@ -1,19 +1,19 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import java.util.List;
-import java.util.Optional;
 
-public abstract class DashboardClaimStatusBuilder<T> {
+public abstract class DashboardClaimStatusFactory<T> {
 
-    public DashboardClaimStatus buildDashboardClaimStatus(T claim) {
-        Optional<DashboardClaimStatusMatcher> statusMatched = getDashboardStatusMatches(claim).stream()
-            .filter(dashboardClaimStatusMatcher -> dashboardClaimStatusMatcher.isMatched())
-            .findFirst();
-        return statusMatched.map(matcher -> matcher.getStatus())
+
+    public DashboardClaimStatus getDashboardClaimStatus(T claim) {
+        return getDashboardStatusMatcher(claim).stream()
+            .filter(DashboardClaimStatusMatcher::isMatched)
+            .findFirst()
+            .map(DashboardClaimStatusMatcher::getStatus)
             .orElse(DashboardClaimStatus.NO_STATUS);
     }
 
-    private List<DashboardClaimStatusMatcher> getDashboardStatusMatches(T claim) {
+    private List<DashboardClaimStatusMatcher> getDashboardStatusMatcher(T claim) {
         return List.of(
             new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_OVERDUE, hasResponsePendingOverdue(claim)),
             new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),

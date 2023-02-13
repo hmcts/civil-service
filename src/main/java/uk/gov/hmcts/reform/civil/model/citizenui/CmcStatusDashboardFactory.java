@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
-public class CmcStatusDashboardBuilder extends DashboardClaimStatusBuilder<CmcClaim> {
+@Service
+public class CmcStatusDashboardFactory extends DashboardClaimStatusFactory<CmcClaim> {
 
     @Override
     public boolean hasResponsePending(CmcClaim claim) {

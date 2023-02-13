@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class CcdClaimStatusDashboardBuilder extends DashboardClaimStatusBuilder<CaseData> {
+@Service
+public class CcdClaimStatusDashboardFactory extends DashboardClaimStatusFactory<CaseData> {
 
     @Override
     public boolean hasResponsePending(CaseData claim) {
