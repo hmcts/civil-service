@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -269,11 +270,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
-        updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                          .formattedWhenWillThisAmountBePaid(formatLocalDate(whenBePaid, DATE)).build());
+
+        if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                              .formattedWhenWillThisAmountBePaid(formatLocalDate(
+                                                                  whenBePaid,
+                                                                  DATE
+                                                              )).build());
+        }
+
         if (V_1.equals(callbackParams.getVersion())
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
@@ -516,7 +525,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
+            && (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
