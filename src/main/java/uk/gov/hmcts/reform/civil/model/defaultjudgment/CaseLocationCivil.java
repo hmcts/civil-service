@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.genapplication;
+package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseLocation {
+public class CaseLocationCivil {
 
+    //RegionId
     private String region;
-    private String siteName;
+
+    //EpimmsId
     private String baseLocation;
 }

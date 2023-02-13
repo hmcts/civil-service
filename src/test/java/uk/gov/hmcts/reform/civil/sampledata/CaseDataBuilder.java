@@ -63,7 +63,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -125,6 +125,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -346,7 +347,7 @@ public class CaseDataBuilder {
     private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private CaseLocation caseManagementLocation;
+    private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
 
@@ -618,7 +619,7 @@ public class CaseDataBuilder {
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent1DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -649,7 +650,7 @@ public class CaseDataBuilder {
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent1DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -681,7 +682,7 @@ public class CaseDataBuilder {
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent2DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -712,7 +713,7 @@ public class CaseDataBuilder {
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent2DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -900,7 +901,7 @@ public class CaseDataBuilder {
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -930,7 +931,7 @@ public class CaseDataBuilder {
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -961,7 +962,7 @@ public class CaseDataBuilder {
             .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant2DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -1576,6 +1577,32 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id", "previous-solicitor@example.com");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeLip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", null, null);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent1OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
@@ -1709,7 +1736,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder courtLocation() {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
-            .caseLocation(CaseLocation.builder()
+            .caseLocation(CaseLocationCivil.builder()
                               .region("2")
                               .baseLocation("000000")
                               .build())
@@ -1725,7 +1752,7 @@ public class CaseDataBuilder {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocation.builder()
+            .caseLocation(CaseLocationCivil.builder()
                               .region("10")
                               .baseLocation("214320")
                               .build())
@@ -2053,7 +2080,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
-        caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("0123").region("0321").build();
         return this;
     }
 
@@ -2290,17 +2317,22 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOfRepresentation(boolean isApplicant, boolean isRespondent2Replaced,
-                                                  String newOrgID, String oldOrgId) {
+                                                  String newOrgID, String oldOrgId, String formerSolicitorEmail) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation newChange = ChangeOfRepresentation.builder()
+        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
             .caseRole(caseRole)
             .organisationToAddID(newOrgID)
             .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now())
-            .build();
-        changeOfRepresentation = newChange;
+            .timestamp(LocalDateTime.now());
+        if (oldOrgId != null) {
+            newChangeBuilder.organisationToRemoveID(oldOrgId);
+        }
+        if (formerSolicitorEmail != null) {
+            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+        }
+        changeOfRepresentation = newChangeBuilder.build();
         return this;
     }
 
@@ -3346,6 +3378,29 @@ public class CaseDataBuilder {
         }
     }
 
+    public CaseDataBuilder atStateTrialReadyCheck(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(6);
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+
+        if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            solicitorReferences = SolicitorReferences.builder()
+                .applicantSolicitor1Reference("123456")
+                .respondentSolicitor1Reference("123456")
+                .respondentSolicitor2Reference("123456").build();
+            return this;
+        }
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
@@ -3659,7 +3714,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingDueDate = now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
         ccdState = HEARING_READINESS;
         return this;
@@ -3719,7 +3774,6 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
-
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }

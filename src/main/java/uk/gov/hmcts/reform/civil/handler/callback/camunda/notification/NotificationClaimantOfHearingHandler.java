@@ -60,7 +60,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         }
         notificationService.sendMail(recipient, emailTemplate, addProperties(caseData),
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReference())
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
         );
     }
 
