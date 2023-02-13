@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), true);
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -95,7 +95,7 @@ public class FeatureToggleService {
     }
 
     public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), true);
+        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
     }
 
     public boolean isPbaV3Enabled() {
