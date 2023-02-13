@@ -560,11 +560,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+
+        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+        if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
+            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        }
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal subTotal = caseData.getTotalClaimAmount().add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
+
+        updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
         updatedCaseData.ccjJudgmentAmountClaimFee(claimFee);
         updatedCaseData.ccjJudgmentSummarySubtotalAmount(subTotal);
         updatedCaseData.ccjJudgmentTotalStillOwed(finalTotal);

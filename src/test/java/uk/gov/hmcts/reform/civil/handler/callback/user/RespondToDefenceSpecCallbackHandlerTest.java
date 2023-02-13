@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.ser.YearSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -400,7 +401,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantRouteFlag_whenClaimantRejectPartPaymentPlan() {
             CaseData caseData = CaseDataBuilder.builder()
-                .getApplicant1AcceptAdmitAmountPaidSpec(NO)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
                 .build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -431,7 +432,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotSetApplicantRouteFlag_whenClaimantAcceptPartPaymentPlan() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .getApplicant1AcceptAdmitAmountPaidSpec(YES)
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
                 .build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -942,7 +943,37 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
 
             BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
-            assertThat(subTotal).isEqualTo(caseData.getTotalClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
+            assertThat(subTotal).isEqualTo(getCaseData(response).getCcjJudgmentAmountClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
+
+            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
+        }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceedWhenPartPaymentAccepted() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimAmount = getCaseData(response).getCcjJudgmentAmountClaimAmount();
+            assertThat(claimAmount).isEqualTo(BigDecimal.valueOf(500));
+
+            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
+            assertThat(subTotal).isEqualTo(getCaseData(response).getCcjJudgmentAmountClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
 
             BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));

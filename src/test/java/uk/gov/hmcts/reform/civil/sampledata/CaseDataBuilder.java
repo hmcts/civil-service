@@ -379,6 +379,11 @@ public class CaseDataBuilder {
     private BigDecimal totalInterest;
     private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
 
+    private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+
+    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
+
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4300,8 +4305,18 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getApplicant1AcceptAdmitAmountPaidSpec(YesOrNo isPartPayAccepted) {
-        this.applicant1AcceptAdmitAmountPaidSpec = isPartPayAccepted;
+    public CaseDataBuilder applicant1AcceptAdmitAmountPaidSpec(YesOrNo isPaymemtAccepted) {
+        this.applicant1AcceptAdmitAmountPaidSpec = isPaymemtAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo isPartPaymentAccepted) {
+        this.applicant1AcceptPartAdmitPaymentPlanSpec = isPartPaymentAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder respondToAdmittedClaimOwingAmountPounds(BigDecimal admitedCliaimAmount) {
+        this.respondToAdmittedClaimOwingAmountPounds = admitedCliaimAmount;
         return this;
     }
 
@@ -4531,6 +4546,8 @@ public class CaseDataBuilder {
             .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
             .totalInterest(totalInterest)
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
+            .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .build();
     }
 }
