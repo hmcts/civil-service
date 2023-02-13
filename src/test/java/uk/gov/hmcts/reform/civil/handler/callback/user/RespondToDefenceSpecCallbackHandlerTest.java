@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.ser.YearSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -943,7 +942,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
 
             BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
-            assertThat(subTotal).isEqualTo(getCaseData(response).getCcjJudgmentAmountClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
 
             BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
@@ -973,7 +975,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
 
             BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
-            assertThat(subTotal).isEqualTo(getCaseData(response).getCcjJudgmentAmountClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
 
             BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));

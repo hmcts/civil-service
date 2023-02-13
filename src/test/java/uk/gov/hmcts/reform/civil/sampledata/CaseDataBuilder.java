@@ -384,7 +384,6 @@ public class CaseDataBuilder {
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
-
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
