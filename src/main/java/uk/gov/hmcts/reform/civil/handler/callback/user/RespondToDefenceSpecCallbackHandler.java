@@ -570,7 +570,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
-
         updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
         updatedCaseData.ccjJudgmentAmountClaimFee(claimFee);
         updatedCaseData.ccjJudgmentSummarySubtotalAmount(subTotal);
