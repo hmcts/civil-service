@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -36,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
 public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
+
+    @MockBean
+    private FeesService feesService;
 
     @MockBean
     private PaymentsService paymentsService;
@@ -75,6 +80,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                             .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
