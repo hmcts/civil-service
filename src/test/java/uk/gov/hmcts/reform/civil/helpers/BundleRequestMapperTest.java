@@ -37,21 +37,27 @@ public class BundleRequestMapperTest {
 
     @Test
     public void testBundleRequestMapperWithAllDocs() {
+        //Create document with type UploadEvidenceWitness
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                     .builder()
                                     .witnessOptionDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                               .documentFileName(testFileName).build()).build()));
+                                                               .documentFileName(testFileName).build())
+                                                         .witnessOptionName("FirstName LastName")
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 02, 10)).build()));
+        //Create document with type UploadEvidenceExpert
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                     .builder()
                                     .expertDocument(Document.builder().documentBinaryUrl(testUrl)
                                                                .documentFileName(testFileName).build()).build()));
+        //Create document with type UploadEvidenceDocumentType
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                          .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(testUrl)
                                                                                     .documentFileName(testFileName).build()).build()));
+        //Create system generated Doc
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
             CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
@@ -68,6 +74,7 @@ public class BundleRequestMapperTest {
         ServedDocumentFiles servedDocumentFiles =
             ServedDocumentFiles.builder().particularsOfClaimDocument(particulersOfClaim).build();
 
+        //Add all type of documents and other request details in case data
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
@@ -109,7 +116,7 @@ public class BundleRequestMapperTest {
         );
         assertNotNull(bundleCreateRequest);
         assertEquals(bundleCreateRequest.getCaseDetails().getCaseData().getDocumentWitnessStatement().get(0).getValue().getDocumentFileName(),
-                     caseData.getDocumentWitnessStatement().get(0).getValue().getWitnessOptionDocument().getDocumentFileName());
+                     "Witness Statement_FirstName LastName_10022023");
     }
 
     @Test

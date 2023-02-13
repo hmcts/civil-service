@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 
@@ -62,36 +63,57 @@ public class BundleRequestMapper {
                 bundleConfigFileName)
                 .systemGeneratedCaseDocuments(mapSystemGeneratedcaseDocument(caseData.getSystemGeneratedCaseDocuments()))
                 .servedDocumentFiles(mapServedDocuments(caseData.getServedDocumentFiles()))
-                .documentWitnessStatement(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatement()))
-                .documentWitnessStatementRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes()))
-                .documentWitnessStatementRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes2()))
-                .documentWitnessSummary(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummary()))
-                .documentWitnessSummaryRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes()))
-                .documentWitnessSummaryRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes2()))
-                .documentHearsayNotice(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNotice()))
-                .documentHearsayNoticeRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes()))
-                .documentHearsayNoticeRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes2()))
+                .documentWitnessStatement(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatement(),
+                                                                      EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
+                .documentWitnessStatementRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes(),
+                                                                         EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
+                .documentWitnessStatementRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes2(),
+                                                                          EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
+                .documentWitnessSummary(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummary(),
+                                                                    EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
+                .documentWitnessSummaryRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes(),
+                                                                       EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
+                .documentWitnessSummaryRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes2(),
+                                                                        EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
+                .documentHearsayNotice(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNotice(),
+                                                                   EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
+                .documentHearsayNoticeRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes(),
+                                                                      EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
+                .documentHearsayNoticeRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes2(),
+                                                                       EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
                 .documentReferredInStatement(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatement()))
                 .documentReferredInStatementRes(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatementRes()))
                 .documentReferredInStatementRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatementRes2()))
-                .documentExpertReport(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReport()))
-                .documentExpertReportRes(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes()))
-                .documentExpertReportRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes2()))
-                .documentJointStatement(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatement()))
-                .documentJointStatementRes(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes()))
-                .documentJointStatementRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes2()))
-                .documentQuestions(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestions()))
-                .documentQuestionsRes(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes()))
-                .documentQuestionsRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes2()))
-                .documentAnswers(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswers()))
-                .documentAnswersRes(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes()))
-                .documentAnswersRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes2()))
+                .documentExpertReport(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReport(),
+                                                                 EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
+                .documentExpertReportRes(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes(),
+                                                                    EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
+                .documentExpertReportRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes2(),
+                                                                     EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
+                .documentJointStatement(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatement(),
+                                                                   EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
+                .documentJointStatementRes(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes(),
+                                                                      EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
+                .documentJointStatementRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes2(),
+                                                                       EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
+                .documentQuestions(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestions(),
+                                                              EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
+                .documentQuestionsRes(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes(),
+                                                                 EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
+                .documentQuestionsRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes2(),
+                                                                  EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
+                .documentAnswers(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswers(),
+                                                            EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
+                .documentAnswersRes(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes(),
+                                                               EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
+                .documentAnswersRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes2(),
+                                                                EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
                 .documentDisclosureList(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureList()))
+                .documentDisclosureListRes(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes()))
+                .documentDisclosureListRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes2()))
                 .documentForDisclosure(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosure()))
                 .documentForDisclosureRes(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosureRes()))
-                .documentDisclosureListRes(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes()))
                 .documentForDisclosureRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosureRes2()))
-                .documentDisclosureListRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes2()))
                 .documentCaseSummary(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummary()))
                 .documentCaseSummaryRes(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummaryRes()))
                 .documentCaseSummaryRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummaryRes2()))
@@ -171,13 +193,22 @@ public class BundleRequestMapper {
         return ElementUtils.wrapElements(bundlingSystemGeneratedCaseDocs);
     }
 
-    private List<Element<BundlingRequestDocument>> mapUploadEvidenceWitnessDoc(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness) {
+    private List<Element<BundlingRequestDocument>> mapUploadEvidenceWitnessDoc(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness, String displayName) {
         List<BundlingRequestDocument> bundlingWitnessDocs = new ArrayList<>();
         if (!Optional.ofNullable(uploadEvidenceWitness).isEmpty()) {
             uploadEvidenceWitness.forEach(witnessDocs -> {
+                StringBuilder fileNameBuilder = new StringBuilder();
+                fileNameBuilder.append(displayName);
+                if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionName()).isPresent()) {
+                    fileNameBuilder.append("_" + witnessDocs.getValue().getWitnessOptionName());
+                }
+                if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionUploadDate()).isPresent()) {
+                    fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(witnessDocs.getValue()
+                                       .getWitnessOptionUploadDate(), "ddMMyyyy"));
+                }
                 Document document = witnessDocs.getValue().getWitnessOptionDocument();
                 bundlingWitnessDocs.add(BundlingRequestDocument.builder()
-                                            .documentFileName(document.getDocumentFileName())
+                                            .documentFileName(fileNameBuilder.toString())
                                             .documentLink(DocumentLink.builder()
                                                               .documentUrl(document.getDocumentUrl())
                                                               .documentBinaryUrl(document.getDocumentBinaryUrl())
@@ -189,13 +220,22 @@ public class BundleRequestMapper {
         return ElementUtils.wrapElements(bundlingWitnessDocs);
     }
 
-    private List<Element<BundlingRequestDocument>> mapUploadEvidenceExpertDoc(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert) {
+    private List<Element<BundlingRequestDocument>> mapUploadEvidenceExpertDoc(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert, String displayName) {
         List<BundlingRequestDocument> bundlingExpertDocs = new ArrayList<>();
         if (!Optional.ofNullable(uploadEvidenceExpert).isEmpty()) {
             uploadEvidenceExpert.forEach(expertDocs -> {
+                StringBuilder fileNameBuilder = new StringBuilder();
+                fileNameBuilder.append(displayName);
+                if (Optional.ofNullable(expertDocs.getValue().getExpertOptionName()).isPresent()) {
+                    fileNameBuilder.append("_" + expertDocs.getValue().getExpertOptionName());
+                }
+                if (Optional.ofNullable(expertDocs.getValue().getExpertOptionUploadDate()).isPresent()) {
+                    fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(expertDocs.getValue()
+                                                                                      .getExpertOptionUploadDate(), "ddMMyyyy"));
+                }
                 Document document = expertDocs.getValue().getExpertDocument();
                 bundlingExpertDocs.add(BundlingRequestDocument.builder()
-                                           .documentFileName(document.getDocumentFileName())
+                                           .documentFileName(fileNameBuilder.toString())
                                            .documentLink(DocumentLink.builder()
                                                              .documentUrl(document.getDocumentUrl())
                                                              .documentBinaryUrl(document.getDocumentBinaryUrl())
