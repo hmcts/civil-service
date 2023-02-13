@@ -10,17 +10,16 @@ plugins {
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
   id "org.flywaydb.flyway" version "9.0.1"
+  id 'net.ltgt.apt' version '0.21'
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 allprojects {
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
-    }
-  }
+
+  sourceCompatibility = '11'
+  targetCompatibility = '11'
 
   apply plugin: 'java'
   apply plugin: 'jacoco'
@@ -29,6 +28,7 @@ allprojects {
   apply plugin: 'org.springframework.boot'
   apply plugin: 'org.owasp.dependencycheck'
   apply plugin: 'com.github.ben-manes.versions'
+  apply plugin: 'net.ltgt.apt'
 
   checkstyle {
     maxWarnings = 0
@@ -37,8 +37,8 @@ allprojects {
   }
 
   jacoco {
-    toolVersion = '0.8.8' // jacocoMavenPluginVersion
-    reportsDirectory = file("$buildDir/reports/jacoco")
+    toolVersion = '0.8.5' // jacocoMavenPluginVersion
+    reportsDir = file("$buildDir/reports/jacoco")
   }
 
 // before committing a change, make sure task still works
@@ -96,12 +96,6 @@ allprojects {
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4.2'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.4'
-
-      // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-api', version: '2.0.5'
-      dependency group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.5'
-      dependency group: 'org.slf4j', name: 'jul-to-slf4j', version: '2.0.5'
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.5'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -217,7 +211,7 @@ task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
-  getMainClass().set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -264,6 +258,13 @@ task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
 }
 
+task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
+}
+
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
@@ -293,7 +294,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
-    runSpecApiTests, runSdoApiTests, runApiTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -428,6 +429,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.19.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
 
+
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.69'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.4'
 
@@ -461,19 +463,20 @@ dependencies {
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
 
-  testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
+  testCompile group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
+  testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.6.4'
   testImplementation 'com.github.hmcts:fortify-client:1.2.2:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
-  contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+  contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
+  contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestCompile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+  contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
+  contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
 
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
+  contractTestCompile sourceSets.main.runtimeClasspath
+  contractTestCompile sourceSets.test.runtimeClasspath
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
