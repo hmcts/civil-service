@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -137,8 +137,8 @@ public class LocationHelper {
             .orElse(BigDecimal.ZERO);
     }
 
-    private CaseLocation getCcmccCaseLocation() {
-        return CaseLocation.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
+    private CaseLocationCivil getCcmccCaseLocation() {
+        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
     }
 
     /**
@@ -247,12 +247,12 @@ public class LocationHelper {
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
-                                        .findFirst().orElseGet(CaseLocation::new));
+                                        .findFirst().orElseGet(CaseLocationCivil::new));
         matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
         return matchingLocation;
     }
 
-    private boolean isValidCaseLocation(CaseLocation caseLocation) {
+    private boolean isValidCaseLocation(CaseLocationCivil caseLocation) {
         return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
             && StringUtils.isNotBlank(caseLocation.getRegion());
     }
