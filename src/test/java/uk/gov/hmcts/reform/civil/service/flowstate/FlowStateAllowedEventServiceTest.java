@@ -520,7 +520,9 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        EVIDENCE_UPLOAD_APPLICANT
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
