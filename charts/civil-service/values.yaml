@@ -72,7 +72,7 @@ java:
         - cross-access-user-password
         - prd-admin-user-username
         - prd-admin-user-password
-        - app-insights-connection-string
+        - appinsights-connection-string
         - docmosis-api-key
         - cmc-db-password-v11
         - gov-notify-api-key
