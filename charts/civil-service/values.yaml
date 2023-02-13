@@ -59,6 +59,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
     POLLING_EVENT_EMITTER_ENABLED: false
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: /mnt/secrets/civil-service/appinsights-connection-string
 
   keyVaults:
     civil:
