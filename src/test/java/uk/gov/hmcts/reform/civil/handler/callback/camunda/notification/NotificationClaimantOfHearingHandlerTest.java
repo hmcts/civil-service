@@ -58,10 +58,10 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingTimeHourMinute("1530")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
@@ -82,11 +82,11 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingTimeHourMinute("1530")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
@@ -108,10 +108,10 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingTimeHourMinute("1530")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
@@ -132,10 +132,10 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
@@ -155,11 +155,11 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
@@ -180,10 +180,10 @@ public class NotificationClaimantOfHearingHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 07))
+                .hearingDate(LocalDate.of(2022, 10, 7))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                .hearingReference("000HN001")
+                .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.YES)

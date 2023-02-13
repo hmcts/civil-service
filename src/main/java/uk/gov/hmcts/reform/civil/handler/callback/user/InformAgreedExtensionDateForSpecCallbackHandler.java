@@ -79,11 +79,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         if (toggleService.isPinInPostEnabled()) {
             return List.of(EXTEND_RESPONSE_DEADLINE, INFORM_AGREED_EXTENSION_DATE_SPEC);
         }
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        }
-        return Collections.emptyList();
-
+        return EVENTS;
     }
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
