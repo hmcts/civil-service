@@ -60,7 +60,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
-
+            log.info("Service Request Reference {}", serviceRequestReference);
             if (caseData.getHearingDueDate() != null) {
                 caseData = caseData.toBuilder()
                     .hearingFeePBADetails(SRPbaDetails.builder()
@@ -68,6 +68,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                                                   .fee(caseData.getHearingFee())
                                                   .serviceReqReference(serviceRequestReference).build())
                     .build();
+                log.info("Setting hearingFeePBADetails {}", caseData.getHearingFeePBADetails().toString());
             } else {
                 caseData = caseData.toBuilder()
                     .claimIssuedPBADetails(SRPbaDetails.builder()

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -27,6 +28,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentsService {
@@ -167,20 +169,23 @@ public class PaymentsService {
         } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
-
+        log.info("Check site ID {}", siteId);
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
 
-        if (caseData.getHearingDate() == null) {
+        if (caseData.getHearingDueDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
             feeResponse = caseData.getClaimFee().toFeeDto();
         } else {
+            log.info("Setting hearing url callback");
             callbackURLUsed = callBackUrl;
             feeResponse = caseData.getHearingFee().toFeeDto();
         }
+        log.info("Url callback url {}", callbackURLUsed);
 
         if (callbackURLUsed != null) {
-            return CreateServiceRequestDTO.builder()
+            log.info("Creating service Request DTO");
+            CreateServiceRequestDTO serviceRequestDTO = CreateServiceRequestDTO.builder()
                 .caseReference(caseData.getLegacyCaseReference())
                 .ccdCaseNumber(caseData.getCcdCaseReference().toString())
                 .hmctsOrgId(siteId)
@@ -195,6 +200,8 @@ public class PaymentsService {
                                         .responsibleParty(caseData.getApplicant1().getPartyName()).build())
                 .build();
 
+            log.info(" Service Request DTO generated {}", serviceRequestDTO.toString());
+            return serviceRequestDTO;
         } else {
             throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
         }
