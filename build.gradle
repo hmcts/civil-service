@@ -248,6 +248,9 @@ task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
+  onlyIf {
+    return System.env.NIGHTLY_RUN != 'true'
+  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
 
