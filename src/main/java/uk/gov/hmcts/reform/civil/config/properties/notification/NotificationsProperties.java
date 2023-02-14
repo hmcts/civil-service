@@ -51,10 +51,14 @@ public class NotificationsProperties {
     @NotEmpty
     private String solicitorClaimDismissedWithinDeadline;
 
-    @NotEmpty String solicitorHearingFeeUnpaid;
+    @NotEmpty String applicantHearingFeeUnpaid;
+    @NotEmpty String respondentHearingFeeUnpaid;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
+
+    @NotEmpty
+    private String claimantSolicitorSpecCaseWillProgressOffline;
 
     @NotEmpty
     private String claimantSolicitorAgreedExtensionDate;
@@ -81,10 +85,16 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
 
     @NotEmpty
+    private String claimantClaimContinuingOnlineForSpec;
+
+    @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
     private String solicitorCaseTakenOffline;
+
+    @NotEmpty
+    private String solicitorTrialReady;
 
     @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
@@ -197,6 +207,15 @@ public class NotificationsProperties {
     private String hearingListedNoFeeDefendantLrTemplate;
 
     @NotEmpty
+    private String noticeOfChangeFormerSolicitor;
+
+    @NotEmpty
+    private String noticeOfChangeOtherParties;
+
+    @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
+
+    @NotEmpty
+    private String evidenceUploadTemplate;
 
 }
