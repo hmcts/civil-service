@@ -1263,7 +1263,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
-                .hearingOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                .hearingNoticeDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                         .value(pdfDocument).build()))
                 .build();
     }
