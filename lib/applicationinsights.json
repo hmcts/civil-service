@@ -1,5 +1,5 @@
 {
-  "connectionString": "${file:/mnt/secrets/civil-service/appinsights-connection-string}",
+  "connectionString": "${file:/mnt/secrets/civil/appinsights-connection-string}",
   "role": {
     "name": "HMCTS Civil Service"
   }
