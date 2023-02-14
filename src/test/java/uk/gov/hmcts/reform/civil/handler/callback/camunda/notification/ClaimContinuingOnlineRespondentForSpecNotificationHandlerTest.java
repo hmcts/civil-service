@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -59,18 +56,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
     private OrganisationService organisationService;
     @MockBean
     private Time time;
-    @MockBean
-    private FeatureToggleService toggleService;
 
     @Autowired
     private ClaimContinuingOnlineRespondentForSpecNotificationHandler handler;
-
-    @Test
-    public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -85,6 +73,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -98,8 +87,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "template-id",
@@ -110,6 +101,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -123,8 +115,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-id",
@@ -180,7 +174,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build())
+            "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build())
                                                  .build())).isEqualTo(TASK_ID_Respondent1);
     }
 }
