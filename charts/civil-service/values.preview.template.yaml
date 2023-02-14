@@ -44,7 +44,6 @@ java:
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
-    APPLICATIONINSIGHTS_CONFIGURATION_FILE: /mnt/secrets/civil/appinsights-connection-string
   postgresql:
     enabled: true
     image:
