@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -118,7 +119,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CaseData extends CaseDataParent implements MappableObject {
+public class CaseData extends CaseDataParent implements MappableObject, Claim {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final Long ccdCaseReference;
@@ -706,18 +707,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isResponseFullAdmitAndPayImmediately() {
-        return isResponseSpecFullAdmission()
-            && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == defenceAdmitPartPaymentTimeRouteRequired;
-    }
-
-    @JsonIgnore
-    public boolean isResponseFullAdmitAndPayBySetDate() {
-        return isResponseSpecFullAdmission()
-            && isPayBySetDate();
-    }
-
-    @JsonIgnore
     public boolean isPayBySetDate() {
         return defenceAdmitPartPaymentTimeRouteRequired != null
             && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
@@ -737,22 +726,94 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isResponseFullAdmitAndPayByInstallments() {
-        return isResponseSpecFullAdmission()
-            && isPayByInstallment();
-    }
-
-    @JsonIgnore
     public boolean hasBreathingSpace() {
         return getBreathing() != null
             && getBreathing().getEnter() != null
             && getBreathing().getLift() == null;
     }
 
-    private boolean isResponseSpecFullAdmission() {
+    @Override
+    @JsonIgnore
+    public boolean hasResponsePending() {
+        return getRespondent1ResponseDate() == null;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponsePendingOverdue() {
+        return getRespondent1ResponseDeadline() != null && getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0))
+            && hasBreathingSpace();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponseDueToday() {
+        return getRespondent1ResponseDeadline() != null && getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
+            && getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0));
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponseFullAdmit() {
         return respondent1ClaimResponseTypeForSpec != null
             && respondent1ClaimResponseTypeForSpec == RespondentResponseTypeSpec.FULL_ADMISSION;
     }
 
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
+        return hasResponseFullAdmit()
+            && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == defenceAdmitPartPaymentTimeRouteRequired;
+    }
 
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
+        return hasResponseFullAdmit()
+            && isPayBySetDate();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
+        return hasResponseFullAdmit()
+            && isPayByInstallment();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean responseDeadlineHasBeenExtended() {
+        return respondent1TimeExtensionDate != null;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isEligibleForCCJ() {
+        return getRespondent1ResponseDeadline() != null
+            && getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0));
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean claimantConfirmedDefendantPaid() {
+        return getRespondent1CourtOrderPayment() != null && respondent1PaidInFull();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isSettled() {
+        return respondent1PaidInFull() || isRepsonseAcceptedByClaimant();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isSentToCourt() {
+        return getCcdState() == CaseState.JUDICIAL_REFERRAL;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean claimantRequestedCountyCourtJudgement() {
+        return getApplicant1DQ()!= null && getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
+    }
 }

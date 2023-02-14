@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.citizenui.CcdClaimStatusDashboardFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
@@ -46,7 +46,7 @@ public class DashboardClaimInfoServiceTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
-    private CcdClaimStatusDashboardFactory ccdClaimStatusDashboardFactory;
+    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
@@ -55,7 +55,7 @@ public class DashboardClaimInfoServiceTest {
     void setUp() {
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
-        given(ccdClaimStatusDashboardFactory.getDashboardClaimStatus(any())).willReturn(DashboardClaimStatus.NO_STATUS);
+        given(dashboardClaimStatusFactory.getDashboardClaimStatus(any())).willReturn(DashboardClaimStatus.NO_STATUS);
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         List<CaseDetails> cases = List.of(caseDetails);
         SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();

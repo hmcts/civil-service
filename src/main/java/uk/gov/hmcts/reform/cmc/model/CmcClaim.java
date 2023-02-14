@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 
 import java.math.BigDecimal;
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CmcClaim {
+public class CmcClaim implements Claim {
 
     private String submitterId;
     private String letterHolderId;
@@ -76,9 +77,78 @@ public class CmcClaim {
         return state == ClaimState.TRANSFERRED;
     }
 
+    @Override
+    @JsonIgnore
+    public boolean hasResponsePending() {
+        return !hasResponse() && getResponseDeadline().isBefore(LocalDate.now());
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponsePendingOverdue() {
+        return hasResponseDeadlinePassed() && hasBreathingSpace();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponseDueToday() {
+        return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
+            && LocalDateTime.now().isBefore(LocalDate.now().atTime(16, 0, 0));
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasResponseFullAdmit() {
+       return hasResponse() && response.isFullAdmit();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
+        return hasResponse() && response.isFullAdmitPayImmediately();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
+        return hasResponse() && response.isFullAdmitPayBySetDate();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
+        return hasResponse() && response.isFullAdmitPayByInstallments();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean responseDeadlineHasBeenExtended() {
+        return isMoreTimeRequested();
+    }
+
     @JsonIgnore
     public boolean isEligibleForCCJ() {
         return hasResponseDeadlinePassed();
+    }
+
+    @Override
+    public boolean claimantConfirmedDefendantPaid() {
+        return getMoneyReceivedOn() != null || isCCJSatisfied();
+    }
+
+    @Override
+    public boolean isSettled() {
+        return claimantAcceptedDefendantResponse();
+    }
+
+    @Override
+    public boolean isSentToCourt() {
+        return isTransferred();
+    }
+
+    @Override
+    public boolean claimantRequestedCountyCourtJudgement() {
+        return getClaimantResponse() != null && getCountyCourtJudgmentRequestedAt() != null;
     }
 
     @JsonIgnore
@@ -98,10 +168,7 @@ public class CmcClaim {
         return hasResponse() && response.isFullAdmitPayBySetDate();
     }
 
-    @JsonIgnore
-    public boolean responseIsFullAdmitAndPayByInstallments() {
-        return hasResponse() && response.isFullAdmitPayImmediately();
-    }
+
 
     @JsonIgnore
     public boolean hasResponseDeadlinePassed(){
@@ -109,16 +176,8 @@ public class CmcClaim {
             || isResponseDeadlinePastFourPmToday());
     }
 
-    @JsonIgnore
-    public boolean isResponseDeadlineToday() {
-        return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
-            && LocalDateTime.now().isBefore(LocalDate.now().atTime(16, 0, 0));
-    }
 
-    @JsonIgnore
-    public boolean isResponseDeadlineOnTime() {
-        return !hasResponse() && getResponseDeadline().isBefore(LocalDate.now());
-    }
+
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return claimData.hasBreathingSpace();

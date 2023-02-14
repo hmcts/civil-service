@@ -19,21 +19,21 @@ public class Response {
     private PaymentIntention paymentIntention;
 
     @JsonIgnore
-    public boolean isResponseFullAdmit() {
+    public boolean isFullAdmit() {
         return responseType == RespondentResponseType.FULL_ADMISSION;
     }
     @JsonIgnore
     public boolean isFullAdmitPayImmediately() {
-       return isResponseFullAdmit() && paymentIntention.isPayImmediately();
+       return isFullAdmit() && paymentIntention.isPayImmediately();
     }
 
     @JsonIgnore
     public boolean isFullAdmitPayBySetDate() {
-        return isResponseFullAdmit()  && paymentIntention.isPayByDate();
+        return isFullAdmit()  && paymentIntention.isPayByDate();
     }
 
     @JsonIgnore
     public boolean isFullAdmitPayByInstallments() {
-        return isResponseFullAdmit() && paymentIntention.isPayByInstallments();
+        return isFullAdmit() && paymentIntention.isPayByInstallments();
     }
 }

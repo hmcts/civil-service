@@ -25,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class CcdClaimStatusDashboardFactoryTest {
 
     @InjectMocks
-    private CcdClaimStatusDashboardFactory ccdClaimStatusDashboardFactory;
+    private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse(){
