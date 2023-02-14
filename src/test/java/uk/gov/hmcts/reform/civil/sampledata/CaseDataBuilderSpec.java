@@ -7,15 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -24,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -37,6 +30,8 @@ public class CaseDataBuilderSpec {
     public static final LocalDateTime SUBMITTED_DATE_TIME = LocalDateTime.now();
     public static final LocalDateTime RESPONSE_DEADLINE = SUBMITTED_DATE_TIME.toLocalDate().plusDays(14)
         .atTime(23, 59, 59);
+    public static final LocalDate CLAIM_ISSUED_DATE = now();
+    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
 
     // Create Claim
     protected CaseCategory caseAccessCategory;
@@ -68,10 +63,13 @@ public class CaseDataBuilderSpec {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     //dates
     protected LocalDateTime submittedDate;
     protected LocalDate issueDate;
+    protected LocalDateTime claimNotificationDeadline;
+    protected LocalDateTime takenOfflineDate;
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
@@ -167,6 +165,11 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec atState(FlowState.Main flowState) {
         return atState(flowState, ONE_V_ONE);
+    }
+
+    public CaseDataBuilderSpec addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
+        return this;
     }
 
     public CaseDataBuilderSpec atState(FlowState.Main flowState, MultiPartyScenario mpScenario) {
@@ -458,6 +461,16 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
+    public CaseDataBuilderSpec claimNotificationDeadline(LocalDateTime deadline) {
+        this.claimNotificationDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec takenOfflineDate(LocalDateTime takenOfflineDate) {
+        this.takenOfflineDate = takenOfflineDate;
+        return this;
+    }
+
     public CaseDataBuilderSpec atStateSpec1v1UnrepresentedPendingClaimIssued() {
         atStateSpec1v1PaymentSuccessful(false);
         issueDate = LocalDate.now();
@@ -490,6 +503,12 @@ public class CaseDataBuilderSpec {
         atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPaymentSuccessful();
         issueDate = LocalDate.now();
 
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpecClaimIssued() {
+        atStateSpec1v1RepresentedPendingClaimIssued();
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
         return this;
     }
 
@@ -532,11 +551,14 @@ public class CaseDataBuilderSpec {
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)
+            .claimNotificationDeadline(claimNotificationDeadline)
+            .takenOfflineDate(takenOfflineDate)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .build();
     }
 
