@@ -23,7 +23,7 @@ public class CcdClaimStatusDashboardFactory extends DashboardClaimStatusFactory<
 
     @Override
     public boolean hasResponseDueToday(CaseData claim) {
-        return claim.getRespondent1ResponseDeadline() != null && claim.getRespondent1ResponseDeadline().isEqual(LocalDateTime.now())
+        return claim.getRespondent1ResponseDeadline() != null && claim.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
             && claim.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0));
     }
 
@@ -70,7 +70,7 @@ public class CcdClaimStatusDashboardFactory extends DashboardClaimStatusFactory<
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement(CaseData claim) {
-        return claim.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
+        return claim.getApplicant1DQ()!= null && claim.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
     }
 
 }

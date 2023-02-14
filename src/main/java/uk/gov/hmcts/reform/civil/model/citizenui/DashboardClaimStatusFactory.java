@@ -16,8 +16,8 @@ public abstract class DashboardClaimStatusFactory<T> {
     private List<DashboardClaimStatusMatcher> getDashboardStatusMatcher(T claim) {
         return List.of(
             new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_OVERDUE, hasResponsePendingOverdue(claim)),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
             new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_DUE_NOW, hasResponseDueToday(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.MORE_TIME_REQUESTED,
                 responseDeadlineHasBeenExtended(claim)
