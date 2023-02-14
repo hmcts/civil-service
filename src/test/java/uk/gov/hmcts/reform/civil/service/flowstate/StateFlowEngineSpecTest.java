@@ -522,7 +522,7 @@ class StateFlowEngineSpecTest {
     // Specified 1V2 one unregistered and one unrepresented with state transition from
     // PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT   -> TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT
     @Test()
-    void shouldGoOffline_1v2_whenCaseOneUnregisteredAnddOneUnrepresent() {
+    void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneUnrepresented() {
         //Given
         CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued()
             .takenOfflineDate(LocalDateTime.now())
@@ -533,7 +533,7 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getState())
             .extracting(State::getName)
             .isNotNull()
-            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT .fullName());
+            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName());
         assertThat(stateFlow.getStateHistory())
             .hasSize(5)
             .extracting(State::getName)

@@ -172,10 +172,6 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atState(FlowState.Main flowState) {
-        return atState(flowState, ONE_V_ONE);
-    }
-
     public CaseDataBuilderSpec addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
         this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
         return this;
