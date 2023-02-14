@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
@@ -70,6 +71,7 @@ public class CaseDataBuilderSpec {
 
     //dates
     protected LocalDateTime submittedDate;
+    protected LocalDate issueDate;
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
@@ -174,7 +176,7 @@ public class CaseDataBuilderSpec {
             case CLAIM_SUBMITTED:
                 return atStateSpec1v1ClaimSubmitted();
             case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
-                return atStateSpec1v1PaymentSuccessful();
+                return atStateSpec1v1PaymentSuccessful(true);
 
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
@@ -332,11 +334,11 @@ public class CaseDataBuilderSpec {
         respondent1Represented = NO;
         respondent1OrgRegistered = NO;
         respondent2Represented = YES;
-        respondent2OrgRegistered = YES;
+        respondent2OrgRegistered = NO;
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v2BothDefendantRepresentedAndUnregistered() {
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
@@ -348,8 +350,23 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered() {
         atStateSpec1v1ClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2SameLegalRepresentative = YES;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful(Boolean respondentRepresented) {
+        if (respondentRepresented) {
+            atStateSpec1v1ClaimSubmitted();
+        } else {
+            atStateSpec1v1DefendantUnrepresentedClaimSubmitted();
+        }
+
         ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
                                                             .customerReference("12345")
@@ -374,6 +391,15 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnrepresentedPaymentSuccessful() {
+        atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
         atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
@@ -383,7 +409,34 @@ public class CaseDataBuilderSpec {
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
-        atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted();
+        atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnregisteredPaymentSuccessful() {
+        atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantUnregisteredPaymentSuccessful() {
+        atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPaymentSuccessful() {
+        atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted();
+        ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
             .customerReference("12345")
             .build();
@@ -395,6 +448,48 @@ public class CaseDataBuilderSpec {
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
             .customerReference("12345")
             .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1RepresentedPendingClaimIssued() {
+        atStateSpec1v1PaymentSuccessful(true);
+        issueDate = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1UnrepresentedPendingClaimIssued() {
+        atStateSpec1v1PaymentSuccessful(false);
+        issueDate = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued() {
+        atStateSpec1v2SameSolicitorBothDefendantUnrepresentedPaymentSuccessful();
+        issueDate = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothUnregisteredPendingClaimIssued() {
+        atStateSpec1v2SameSolicitorBothDefendantUnregisteredPaymentSuccessful();
+        issueDate = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothUnregisteredPendingClaimIssued() {
+        atStateSpec1v2DifferentSolicitorBothDefendantUnregisteredPaymentSuccessful();
+        issueDate = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued() {
+        atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPaymentSuccessful();
+        issueDate = LocalDate.now();
+
         return this;
     }
 
@@ -436,6 +531,7 @@ public class CaseDataBuilderSpec {
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             //dates
             .submittedDate(submittedDate)
+            .issueDate(issueDate)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
