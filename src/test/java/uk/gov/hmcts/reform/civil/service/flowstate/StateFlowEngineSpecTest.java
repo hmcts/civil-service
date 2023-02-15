@@ -130,6 +130,7 @@ class StateFlowEngineSpecTest {
         );
     }
 
+    //AC1 (CIV-6322) - Pending Claim Issued for 1v1 after Payment Successful
     static Stream<Arguments> caseDataStream1v1ClaimIssuePendingRepresentedRespondent() {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v1RepresentedPendingClaimIssued().build())
@@ -137,19 +138,14 @@ class StateFlowEngineSpecTest {
         );
     }
 
+    //AC2 (CIV-6322) - Pending_Claim_Issued_for_unrepresented_defendant_one_v_one_spec 1v1 after Payment Successful
     static Stream<Arguments> caseDataStream1v1ClaimIssuePendingUnrepresentedRespondent() {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v1UnrepresentedPendingClaimIssued().build())
         );
     }
 
-    static Stream<Arguments> caseDataStream1v2ClaimIssuePendingUnrepresentedRespondents() {
-        return Stream.of(
-            arguments(CaseDataBuilderSpec.builder()
-                          .atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued().build())
-        );
-    }
-
+    //AC3+4 (CIV-6322) - Pending_Claim_Issued_unregistered_defendant 1v2 after Payment Successful
     static Stream<Arguments> caseDataStream1v2ClaimIssuePendingUnregisteredRespondents() {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder()
@@ -159,10 +155,19 @@ class StateFlowEngineSpecTest {
         );
     }
 
+    //AC5 (CIV-6322) - Pending_Claim_Issued_unrepresented_unregistered_defendant 1v2 after Payment Successful
     static Stream<Arguments> caseDataStream1v2ClaimIssuePendingOneUnregisteredOneUnrepresented() {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder()
                           .atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued().build())
+        );
+    }
+
+    //AC6 (CIV-6322) - Pending_Claim_Issued_unrepresented_defendant 1v2 after Payment Successful
+    static Stream<Arguments> caseDataStream1v2ClaimIssuePendingUnrepresentedRespondents() {
+        return Stream.of(
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued().build())
         );
     }
 
@@ -300,6 +305,7 @@ class StateFlowEngineSpecTest {
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
     }
 
+    //AC1 (CIV-6322) - Pending Claim Issued for 1v1 after Payment Successful
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
         + " to PENDING_CLAIM_ISSUED")
     @MethodSource("caseDataStream1v1ClaimIssuePendingRepresentedRespondent")
@@ -320,6 +326,7 @@ class StateFlowEngineSpecTest {
                 PENDING_CLAIM_ISSUED.fullName());
     }
 
+    //AC2 (CIV-6322) - Pending_Claim_Issued_for_unrepresented_defendant_one_v_one_spec 1v1 after Payment Successful
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
         + " to PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC")
     @MethodSource("caseDataStream1v1ClaimIssuePendingUnrepresentedRespondent")
@@ -340,26 +347,7 @@ class StateFlowEngineSpecTest {
                 PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
     }
 
-    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
-        + " to PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT")
-    @MethodSource("caseDataStream1v2ClaimIssuePendingUnrepresentedRespondents")
-    void shouldReturnPendingClaimIssuedUnrepresentedDefendant_whenCaseDataAtStateClaimIssuedPaymentSuccessful(CaseData caseData) {
-        //When
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-        // Then Claim will go through state CLAIM_ISSUED_PAYMENT_SUCCESSFUL and finish at state PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT
-        assertThat(stateFlow.getState())
-            .extracting(State::getName)
-            .isNotNull()
-            .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
-        assertThat(stateFlow.getStateHistory())
-            .hasSize(4)
-            .extracting(State::getName)
-            .containsExactly(
-                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
-    }
-
+    //AC3+4 (CIV-6322) - Pending_Claim_Issued_unregistered_defendant 1v2 after Payment Successful
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
         + " to PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT")
     @MethodSource("caseDataStream1v2ClaimIssuePendingUnregisteredRespondents")
@@ -380,6 +368,7 @@ class StateFlowEngineSpecTest {
                 PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName());
     }
 
+    //AC5 (CIV-6322) - Pending_Claim_Issued_unrepresented_unregistered_defendant 1v2 after Payment Successful
     @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
         + " to PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT")
     @MethodSource("caseDataStream1v2ClaimIssuePendingOneUnregisteredOneUnrepresented")
@@ -398,6 +387,27 @@ class StateFlowEngineSpecTest {
             .containsExactly(
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                 PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName());
+    }
+
+    //AC6 (CIV-6322) - Pending_Claim_Issued_unrepresented_defendant 1v2 after Payment Successful
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_ISSUED_PAYMENT_SUCCESSFUL"
+        + " to PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT")
+    @MethodSource("caseDataStream1v2ClaimIssuePendingUnrepresentedRespondents")
+    void shouldReturnPendingClaimIssuedUnrepresentedDefendant_whenCaseDataAtStateClaimIssuedPaymentSuccessful(CaseData caseData) {
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then Claim will go through state CLAIM_ISSUED_PAYMENT_SUCCESSFUL and finish at state PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(4)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
     }
 }
 
