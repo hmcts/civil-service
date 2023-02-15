@@ -21,7 +21,7 @@ public class RespondentResponseCui {
     private String canWeUseMediationPhoneCui;
     private YesOrNo mediationDisagreementCui;
     private String noMediationReasonCui;
-    private String moMediationOtherReasonCui;
+    private String noMediationOtherReasonCui;
     private YesOrNo companyTelephoneOptionMediationCui;
     private String companyTelephoneConfirmationMediationCui;
     private String companyTelephoneContactPersonMediationCui;
