@@ -59,7 +59,6 @@ public class DashboardClaimInfoServiceTest {
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
-
         List<CaseDetails> cases = List.of(CASE_DETAILS);
         SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();
         given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
