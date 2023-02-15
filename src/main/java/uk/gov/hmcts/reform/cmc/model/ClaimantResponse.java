@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClaimantResponse {
+
     private  ClaimantResponseType type;
     private BigDecimal amountPaid;
     private  String paymentReceived;

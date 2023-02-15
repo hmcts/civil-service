@@ -32,7 +32,6 @@ public class DashboardClaimInfoService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
-
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
     }
