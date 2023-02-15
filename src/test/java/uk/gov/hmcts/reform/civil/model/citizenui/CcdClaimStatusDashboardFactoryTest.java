@@ -71,7 +71,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediatly(){
+    void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediately(){
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(claim));

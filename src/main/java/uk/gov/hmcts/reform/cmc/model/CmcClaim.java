@@ -123,7 +123,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean responseDeadlineHasBeenExtended() {
-        return isMoreTimeRequested();
+        return hasResponsePending() && isMoreTimeRequested();
     }
 
     @JsonIgnore
@@ -132,21 +132,25 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    @JsonIgnore
     public boolean claimantConfirmedDefendantPaid() {
-        return getMoneyReceivedOn() != null || isCCJSatisfied();
+        return moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null;
     }
 
     @Override
+    @JsonIgnore
     public boolean isSettled() {
-        return claimantAcceptedDefendantResponse();
+        return moneyReceivedOn != null || claimantAcceptedDefendantResponse();
     }
 
     @Override
+    @JsonIgnore
     public boolean isSentToCourt() {
         return isTransferred();
     }
 
     @Override
+    @JsonIgnore
     public boolean claimantRequestedCountyCourtJudgement() {
         return getClaimantResponse() != null && getCountyCourtJudgmentRequestedAt() != null;
     }
@@ -158,19 +162,6 @@ public class CmcClaim implements Claim {
     }
 
     @JsonIgnore
-    public boolean responseIsFullAdmitAndPayImmediately(){
-       return hasResponse()
-           && response.isFullAdmitPayImmediately();
-    }
-
-    @JsonIgnore
-    public boolean responseIsFullAdmitAndPayBySetDate() {
-        return hasResponse() && response.isFullAdmitPayBySetDate();
-    }
-
-
-
-    @JsonIgnore
     public boolean hasResponseDeadlinePassed(){
         return !hasResponse() && (getResponseDeadline().isBefore(LocalDate.now())
             || isResponseDeadlinePastFourPmToday());
@@ -180,13 +171,9 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     public boolean hasBreathingSpace() {
-        return claimData.hasBreathingSpace();
+        return claimData != null && claimData.hasBreathingSpace();
     }
 
-    @JsonIgnore
-    public boolean isCCJSatisfied() {
-        return moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null;
-    }
 
     private boolean isResponseDeadlinePastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())
