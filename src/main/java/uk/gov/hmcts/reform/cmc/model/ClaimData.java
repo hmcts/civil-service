@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,9 +31,10 @@ public class ClaimData {
     }
 
     @JsonIgnore
-    public boolean hasBreathingSpace(){
+    public boolean hasBreathingSpace() {
         return breathingSpace != null && breathingSpace.applies();
     }
+
     private String getPartyName(List<CmcParty> parties) {
         if (parties.isEmpty()) {
             return "";

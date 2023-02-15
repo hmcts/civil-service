@@ -49,8 +49,8 @@ public class BreathingSpace {
     private String bsLiftedFlag;
 
     @JsonIgnore
-    public boolean applies(){
-        return  bsEnteredDate != null
+    public boolean applies() {
+        return bsEnteredDate != null
             && bsLiftedDate == null
             && (bsExpectedEndDate == null || bsExpectedEndDate.isBefore(LocalDate.now()));
     }

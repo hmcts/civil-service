@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,11 +68,12 @@ public class CmcClaim implements Claim {
     }
 
     @JsonIgnore
-    public boolean hasResponse(){
+    public boolean hasResponse() {
         return response != null;
     }
-   @JsonIgnore
-    public boolean isTransferred(){
+
+    @JsonIgnore
+    public boolean isTransferred() {
         return state == ClaimState.TRANSFERRED;
     }
 
@@ -99,7 +99,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponseFullAdmit() {
-       return hasResponse() && response.isFullAdmit();
+        return hasResponse() && response.isFullAdmit();
     }
 
     @Override
@@ -156,17 +156,16 @@ public class CmcClaim implements Claim {
     }
 
     @JsonIgnore
-    public boolean claimantAcceptedDefendantResponse(){
+    public boolean claimantAcceptedDefendantResponse() {
         return claimantResponse != null
             && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
     }
 
     @JsonIgnore
-    public boolean hasResponseDeadlinePassed(){
+    public boolean hasResponseDeadlinePassed() {
         return !hasResponse() && (getResponseDeadline().isBefore(LocalDate.now())
             || isResponseDeadlinePastFourPmToday());
     }
-
 
 
     @JsonIgnore

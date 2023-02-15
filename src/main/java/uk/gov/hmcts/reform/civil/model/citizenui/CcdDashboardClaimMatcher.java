@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
 @AllArgsConstructor
 public class CcdDashboardClaimMatcher implements Claim {
 

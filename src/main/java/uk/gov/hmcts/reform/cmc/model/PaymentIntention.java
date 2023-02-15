@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 public class PaymentIntention {
     private PaymentOption paymentOption;
-    private  LocalDate paymentDate;
+    private LocalDate paymentDate;
 
     @JsonIgnore
     public boolean isPayImmediately() {

@@ -744,5 +744,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getBreathing().getLift() == null;
     }
 
-
 }

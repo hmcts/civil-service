@@ -22,14 +22,15 @@ public class Response {
     public boolean isFullAdmit() {
         return responseType == RespondentResponseType.FULL_ADMISSION;
     }
+
     @JsonIgnore
     public boolean isFullAdmitPayImmediately() {
-       return isFullAdmit() && paymentIntention.isPayImmediately();
+        return isFullAdmit() && paymentIntention.isPayImmediately();
     }
 
     @JsonIgnore
     public boolean isFullAdmitPayBySetDate() {
-        return isFullAdmit()  && paymentIntention.isPayByDate();
+        return isFullAdmit() && paymentIntention.isPayByDate();
     }
 
     @JsonIgnore
