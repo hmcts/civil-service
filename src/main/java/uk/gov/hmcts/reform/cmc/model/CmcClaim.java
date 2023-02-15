@@ -167,12 +167,10 @@ public class CmcClaim implements Claim {
             || isResponseDeadlinePastFourPmToday());
     }
 
-
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return claimData != null && claimData.hasBreathingSpace();
     }
-
 
     private boolean isResponseDeadlinePastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())

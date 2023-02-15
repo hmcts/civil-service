@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class PaymentIntention {
+
     private PaymentOption paymentOption;
     private LocalDate paymentDate;
 
