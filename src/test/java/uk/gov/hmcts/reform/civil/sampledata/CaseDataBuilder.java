@@ -2040,11 +2040,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoDisposal() {
         disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format(
-                "Each party has the right to apply to have this Order set "
-                    + "aside or varied. Any such application must be received "
-                    + "by the Court (together with the appropriate fee) "
-                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
+             .input(String.format(
+            "Each party has the right to apply to have this Order set "
+                + "aside or varied. Any such application must be received "
+                + "by the Court (together with the appropriate fee) "
+                + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
             .build();
         disposalHearingHearingTime = DisposalHearingHearingTime.builder()
             .input("This claim will be listed for final disposal before a judge on the first available date after")
@@ -2107,10 +2107,10 @@ public class CaseDataBuilder {
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
             .input("This order has been made without a hearing. "
-                       + "Each party has the right to apply to have this Order "
-                       + "set aside or varied. Any such application must be "
-                       + "received by the Court "
-                       + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+                    + "Each party has the right to apply to have this Order "
+                    + "set aside or varied. Any such application must be "
+                    + "received by the Court "
+                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
             .build();
         return this;
     }
@@ -3051,7 +3051,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
-                                                                    RespondentResponseType respondent2Response) {
+                                                       RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
         respondent2Responds(respondent2Response);
@@ -3097,10 +3097,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -3109,10 +3109,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -3417,7 +3417,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                                        RespondentResponseTypeSpec respondent2Response) {
+                                                                       RespondentResponseTypeSpec respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);
@@ -3764,7 +3764,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
+                                                   .input("unforeseen complexities")
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
 
@@ -4165,7 +4165,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
-                    .fee(
+                        .fee(
                         Fee.builder()
                             .code("FE203")
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
@@ -4185,10 +4185,10 @@ public class CaseDataBuilder {
             .ccdState(PENDING_CASE_ISSUED)
             .claimFee(
                 Fee.builder()
-                    .code("FE203")
-                    .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                    .version("1")
-                    .build())
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .applicant1(Party.builder()
                             .individualFirstName("First name")
@@ -4277,15 +4277,15 @@ public class CaseDataBuilder {
                                                       LocalDate cos1Date, LocalDate cos2Date,
                                                       boolean file1, boolean file2) {
         List<Element<Document>> files = wrapElements(Document.builder()
-                                                         .documentUrl("fake-url")
-                                                         .documentFileName("file-name")
-                                                         .documentBinaryUrl("binary-url")
-                                                         .build());
+                .documentUrl("fake-url")
+                .documentFileName("file-name")
+                .documentBinaryUrl("binary-url")
+                .build());
         List<Element<Document>> files2 = wrapElements(Document.builder()
-                                                          .documentUrl("fake-url2")
-                                                          .documentFileName("file-name2")
-                                                          .documentBinaryUrl("binary-url2")
-                                                          .build());
+                .documentUrl("fake-url2")
+                .documentFileName("file-name2")
+                .documentBinaryUrl("binary-url2")
+                .build());
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
@@ -4309,6 +4309,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
         this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
+        return this;
+    }
+
+    public CaseDataBuilder specRespondent1Represented(YesOrNo specRespondent1Represented) {
+        this.specRespondent1Represented = specRespondent1Represented;
         return this;
     }
 
@@ -4363,6 +4368,7 @@ public class CaseDataBuilder {
             .personalInjuryType(personalInjuryType)
             .personalInjuryTypeOther(personalInjuryTypeOther)
             .applicantSolicitor1PbaAccounts(applicantSolicitor1PbaAccounts)
+            .claimFee(claimFee)
             .applicant1(applicant1)
             .applicant2(applicant2)
             .respondent1(respondent1)
@@ -4560,9 +4566,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-            //Certificate of Service
-            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+                //Certificate of Service
+                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .caseAccessCategory(caseAccessCategory)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
@@ -4572,4 +4578,5 @@ public class CaseDataBuilder {
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .build();
     }
+
 }
