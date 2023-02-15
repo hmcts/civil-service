@@ -516,7 +516,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
     //Hearing Scheduled
-    private String hearingReference;
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
@@ -595,7 +594,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
-    private final List<Element<CaseDocument>> hearingOrderDocument;
+    private final List<Element<CaseDocument>> hearingNoticeDocument;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
