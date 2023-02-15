@@ -278,6 +278,7 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
+
     /**
      * This field is not used.
      *

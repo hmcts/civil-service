@@ -23,13 +23,15 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasResponsePendingOverdue() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(
+            LocalDate.now().atTime(FOUR_PM))
             && caseData.hasBreathingSpace();
     }
 
     @Override
     public boolean hasResponseDueToday() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
+        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(
+            LocalDate.now())
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
@@ -85,7 +87,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return caseData.getApplicant1DQ()!= null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
+        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
     }
 
 }
