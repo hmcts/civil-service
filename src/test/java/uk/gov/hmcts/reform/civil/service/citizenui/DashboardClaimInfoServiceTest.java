@@ -31,6 +31,7 @@ public class DashboardClaimInfoServiceTest {
 
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
         Arrays.asList(DashboardClaimInfo.builder()
+                          .status(DashboardClaimStatus.NO_STATUS)
                           .ocmc(true)
                           .build());
     private static final String CLAIMANT_NAME = "Harry Porter";
