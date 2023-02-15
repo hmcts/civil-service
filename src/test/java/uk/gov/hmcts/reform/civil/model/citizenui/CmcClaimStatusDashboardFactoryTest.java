@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(SpringExtension.class)
 public class CmcClaimStatusDashboardFactoryTest {
+
     @InjectMocks
     private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
@@ -66,21 +67,21 @@ public class CmcClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediately(){
+    void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediately() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.IMMEDIATELY);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY);
     }
 
     @Test
-    void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnAdmitPayBySetDate(){
+    void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnAdmitPayBySetDate() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.BY_SPECIFIED_DATE);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE);
     }
 
     @Test
-    void given_responseAdmitPayByInstallments_whenGetStatus_thenReturnAdmitPayByInstallments(){
+    void given_responseAdmitPayByInstallments_whenGetStatus_thenReturnAdmitPayByInstallments() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.INSTALMENTS);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS);
@@ -88,7 +89,7 @@ public class CmcClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimantConfirmedDefendantPaid_whenGetStatus_thenReturnClaimantAcceptedStatesPaid() {
-        CmcClaim claim =  CmcClaim.builder()
+        CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
             .response(Response.builder().build())
             .moneyReceivedOn(LocalDate.now())
@@ -123,17 +124,17 @@ public class CmcClaimStatusDashboardFactoryTest {
 
     @Test
     void given_claimIsSentToCourt_whenGetStatus_thenReturnTransferred() {
-      CmcClaim claim = CmcClaim.builder()
-          .responseDeadline(LocalDate.now().plusDays(10))
-          .response(Response.builder().build())
-          .state(ClaimState.TRANSFERRED).build();
+        CmcClaim claim = CmcClaim.builder()
+            .responseDeadline(LocalDate.now().plusDays(10))
+            .response(Response.builder().build())
+            .state(ClaimState.TRANSFERRED).build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.TRANSFERRED);
     }
 
     @Test
-    void given_claimantRequestedCountyCourtJudgement_whenGetStatus_thenReturnRequestedCountryCourtJudgement(){
+    void given_claimantRequestedCountyCourtJudgement_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
         CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
             .response(Response.builder().build())
