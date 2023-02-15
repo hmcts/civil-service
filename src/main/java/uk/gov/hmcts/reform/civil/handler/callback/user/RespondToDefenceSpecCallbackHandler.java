@@ -275,8 +275,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            //updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                              .whenWillThisAmountBePaid(whenBePaid)
                                                               .formattedWhenWillThisAmountBePaid(formatLocalDate(
                                                                   whenBePaid,
                                                                   DATE
