@@ -358,9 +358,9 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
-        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES ||
-            applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES ||
-            applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
+            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
+            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
     }
 
     private final IdamUserDetails claimantUserDetails;

@@ -727,8 +727,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPayByInstallment() {
         return defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired ==
-            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+            && defenceAdmitPartPaymentTimeRouteRequired
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
     }
 
     @JsonIgnore
