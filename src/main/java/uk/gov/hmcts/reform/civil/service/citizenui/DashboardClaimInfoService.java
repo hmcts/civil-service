@@ -31,7 +31,7 @@ public class DashboardClaimInfoService {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
-    private final CcdDashboardClaimMatcher dashboardClaimMatcher;
+
 
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
@@ -61,13 +61,13 @@ public class DashboardClaimInfoService {
 
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        dashboardClaimMatcher.setCaseData(caseData);
+
         DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
             .claimNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
             .claimAmount(caseData.getTotalClaimAmount())
-            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(dashboardClaimMatcher))
+            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData)))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());

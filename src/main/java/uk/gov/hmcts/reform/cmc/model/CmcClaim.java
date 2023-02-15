@@ -80,7 +80,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponsePending() {
-        return !hasResponse() && getResponseDeadline().isBefore(LocalDate.now());
+        return !hasResponse() && getResponseDeadline().isAfter(LocalDate.now());
     }
 
     @Override
