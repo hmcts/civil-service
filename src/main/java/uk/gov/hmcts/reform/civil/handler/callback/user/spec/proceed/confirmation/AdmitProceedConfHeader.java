@@ -22,7 +22,8 @@ public class AdmitProceedConfHeader implements RespondToResponseConfirmationHead
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+        if (caseData.getApplicant1ProceedsWithClaimSpec() == null
+            || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }
