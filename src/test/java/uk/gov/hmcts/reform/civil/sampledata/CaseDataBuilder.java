@@ -4305,6 +4305,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specRespondent1Represented(YesOrNo specRespondent1Represented) {
+        this.specRespondent1Represented = specRespondent1Represented;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
