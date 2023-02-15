@@ -44,9 +44,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
 
     @MockBean
-    private FeesService feesService;
-
-    @MockBean
     private PaymentsService paymentsService;
 
     @MockBean
@@ -74,27 +71,20 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MakeServiceRequestPayments {
 
-        private final Fee feeData = Fee.builder()
-            .code("CODE")
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .build();
-
         @BeforeEach
         void setup() {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
         }
 
         @Test
         void shouldMakePaymentServiceRequest_whenInvoked() throws Exception {
+            //Given
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
+                .thenReturn(paymentServiceResponse.builder()
                             .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-            caseData = caseData.toBuilder()
-                .totalClaimAmount(new BigDecimal(1000)).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //Then
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             assertThat(extractPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
@@ -102,6 +92,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakeHearingPaymentServiceRequest_whenInvoked() throws Exception {
+            //Given
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -117,9 +108,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                                 .statementOfValueInPennies(new BigDecimal(1000)).build())
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+            //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //Then
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             assertThat(extractHearingPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
