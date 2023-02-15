@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -181,7 +183,11 @@ public class HearingScheduledHandler extends CallbackHandler {
                     HearingUtils.addBusinessDays(
                         LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
             }
-            switch (caseData.getAllocatedTrack()) {
+            AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+            if (isNull(caseData.getAllocatedTrack())) {
+                allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+            }
+            switch (allocatedTrack) {
                 case SMALL_CLAIM:
                     hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                     break;

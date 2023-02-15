@@ -150,15 +150,6 @@ class FeatureToggleServiceTest {
     }
 
     @Test
-    void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
-        var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
-        givenToggle(organisationOnboardedFeatureKey, true);
-
-        assertThat(featureToggleService.isOrganisationOnboarded("someId")).isTrue();
-        verifyBoolVariationCalled(organisationOnboardedFeatureKey, List.of("timestamp", "environment", "orgId"));
-    }
-
-    @Test
     void shouldCallBoolVariation_whenIsCertificateOfServiceEnabledInvoked() {
         var certificateOfServiceKey = "isCertificateOfServiceEnabled";
         givenToggle(certificateOfServiceKey, true);
