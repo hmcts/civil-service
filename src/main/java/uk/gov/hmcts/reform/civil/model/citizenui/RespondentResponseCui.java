@@ -11,11 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentResponseCui {
-
-    private YesOrNo partnerPensionCui;
-    private YesOrNo partnerDisabilityCui;
-    private YesOrNo partnerSevereDisabilityCui;
-    private String childrenEducationCui;
+    private FinancialDetailsCui respondent1FinancialDetailsFromCui;
 
     private YesOrNo canWeUseMediationCui;
     private String canWeUseMediationPhoneCui;
@@ -26,5 +22,4 @@ public class RespondentResponseCui {
     private String companyTelephoneConfirmationMediationCui;
     private String companyTelephoneContactPersonMediationCui;
     private String companyTelephonePhoneNumberMediationCui;
-
 }
