@@ -315,11 +315,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isConfirmationForLip(CaseData caseData) {
-        return (caseData.getDefendant1LIPAtClaimIssued() != null
-            && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
-            || (caseData.getDefendant2LIPAtClaimIssued() != null
-            && caseData.getDefendant2LIPAtClaimIssued() == YesOrNo.YES);
-
+        return caseData.getRespondent1Represented() != YES
+            || (caseData.getAddRespondent2().equals(YES)
+            && caseData.getRespondent2Represented() != YES);
     }
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
