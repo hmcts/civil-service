@@ -38,7 +38,6 @@ public class DashboardClaimInfoService {
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
-        log.info(ocmcClaims.toString());
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).collect(Collectors.toList());
     }
@@ -47,7 +46,6 @@ public class DashboardClaimInfoService {
         Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
         SearchResult claims = coreCaseDataService.searchCases(query, authorisation);
         if (claims.getTotal() == 0) {
-            log.info("no claims");
             return Collections.emptyList();
         }
         return translateSearchResultToDashboardItems(claims);

@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
-import uk.gov.hmcts.reform.civil.enums.DefenceType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 
 @Getter
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 public class Response {
 
     public RespondentResponseType responseType;
-    public DefenceType defenceType;
     private PaymentIntention paymentIntention;
 
     @JsonIgnore
