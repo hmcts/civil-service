@@ -10,10 +10,13 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Component
 @Setter
 public class CcdDashboardClaimMatcher implements Claim {
+
+    private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
 
     @Override
@@ -25,14 +28,14 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponsePendingOverdue() {
-        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0))
+        return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.hasBreathingSpace();
     }
 
     @Override
     public boolean hasResponseDueToday() {
         return caseData.getRespondent1ResponseDeadline() != null && caseData.getRespondent1ResponseDeadline().toLocalDate().isEqual(LocalDate.now())
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0));
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
