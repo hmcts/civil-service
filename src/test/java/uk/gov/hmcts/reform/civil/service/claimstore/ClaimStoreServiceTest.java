@@ -52,8 +52,7 @@ public class ClaimStoreServiceTest {
                                                                                             .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .ocmc(true)
-                                                                                            .status(
-                                                                                                DashboardClaimStatus.NO_RESPONSE)
+
                                                                                             .build());
 
     @BeforeEach
