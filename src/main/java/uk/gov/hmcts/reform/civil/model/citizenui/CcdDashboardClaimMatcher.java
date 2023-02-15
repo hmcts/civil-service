@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -76,7 +75,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSettled() {
-        return caseData.respondent1PaidInFull() || caseData.isRepsonseAcceptedByClaimant();
+        return caseData.respondent1PaidInFull() || caseData.isResponseAcceptedByClaimant();
     }
 
     @Override
