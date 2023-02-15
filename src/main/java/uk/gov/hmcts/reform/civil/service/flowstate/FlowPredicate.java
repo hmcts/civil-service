@@ -884,4 +884,8 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
+
+    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
+        (YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()));
 }
