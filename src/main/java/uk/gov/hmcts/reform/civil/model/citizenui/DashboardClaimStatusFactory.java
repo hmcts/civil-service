@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
 @Service
-public  class DashboardClaimStatusFactory {
-
+public class DashboardClaimStatusFactory {
 
     public DashboardClaimStatus getDashboardClaimStatus(Claim claim) {
         return Arrays.stream(DashboardClaimStatus.values())
@@ -14,6 +13,5 @@ public  class DashboardClaimStatusFactory {
             .findFirst()
             .orElse(DashboardClaimStatus.NO_STATUS);
     }
-
 
 }

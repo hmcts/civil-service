@@ -282,8 +282,8 @@ public class CaseDataParent implements MappableObject {
      * This field is not used.
      *
      * @deprecated this field is not used and it was in a screen no longer presented to the user.
-     *     It is kept here to devote a single jira to its removal, to ensure said removal won't cause
-     *     any problem when bringing info from db.
+     * It is kept here to devote a single jira to its removal, to ensure said removal won't cause
+     * any problem when bringing info from db.
      */
     @Deprecated
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
@@ -343,7 +343,7 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return  this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == YesOrNo.NO;
     }
 
     /**
@@ -357,10 +357,10 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant2;
 
     @JsonIgnore
-    public boolean isResponseAcceptedByClaimant(){
-       return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES ||
-           applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES ||
-           applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    public boolean isResponseAcceptedByClaimant() {
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES ||
+            applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES ||
+            applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
     }
 
     private final IdamUserDetails claimantUserDetails;
