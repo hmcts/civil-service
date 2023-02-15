@@ -72,10 +72,9 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
         }
-        if(caseData.getRespondToClaimAdmitPartLRspec() != null) {
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
-        log.info(item.toString());
         return item;
     }
 }

@@ -10,13 +10,13 @@ public enum DashboardClaimStatus {
         Claim::hasResponseDueToday
     ),
     RESPONSE_OVERDUE(
-       Claim::hasResponsePendingOverdue
+        Claim::hasResponsePendingOverdue
     ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
     ),
     MORE_TIME_REQUESTED(
-      Claim::responseDeadlineHasBeenExtended
+        Claim::responseDeadlineHasBeenExtended
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -34,7 +34,7 @@ public enum DashboardClaimStatus {
         Claim::claimantConfirmedDefendantPaid
     ),
     TRANSFERRED(
-       Claim::isSentToCourt
+        Claim::isSentToCourt
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
@@ -47,11 +47,11 @@ public enum DashboardClaimStatus {
     @Getter
     private final Predicate<Claim> claimMatcher;
 
-
     DashboardClaimStatus() {
         claimMatcher = c -> false;
 
     }
+
     DashboardClaimStatus(Predicate<Claim> claimMatcher) {
         this.claimMatcher = claimMatcher;
     }

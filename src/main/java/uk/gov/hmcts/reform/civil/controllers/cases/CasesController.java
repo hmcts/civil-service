@@ -122,7 +122,6 @@ public class CasesController {
             authorization,
             submitterId
         );
-        log.info(defendantClaims.toString());
         return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
     }
 
