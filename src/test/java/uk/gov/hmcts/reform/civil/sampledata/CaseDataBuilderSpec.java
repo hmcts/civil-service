@@ -177,7 +177,6 @@ public class CaseDataBuilderSpec {
                 return atStateSpec1v1ClaimSubmitted();
             case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
                 return atStateSpec1v1PaymentSuccessful(true);
-
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -366,7 +365,16 @@ public class CaseDataBuilderSpec {
         } else {
             atStateSpec1v1DefendantUnrepresentedClaimSubmitted();
         }
+        
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
 
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
+        atStateSpec1v1ClaimSubmitted();
         ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
                                                             .customerReference("12345")
