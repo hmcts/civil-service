@@ -225,6 +225,9 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_AFTER_SDO:
                         buildClaimTakenOfflineAfterSDO(builder, caseData);
                         break;
+                    case TAKEN_CASE_OFFLINE_SDO_DJ:
+                        buildClaimTakenOfflineAfterSDO(builder, caseData);
+                        break;
                     default:
                         break;
                 }
