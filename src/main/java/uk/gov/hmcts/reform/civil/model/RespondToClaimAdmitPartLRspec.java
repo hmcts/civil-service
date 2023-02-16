@@ -17,12 +17,9 @@ public class RespondToClaimAdmitPartLRspec implements MappableObject {
     @FutureOrPresent(message = "Date for when will the amount be paid must be today or in the future.",
         groups = PaymentDateGroup.class)
     private final LocalDate whenWillThisAmountBePaid;
-    private final String formattedWhenWillThisAmountBePaid;
 
     @JsonCreator
-    public RespondToClaimAdmitPartLRspec(@JsonProperty("whenWillThisAmountBePaid") LocalDate whenWillThisAmountBePaid,
-                                         @JsonProperty("formattedWhenWillThisAmountBePaid") String formattedWhenWillThisAmountBePaid) {
+    public RespondToClaimAdmitPartLRspec(@JsonProperty("whenWillThisAmountBePaid") LocalDate whenWillThisAmountBePaid) {
         this.whenWillThisAmountBePaid = whenWillThisAmountBePaid;
-        this.formattedWhenWillThisAmountBePaid = formattedWhenWillThisAmountBePaid;
     }
 }
