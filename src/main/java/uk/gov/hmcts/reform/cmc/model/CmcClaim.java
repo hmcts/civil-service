@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORM
 public class CmcClaim implements Claim {
 
     @JsonIgnore
-    private static final LocalTime FOUR_PM = LocalTime.of (16, 1, 0);
+    private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private String submitterId;
     private String letterHolderId;
     private String defendantId;
