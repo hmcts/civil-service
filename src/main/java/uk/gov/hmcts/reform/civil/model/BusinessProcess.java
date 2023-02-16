@@ -25,7 +25,8 @@ public class BusinessProcess {
     private LocalDateTime readyOn;
 
     public static BusinessProcess ready(CaseEvent caseEvent) {
-        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).build();
+        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).readyOn(LocalDateTime.now())
+            .build();
     }
 
     @JsonIgnore
