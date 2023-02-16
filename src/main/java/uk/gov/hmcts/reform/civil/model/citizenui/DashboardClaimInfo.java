@@ -44,8 +44,8 @@ public class DashboardClaimInfo {
 
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
-        return Optional.ofNullable(responseDeadline).
-            filter(deadline ->
+        return Optional.ofNullable(responseDeadline)
+            .filter(deadline ->
                        deadline.isAfter(LocalDate.now()))
             .map(deadline ->
                      LocalDate.now().until(
