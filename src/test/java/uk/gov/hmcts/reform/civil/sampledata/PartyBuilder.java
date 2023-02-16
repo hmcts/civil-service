@@ -142,6 +142,11 @@ public class PartyBuilder {
         return this;
     }
 
+    public PartyBuilder partyEmail(String email) {
+        partyEmail = email;
+        return this;
+    }
+
     public Party build() {
         return Party.builder()
             .type(type)
