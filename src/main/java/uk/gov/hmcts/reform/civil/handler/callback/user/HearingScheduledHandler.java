@@ -86,7 +86,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
             .confirmationBody(getBody())
@@ -168,7 +167,7 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        String state = null;
+        String state;
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
@@ -177,70 +176,30 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
         if (nonNull(caseData.getListingOrRelisting())
             && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
+            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
                 caseDataBuilder.hearingDueDate(
-                    HearingUtils.addBusinessDays(
-                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
-            } else {
-                caseDataBuilder.hearingDueDate(
-                    HearingUtils.addBusinessDays(
-                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
-            }
-            AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-            if (isNull(caseData.getAllocatedTrack())) {
-                allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
-            }
-            switch (allocatedTrack) {
-                case SMALL_CLAIM:
-
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
-
-                    break;
-                case FAST_CLAIM:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
-                        HearingUtils.getFastTrackFee(
-                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
-                    break;
-                case MULTI_CLAIM:
-
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
-
-                    break;
-                default:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
+                    calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
+                                                                       publicHolidaysCollection.getPublicHolidays()));
+                calculateAndApplyFee(caseData, caseDataBuilder);
             }
             state = "HEARING_READINESS";
             caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(state)
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
         } else {
             state = "PREPARE_FOR_HEARING_CONDUCT_HEARING";
             caseDataBuilder.businessProcess(BusinessProcess.ready(PREPARE_FOR_HEARING_CONDUCT_HEARING));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(state)
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
-        }
-        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
-                                                                   publicHolidaysCollection.getPublicHolidays()));
-            calculateAndApplyFee(caseData, caseDataBuilder);
-        }
-        if (nonNull(caseData.getHearingLocation())) {
-            DynamicList locationList = caseData.getHearingLocation();
-            locationList.setListItems(null);
-            caseDataBuilder.hearingLocation(locationList);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state("HEARING_READINESS")
+            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
     private static void calculateAndApplyFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        switch (caseData.getAllocatedTrack()) {
+        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        if (isNull(caseData.getAllocatedTrack())) {
+            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+        }
+        switch (allocatedTrack) {
             case SMALL_CLAIM:
                 caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
                 break;
