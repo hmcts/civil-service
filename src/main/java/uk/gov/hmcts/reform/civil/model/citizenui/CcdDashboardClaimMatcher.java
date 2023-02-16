@@ -66,7 +66,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isEligibleForCCJ() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(16, 1, 0));
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
