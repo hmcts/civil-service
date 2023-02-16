@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.AbstractObjectAssert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -177,14 +176,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
-
-    @Test
     void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
+        // Given
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
             .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
@@ -201,7 +194,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         List<String> errors = Collections.singletonList("error 1");
         Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
 
+        // When
         CallbackResponse response = handler.handle(params);
+
+        // Then
         assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
@@ -210,13 +206,16 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testNotSpecDefendantResponse() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track");
             when(validator.validate(any())).thenReturn(List.of());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).isNotNull();
@@ -224,15 +223,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseValidationError() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
             when(validator.validate(any())).thenReturn(List.of("Validation error"));
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getData()).isNull();
             assertThat(response.getErrors()).isNotNull();
@@ -242,14 +244,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseFastTrack() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
@@ -262,6 +267,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseFastTrackDefendantPaid() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .build();
@@ -277,9 +283,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
@@ -291,6 +299,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseFastTrackDefendantPaidLessThanClaimed() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .build();
@@ -307,9 +316,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
@@ -325,6 +336,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
@@ -332,9 +344,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
             when(validator.validate(any())).thenReturn(List.of("Validation error"));
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getData()).isNull();
             assertThat(response.getErrors()).isNotNull();
@@ -344,15 +358,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
@@ -362,6 +379,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testSpecDefendantResponseAdmitPartOfClaimFastTrackStillOwes() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
@@ -373,9 +391,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
 
@@ -389,36 +409,42 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testValidateLengthOfUnemploymentWithError() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
             CallbackParams params = callbackParamsOf(caseData,
                                                      MID, "validate-length-of-unemployment",
                                                      "DEFENDANT_RESPONSE_SPEC"
             );
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             List<String> expectedErrorArray = new ArrayList<>();
             expectedErrorArray.add("Length of time unemployed must be a whole number, for example, 10.");
 
+            // Then
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
         }
 
         @Test
         public void testValidateRespondentPaymentDate() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().generatePaymentDateForAdmitPartResponse().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date",
                                                      "DEFENDANT_RESPONSE_SPEC"
             );
             when(validator.validate(any())).thenReturn(List.of("Validation error"));
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             List<String> expectedErrorArray = new ArrayList<>();
             expectedErrorArray.add("Date for when will the amount be paid must be today or in the future.");
 
+            // Then
             assertThat(response).isNotNull();
             /*
              * It was not possible to capture the error message generated by @FutureOrPresent in the class
@@ -429,15 +455,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void testValidateRepaymentDate() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
             CallbackParams params = callbackParamsOf(caseData, MID,
                                                      "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC"
             );
             when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertEquals("Validation error", response.getErrors().get(0));
 
         }
@@ -463,6 +492,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void updateRespondent1AddressWhenUpdated() {
+            // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -481,9 +511,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
                 .thenReturn(LocalDateTime.now());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent1").extracting("primaryAddress")
                 .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
@@ -497,6 +529,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void updateRespondent2AddressWhenUpdated() {
+            // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -519,9 +552,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
                 .thenReturn(LocalDateTime.now());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
                 .extracting("AddressLine1").isEqualTo("address line 1");
@@ -535,6 +570,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void defendantResponsePopulatesWitnessesData() {
+            // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -580,9 +616,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
                 .thenReturn(LocalDateTime.now());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent1DQWitnesses")
                 .isEqualTo(new ObjectMapper().convertValue(res1witnesses, new TypeReference<>() {
@@ -604,6 +642,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void updateRespondent1AddressWhenUpdated() {
+            // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -622,9 +661,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
                 .thenReturn(LocalDateTime.now());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent1").extracting("primaryAddress")
                 .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
@@ -638,6 +679,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void updateRespondent2AddressWhenUpdated() {
+            // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -660,9 +702,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
                 .thenReturn(LocalDateTime.now());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
                 .extracting("AddressLine1").isEqualTo("address line 1");
@@ -679,6 +723,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void oneVOne() {
+                // Given
                 DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
                 DynamicList preferredCourt = DynamicList.builder()
                     .listItems(locationValues.getListItems())
@@ -730,9 +775,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UserInfo userInfo = UserInfo.builder().uid("798").build();
                 when(userService.getUserInfo(anyString())).thenReturn(userInfo);
 
+                // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
+                // Then
                 AbstractObjectAssert<?, ?> sent1 = assertThat(response.getData())
                     .extracting("respondent1DQRequestedCourt");
                 sent1.extracting("caseLocation")
@@ -749,6 +796,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void oneVTwo_SecondDefendantReplies() {
+                // Given
                 DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
                 DynamicList preferredCourt = DynamicList.builder()
                     .listItems(locationValues.getListItems())
@@ -810,9 +858,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UserInfo userInfo = UserInfo.builder().uid("798").build();
                 when(userService.getUserInfo(anyString())).thenReturn(userInfo);
 
+                // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
+                // Then
                 AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
                     .extracting("respondent2DQRequestedCourt");
                 sent2.extracting("caseLocation")
@@ -836,26 +886,32 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination1() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_PartAdmissionX2()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
 
         @Test
         void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
@@ -866,6 +922,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
          */
         @Test
         void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(YES)
@@ -876,8 +933,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("FULL_DEFENCE");
             assertThat(response.getData()).extracting("sameSolicitorSameResponse")
@@ -886,6 +945,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetMultiPartyResponseTypeFlags_AdmitAll_OR_Admit_Part_1v2() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2AdmitAll_AdmitPart()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -895,14 +955,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
 
         @Test
         void shouldSetMultiPartyResponseTypeFlags_FullDefence_OR_AdmitAll_1v2() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v2FullDefence_AdmitPart()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -912,8 +975,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
@@ -939,6 +1004,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            // Given
             List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
@@ -948,21 +1014,26 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().build())
                 .respondent1DQWitnessesRequiredSpec(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getErrors()).isEmpty();
         }
     }
@@ -972,11 +1043,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenApplicantIsProceedingWithClaim() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
@@ -991,6 +1064,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
 
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# You have submitted your response%n## Claim number: %s", claimNumber))
@@ -1000,6 +1074,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenPartialAdmitNotPay() {
+            // Given
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusMonths(1);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1017,11 +1092,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
             String claimNumber = caseData.getLegacyCaseReference();
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(admitted.toString())
@@ -1031,6 +1108,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenPartialAdmitPayImmediately() {
+            // Given
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1042,8 +1120,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
@@ -1051,6 +1131,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenRepayPlanFullAdmit() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
@@ -1061,8 +1142,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains("repayment plan");
@@ -1070,6 +1153,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenRepayPlanPartialAdmit() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
@@ -1080,8 +1164,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains("repayment plan");
@@ -1089,6 +1175,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenFullAdmitAlreadyPaid() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
@@ -1098,8 +1185,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(caseData.getTotalClaimAmount().toString())
@@ -1108,6 +1197,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenFullAdmitBySetDate() {
+            // Given
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1125,8 +1215,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(" and your explanation of why you cannot pay before then.")
@@ -1137,6 +1229,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenPartialAdmitPaidFull() {
+            // Given
             BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
             BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             CaseData caseData = CaseDataBuilder.builder()
@@ -1149,8 +1242,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(caseData.getTotalClaimAmount().toString());
@@ -1158,6 +1253,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.FULL_DEFENCE,
@@ -1168,6 +1264,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String claimNumber = caseData.getLegacyCaseReference();
@@ -1187,6 +1284,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format(
@@ -1199,6 +1298,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponsePartAdmissionFullAdmission() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.PART_ADMISSION,
@@ -1209,6 +1309,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String claimNumber = caseData.getLegacyCaseReference();
@@ -1228,6 +1329,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format(
@@ -1240,6 +1343,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimFullAdmission() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.COUNTER_CLAIM,
@@ -1250,6 +1354,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String claimNumber = caseData.getLegacyCaseReference();
@@ -1269,6 +1374,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format(
@@ -1281,6 +1388,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimPartAdmission() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.COUNTER_CLAIM,
@@ -1291,6 +1399,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String claimNumber = caseData.getLegacyCaseReference();
@@ -1310,6 +1419,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
+
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format(
@@ -1322,6 +1433,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenPartialAdmitPaidLess() {
+            // Given
             BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
             BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             CaseData caseData = CaseDataBuilder.builder()
@@ -1334,8 +1446,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains("The claim will be settled. We'll contact you when they respond.")
@@ -1346,6 +1460,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void specificSummary_whenCounterClaim() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
@@ -1353,8 +1468,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getConfirmationBody())
                 .doesNotContain(caseData.getApplicant1().getPartyName())
                 .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
@@ -1366,13 +1483,16 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void when1v1_thenSameSolSameResponseNull() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
             when(dateOfBirthValidator.validate(any())).thenReturn(Collections.emptyList());
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getData())
                 .doesNotHaveToString("sameSolicitorSameResponse");
         }
@@ -1383,6 +1503,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateCourtLocations() {
+            // Given
             CaseData caseData = CaseData.builder().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
@@ -1395,11 +1516,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             System.out.println(response.getData());
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondToCourtLocation")
                 .extracting("responseCourtLocations")
@@ -1408,5 +1531,4 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
         }
     }
-
 }

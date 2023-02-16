@@ -34,6 +34,7 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -69,7 +70,8 @@ public class RoboticsDataMapperForSpec {
             .events(eventHistoryMapper.buildEvents(caseData));
 
         if (featureToggleService.isNoticeOfChangeEnabled()
-            && caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM) {
+            && (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
+            || caseData.getCcdState() == CASE_DISMISSED)) {
             builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 

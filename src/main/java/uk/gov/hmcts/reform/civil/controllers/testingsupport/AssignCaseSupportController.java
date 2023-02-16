@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.UnassignUserFromCasesRequestBody;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -34,27 +34,17 @@ import java.util.Optional;
 @ConditionalOnExpression("${testing.support.enabled:false}")
 public class AssignCaseSupportController {
 
-    private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final OrganisationService organisationService;
     private final CaseAssignmentSupportService assignCaseSupportService;
+    private final AssignCaseService assignCaseService;
 
     @PostMapping(value = {"/assign-case/{caseId}", "/assign-case/{caseId}/{caseRole}"})
     @ApiOperation("Assign case to user")
     public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                            @PathVariable("caseId") String caseId,
                            @PathVariable("caseRole") Optional<CaseRole> caseRole) {
-        String userId = userService.getUserInfo(authorisation).getUid();
-
-        String organisationId = organisationService.findOrganisation(authorisation)
-            .map(Organisation::getOrganisationIdentifier).orElse(null);
-
-        coreCaseUserService.assignCase(
-            caseId,
-            userId,
-            organisationId,
-            caseRole.orElse(CaseRole.RESPONDENTSOLICITORONE)
-        );
+        assignCaseService.assignCase(authorisation, caseId, caseRole);
     }
 
     @PostMapping(value = {"/unassign-user", "/unassign-user"})
