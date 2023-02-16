@@ -1,31 +1,6 @@
-tags:
-  civil-ccd-stack: true
-
-postgresql:
-  enabled: true
-  image:
-    registry: hmctspublic.azurecr.io
-    repository: imported/bitnami/postgresql
-    tag: '11.6.0'
-  resources:
-    requests:
-      cpu: 25m
-  initdbScripts:
-    init.sql: |-
-      CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-  postgresqlUsername: ${POSTGRES_USER}
-  postgresqlPassword: ${POSTGRES_PASSWORD}
-  persistence:
-    enabled: false
-
 java:
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   keyVaults:
     civil:
       resourceGroup: civil
@@ -44,9 +19,11 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - robotics-notification-recipient-spec
-        - launch-darkly-sdk-key
+        - name: launch-darkly-sdk-key-non-prod
+          alias: launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - ordnance-survey-api-key
+        - notification-caseworker-spec-receiver
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -58,20 +35,41 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
-    SERVICE_REQUEST_UPDATE: http://${SERVICE_NAME}/service-request-update
+    SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued
     LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
-
+  postgresql:
+    enabled: true
+    image:
+      tag: '11.6.0'
+    primary:
+      persistence:
+        enabled: false
+      resources:
+        requests:
+          cpu: 25m
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+    auth:
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
   enabled: true
   redirect_uris:
     XUI:
-      - https://xui-${SERVICE_FQDN}/oauth2/callback
+      - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true
@@ -95,6 +93,7 @@ xui-webapp:
       LAUNCH_DARKLY_CLIENT_ID: ~
 
 ccd:
+  enabled: true
   ccd:
     adminWeb:
       enabled: false
@@ -109,13 +108,16 @@ ccd:
     postgresql:
       enabled: false
     ras:
-      enabled: true
-
+      enabled: false
+    userProfileImporter:
+      enabled: false
+    userProfile:
+      enabled: false
   global:
     ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
-    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
+    ccdUserProfileUrl: http://ccd-user-profile-api-aat.service.core-compute-aat.internal
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -131,10 +133,15 @@ ccd:
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
-      keyVaults: []
+      disableKeyVaults: true
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
+      devcpuRequests: 500m
+      devmemoryRequests: 2048Mi
+      devmemoryLimits: 4096Mi
+      autoscaling:
+        enabled: false
       environment:
         CASE_DOCUMENT_AM_API_ATTACH_DOCUMENT_ENABLED: false
         DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
@@ -152,14 +159,9 @@ ccd:
         CCD_MULTIPARTY_LOG_LEVEL: DEBUG
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
-      keyVaults: []
+        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+      disableKeyVaults: true
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-  am-role-assignment-service:
-    java:
-      keyVaults:
-        am:
-          secrets:
-            - role-assignment-service-LD-SDK-KEY
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
@@ -171,15 +173,8 @@ ccd:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-      keyVaults: []
+      disableKeyVaults: true
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-  ccd-user-profile-api:
-    java:
-      imagePullPolicy: Always
-      enviroment:
-        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-      keyVaults: []
-      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
   postgresql:
     persistence:

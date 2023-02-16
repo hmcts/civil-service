@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 
@@ -31,8 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +55,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        CaseData preDecisionCaseData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
@@ -68,36 +66,21 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             DecisionRequest.decisionRequest(caseDetails)
         );
 
-        CaseData updatedCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = updatedCaseData.toBuilder();
+        CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
 
-        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
+        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
+            updatedCaseDataBuilder,
+            preDecisionCaseData.getChangeOrganisationRequestField()
+        );
 
-        updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION));
-
-        updateChangeOfRepresentationHistory(callbackParams.getCaseData().getChangeOrganisationRequestField(),
-                                            updatedCaseData, updatedCaseDataBuilder);
+        updatedCaseDataBuilder
+            .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
+            .changeOfRepresentation(getChangeOfRepresentation(
+                    callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
-    }
-
-    private void updateChangeOfRepresentationHistory(ChangeOrganisationRequest corFieldBeforeNoC,
-                                                     CaseData updatedCaseData,
-                                                     CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder) {
-        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory =
-            updatedCaseData.getChangeOfRepresentation();
-
-        ChangeOfRepresentation newChangeOfRepresentation =
-            getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData);
-
-        if (changeOfRepresentationHistory != null
-            && !changeOfRepresentationHistory.isEmpty()) {
-            changeOfRepresentationHistory.add(element(newChangeOfRepresentation));
-            updatedCaseDataBuilder.changeOfRepresentation(changeOfRepresentationHistory);
-        } else {
-            updatedCaseDataBuilder.changeOfRepresentation(wrapElements(newChangeOfRepresentation));
-        }
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
@@ -106,7 +89,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
             .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
             .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
-            .timestamp(corFieldBeforeNoC.getRequestTimestamp());
+            .timestamp(corFieldBeforeNoC.getRequestTimestamp())
+            .formerRepresentationEmailAddress(
+                getFormerEmail(corFieldBeforeNoC.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeNoC.getOrganisationToRemove() != null) {
             builder.organisationToRemoveID(corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
@@ -115,7 +100,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     /** After applying the NoC decision the ChangeOrganisationRequest field is nullified
-     * To auto assigned the case to the new user, Assign case access checks for:
+     * To auto assign the case to the new user, Assign case access checks for:
      * 1. ChangeOrganisationRequest field in case data, it does this by looking for the OrganisationToAdd node
      * 2. checks if caseroleID field is null
      *
@@ -126,21 +111,19 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      *
      * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
      *
-     * @param updatedCaseData updatedCaseData
-     * @param updatedcaseDataBuilder updatedcaseDataBuilder
+     * @param updatedCaseDataBuilder updatedcaseDataBuilder
+     * @param changeOrganisationRequest preDecisionCor
      */
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-        CaseData updatedCaseData,
-        CaseData.CaseDataBuilder<?, ?> updatedcaseDataBuilder) {
-        ChangeOrganisationRequest updatedcor = updatedCaseData.getChangeOrganisationRequestField();
-        if (updatedcor == null) {
-            updatedcaseDataBuilder
-                .changeOrganisationRequestField(ChangeOrganisationRequest.builder()
-                                                   .organisationToAdd(Organisation.builder()
-                                                                          .organisationID(
-                                                                              ORG_ID_FOR_AUTO_APPROVAL).build())
-                                                                      .build());
-        }
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder,
+        ChangeOrganisationRequest preDecisionCor) {
+        updatedCaseDataBuilder
+                .changeOrganisationRequestField(
+                    ChangeOrganisationRequest.builder()
+                        .createdBy(preDecisionCor.getCreatedBy())
+                        .organisationToAdd(
+                            Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
+
     }
 
     /** The ChangeOrganisationRequest field has a node called OrganisationToRemove.
@@ -204,6 +187,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
                     return respondent2OrganisationIDCopy;
                 }
             }
+        }
+        return null;
+    }
+
+    private String getFormerEmail(String caseRole, CaseData caseData) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            return caseData.getRespondentSolicitor2EmailAddress();
         }
         return null;
     }

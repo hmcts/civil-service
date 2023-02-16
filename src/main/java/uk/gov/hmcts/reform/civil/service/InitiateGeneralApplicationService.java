@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -21,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
@@ -39,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
@@ -164,18 +160,6 @@ public class InitiateGeneralApplicationService {
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
 
-        Optional<Organisation> org = findOrganisation(authToken);
-        if (org.isPresent()) {
-            applicationBuilder
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                                             .builder()
-                                             .id(userDetails.getId())
-                                             .email(userDetails.getEmail())
-                                             .forename(userDetails.getForename())
-                                             .surname(userDetails.getSurname())
-                                             .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
-        }
-
         GACaseManagementCategoryElement civil =
             GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
         List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
@@ -183,11 +167,12 @@ public class InitiateGeneralApplicationService {
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
-        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
-        applicationBuilder.locationName(caseLocation.getLeft().getSiteName());
+        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
+                                            ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
 
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
@@ -226,11 +211,6 @@ public class InitiateGeneralApplicationService {
         newApplication.add(element(application));
 
         return newApplication;
-    }
-
-    public Boolean validateFileName(String fileName, String expectedFileName) {
-
-        return FilenameUtils.removeExtension(fileName).equalsIgnoreCase(expectedFileName);
     }
 
     public List<String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
@@ -298,16 +278,6 @@ public class InitiateGeneralApplicationService {
         }
     }
 
-    public Optional<Organisation> findOrganisation(String authToken) {
-        try {
-            return ofNullable(organisationApi.findUserOrganisation(authToken, authTokenGenerator.generate()));
-
-        } catch (FeignException.NotFound | FeignException.Forbidden ex) {
-            log.error("User not registered in MO", ex);
-            return Optional.empty();
-        }
-    }
-
     public boolean respondentAssigned(CaseData caseData) {
         String caseId = caseData.getCcdCaseReference().toString();
         CaseAssignedUserRolesResource userRoles = getUserRolesOnCase(caseId);
@@ -345,7 +315,7 @@ public class InitiateGeneralApplicationService {
         return respondentCaseRoles;
     }
 
-    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+    private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
             if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
                 if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
@@ -367,7 +337,7 @@ public class InitiateGeneralApplicationService {
             }
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            CaseLocation courtLocation = CaseLocation.builder()
+            CaseLocationCivil courtLocation = CaseLocationCivil.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
@@ -380,16 +350,16 @@ public class InitiateGeneralApplicationService {
         return !statesBeforeSDO.contains(state);
     }
 
-    private CaseLocation getClaimant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getClaimant1PreferredLocation(CaseData caseData) {
         if (caseData.getApplicant1DQ() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getCourtLocation().getCaseLocation().getRegion())
                 .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
                 .build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
@@ -403,13 +373,13 @@ public class InitiateGeneralApplicationService {
                 && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
     }
 
-    private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendant1PreferredLocation(CaseData caseData) {
         if (caseData.getRespondent1DQ() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -417,11 +387,11 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private CaseLocation getDefendantPreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
         if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -429,14 +399,14 @@ public class InitiateGeneralApplicationService {
                 .build();
         } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
             || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                   .getCaseLocation().getBaseLocation())
                 .build();
         } else {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
     }
 }

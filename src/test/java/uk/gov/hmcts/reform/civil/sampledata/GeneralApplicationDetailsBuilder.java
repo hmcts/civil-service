@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static java.time.LocalDate.EPOCH;
 import static java.time.LocalDateTime.now;
@@ -295,7 +296,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDetails(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
-                                               boolean withGADetailsResp2,
+                                               boolean withGADetailsResp2, boolean withGADetailsMaster,
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -305,19 +306,34 @@ public class GeneralApplicationDetailsBuilder {
             applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
             caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
         }
+
         if (withGADetails) {
             List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
             applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
-            caseDataBuilder.generalApplicationsDetails(
+            caseDataBuilder.claimantGaAppDetails(
                     wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
             ));
         }
+
+        if (withGADetailsMaster) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.gaDetailsMasterCollection(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
         List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
         applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
         if (withGADetailsResp) {
-            caseDataBuilder.gaDetailsRespondentSol(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])));
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
         }
 
+        if (withGADetailsResp2) {
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
         return caseDataBuilder.build();
     }
 
@@ -428,7 +444,7 @@ public class GeneralApplicationDetailsBuilder {
                 .applicant1DQ(Applicant1DQ.builder()
                         .applicant1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("applicant1DQRequestedCourt")
-                                                        .caseLocation(CaseLocation.builder()
+                                                        .caseLocation(CaseLocationCivil.builder()
                                                                           .region("2")
                                                                           .baseLocation("00000")
                                                                           .build())
@@ -438,7 +454,7 @@ public class GeneralApplicationDetailsBuilder {
                 .respondent1DQ(Respondent1DQ.builder()
                         .respondent1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("respondent1DQRequestedCourt")
-                                                         .caseLocation(CaseLocation.builder()
+                                                         .caseLocation(CaseLocationCivil.builder()
                                                                            .region("2")
                                                                            .baseLocation("11111")
                                                                            .build())
@@ -534,7 +550,7 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1DQ(Applicant1DQ.builder()
                         .applicant1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("applicant1DQRequestedCourt")
-                                                        .caseLocation(CaseLocation.builder()
+                                                        .caseLocation(CaseLocationCivil.builder()
                                                                           .region("2")
                                                                           .baseLocation("11111")
                                                                           .build())
@@ -544,7 +560,7 @@ public class GeneralApplicationDetailsBuilder {
                 .respondent1DQ(Respondent1DQ.builder()
                         .respondent1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("respondent1DQRequestedCourt")
-                                                         .caseLocation(CaseLocation.builder()
+                                                         .caseLocation(CaseLocationCivil.builder()
                                                                            .region("2")
                                                                            .baseLocation("00000")
                                                                            .build())
@@ -632,7 +648,7 @@ public class GeneralApplicationDetailsBuilder {
             .ccdCaseReference(1234L)
             .superClaimType(claimType)
             .courtLocation(CourtLocation.builder()
-                               .caseLocation(CaseLocation.builder()
+                               .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")
                                                  .baseLocation("00000")
                                                  .build())
@@ -734,7 +750,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent2DQ respondent2DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .ccdCaseReference(1234L)
-                .courtLocation(CourtLocation.builder().caseLocation(CaseLocation.builder()
+                .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
                                                                         .region("2")
                                                                         .baseLocation("00000")
                                                                         .build()).build())
@@ -838,7 +854,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent1DQ respondent1DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
             .ccdCaseReference(1234L)
-            .courtLocation(CourtLocation.builder().caseLocation(CaseLocation.builder()
+            .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
                                                                     .region("2")
                                                                     .baseLocation("00000")
                                                                     .build()).build())
@@ -937,7 +953,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent2DQ respondent2DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
             .ccdCaseReference(1234L)
-            .courtLocation(CourtLocation.builder().caseLocation(CaseLocation.builder()
+            .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
                                                                     .region("2")
                                                                     .baseLocation("00000")
                                                                     .build()).build())
@@ -1201,13 +1217,15 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithGeneralOrderPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
-            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                                                    .value(pdfDocument).build()))
             .build();
     }
 
@@ -1223,14 +1241,31 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithDirectionOrderPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
-            .directionOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                                                    .value(pdfDocument).build()))
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                      .value(pdfDocument).build()))
             .build();
+    }
+
+    public CaseData getTestCaseDataWithHearingOrderDocumentPDFDocument(CaseData caseData) {
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .hearingNoticeDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                        .value(pdfDocument).build()))
+                .build();
     }
 
     public CaseData getTriggerGeneralApplicationTestData() {

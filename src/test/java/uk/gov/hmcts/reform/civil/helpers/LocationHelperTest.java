@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -46,7 +46,7 @@ public class LocationHelperTest {
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
             .isNotNull()
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .region("regionId")
                            .baseLocation("epimms")
                            .build());
@@ -160,7 +160,7 @@ public class LocationHelperTest {
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .baseLocation(CCMCC_EPIMS)
                            .region(CCMCC_REGION_ID).build());
     }
@@ -182,7 +182,7 @@ public class LocationHelperTest {
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .baseLocation(CCMCC_EPIMS)
                            .region(CCMCC_REGION_ID).build());
     }
@@ -282,5 +282,49 @@ public class LocationHelperTest {
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getResponseCourtCode())
             .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
+    }
+
+    @Test
+    public void when1v2AnyIndividual_thenCourtIsIndividualDefendant() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
+                            .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .courtLocation(CourtLocation.builder()
+                               .applicantPreferredCourt("123")
+                               .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .respondent2(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("432")
+                                       .build()
+                               )
+                               .build())
+            // company answered first
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
+                .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
     }
 }

@@ -35,6 +35,7 @@ public interface NotificationData {
     //Default judgment
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
+
     String DEFENDANT_NAME = "DefendantName";
     String BOTH_DEFENDANTS = "Both Defendants";
     String CLAIM_NUMBER_INTERIM = "Claim number";
@@ -44,12 +45,37 @@ public interface NotificationData {
     String DEFENDANT_EMAIL = "DefendantLegalOrgName";
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
+    String PAYMENT_TYPE = "payment type";
+    String AMOUNT_CLAIMED = "amountClaimed";
+    String AMOUNT_OF_COSTS = "amountOfCosts";
+    String AMOUNT_PAID = "amountPaidBeforeJudgment";
+    String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
+    String RESPONDENT = "respondent";
 
     // CUI Pin in Post
     String CLAIMANT_NAME = "claimantName";
     String RESPOND_URL = "respondToClaimUrl";
     String PIN = "pin";
     String FRONTEND_URL = "frontendBaseUrl";
+
+    //Case Progression
+    String EMAIL_ADDRESS = "emailAddress";
+    String HEARING_FEE = "hearingFee";
+    String HEARING_DATE = "hearingDate";
+    String HEARING_TIME = "hearingTime";
+    String HEARING_DUE_DATE = "hearingDueDate";
+    String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
+    String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
+    String HEARING_OR_TRIAL = "hearing/trial";
+    String CLAIMANT_DEFENDANT_REFERENCE = "claimant/defendantReferenceNumber";
+
+    //NoC
+    String CASE_NAME = "case name";
+    String ISSUE_DATE = "issue date";
+    String CCD_REF = "ccd reference code";
+    String NEW_SOL = "new solicitor";
+    String FORMER_SOL = "former solicitor";
+    String OTHER_SOL_NAME = "other solicitor name";
 
     Map<String, String> addProperties(CaseData caseData);
 

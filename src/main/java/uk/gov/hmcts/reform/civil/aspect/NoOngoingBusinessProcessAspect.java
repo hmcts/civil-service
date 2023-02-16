@@ -40,20 +40,21 @@ public class NoOngoingBusinessProcessAspect {
     ) throws Throwable {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
+
+        if (callbackParams.getType() == SUBMITTED
+            || caseEvent.isCamundaEvent()
+            || caseData.hasNoOngoingBusinessProcess()
+            || generalAppsOrSDOOrReferToJudge(callbackParams)
+            || caseEvent.equals(CaseEvent.migrateCase)
+        ) {
+            return joinPoint.proceed();
+        }
         StringBuilder stateHistoryBuilder = new StringBuilder();
         FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
         stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
             stateHistoryBuilder.append(s.getName());
             stateHistoryBuilder.append(", ");
         });
-        if (callbackParams.getType() == SUBMITTED
-            || caseEvent.isCamundaEvent()
-            || caseData.hasNoOngoingBusinessProcess()
-            || generalAppsOrSDO(callbackParams)
-            || caseEvent.equals(CaseEvent.migrateCase)
-        ) {
-            return joinPoint.proceed();
-        }
         log.info(format(
             "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
                 + "stateFlowHistory: %s",
@@ -66,8 +67,9 @@ public class NoOngoingBusinessProcessAspect {
             .build();
     }
 
-    private boolean generalAppsOrSDO(CallbackParams callbackParams) {
+    private boolean generalAppsOrSDOOrReferToJudge(CallbackParams callbackParams) {
         return (valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
-            || valueOf(CaseEvent.CREATE_SDO).equals(callbackParams.getRequest().getEventId()));
+            || valueOf(CaseEvent.CREATE_SDO).equals(callbackParams.getRequest().getEventId())
+            || valueOf(CaseEvent.REFER_TO_JUDGE).equals(callbackParams.getRequest().getEventId()));
     }
 }

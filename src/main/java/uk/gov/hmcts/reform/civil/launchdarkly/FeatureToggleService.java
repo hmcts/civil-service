@@ -31,11 +31,6 @@ public class FeatureToggleService {
         return internalClient.boolVariation(feature, user, false);
     }
 
-    public boolean isOrganisationOnboarded(String orgId) {
-        LDUser ldUser = createLDUser().custom("orgId", orgId).build();
-        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
-    }
-
     public boolean isRpaContinuousFeedEnabled() {
         return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
     }
@@ -54,10 +49,6 @@ public class FeatureToggleService {
             createLDUser().build(),
             false
         );
-    }
-
-    public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
     }
 
     public boolean isSdoEnabled() {
@@ -86,6 +77,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
+    public boolean isCaseFlagsEnabled() {
+        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+    }
+
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
@@ -94,8 +89,17 @@ public class FeatureToggleService {
         return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
     }
 
+    public boolean isPbaV3Enabled() {
+        return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
+    }
+
     public boolean isSDOEnabled() {
         return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+    }
+
+    public boolean isCertificateOfServiceEnabled() {
+        return internalClient.boolVariation("isCertificateOfServiceEnabled",
+                                            createLDUser().build(), false);
     }
 
     private void close() {
