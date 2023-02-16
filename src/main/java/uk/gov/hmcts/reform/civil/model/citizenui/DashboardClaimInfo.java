@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -31,11 +33,11 @@ public class DashboardClaimInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal claimAmount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadline;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate paymentDate;
     private DashboardClaimStatus status;

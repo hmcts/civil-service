@@ -51,7 +51,6 @@ public class ClaimStoreServiceTest {
                                                                                             .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .ocmc(true)
-
                                                                                             .build());
 
     @BeforeEach

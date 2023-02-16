@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
 @Data
 @Builder
@@ -25,6 +28,8 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CmcClaim implements Claim {
 
+    @JsonIgnore
+    private static final LocalTime FOUR_PM = LocalTime.of (16, 1, 0);
     private String submitterId;
     private String letterHolderId;
     private String defendantId;
@@ -34,7 +39,7 @@ public class CmcClaim implements Claim {
     @JsonProperty("claim")
     private ClaimData claimData;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate responseDeadline;
@@ -42,17 +47,17 @@ public class CmcClaim implements Claim {
     private String submitterEmail;
 
     public Response response;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate moneyReceivedOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDateTime countyCourtJudgmentRequestedAt;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
@@ -93,7 +98,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasResponseDueToday() {
         return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
-            && LocalDateTime.now().isBefore(LocalDate.now().atTime(16, 0, 0));
+            && LocalDateTime.now().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
     @Override
@@ -174,6 +179,6 @@ public class CmcClaim implements Claim {
 
     private boolean isResponseDeadlinePastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())
-            && LocalDateTime.now().isAfter(LocalDate.now().atTime(16, 0, 0));
+            && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 }
