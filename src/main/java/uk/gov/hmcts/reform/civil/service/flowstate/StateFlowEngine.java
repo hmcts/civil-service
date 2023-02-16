@@ -381,6 +381,8 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotified)
+                .transitionTo(TAKEN_CASE_OFFLINE_SDO_DJ)
+                    .onlyIf(takenOfflineAfterSDODJ)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf((respondentTimeExtension).and(allResponsesReceived))
