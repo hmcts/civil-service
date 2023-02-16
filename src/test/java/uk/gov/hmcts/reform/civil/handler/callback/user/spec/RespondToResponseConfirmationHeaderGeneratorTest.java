@@ -100,7 +100,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildJudgmentSubmitProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
