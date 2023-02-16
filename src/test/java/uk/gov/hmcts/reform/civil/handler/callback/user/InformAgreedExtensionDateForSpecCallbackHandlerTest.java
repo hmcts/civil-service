@@ -73,7 +73,6 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
     @MockBean
     private FeatureToggleService toggleService;
 
-
     @Test
     void shouldContainExtendResponseDeadlineEvent_whenPinAndPostEnabled() {
         given(toggleService.isPinInPostEnabled()).willReturn(true);
