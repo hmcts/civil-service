@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -48,15 +45,6 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
     private OrganisationService organisationService;
     @Autowired
     private FailedPaymentApplicantForSpecNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService toggleService;
-
-    @Test
-    public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -69,11 +57,14 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
 
         @Test
         void shouldNotifyClaimantSolicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
