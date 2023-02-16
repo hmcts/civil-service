@@ -125,6 +125,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -375,6 +376,13 @@ public class CaseDataBuilder {
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
     private BigDecimal ccjPaymentPaidSomeAmount;
+    private YesOrNo ccjPaymentPaidSomeOption;
+    private BigDecimal totalInterest;
+    private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+
+    private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+
+    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -3377,6 +3385,29 @@ public class CaseDataBuilder {
         }
     }
 
+    public CaseDataBuilder atStateTrialReadyCheck(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(6);
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+
+        if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            solicitorReferences = SolicitorReferences.builder()
+                .applicantSolicitor1Reference("123456")
+                .respondentSolicitor1Reference("123456")
+                .respondentSolicitor2Reference("123456").build();
+            return this;
+        }
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
@@ -3690,7 +3721,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingDueDate = now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
         ccdState = HEARING_READINESS;
         return this;
@@ -3750,7 +3781,6 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
-
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -4368,6 +4398,41 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specRespondent1Represented(YesOrNo specRespondent1Represented) {
+        this.specRespondent1Represented = specRespondent1Represented;
+        return this;
+    }
+
+    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption) {
+        this.ccjPaymentPaidSomeOption = paymentOption;
+        return this;
+    }
+
+    public CaseDataBuilder claimFee(Fee fee) {
+        this.claimFee = fee;
+        return this;
+    }
+
+    public CaseDataBuilder totalInterest(BigDecimal interest) {
+        this.totalInterest = interest;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1AcceptAdmitAmountPaidSpec(YesOrNo isPaymemtAccepted) {
+        this.applicant1AcceptAdmitAmountPaidSpec = isPaymemtAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo isPartPaymentAccepted) {
+        this.applicant1AcceptPartAdmitPaymentPlanSpec = isPartPaymentAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder respondToAdmittedClaimOwingAmountPounds(BigDecimal admitedCliaimAmount) {
+        this.respondToAdmittedClaimOwingAmountPounds = admitedCliaimAmount;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4592,6 +4657,11 @@ public class CaseDataBuilder {
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .caseAccessCategory(caseAccessCategory)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
+            .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
+            .totalInterest(totalInterest)
+            .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
+            .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .build();
     }
 
