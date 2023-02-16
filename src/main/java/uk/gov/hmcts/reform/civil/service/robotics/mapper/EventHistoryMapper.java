@@ -53,6 +53,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -258,6 +259,7 @@ public class EventHistoryMapper {
             }
         }
         buildInformAgreedExtensionDateForSpec(builder, caseData);
+        buildClaimTakenOfflineAfterDJ(builder, caseData);
 
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -2044,5 +2046,13 @@ public class EventHistoryMapper {
                                   .miscText(detailsText)
                                   .build())
                 .build());
+    }
+
+    private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
+                                               CaseData caseData) {
+        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM && caseData.getOrderSDODocumentDJ() != null) {
+            buildClaimTakenOfflineAfterSDO(builder, caseData);
+        }
+
     }
 }
