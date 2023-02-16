@@ -248,6 +248,9 @@ task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
+  onlyIf {
+    return System.env.NIGHTLY_RUN != 'true'
+  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
 
@@ -274,7 +277,7 @@ task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multipa
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:e2e-unspec'
+  commandLine '/usr/bin/yarn', '--silent', 'test:AATFunctional'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
