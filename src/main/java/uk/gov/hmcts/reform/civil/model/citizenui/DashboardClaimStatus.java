@@ -42,15 +42,10 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
-    NO_STATUS;
+    NO_STATUS(c -> false);
 
     @Getter
     private final Predicate<Claim> claimMatcher;
-
-    DashboardClaimStatus() {
-        claimMatcher = c -> false;
-
-    }
 
     DashboardClaimStatus(Predicate<Claim> claimMatcher) {
         this.claimMatcher = claimMatcher;
