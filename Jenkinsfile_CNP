@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
+def ccdBranch = "feat/CIV-5365_review-polling-mechanism"
 def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 
@@ -59,7 +59,7 @@ def publishRpaContract() {
 }
 
 def checkForEnableHelmLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "enableHelm").contains("enableHelm")
+    return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
 withPipeline(type, product, component) {
@@ -112,8 +112,13 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
 
-  afterSuccess('smoketest:preview') {
+  afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
+    if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
+      sh """
+        exit 1
+      """
+    }
   }
 
   before('functionalTest:preview') {
@@ -124,7 +129,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
 
-  afterSuccess('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
@@ -142,7 +147,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
   }
 
-  afterSuccess('smoketest:aat') {
+  afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
@@ -155,7 +160,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
   }
 
-  afterSuccess('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
