@@ -29,7 +29,8 @@ public class AdmitProceedConfHeader implements RespondToResponseConfirmationHead
                 "# The defendant said they'll pay you immediately.%n## Claim number: %s",
                 claimNumber
             ));
-        } else if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+        } else if (caseData.getApplicant1ProceedsWithClaimSpec() == null
+            || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }

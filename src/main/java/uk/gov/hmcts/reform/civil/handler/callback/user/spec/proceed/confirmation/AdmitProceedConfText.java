@@ -44,7 +44,8 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
                       formattedWhenBePaid,
                       "https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf"
             ));
-        } else if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+        } else if (caseData.getApplicant1ProceedsWithClaimSpec() == null
+            || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }
