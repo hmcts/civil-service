@@ -181,7 +181,7 @@ class DeadlineExtensionValidatorTest {
                 false
             );
 
-            assertThat(errors).contains("Date must be Weekday/Working Day");
+            assertThat(errors).contains("Date must be next working weekday");
         }
     }
 }
