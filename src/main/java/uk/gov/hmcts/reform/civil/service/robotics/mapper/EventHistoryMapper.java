@@ -2050,7 +2050,7 @@ public class EventHistoryMapper {
 
     private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
                                                CaseData caseData) {
-        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM && caseData.getOrderSDODocumentDJ() != null) {
+        if (caseData.getTakenOfflineDate() != null && caseData.getOrderSDODocumentDJ() != null) {
             buildClaimTakenOfflineAfterSDO(builder, caseData);
         }
 
