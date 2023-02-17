@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -40,19 +38,16 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class BundleCreationServiceTest {
+class BundleCreationServiceTest {
 
     @InjectMocks
     private BundleCreationService bundlingService;
-    private BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
     @Mock
     private BundleApiClient bundleApiClient;
-    @Mock
-    private BundleCreateRequest bundleCreateRequest;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
@@ -165,24 +160,26 @@ public class BundleCreationServiceTest {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
         Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
         particularsOfClaim.add(ElementUtils.element(document));
-        ServedDocumentFiles servedDocumentFiles =
-            ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
-        return servedDocumentFiles;
+        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
     }
 
     @Test
-    public void testCreateBundleService() throws Exception {
-        //given: case details with all document type
+    void testBundleApiClientIsInvoked() throws Exception {
+        //Given: case details with all document type
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(userConfig.getUserName()).thenReturn("test");
-        when(userConfig.getPassword()).thenReturn("test");
-        when(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).thenReturn(caseData);
-        when(authTokenGenerator.generate()).thenReturn("test");
-        when(userService.getAccessToken("test", "test")).thenReturn("test");
-        //when: bundlecreation service is called
-        BundleCreateResponse expectedResponse = bundlingService.createBundle(event);
-        //then: BundleRest API should be called
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any(), any())).willReturn(null);
+        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
+        given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
+        given(userConfig.getUserName()).willReturn("test");
+        given(userConfig.getPassword()).willReturn("test");
+        given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
+        given(authTokenGenerator.generate()).willReturn("test");
+        given(userService.getAccessToken("test", "test")).willReturn("test");
+
+        //When: bundlecreation service is called
+        bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
+
+        //Then: BundleRest API should be called
         verify(bundleApiClient).createBundleServiceRequest(anyString(), anyString(), any());
     }
 

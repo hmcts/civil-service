@@ -32,7 +32,7 @@ public class BundleCreationService {
     private String bundleConfig;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    public BundleCreateResponse createBundle(BundleCreationTriggerEvent event) throws Exception {
+    public BundleCreateResponse createBundle(BundleCreationTriggerEvent event) {
         CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
         return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
                             bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
@@ -48,7 +48,7 @@ public class BundleCreationService {
     }
 
     private BundleCreateResponse createNewBundleRequest(String authorization, String serviceAuthorization,
-                                              BundleCreateRequest bundleCreateRequest) throws Exception {
+                                              BundleCreateRequest bundleCreateRequest) {
 
         return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
     }

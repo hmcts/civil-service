@@ -28,35 +28,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
-public class BundleRequestMapperTest {
+class BundleRequestMapperTest {
 
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
-    private final String testUrl = "url";
-    private final String testFileName = "testFileName.pdf";
+    private final static String TEST_URL = "url";
+    private final static String TEST_FILE_NAME = "testFileName.pdf";
 
     @Test
-    public void testBundleRequestMapperWithAllDocs() {
-        //Create document with type UploadEvidenceWitness
+    void testBundleRequestMapperWithAllDocs() {
+        // Given
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = getWitnessDocs();
-        //Create document with type UploadEvidenceExpert
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = getExpertDocs();
-        //Create document with type UploadEvidenceDocumentType
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
-        //Create system generated Doc
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
-        //Create servedDocument files
         ServedDocumentFiles servedDocumentFiles = setupParticularsOfClaimDocs();
-
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
                                         systemGeneratedCaseDocuments, servedDocumentFiles);
+
+        // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
             ".yaml", "test", "test", 1L
         );
+
+        // Then
         assertNotNull(bundleCreateRequest);
-        assertEquals(bundleCreateRequest.getCaseDetails().getCaseData().getDocumentWitnessStatement().get(0).getValue().getDocumentFileName(),
-                     "Witness Statement_FirstName LastName_10022023");
+        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
+                         .getDocumentWitnessStatement().get(0).getValue().getDocumentFileName());
     }
 
     private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -104,19 +103,17 @@ public class BundleRequestMapperTest {
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
+        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
-        ServedDocumentFiles servedDocumentFiles =
-            ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
-        return servedDocumentFiles;
+        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
-                                                                           .documentFileName(testFileName).build()).build()));
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build()).build()));
         return otherEvidenceDocs;
     }
 
@@ -124,8 +121,8 @@ public class BundleRequestMapperTest {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                            .documentFileName(testFileName).build()).build()));
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  expertEvidenceDocs;
     }
@@ -134,38 +131,45 @@ public class BundleRequestMapperTest {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                                    .documentFileName(testFileName).build())
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).build())
                                                          .witnessOptionName("FirstName LastName")
-                                                         .witnessOptionUploadDate(LocalDate.of(2023, 02, 10)).build()));
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10)).build()));
         return witnessEvidenceDocs;
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
+                TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
             CaseDocument.builder()
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
 
     @Test
-    public void testBundleCreateRequestMapperForEmptyDetails() {
+    void testBundleCreateRequestMapperForEmptyDetails() {
+        // Given
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build()).hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
+
+        // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
                                                                                                            ".yaml",
                                                                                                        "test", "test",
                                                                                                        1L
         );
+
+        // Then
         assertNotNull(bundleCreateRequest);
     }
 }

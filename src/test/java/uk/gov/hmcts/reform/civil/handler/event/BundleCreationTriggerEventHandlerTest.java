@@ -42,7 +42,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @ExtendWith(SpringExtension.class)
-public class BundleCreationTriggerEventHandlerTest {
+class BundleCreationTriggerEventHandlerTest {
+
+    private final static String TEST_URL = "url";
+    private final static String TEST_FILE_NAME = "testFileName.pdf";
 
     @Mock
     private BundleCreationService bundleCreationService;
@@ -50,14 +53,11 @@ public class BundleCreationTriggerEventHandlerTest {
     CoreCaseDataService coreCaseDataService;
     @Mock
     CaseDetailsConverter caseDetailsConverter;
-    private BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
     private BundleCreateResponse bundleCreateResponse;
     @InjectMocks
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
-    private final String testUrl = "url";
-    private final String testFileName = "testFileName.pdf";
-    CaseData caseData;
-    CaseDetails caseDetails;
+    private CaseData caseData;
+    private CaseDetails caseDetails;
 
     @BeforeEach
     public void setup() {
@@ -128,8 +128,8 @@ public class BundleCreationTriggerEventHandlerTest {
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()
                                                          .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 testUrl)
-                                                                                    .documentFileName(testFileName).build()).build()));
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).build()).build()));
         return witnessEvidenceDocs;
     }
 
@@ -137,8 +137,8 @@ public class BundleCreationTriggerEventHandlerTest {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                            .documentFileName(testFileName).build()).build()));
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
         return expertEvidenceDocs;
     }
 
@@ -146,8 +146,8 @@ public class BundleCreationTriggerEventHandlerTest {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
-                                                                           .documentFileName(testFileName).build()).build()));
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build()).build()));
         return otherEvidenceDocs;
     }
 
@@ -155,35 +155,53 @@ public class BundleCreationTriggerEventHandlerTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
             CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                testUrl).documentFileName(testFileName).build()).build();
+                TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
             CaseDocument.builder()
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
+        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
-        ServedDocumentFiles servedDocumentFiles =
-            ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
-        return servedDocumentFiles;
+        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
     }
 
     @Test
-    public void testSendBundleCreationTrigger() throws Exception {
-        //given : Case details with all type of documents require for bundles
+    void testSendBundleCreationTriggerDoesNotThrowExceptionWhenItsAllGood() {
+        // Given: Case details with all type of documents require for bundles
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
             .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
         when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
-        //when: Bundle creation trigger is called
-        //then: Any Exception should not be thrown
+
+        // When: Bundle creation trigger is called
+        // Then: Any Exception should not be thrown
         Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
+    }
+
+    @Test
+    void testPrepareNewBundlePopulatesAllFields() {
+        // Given: a bundle object and case data
+
+        // When: I call the prepareNewBundle method
+
+        // Then: the bundleHearingDate, stitchedDocument, filename, title, description, stitchStatus, createdOn and id fields must be populated
+    }
+
+    @Test
+    void testPrepareCaseContent() {
+        // Given: a collection of case bundles and a valid startEventResponse
+
+        // When: I call the prepareCaseContent method
+
+        // Then: all fields are populated correctly
     }
 }
