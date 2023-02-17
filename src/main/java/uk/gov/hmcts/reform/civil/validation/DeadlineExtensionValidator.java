@@ -55,7 +55,7 @@ public class DeadlineExtensionValidator {
             dateToValidate,
             END_OF_BUSINESS_DAY
         ).isAfter(newResponseDeadline)) {
-            return List.of("Date must be from claim issue date plus a maximum of 42 days.");
+            return List.of("Date must be from claim issue date plus a maximum of 56 days.");
         }
 
         if (isAoSApplied && LocalDateTime.of(
@@ -66,7 +66,7 @@ public class DeadlineExtensionValidator {
         }
 
         if (!workingDayIndicator.isWorkingDay(dateToValidate)) {
-            return List.of("Date must be Weekday/Working Day");
+            return List.of("Date must be next working weekday");
         }
         return emptyList();
     }

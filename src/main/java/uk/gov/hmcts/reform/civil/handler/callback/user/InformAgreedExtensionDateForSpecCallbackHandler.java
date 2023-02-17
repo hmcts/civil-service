@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -34,6 +35,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -56,6 +62,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
+    public static final String  ERROR_EXTENSION_DATE_ALREADY_SUBMITTED =
+        "This action cannot currently be performed because it has already been completed";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,6 +86,21 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
         }
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
+            || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
+            && caseData.getRespondent1TimeExtensionDate() != null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_EXTENSION_DATE_ALREADY_SUBMITTED))
+                .build();
+        }
+        if ((!solicitorRepresentsOnlyRespondent2(callbackParams) && caseData.getRespondent1TimeExtensionDate() != null)
+            || (solicitorRepresentsOnlyRespondent2(callbackParams)
+            && caseData.getRespondent2TimeExtensionDate() != null)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_EXTENSION_DATE_ALREADY_SUBMITTED))
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().isRespondent1(isRespondent1).build().toMap(objectMapper))
@@ -87,8 +110,16 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
+
+        if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            agreedExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+        }
+        if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP) && solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        }
+
         var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
