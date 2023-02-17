@@ -1073,11 +1073,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ABOUT_TO_SUBMIT
                 ));
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
         }
 
         @Test
@@ -1104,6 +1106,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("respondent2OrgRegistered", "Yes");
+            assertThat(response.getData())
+                .containsEntry("respondentSolicitor2EmailAddress", "respondentsolicitor@example.com");
         }
 
         //TO DO remove V_1 when CIV-3278 is released

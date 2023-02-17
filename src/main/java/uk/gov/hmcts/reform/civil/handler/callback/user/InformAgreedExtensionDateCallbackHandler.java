@@ -161,6 +161,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent1TimeExtensionDate(time.now())
                 .respondent1ResponseDeadline(newDeadline)
+                .respondent2TimeExtensionDate(time.now())
+                .respondent2ResponseDeadline(newDeadline)
+                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
                 .nextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
