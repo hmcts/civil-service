@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,39 +67,25 @@ public class BundleCreationTriggerEventHandlerTest {
                                                         "Trial Bundle").build()).build();
         List<Bundle> list = new ArrayList<>();
         list.add(bundle1);
-        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 testUrl)
-                                                                                    .documentFileName(testFileName).build()).build()));
-        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                            .documentFileName(testFileName).build()).build()));
-        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
-                                                                           .documentFileName(testFileName).build()).build()));
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                testUrl).documentFileName(testFileName).build()).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
-        CaseDocument caseDocumentDQ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
 
-        List<Element<Document>> particulersOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
-        particulersOfClaim.add(ElementUtils.element(document));
-        ServedDocumentFiles servedDocumentFiles =
-            ServedDocumentFiles.builder().particularsOfClaimDocument(particulersOfClaim).build();
-        caseData = CaseData.builder().ccdCaseReference(1L)
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
+        ServedDocumentFiles servedDocumentFiles = setupParticularsOfClaimDocs();
+        caseData = generateCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
+                                    systemGeneratedCaseDocuments, servedDocumentFiles);
+        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        bundleCreateResponse =
+            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(list).build()).build();
+    }
+
+    private CaseData generateCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
+                                      List<Element<UploadEvidenceExpert>> expertEvidenceDocs,
+                                      List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs,
+                                      List<Element<CaseDocument>> systemGeneratedCaseDocuments,
+                                      ServedDocumentFiles servedDocumentFiles) {
+        return CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
             .documentHearsayNotice(witnessEvidenceDocs)
@@ -134,18 +121,69 @@ public class BundleCreationTriggerEventHandlerTest {
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
-        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        bundleCreateResponse =
-            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(list).build()).build();
+    }
+
+    private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
+        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 testUrl)
+                                                                                    .documentFileName(testFileName).build()).build()));
+        return witnessEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
+                                                                            .documentFileName(testFileName).build()).build()));
+        return expertEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
+                                                                           .documentFileName(testFileName).build()).build()));
+        return otherEvidenceDocs;
+    }
+
+    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentClaim =
+            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
+                testUrl).documentFileName(testFileName).build()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
+        CaseDocument caseDocumentDQ =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
+        return systemGeneratedCaseDocuments;
+    }
+
+    private ServedDocumentFiles setupParticularsOfClaimDocs() {
+        List<Element<Document>> particularsOfClaim = new ArrayList<>();
+        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
+        particularsOfClaim.add(ElementUtils.element(document));
+        ServedDocumentFiles servedDocumentFiles =
+            ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return servedDocumentFiles;
     }
 
     @Test
     public void testSendBundleCreationTrigger() throws Exception {
+        //given : Case details with all type of documents require for bundles
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
         when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
             .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
-        bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
+        //when: Bundle creation trigger is called
+        //then: Any Exception should not be thrown
+        Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
     }
 }

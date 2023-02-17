@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +37,7 @@ public class BundleCreationTriggerEventHandler {
 
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws Exception {
-        log.info("EventId in bundle trigger is :" + event.getCaseId());
         BundleCreateResponse bundleCreateResponse  = bundleCreationService.createBundle(event);
-        log.info("bundle api response : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateResponse));
         if (null != bundleCreateResponse && null != bundleCreateResponse.getData() && null != bundleCreateResponse.getData().getCaseBundles()) {
 
             String caseId = event.getCaseId().toString();
@@ -65,10 +61,8 @@ public class BundleCreationTriggerEventHandler {
             });
             List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
             caseBundles.addAll(newBundles);
-            log.info("caseData.getCaseBundles :" + caseBundles);
             CaseDataContent caseContent = getCaseContent(caseBundles, startEventResponse);
             coreCaseDataService.submitUpdate(caseId, caseContent);
-            log.info("caseData updated for caseId :" + caseId);
         }
     }
 
