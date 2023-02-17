@@ -35,6 +35,12 @@ public class BundleCreationTriggerEventHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
+    /**
+     * This method will call bundle API and save required details in case data.
+     * If there is any existing bundle then new bundle will be added to existing list of bundles.
+     * @param event BundleCreationTriggerEvent.
+     * @throws Exception If there is any issue calling bundle API then exception will be thrown.
+     */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws Exception {
         BundleCreateResponse bundleCreateResponse  = bundleCreationService.createBundle(event);

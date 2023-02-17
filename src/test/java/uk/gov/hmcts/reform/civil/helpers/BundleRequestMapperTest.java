@@ -38,44 +38,33 @@ public class BundleRequestMapperTest {
     @Test
     public void testBundleRequestMapperWithAllDocs() {
         //Create document with type UploadEvidenceWitness
-        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                    .builder()
-                                    .witnessOptionDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                               .documentFileName(testFileName).build())
-                                                         .witnessOptionName("FirstName LastName")
-                                                         .witnessOptionUploadDate(LocalDate.of(2023, 02, 10)).build()));
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = getWitnessDocs();
         //Create document with type UploadEvidenceExpert
-        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                    .builder()
-                                    .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                               .documentFileName(testFileName).build()).build()));
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = getExpertDocs();
         //Create document with type UploadEvidenceDocumentType
-        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                         .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
-                                                                                    .documentFileName(testFileName).build()).build()));
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
         //Create system generated Doc
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
-        CaseDocument caseDocumentDQ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
-
-        List<Element<Document>> particulersOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
-        particulersOfClaim.add(ElementUtils.element(document));
-        ServedDocumentFiles servedDocumentFiles =
-            ServedDocumentFiles.builder().particularsOfClaimDocument(particulersOfClaim).build();
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
+        //Create servedDocument files
+        ServedDocumentFiles servedDocumentFiles = setupParticularsOfClaimDocs();
 
         //Add all type of documents and other request details in case data
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+        CaseData caseData = getCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
+                                        systemGeneratedCaseDocuments, servedDocumentFiles);
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+            ".yaml", "test", "test", 1L
+        );
+        assertNotNull(bundleCreateRequest);
+        assertEquals(bundleCreateRequest.getCaseDetails().getCaseData().getDocumentWitnessStatement().get(0).getValue().getDocumentFileName(),
+                     "Witness Statement_FirstName LastName_10022023");
+    }
+
+    private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
+                                 List<Element<UploadEvidenceExpert>> expertEvidenceDocs,
+                                 List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs,
+                                 List<Element<CaseDocument>> systemGeneratedCaseDocuments,
+                                 ServedDocumentFiles servedDocumentFiles) {
+        return CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
             .documentHearsayNotice(witnessEvidenceDocs)
@@ -111,12 +100,58 @@ public class BundleRequestMapperTest {
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
-        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
-            ".yaml", "test", "test", 1L
-        );
-        assertNotNull(bundleCreateRequest);
-        assertEquals(bundleCreateRequest.getCaseDetails().getCaseData().getDocumentWitnessStatement().get(0).getValue().getDocumentFileName(),
-                     "Witness Statement_FirstName LastName_10022023");
+    }
+
+    private ServedDocumentFiles setupParticularsOfClaimDocs() {
+        List<Element<Document>> particularsOfClaim = new ArrayList<>();
+        Document document = Document.builder().documentFileName(testFileName).documentUrl(testUrl).build();
+        particularsOfClaim.add(ElementUtils.element(document));
+        ServedDocumentFiles servedDocumentFiles =
+            ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return servedDocumentFiles;
+    }
+
+    private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
+                                                                           .documentFileName(testFileName).build()).build()));
+        return otherEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceExpert>> getExpertDocs() {
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
+                                                                            .documentFileName(testFileName).build()).build()));
+
+        return  expertEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceWitness>> getWitnessDocs() {
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
+        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(testUrl)
+                                                                                    .documentFileName(testFileName).build())
+                                                         .witnessOptionName("FirstName LastName")
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 02, 10)).build()));
+        return witnessEvidenceDocs;
+    }
+
+    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentClaim =
+            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
+        CaseDocument caseDocumentDQ =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(testUrl).documentFileName(testFileName).build()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
+        return systemGeneratedCaseDocuments;
     }
 
     @Test
