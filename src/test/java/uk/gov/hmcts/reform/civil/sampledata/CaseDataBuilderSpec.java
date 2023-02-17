@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -22,7 +23,9 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -211,6 +214,8 @@ public class CaseDataBuilderSpec {
                 return atStateClaimDraft();
             case CLAIM_SUBMITTED:
                 return atStateSpec1v1ClaimSubmitted();
+            case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
+                return atStateSpec1v1PaymentSuccessful();
 
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
@@ -391,6 +396,56 @@ public class CaseDataBuilderSpec {
         respondent1TimeExtensionDate = submittedDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
 
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
+        atStateSpec1v1ClaimSubmitted();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1PaymentFailed() {
+        atStateSpec1v1ClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful() {
+        atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
+        atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
+        atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec2v1PaymentFailure() {
+        atStateClaimSubmitted2v1();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+            .customerReference("12345")
+            .build();
         return this;
     }
 
