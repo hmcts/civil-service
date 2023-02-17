@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -302,8 +303,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        boolean notVersion0 = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (notVersion0
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
                 .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
@@ -315,7 +317,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .superClaimType(SPEC_CLAIM);
         }
 
-        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if (notVersion0 && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             updatedCaseData.applicant1DQ(
                 Applicant1DQ.builder().applicant1DQRequestedCourt(
