@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -305,17 +304,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            && ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+        if (isdefendatFullAdmitPayImmidietely(caseData)) {
             LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            /*updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
-            updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                              .whenWillThisAmountBePaid(whenBePaid)
-                                                              .formattedWhenWillThisAmountBePaid(formatLocalDate(
-                                                                  whenBePaid,
-                                                                  DATE
-                                                              )).build());*/
-            updatedCaseData.format(formatLocalDate(whenBePaid, DATE));
+            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
 
         if (V_1.equals(callbackParams.getVersion())
