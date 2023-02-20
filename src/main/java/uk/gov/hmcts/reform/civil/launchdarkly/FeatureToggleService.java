@@ -85,10 +85,6 @@ public class FeatureToggleService {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
-    public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
-    }
-
     public boolean isPbaV3Enabled() {
         return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
     }
