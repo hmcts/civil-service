@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +27,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Component
@@ -168,7 +169,7 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-        if (CaseCategoryUtils.isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return getSpecClaimantRequestedCourt(caseData);
         } else {
             return getUnspecClaimantRequestedCourt(caseData);

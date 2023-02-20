@@ -302,6 +302,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (isdefendatFullAdmitPayImmidietely(caseData)) {
@@ -310,17 +311,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
 
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
-        } else {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM);
-        }
+        updatedCaseData.respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
@@ -376,6 +369,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     () -> getDefaultConfirmationHeader(caseData),
                     caseData
                 ));
+
         return responseBuilder.build();
     }
 
