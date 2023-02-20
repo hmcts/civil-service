@@ -5,11 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
@@ -31,7 +27,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
         Class<? extends RespondToResponseConfirmationHeaderGenerator>>>
         getCasesToExpectedImplementation() {
         return List.of(
-            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), AdmitProceedConfHeader.class),
+            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmidietelyHeader.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfHeader.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfHeader.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfHeader.class),
@@ -76,7 +72,6 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
         return CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
-            .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
