@@ -233,39 +233,11 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
-task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
+task runAllApiTests(type: Exec, description: 'Runs ALL Api tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
-}
-
-task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-sdo'
-}
-
-task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  onlyIf {
-    return System.env.NIGHTLY_RUN != 'true'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
-}
-
-task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
-}
-
-task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-all'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
@@ -295,9 +267,8 @@ task smoke(description: 'Runs the smoke tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSmokeTests))
 }
 
-task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests))
+task functional(description: 'Runs the API (functional) tests.') {
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runAllApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
