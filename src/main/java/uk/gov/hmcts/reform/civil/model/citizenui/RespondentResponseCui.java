@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentResponseCui {
-    private FinancialDetailsCui respondent1FinancialDetailsFromCui;
     private MediationCUI respondent1MediationFromCui;
 }
