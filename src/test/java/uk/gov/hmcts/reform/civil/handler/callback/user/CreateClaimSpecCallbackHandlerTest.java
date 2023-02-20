@@ -1276,16 +1276,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
-        }
-
-        // TODO: move this test case to AboutToSubmitCallbackV0 after release
-        @Test
-        void shouldSetCaseCategoryToSpec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
         }
 
         // TODO: move this test case to AboutToSubmitCallbackV0 after release
@@ -1368,10 +1358,18 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .accessCode(
                                     AccessCodeGenerator.generateAccessCode())
                                 .respondentCaseRole(
-                                    CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                    CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
+        }
+
+        @Test
+        void shouldSetCaseCategoryToSpec_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
         }
 
         @Test
@@ -1458,6 +1456,24 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
         }
 
         @Nested
