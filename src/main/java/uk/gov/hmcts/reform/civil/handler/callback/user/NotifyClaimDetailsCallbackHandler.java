@@ -291,9 +291,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isConfirmationForLip(CaseData caseData) {
-        return caseData.getRespondent1Represented() != YES
+        return NO.equals(caseData.getRespondent1Represented())
             || (YES.equals(caseData.getAddRespondent2())
-            && caseData.getRespondent2Represented() != YES);
+            && NO.equals(caseData.getRespondent2Represented()));
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -447,9 +447,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isBothDefendantLip(CaseData caseData) {
-        return caseData.getRespondent1Represented() != YES
+        return NO.equals(caseData.getRespondent1Represented())
             && YES.equals(caseData.getAddRespondent2())
-            && caseData.getRespondent2Represented() != YES;
+            && NO.equals(caseData.getRespondent2Represented());
     }
 
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
