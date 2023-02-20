@@ -292,7 +292,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private boolean isConfirmationForLip(CaseData caseData) {
         return caseData.getRespondent1Represented() != YES
-            || (caseData.getAddRespondent2().equals(YES)
+            || (YES.equals(caseData.getAddRespondent2())
             && caseData.getRespondent2Represented() != YES);
     }
 
@@ -448,7 +448,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private boolean isBothDefendantLip(CaseData caseData) {
         return caseData.getRespondent1Represented() != YES
-            && caseData.getAddRespondent2().equals(YES)
+            && YES.equals(caseData.getAddRespondent2())
             && caseData.getRespondent2Represented() != YES;
     }
 
