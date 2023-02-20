@@ -1438,8 +1438,8 @@ public class CaseDataBuilder {
         respondentSolicitor1OrganisationDetails = null;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-        respondentSolicitor1OrganisationDetails = null;
         defendant1LIPAtClaimIssued = YES;
+        respondent1Represented = NO;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
@@ -1832,11 +1832,13 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
+        respondent1Represented = NO;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
         defendant2LIPAtClaimIssued = NO;
+        respondent2Represented = YES;
         return this;
     }
 
@@ -1844,11 +1846,13 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = NO;
+        respondent1Represented = YES;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
         defendant2LIPAtClaimIssued = YES;
+        respondent2Represented = NO;
         return this;
     }
 
@@ -2403,6 +2407,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimNotified1v2RespondentLiP() {
         atStatePendingClaimIssued();
+        addRespondent2 = YES;
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
