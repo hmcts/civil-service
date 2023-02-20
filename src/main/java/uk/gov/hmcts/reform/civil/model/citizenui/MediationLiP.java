@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MediationCUI {
+public class MediationLiP {
 
     private YesOrNo canWeUseMediationCui;
     private String canWeUseMediationPhoneCui;

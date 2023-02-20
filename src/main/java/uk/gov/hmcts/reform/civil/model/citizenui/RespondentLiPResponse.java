@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespondentResponseCui {
+public class RespondentLiPResponse {
 
-    private MediationCUI respondent1MediationFromCui;
+    private MediationLiP respondent1MediationLiPResponse;
 }

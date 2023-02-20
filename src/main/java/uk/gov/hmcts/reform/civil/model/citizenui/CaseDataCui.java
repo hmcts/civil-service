@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CaseDataCui {
 
-    @JsonProperty("respondent1ResponseCui")
-    private RespondentResponseCui respondent1ResponseCui;
+    @JsonProperty("respondent1LiPResponse")
+    private RespondentLiPResponse respondent1LiPResponse;
 }
