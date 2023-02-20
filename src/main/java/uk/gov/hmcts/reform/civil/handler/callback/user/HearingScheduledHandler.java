@@ -168,7 +168,6 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        String state;
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
@@ -183,14 +182,16 @@ public class HearingScheduledHandler extends CallbackHandler {
                                                                        publicHolidaysCollection.getPublicHolidays()));
                 calculateAndApplyFee(caseData, caseDataBuilder);
             }
-            state = "HEARING_READINESS";
-            caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         } else {
-            state = "PREPARE_FOR_HEARING_CONDUCT_HEARING";
-            caseDataBuilder.businessProcess(BusinessProcess.ready(PREPARE_FOR_HEARING_CONDUCT_HEARING));
+            caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(HEARING_READINESS.name())
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
+            .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
