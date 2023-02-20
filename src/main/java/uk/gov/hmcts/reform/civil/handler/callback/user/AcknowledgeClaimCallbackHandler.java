@@ -220,6 +220,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
                 .respondent2AcknowledgeNotificationDate(time.now())
                 .respondent1ResponseDeadline(newDeadlineRespondent1)
+                .respondent2ResponseDeadline(newDeadlineRespondent1)
                 .businessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM))
                 .respondent1(updatedRespondent1)
                 .respondent2(updatedRespondent2)
