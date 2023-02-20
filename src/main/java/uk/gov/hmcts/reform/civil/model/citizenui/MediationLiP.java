@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @AllArgsConstructor
 public class MediationLiP {
 
-    private YesOrNo canWeUseMediationCui;
-    private String canWeUseMediationPhoneCui;
-    private YesOrNo mediationDisagreementCui;
-    private String noMediationReasonCui;
-    private String noMediationOtherReasonCui;
-    private YesOrNo companyTelephoneOptionMediationCui;
-    private String companyTelephoneConfirmationMediationCui;
-    private String companyTelephoneContactPersonMediationCui;
-    private String companyTelephonePhoneNumberMediationCui;
+    private YesOrNo canWeUseMediationLiP;
+    private String canWeUseMediationPhoneLiP;
+    private YesOrNo mediationDisagreementLiP;
+    private String noMediationReasonLiP;
+    private String noMediationOtherReasonLiP;
+    private YesOrNo companyTelephoneOptionMediationLiP;
+    private String companyTelephoneConfirmationMediationLiP;
+    private String companyTelephoneContactPersonMediationLiP;
+    private String companyTelephonePhoneNumberMediationLiP;
 }
