@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
@@ -49,7 +50,7 @@ public class BundleCreationTriggerEventHandler {
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
         caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
                                .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-            ).toList());
+            ).collect(Collectors.toList()));
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
     }
