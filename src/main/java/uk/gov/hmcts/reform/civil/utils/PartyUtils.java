@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 public class PartyUtils {
 

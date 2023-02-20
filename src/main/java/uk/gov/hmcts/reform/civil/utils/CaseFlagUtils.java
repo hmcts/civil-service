@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 
 public class CaseFlagUtils {
 
-
     public static String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
     public static String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
     public static String RESPONDENT_SOLICITOR_TWO_WITNESS = "Respondent solicitor 2 witness";

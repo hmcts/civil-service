@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Data
