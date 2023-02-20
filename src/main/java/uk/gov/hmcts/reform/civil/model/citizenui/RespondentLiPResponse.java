@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespondentResponseCui {
-    private FinancialDetailsCui respondent1FinancialDetailsFromCui;
+public class RespondentLiPResponse {
+    private FinancialDetailsLiP respondent1LiPFinancialDetails;
 }

@@ -10,10 +10,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinancialDetailsCui {
+public class FinancialDetailsLiP {
 
-    private YesOrNo partnerPensionCui;
-    private YesOrNo partnerDisabilityCui;
-    private YesOrNo partnerSevereDisabilityCui;
-    private String childrenEducationCui;
+    private YesOrNo partnerPensionLiP;
+    private YesOrNo partnerDisabilityLiP;
+    private YesOrNo partnerSevereDisabilityLiP;
+    private String childrenEducationLiP;
 }

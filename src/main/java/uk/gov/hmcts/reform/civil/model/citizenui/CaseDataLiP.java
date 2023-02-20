@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseDataCui {
+public class CaseDataLiP {
 
-    @JsonProperty("respondent1ResponseCui")
-    private RespondentResponseCui respondent1ResponseCui;
+    @JsonProperty("respondent1LiPResponse")
+    private RespondentLiPResponse respondent1LiPResponse;
 }
