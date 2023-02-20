@@ -20,11 +20,11 @@ public class PayImmidietelyConfText implements RespondToResponseConfirmationText
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         if (!isdefendatFullAdmitPayImmidietely(caseData)) {
             return Optional.empty();
         }
+        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         return Optional.of(format(
             "They must make sure you have the money by %s. "
                 + "Any cheques or transfers should be clear in your account."

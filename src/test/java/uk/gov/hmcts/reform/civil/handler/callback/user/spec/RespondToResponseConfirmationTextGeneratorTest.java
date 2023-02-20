@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmidietelyConfText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         Class<? extends RespondToResponseConfirmationTextGenerator>>>
         getCasesToExpectedImplementation() {
         return List.of(
-            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), AdmitProceedConfText.class),
+            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmidietelyConfText.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfText.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfText.class),
