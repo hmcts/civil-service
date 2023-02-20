@@ -354,7 +354,7 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal ccjJudgmentAmountInterestToDate;
 
     @JsonUnwrapped
-    private final CaseDataLiP caseDataLiP ;
+    private final CaseDataLiP caseDataLiP;
 
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;

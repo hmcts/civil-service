@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentLiPResponse {
+
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
 }
