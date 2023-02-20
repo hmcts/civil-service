@@ -35,8 +35,6 @@ public class CaseFlagUtils {
         //NO-OP
     }
 
-    private static int counter = 1;
-
     public static Flags createFlags(String flagsPartyName, String roleOnCase) {
         return Flags.builder()
             .partyName(flagsPartyName)
@@ -46,10 +44,6 @@ public class CaseFlagUtils {
     }
 
     private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
-        firstName = "Firstname" + counter;
-        lastName = "Lastname" + counter;
-        counter++;
-
         String partyName = String.format("%s %s", firstName, lastName);
         return DQPartyFlagStructure.builder()
             .firstName(firstName)
