@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -132,25 +131,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
                                                       "Sealed Claim form",
                                                       LocalDate.now().toString()));
-
-        //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
-        /*if (toggleService.isNoticeOfChangeEnabled() && stitchEnabled) {
-            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-                || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
-
-                CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                    caseDataBuilder.build(),
-                    callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-                documentMetaDataList.add(new DocumentMetaData(
-                    lipForm.getDocumentLink(),
-                    "Litigant in person claim form",
-                    LocalDate.now().toString()
-                ));
-
-            }
-        }*/
 
         if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             documentMetaDataList.add(new DocumentMetaData(
