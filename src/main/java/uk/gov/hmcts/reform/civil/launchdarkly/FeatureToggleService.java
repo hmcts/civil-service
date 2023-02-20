@@ -78,7 +78,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseFlagsEnabled() {
-        return true;
+        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
     }
 
     public boolean isPinInPostEnabled() {

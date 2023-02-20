@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 
 public class CaseFlagUtils {
 
+
     public static String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
     public static String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
     public static String RESPONDENT_SOLICITOR_TWO_WITNESS = "Respondent solicitor 2 witness";
@@ -35,6 +36,8 @@ public class CaseFlagUtils {
         //NO-OP
     }
 
+    private static int counter = 1;
+
     public static Flags createFlags(String flagsPartyName, String roleOnCase) {
         return Flags.builder()
             .partyName(flagsPartyName)
@@ -44,10 +47,14 @@ public class CaseFlagUtils {
     }
 
     private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
+        firstName = "Firstname" + counter;
+        lastName = "Lastname" + counter;
+        counter++;
+
         String partyName = String.format("%s %s", firstName, lastName);
         return DQPartyFlagStructure.builder()
-            .firstName(firstName != null ? firstName : "firstname")
-            .lastName(lastName != null ? lastName : "lastname")
+            .firstName(firstName)
+            .lastName(lastName)
             .flags(createFlags(partyName, roleOnCase))
             .build();
     }
