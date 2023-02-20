@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentResponseCui {
+
     private MediationCUI respondent1MediationFromCui;
 }
