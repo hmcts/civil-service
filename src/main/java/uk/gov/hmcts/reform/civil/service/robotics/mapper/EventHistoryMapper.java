@@ -225,9 +225,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_AFTER_SDO:
                         buildClaimTakenOfflineAfterSDO(builder, caseData);
                         break;
-                    case TAKEN_CASE_OFFLINE_SDO_DJ:
-                        buildClaimTakenOfflineAfterSDO(builder, caseData);
-                        break;
                     default:
                         break;
                 }
@@ -258,6 +255,7 @@ public class EventHistoryMapper {
             }
         }
         buildInformAgreedExtensionDateForSpec(builder, caseData);
+        buildClaimTakenOfflineAfterDJ(builder, caseData);
 
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -2044,5 +2042,13 @@ public class EventHistoryMapper {
                                   .miscText(detailsText)
                                   .build())
                 .build());
+    }
+
+    private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
+                                               CaseData caseData) {
+        if (caseData.getTakenOfflineDate() != null && caseData.getOrderSDODocumentDJ() != null) {
+            buildClaimTakenOfflineAfterSDO(builder, caseData);
+        }
+
     }
 }
