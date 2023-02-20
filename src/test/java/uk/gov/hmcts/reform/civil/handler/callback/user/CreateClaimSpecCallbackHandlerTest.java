@@ -1454,6 +1454,24 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("code").isEqualTo("Civil");
         }
 
+        @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+        }
+
         @Nested
         class IdamEmail {
 
