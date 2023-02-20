@@ -132,8 +132,8 @@ class DeadlineExtensionValidatorTest {
             assertThat(errors).contains("The agreed extension date must be after the current deadline");
         }
 
-        /*@Test
-        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond42DaysForSpec() {
+        @Test
+        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond56DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
             LocalDate agreedExtension = NOW.with(DayOfWeek.SUNDAY).plusDays(7);
@@ -146,10 +146,10 @@ class DeadlineExtensionValidatorTest {
                 false
             );
 
-            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 42 days.");
-        }*/
+            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 56 days.");
+        }
 
-        /*@Test
+        @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsBeyond29And56DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
@@ -164,7 +164,7 @@ class DeadlineExtensionValidatorTest {
             );
 
             assertThat(errors).contains("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
-        }*/
+        }
 
         @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsWeekendForSpec() {
