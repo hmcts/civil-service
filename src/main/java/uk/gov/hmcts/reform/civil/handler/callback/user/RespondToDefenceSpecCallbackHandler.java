@@ -177,7 +177,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
-        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
+            caseData));
 
         return updatedCaseData.build();
     }
@@ -323,7 +324,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 Applicant1DQ.builder().applicant1DQRequestedCourt(
                     RequestedCourt.builder().responseCourtLocations(
                         courtLocationUtils.getLocationsFromList(locations)).build()
-                    ).build());
+                ).build());
         }
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
@@ -335,6 +336,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
             howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
+
+            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
+                caseData.getTotalClaimAmount(),
+                null
+            ).name());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -564,9 +570,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
-        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(
+            caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal subTotal = claimAmount.add(claimFee).add(caseData.getTotalInterest());
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
         updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
