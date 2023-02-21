@@ -14,9 +14,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -35,6 +38,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final Time time;
+    private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -57,15 +61,19 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private CallbackResponse lipClaimInitialState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.superClaimType(SPEC_CLAIM);
+        caseDataBuilder.caseAccessCategory(SPEC_CLAIM);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        caseDataBuilder.issueDate(issueDate);
+        caseDataBuilder.respondent1ResponseDeadline(
+            deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now()));
         caseDataBuilder.submittedDate(time.now());
         if (null != callbackParams.getRequest().getEventId()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());

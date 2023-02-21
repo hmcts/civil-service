@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -74,11 +74,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -100,6 +99,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
 
+    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
+        + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
+
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
         + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
@@ -111,6 +117,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date that the defendants have to respond.";
+
+    public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "confirmed you will receive an email. The email will also include the date that the defendants have to respond.";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When the payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
@@ -130,6 +140,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
+    private final FeatureToggleService featureToggleService;
     private final OrganisationService organisationService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
@@ -141,7 +152,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -151,8 +161,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
             .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
@@ -166,7 +175,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
@@ -191,11 +199,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
@@ -403,21 +407,17 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (V_1.equals(callbackParams.getVersion())
-            && toggleService.isCourtLocationDynamicListEnabled()) {
-            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
+            dataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (V_1.equals(callbackParams.getVersion())
-            && toggleService.isAccessProfilesEnabled()) {
-            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        }
+        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
@@ -442,7 +442,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder.respondent2OrgRegistered(YES);
+            dataBuilder
+                .respondent2OrgRegistered(YES)
+                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -483,14 +485,18 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (null != callbackParams.getRequest().getEventId()) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
+            if (!featureToggleService.isPbaV3Enabled()) {
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
+            } else {
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
+            }
         }
-
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
     }
 
+    //--------v1 callback overloaded, return to single param
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
@@ -525,12 +531,20 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? CONFIRMATION_SUMMARY
+                ? getConfirmationSummary()
                 : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private String getConfirmationSummary() {
+        if (featureToggleService.isPbaV3Enabled()) {
+            return CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return CONFIRMATION_SUMMARY;
+        }
     }
 
     private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
@@ -674,10 +688,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
 
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
             .totalInterest(interest);
 
@@ -704,7 +719,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? SPEC_CONFIRMATION_SUMMARY
+                ? getSpecConfirmationSummary()
                 : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
@@ -713,6 +728,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             claimIssueConfiguration.getN215Link(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private String getSpecConfirmationSummary() {
+        if (featureToggleService.isPbaV3Enabled()) {
+            return SPEC_CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return SPEC_CONFIRMATION_SUMMARY;
+        }
     }
 
     private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
@@ -728,15 +751,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
-            .build();
-    }
-
-    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.superClaimType(SPEC_CLAIM);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

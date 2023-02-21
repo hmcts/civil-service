@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
@@ -324,11 +325,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         // existing cases
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
-                                                   .builder()
-                                                   .input(String.format("Each party has the right to apply to have this"
-                                                              + " order set aside or varied. Any such application must "
-                                                              + "be received by the Court "
-                                                              + "(together with the appropriate fee) by 4pm on %s.",
+                                                   .builder().input(String.format(
+                                                            "This order has been made without a hearing. "
+                                                           + "Each party has the right to apply to have this Order "
+                                                           + "set aside or varied. Any such application must "
+                                                           + "be received by the Court "
+                                                           + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                                                               .format(DateTimeFormatter
                                                                           .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
@@ -438,7 +440,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
                                                .input(String.format(
-                                                       "Each party has the right to apply to have this Order "
+                                                       "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
                                                        + "set aside or varied. Any such application must be "
                                                        + "received by the Court "
                                                        + "(together with the appropriate fee) by 4pm on %s.",
@@ -620,6 +623,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .ifPresent(caseDataBuilder::locationName);
 
         }
+
+        caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

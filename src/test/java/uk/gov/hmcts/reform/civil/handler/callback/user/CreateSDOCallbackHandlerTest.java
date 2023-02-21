@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -31,7 +30,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -68,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
@@ -350,7 +350,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPrePopulateDisposalHearingPageSpec1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .totalClaimAmount(BigDecimal.valueOf(10000))
                 .build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -379,7 +379,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPrePopulateDisposalHearingPageSpec2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .totalClaimAmount(BigDecimal.valueOf(10000))
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
@@ -414,14 +414,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPrePopulateDisposalHearingPageSpec3() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .totalClaimAmount(BigDecimal.valueOf(10000))
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
                                       RequestedCourt.builder()
                                           .responseCourtCode("court3")
                                           .caseLocation(
-                                              CaseLocation.builder()
+                                              CaseLocationCivil.builder()
                                                   .baseLocation("dummy base")
                                                   .region("dummy region")
                                                   .build()
@@ -469,7 +469,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateOrderDetailsPages() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
@@ -539,17 +539,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input1")
-                .isEqualTo("The claimant shall serve on every other party the witness statements of all witnesses of "
-                               + "fact on whose evidence reliance is to be placed by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input2")
-                .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal copies of the witness statements"
-                               + " of all witnesses whose evidence they wish the court to consider "
-                               + "when deciding the amount of damages by 4pm on");
+                               + " of all witnesses of fact on whose evidence reliance is to be placed by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input4")
@@ -853,7 +845,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "Digital Portal by the above date.");
 
             assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
-                .isEqualTo("Each party has the right to apply to have this Order set aside or varied. "
+                .isEqualTo("This order has been made without hearing. "
+                               + "Each party has the right to apply to have this Order set aside or varied. "
                                + "Any such application must be received by the Court "
                                + "(together with the appropriate fee) by 4pm on "
                                + DateFormatHelper.formatLocalDate(newDate, DateFormatHelper.DATE));
@@ -955,10 +948,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
             assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
-                .isEqualTo(String.format(
-                    "Each party has the right to apply to have this Order set aside or varied. "
-                        + "Any such application must be received by the Court (together with the "
-                        + "appropriate fee) by 4pm on %s.",
+                .isEqualTo(String.format("This order has been made without hearing. "
+                                             + "Each party has the right to apply to have this Order set aside or varied. "
+                                             + "Any such application must be received by the Court (together with the "
+                                             + "appropriate fee) by 4pm on %s.",
                     date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
                 ));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
@@ -972,7 +965,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the contents of the bundle before it is filed. The bundle will include a case "
                                + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
-                .isEqualTo(String.format("Each party has the right to apply "
+                .isEqualTo(String.format("This order has been made without hearing. "
+                                             + "Each party has the right to apply "
                                              + "to have this Order set aside or varied. Any such application must be "
                                              + "received by the Court (together with the appropriate fee) by 4pm "
                                              + "on %s.",
@@ -981,7 +975,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateOrderDetailsPages_ForSmallClaims_WhenIsHearingAndListingSDOEnabledIsFalse() {
-            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+            CaseData caseData = CaseDataBuilder.builder().setClaimTypeToSpecClaim().atStateClaimDraft()
                 .applicant1DQWithLocation().build();
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
 
@@ -1012,7 +1006,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testSDOSortsLocationListThroughOrganisationPartyType() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(10000))
                 .respondent1DQWithLocation().applicant1DQWithLocation().applicant1(Party.builder()
@@ -1046,7 +1040,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             CaseData caseData = CaseDataBuilder.builder().respondent1DQWithLocation().applicant1DQWithLocation()
-                .setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .setClaimTypeToSpecClaim().atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(10000))
                 .build().toBuilder().orderType(OrderType.DECIDE_DAMAGES).applicant1(Party.builder()
                                                                                         .type(Party.Type.ORGANISATION)

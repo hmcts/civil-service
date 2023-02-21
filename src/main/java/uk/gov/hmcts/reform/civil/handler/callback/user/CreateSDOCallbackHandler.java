@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
@@ -201,13 +202,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
 
         DisposalHearingWitnessOfFact tempDisposalHearingWitnessOfFact = DisposalHearingWitnessOfFact.builder()
-            .input1("The claimant shall serve on every other party the witness statements of all witnesses of fact"
-                        + " on whose evidence reliance is to be placed by 4pm on")
-            .date1(LocalDate.now().plusWeeks(4))
-            .input2("The provisions of CPR 32.6 apply to such evidence.")
             .input3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
-                        + " whose evidence they wish the court to consider "
-                        + "when deciding the amount of damages by 4pm on")
+                        + " of fact on whose evidence reliance is to be placed by 4pm on")
             .date2(LocalDate.now().plusWeeks(4))
             .input4("The provisions of CPR 32.6 apply to such evidence.")
             .input5("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on")
@@ -271,8 +267,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
             DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-                .input(String.format(
-                    "Each party has the right to apply to have this Order set "
+                .input(String.format("This order has been made without hearing. "
+                        + "Each party has the right to apply to have this Order set "
                         + "aside or varied. Any such application must be received "
                         + "by the Court (together with the appropriate fee) "
                         + "by 4pm on %s.",
@@ -392,8 +388,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format(
-                    "Each party has the right to apply "
+                .input(String.format("This order has been made without hearing. "
+                        + "Each party has the right to apply "
                         + "to have this Order set aside or varied. Any such application must be "
                         + "received by the Court (together with the appropriate fee) by 4pm "
                         + "on %s.",
@@ -573,7 +569,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            tempSmallClaimsNotes.input("Each party has the right to apply to have this Order set aside or varied. "
+            tempSmallClaimsNotes.input("This order has been made without hearing. "
+                                           + "Each party has the right to apply to have this Order set aside or varied. "
                                            + "Any such application must be received by the Court "
                                            + "(together with the appropriate fee) by 4pm on "
                                            + DateFormatHelper.formatLocalDate(
@@ -803,6 +800,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+
+        dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
