@@ -403,6 +403,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
 
+    public static final Predicate<CaseData> fullAdmitPayImmidiately = caseData ->
+        getPredicateForPayImmidiately(caseData);
+
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
 
         caseData.getReasonNotSuitableSDO() != null
@@ -801,6 +804,17 @@ public class FlowPredicate {
                     break;
                 default:
                     break;
+            }
+        }
+        return predicate;
+    }
+
+    private static boolean getPredicateForPayImmidiately(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
+                predicate = null != caseData.getWhenToBePaidText()
+                    &&  null == caseData.getApplicant1ProceedWithClaim();
             }
         }
         return predicate;
