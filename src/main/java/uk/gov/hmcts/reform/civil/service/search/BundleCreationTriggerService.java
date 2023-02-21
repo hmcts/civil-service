@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -27,7 +28,8 @@ public class BundleCreationTriggerService extends ElasticSearchService {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(matchQuery("data.hearingDate", LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
-                            .must(beState(CaseState.HEARING_READINESS))
+                            .must(beState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                            .mustNot(matchQuery("data.bundleCreationNotified", YesOrNo.YES))
                 ), List.of("reference"), startIndex
         );
     }
