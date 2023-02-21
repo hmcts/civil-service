@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -173,6 +174,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
         caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService
