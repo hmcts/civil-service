@@ -258,15 +258,8 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            System.out.println("    -- " + updatedData.getSystemGeneratedCaseDocuments().get(0).getValue());
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-              //                                          eq(caseData)
-            //);
-
-
 
         }
 
@@ -284,10 +277,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-           // verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-          //  verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-            //                                             eq(caseData)
-            //);
+
         }
 
         @Test
@@ -304,10 +294,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-              //                                           eq(caseData)
-            //);
+
         }
 
         @Test
@@ -324,10 +311,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            //verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
-              //                                           eq(caseData)
-            //);
+
         }
     }
 
