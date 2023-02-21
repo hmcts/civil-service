@@ -89,4 +89,24 @@ public class CcdDashboardClaimMatcher implements Claim {
         return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
     }
 
+    @Override
+    public boolean isWaitingForClaimantToRespond() {
+        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec();
+    }
+
+    @Override
+    public boolean isProceedOffline() {
+        return false;
+    }
+
+    @Override
+    public boolean hasChangeRequestFromDefendant() {
+        return false;
+    }
+
+    @Override
+    public boolean hasChangeRequestedFromClaimant() {
+        return false;
+    }
+
 }

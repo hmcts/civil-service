@@ -18,7 +18,12 @@ public class Response {
 
     @JsonIgnore
     public boolean isFullAdmit() {
-        return responseType == RespondentResponseType.FULL_ADMISSION;
+        return RespondentResponseType.FULL_ADMISSION == responseType;
+    }
+
+    @JsonIgnore
+    public boolean isFullDefence(){
+       return RespondentResponseType.FULL_DEFENCE == responseType;
     }
 
     @JsonIgnore

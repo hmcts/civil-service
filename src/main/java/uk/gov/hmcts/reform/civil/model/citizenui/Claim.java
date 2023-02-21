@@ -27,5 +27,9 @@ public interface Claim {
     boolean isSentToCourt();
 
     boolean claimantRequestedCountyCourtJudgement();
+    boolean isWaitingForClaimantToRespond();
+    boolean isProceedOffline();
+    boolean hasChangeRequestFromDefendant();
+    boolean hasChangeRequestedFromClaimant();
 
 }

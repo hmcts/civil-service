@@ -33,6 +33,7 @@ public class ClaimStoreService {
             .defendantName(cmcClaim.getDefendantName())
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
+            .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
             .ocmc(true)
             .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
             .build()

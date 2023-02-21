@@ -63,6 +63,7 @@ public class CmcClaim implements Claim {
     private LocalDate admissionPayImmediatelyPastPaymentDate;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
+    private ProceedOfflineReasonType proceedOfflineReason;
 
     public String getClaimantName() {
         return claimData.getClaimantName();
@@ -157,7 +158,28 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean claimantRequestedCountyCourtJudgement() {
-        return getClaimantResponse() != null && getCountyCourtJudgmentRequestedAt() != null;
+        return hasResponse() && getCountyCourtJudgmentRequestedAt() != null;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isWaitingForClaimantToRespond() {
+        return hasResponse() && response.isFullDefence() && claimantResponse == null;
+    }
+
+    @Override
+    public boolean isProceedOffline() {
+        return ProceedOfflineReasonType.OTHER == proceedOfflineReason;
+    }
+
+    @Override
+    public boolean hasChangeRequestFromDefendant() {
+        return ProceedOfflineReasonType.APPLICATION_BY_DEFENDANT == proceedOfflineReason;
+    }
+
+    @Override
+    public boolean hasChangeRequestedFromClaimant() {
+        return ProceedOfflineReasonType.APPLICATION_BY_CLAIMANT == proceedOfflineReason;
     }
 
     @JsonIgnore

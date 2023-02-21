@@ -42,6 +42,18 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
+    PROCEED_OFFLINE(
+        Claim::isProceedOffline
+    ),
+    CHANGE_BY_DEFENDANT(
+        Claim::hasChangeRequestFromDefendant
+    ),
+    CHANGE_BY_CLAIMANT(
+        Claim::hasChangeRequestedFromClaimant
+    ),
+    WAITING_FOR_CLAIMANT_TO_RESPOND (
+        Claim::isWaitingForClaimantToRespond
+    ),
     NO_STATUS(c -> false);
 
     @Getter
