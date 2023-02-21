@@ -24,8 +24,8 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Slf4j
 @Service
@@ -91,7 +91,7 @@ public class PaymentRequestUpdateCallbackService {
         if (feeType.equals(FeeType.HEARING.name())) {
             return SERVICE_REQUEST_RECEIVED;
         } else if (feeType.equals(FeeType.CLAIMISSUED.name())
-                   && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                   && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return CREATE_CLAIM_SPEC_AFTER_PAYMENT;
         } else {
             return CREATE_CLAIM_AFTER_PAYMENT;

@@ -40,6 +40,18 @@ public abstract class BaseCallbackHandlerTest {
         );
     }
 
+    public CallbackParams callbackParamsOf(Map<String, Object> data, String eventId, CallbackType type) {
+        return callbackParamsOf(
+            data,
+            AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+            type,
+            null,
+            null,
+            Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"),
+            eventId
+        );
+    }
+
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, String pageId) {
         return callbackParamsOf(
             data,
@@ -152,6 +164,23 @@ public abstract class BaseCallbackHandlerTest {
             .build();
     }
 
+    public CallbackParams callbackParamsOf(Map<String, Object> data,
+                                           CaseState state,
+                                           CallbackType type,
+                                           CallbackVersion version,
+                                           String pageId,
+                                           Map<Params, Object> params,
+                                           String eventId
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .pageId(pageId)
+            .request(toCallbackRequest(data, state.name(), eventId))
+            .version(version)
+            .params(params)
+            .build();
+    }
+
     public CallbackParams specCallbackParamsOf(CaseData caseData,
                                                CallbackType type,
                                                CallbackVersion version,
@@ -174,6 +203,13 @@ public abstract class BaseCallbackHandlerTest {
 
     private CallbackRequest toCallbackRequest(Map<String, Object> data, String state) {
         return CallbackRequest.builder()
+            .caseDetails(CaseDetails.builder().data(data).id(CASE_ID).state(state).build())
+            .build();
+    }
+
+    private CallbackRequest toCallbackRequest(Map<String, Object> data, String state, String eventId) {
+        return CallbackRequest.builder()
+            .eventId(eventId)
             .caseDetails(CaseDetails.builder().data(data).id(CASE_ID).state(state).build())
             .build();
     }
