@@ -36,14 +36,13 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasResponseFullAdmit() {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION;
+        return  RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
         return hasResponseFullAdmit()
-            && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+            && isPayImmediately();
     }
 
     @Override
@@ -129,4 +128,23 @@ public class CcdDashboardClaimMatcher implements Claim {
         return false;
     }
 
+    @Override
+    public boolean hasCCJByRedetermination() {
+        return false;
+    }
+
+    @Override
+    public boolean hasDefendantStatedTheyPaid() {
+        return defendantRespondedWithPartAdmit()
+            && isPayImmediately();
+    }
+
+    private boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+    }
+
+    @Override
+    public boolean defendantRespondedWithPartAdmit() {
+        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
+    }
 }

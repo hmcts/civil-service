@@ -35,6 +35,9 @@ public class DashboardClaimInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal claimAmount;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private BigDecimal admittedAmount;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadline;

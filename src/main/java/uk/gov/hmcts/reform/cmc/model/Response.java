@@ -7,14 +7,19 @@ import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Response {
 
-    public RespondentResponseType responseType;
+    private RespondentResponseType responseType;
     private PaymentIntention paymentIntention;
+    private BigDecimal amount;
+    private PaymentDeclaration paymentDeclaration;
+
 
     @JsonIgnore
     public boolean isFullAdmit() {
@@ -54,5 +59,10 @@ public class Response {
     @JsonIgnore
     public boolean isPaymentDateOnTime(){
         return paymentIntention != null && paymentIntention.isPaymentDateOnTime();
+    }
+
+    @JsonIgnore
+    public boolean hasPaymentDeclaration(){
+        return paymentDeclaration != null;
     }
 }

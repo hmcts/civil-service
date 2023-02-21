@@ -39,9 +39,14 @@ public interface Claim {
     boolean isPassedToCountyCourtBusinessCentre();
 
     boolean hasClaimantAskedToSignSettlementAgreement();
+
     boolean hasClaimantAcceptedPartialAdmissionAmount();
+
     boolean haveBothPartiesSignedSettlementAgreement();
+
     boolean hasCCJByRedetermination();
 
+    boolean hasDefendantStatedTheyPaid();
 
+    boolean defendantRespondedWithPartAdmit();
 }

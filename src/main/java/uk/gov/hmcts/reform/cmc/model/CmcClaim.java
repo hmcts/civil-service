@@ -206,7 +206,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
-        return hasResponse() && response.isPartAdmitPayImmediately() && response.isPartAdmitPayImmediately()
+        return hasResponse() && response.isPartAdmitPayImmediately() && response.isPaymentDateOnTime()
             && claimantAcceptedDefendantResponse() ;
     }
 
@@ -224,6 +224,16 @@ public class CmcClaim implements Claim {
             ||  (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
     }
 
+    @Override
+    public boolean hasDefendantStatedTheyPaid() {
+        return hasResponse() && response.hasPaymentDeclaration();
+    }
+
+    @Override
+    public boolean defendantRespondedWithPartAdmit() {
+        return hasResponse() && response.isPartAdmit();
+    }
+
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return hasClaimantResponse()
@@ -239,6 +249,11 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return claimData != null && claimData.hasBreathingSpace();
+    }
+
+    @JsonIgnore
+    public BigDecimal getAdmittedAmount(){
+        return hasResponse()? response.getAmount() : null;
     }
 
     private boolean isResponseDeadlinePastFourPmToday() {

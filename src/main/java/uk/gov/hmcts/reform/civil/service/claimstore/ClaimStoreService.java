@@ -35,6 +35,7 @@ public class ClaimStoreService {
             .claimAmount(cmcClaim.getTotalAmountTillToday())
             .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
             .ocmc(true)
+            .admittedAmount(cmcClaim.getAdmittedAmount())
             .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
             .build()
         ).collect(Collectors.toList());

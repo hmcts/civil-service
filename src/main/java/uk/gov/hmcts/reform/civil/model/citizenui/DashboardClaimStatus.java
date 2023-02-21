@@ -54,20 +54,26 @@ public enum DashboardClaimStatus {
     CHANGE_BY_CLAIMANT(
         Claim::hasChangeRequestedFromClaimant
     ),
-    WAITING_FOR_CLAIMANT_TO_RESPOND (
+    WAITING_FOR_CLAIMANT_TO_RESPOND(
         Claim::isWaitingForClaimantToRespond
     ),
-    CLAIMANT_ASKED_FOR_SETTLEMENT (
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
-    PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE (
+    PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT (
+    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    SETTLEMENT_SIGNED (
-       Claim::haveBothPartiesSignedSettlementAgreement
+    SETTLEMENT_SIGNED(
+        Claim::haveBothPartiesSignedSettlementAgreement
+    ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
     ),
     NO_STATUS(c -> false);
 
