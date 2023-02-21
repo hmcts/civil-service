@@ -180,7 +180,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
-
+            log.info(courtLocationUtils.getLocationsFromList(locations).toString());
             caseDataBuilder
                 .courtLocation(CourtLocation.builder()
                                    .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
