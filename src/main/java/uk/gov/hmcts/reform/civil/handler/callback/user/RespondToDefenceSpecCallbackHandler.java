@@ -178,8 +178,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
-        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
-            caseData));
+        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(
+            doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
 
         return updatedCaseData.build();
     }
