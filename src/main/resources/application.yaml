@@ -363,6 +363,10 @@ rd_professional:
   api:
     url: http://localhost:8765
 
+rd_commondata:
+  api:
+    url: http://localhost:8765
+
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
@@ -445,6 +449,10 @@ testing:
     enabled: true
 
 rd_professional:
+  api:
+    url: http://fake-prd-api
+
+rd_commondata:
   api:
     url: http://fake-prd-api
 
