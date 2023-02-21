@@ -188,7 +188,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
 
-
         if ((caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && caseData.getApplicant1ProceedWithClaim() == YES)
             || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
@@ -320,7 +319,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
 
         if (notVersion0 && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
