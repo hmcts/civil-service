@@ -69,7 +69,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -303,17 +302,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
-        } else {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM);
-        }
+        updatedCaseData.respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
