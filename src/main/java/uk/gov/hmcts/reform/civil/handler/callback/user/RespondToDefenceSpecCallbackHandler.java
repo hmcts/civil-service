@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -54,6 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
@@ -184,7 +186,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
-        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(callbackParams.getCaseData()));
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
+
+
+        if ((caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            && caseData.getApplicant1ProceedWithClaim() == YES)
+            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
+            Set<DefendantResponseShowTag> showConditionFlags = caseData.getShowConditionFlags();
+            showConditionFlags.add(DefendantResponseShowTag.VULNERABILITY);
+            updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
