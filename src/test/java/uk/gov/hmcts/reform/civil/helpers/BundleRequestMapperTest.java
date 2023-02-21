@@ -32,8 +32,8 @@ class BundleRequestMapperTest {
 
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
-    private final static String TEST_URL = "url";
-    private final static String TEST_FILE_NAME = "testFileName.pdf";
+    private static final String TEST_URL = "url";
+    private static final String TEST_FILE_NAME = "testFileName.pdf";
 
     @Test
     void testBundleRequestMapperWithAllDocs() {

@@ -7,12 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
@@ -34,8 +36,11 @@ import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
@@ -44,8 +49,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 @ExtendWith(SpringExtension.class)
 class BundleCreationTriggerEventHandlerTest {
 
-    private final static String TEST_URL = "url";
-    private final static String TEST_FILE_NAME = "testFileName.pdf";
+    private static final String TEST_URL = "url";
+    private static final String TEST_FILE_NAME = "testFileName.pdf";
 
     @Mock
     private BundleCreationService bundleCreationService;
@@ -58,15 +63,19 @@ class BundleCreationTriggerEventHandlerTest {
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
     private CaseData caseData;
     private CaseDetails caseDetails;
+    private Bundle bundle;
 
     @BeforeEach
     public void setup() {
-        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().title("Trial").id("1")
-                                                    .stitchStatus("new")
-                                                    .stitchedDocument(null).stitchingFailureMessage(null).fileName(
-                                                        "Trial Bundle").build()).build();
-        List<Bundle> list = new ArrayList<>();
-        list.add(bundle1);
+        bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
+                                                   .stitchStatus("new")
+                                                   .stitchedDocument(null)
+                                                   .fileName("Trial Bundle.pdf")
+                                                   .description("This is trial bundle")
+                                                   .createdOn(LocalDateTime.of(2023, 12, 12, 1, 1, 1))
+                                                   .build()).build();
+        List<Bundle> bundlesList = new ArrayList<>();
+        bundlesList.add(bundle);
 
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
@@ -77,7 +86,7 @@ class BundleCreationTriggerEventHandlerTest {
                                     systemGeneratedCaseDocuments, servedDocumentFiles);
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         bundleCreateResponse =
-            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(list).build()).build();
+            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(bundlesList).build()).build();
     }
 
     private CaseData generateCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -118,7 +127,7 @@ class BundleCreationTriggerEventHandlerTest {
             .addRespondent2(YesOrNo.YES)
             .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
             .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
-            .hearingDate(LocalDate.now())
+            .hearingDate(LocalDate.of(2023, 3, 12))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
     }
@@ -189,19 +198,41 @@ class BundleCreationTriggerEventHandlerTest {
 
     @Test
     void testPrepareNewBundlePopulatesAllFields() {
-        // Given: a bundle object and case data
-
         // When: I call the prepareNewBundle method
-
+        IdValue<uk.gov.hmcts.reform.civil.model.Bundle> generatedBundle =
+            bundleCreationTriggerEventHandler.prepareNewBundle(bundle, caseData);
         // Then: the bundleHearingDate, stitchedDocument, filename, title, description, stitchStatus, createdOn and id fields must be populated
+        Assertions.assertEquals(bundle.getValue().getId(), generatedBundle.getId());
+        Assertions.assertEquals(bundle.getValue().getStitchStatus(), generatedBundle.getValue().getStitchStatus().get());
+        Assertions.assertEquals(
+            bundle.getValue().getDescription(),
+            generatedBundle.getValue().getDescription()
+        );
+        Assertions.assertEquals(bundle.getValue().getTitle(), generatedBundle.getValue().getTitle());
+        Assertions.assertEquals(bundle.getValue().getFileName(), generatedBundle.getValue().getFilename());
+        Assertions.assertEquals(caseData.getHearingDate(), generatedBundle.getValue().getBundleHearingDate().get());
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPrepareCaseContent() {
         // Given: a collection of case bundles and a valid startEventResponse
-
+        StartEventResponse startEventResponse =
+            StartEventResponse.builder().token("123").eventId("event1").caseDetails(caseDetails).build();
+        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1",
+                                      uk.gov.hmcts.reform.civil.model.Bundle.builder()
+                                          .title("Trial Bundle").filename("TrialBundle.pdf")
+                                          .stitchStatus(Optional.of("NEW")).build()));
         // When: I call the prepareCaseContent method
-
+        CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
+                                                                                               startEventResponse);
         // Then: all fields are populated correctly
+        Assertions.assertEquals("event1", caseDataContent.getEvent().getId());
+        Assertions.assertEquals("123", caseDataContent.getEventToken());
+        Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
+        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
+        Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
+                                );
     }
 }
