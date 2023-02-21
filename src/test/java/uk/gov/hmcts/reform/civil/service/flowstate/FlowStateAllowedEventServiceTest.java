@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -10,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +72,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -119,11 +117,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 })
 class FlowStateAllowedEventServiceTest {
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @MockBean
+    private FeatureToggleService toggleService;
 
     static class GetFlowStateArguments implements ArgumentsProvider {
 
@@ -521,7 +519,10 @@ class FlowStateAllowedEventServiceTest {
                         REFER_TO_JUDGE,
                         migrateCase,
                         TAKE_CASE_OFFLINE,
-                        GENERATE_DIRECTIONS_ORDER
+                        GENERATE_DIRECTIONS_ORDER,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
@@ -831,9 +832,6 @@ class FlowStateAllowedEventServiceTest {
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
         void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
-            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
-                .isEmpty();
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
@@ -933,11 +931,6 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class IsEventAllowedOnCaseDetails {
 
-        @BeforeEach
-        void enableSpec() {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        }
-
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
         void shouldReturnValidStates_whenCaseEventIsGiven(
@@ -946,8 +939,8 @@ class FlowStateAllowedEventServiceTest {
             CaseEvent caseEvent
         ) {
             //work around starts: to force SPEC CLAIM tests to pass to not impact Damages.
-            if ((caseDetails.getData().get("superClaimType") != null
-                && caseDetails.getData().get("superClaimType").equals(SPEC_CLAIM))
+            if ((caseDetails.getData().get("CaseAccessCategory") != null
+                && caseDetails.getData().get("CaseAccessCategory").equals(SPEC_CLAIM))
                 || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
                 expected = false;
             }
@@ -964,8 +957,6 @@ class FlowStateAllowedEventServiceTest {
             CaseDetails caseDetails,
             CaseEvent caseEvent
         ) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }

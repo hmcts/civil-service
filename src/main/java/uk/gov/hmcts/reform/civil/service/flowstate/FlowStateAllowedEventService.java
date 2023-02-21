@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -108,7 +108,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -484,7 +483,10 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE
             )
         ),
 
@@ -926,7 +928,10 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE
             )
         ),
 
@@ -1053,14 +1058,10 @@ public class FlowStateAllowedEventService {
             return true;
         }
 
-        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
-            if (toggleService.isLrSpecEnabled()) {
-                StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
-                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
-            } else {
-                return false;
-            }
+            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
+            return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
@@ -1069,14 +1070,10 @@ public class FlowStateAllowedEventService {
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
         if (caseEvent.equals(CREATE_CLAIM_SPEC)) {
-            if (toggleService.isLrSpecEnabled()) {
-                return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
-                    .filter(entry -> entry.getValue().contains(caseEvent))
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-            } else {
-                return Collections.emptyList();
-            }
+            return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(caseEvent))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
         }
         return ALLOWED_EVENTS_ON_FLOW_STATE.entrySet().stream()
             .filter(entry -> entry.getValue().contains(caseEvent))

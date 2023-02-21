@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @SpringBootTest(classes = {
     NotifyRoboticsOnContinuousFeedHandler.class,
@@ -77,18 +77,25 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     @MockBean
     LocationRefDataService locationRefDataService;
 
+    @Autowired
+    private NotifyRoboticsOnContinuousFeedHandler handler;
+
+    @MockBean
+    private JsonSchemaValidationService validationService;
+
     @Nested
     class ValidJsonPayload {
 
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
-
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
             handler.handle(params);
 
+            // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
@@ -96,14 +103,17 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
-            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+            caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
             handler.handle(params);
 
+            // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
@@ -112,11 +122,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
     @Nested
     class InValidJsonPayload {
-
-        @MockBean
-        private JsonSchemaValidationService validationService;
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
