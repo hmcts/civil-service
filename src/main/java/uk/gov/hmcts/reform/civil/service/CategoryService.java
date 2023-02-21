@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.crd.model.Category;
 import java.util.Optional;
 
 @Service
-
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryService {
