@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cmc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,12 @@ public class ClaimantResponse {
     private BigDecimal amountPaid;
     private  String paymentReceived;
     private String settleForAmount;
+    private CourtDetermination courtDetermination;
+
+    @JsonIgnore
+    public boolean hasCourtDetermination() {
+        return courtDetermination != null;
+    }
+
+
 }

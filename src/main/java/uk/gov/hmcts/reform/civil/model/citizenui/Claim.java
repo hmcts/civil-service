@@ -41,5 +41,7 @@ public interface Claim {
     boolean hasClaimantAskedToSignSettlementAgreement();
     boolean hasClaimantAcceptedPartialAdmissionAmount();
     boolean haveBothPartiesSignedSettlementAgreement();
+    boolean hasCCJByRedetermination();
+
 
 }

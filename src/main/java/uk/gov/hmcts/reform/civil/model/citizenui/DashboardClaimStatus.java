@@ -39,6 +39,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    REQUESTED_CCJ_BY_REDETERMINATION(
+        Claim::hasCCJByRedetermination
+    ),
     SETTLED(
         Claim::isSettled
     ),

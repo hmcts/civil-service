@@ -211,8 +211,17 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    @JsonIgnore
     public boolean haveBothPartiesSignedSettlementAgreement() {
         return settlement != null && settlement.isThroughAdmissions() && settlement.isSettled();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasCCJByRedetermination() {
+        return reDeterminationRequestedAt != null
+            || (hasClaimantResponse() && claimantResponse.hasCourtDetermination())
+            ||  (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
     }
 
     @JsonIgnore
