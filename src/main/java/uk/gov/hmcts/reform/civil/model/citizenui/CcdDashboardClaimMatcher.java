@@ -109,4 +109,24 @@ public class CcdDashboardClaimMatcher implements Claim {
         return false;
     }
 
+    @Override
+    public boolean isPassedToCountyCourtBusinessCentre() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimantAskedToSignSettlementAgreement() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimantAcceptedPartialAdmissionAmount() {
+        return false;
+    }
+
+    @Override
+    public boolean haveBothPartiesSignedSettlementAgreement() {
+        return false;
+    }
+
 }

@@ -27,6 +27,11 @@ public class Response {
     }
 
     @JsonIgnore
+    public boolean isPartAdmit() {
+        return RespondentResponseType.PART_ADMISSION == responseType;
+    }
+
+    @JsonIgnore
     public boolean isFullAdmitPayImmediately() {
         return isFullAdmit() && paymentIntention.isPayImmediately();
     }
@@ -39,5 +44,15 @@ public class Response {
     @JsonIgnore
     public boolean isFullAdmitPayByInstallments() {
         return isFullAdmit() && paymentIntention.isPayByInstallments();
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitPayImmediately() {
+        return isPartAdmit() && paymentIntention.isPayImmediately();
+    }
+
+    @JsonIgnore
+    public boolean isPaymentDateOnTime(){
+        return paymentIntention != null && paymentIntention.isPaymentDateOnTime();
     }
 }

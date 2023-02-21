@@ -27,9 +27,19 @@ public interface Claim {
     boolean isSentToCourt();
 
     boolean claimantRequestedCountyCourtJudgement();
+
     boolean isWaitingForClaimantToRespond();
+
     boolean isProceedOffline();
+
     boolean hasChangeRequestFromDefendant();
+
     boolean hasChangeRequestedFromClaimant();
+
+    boolean isPassedToCountyCourtBusinessCentre();
+
+    boolean hasClaimantAskedToSignSettlementAgreement();
+    boolean hasClaimantAcceptedPartialAdmissionAmount();
+    boolean haveBothPartiesSignedSettlementAgreement();
 
 }

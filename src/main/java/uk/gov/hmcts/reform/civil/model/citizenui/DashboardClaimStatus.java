@@ -54,6 +54,18 @@ public enum DashboardClaimStatus {
     WAITING_FOR_CLAIMANT_TO_RESPOND (
         Claim::isWaitingForClaimantToRespond
     ),
+    CLAIMANT_ASKED_FOR_SETTLEMENT (
+        Claim::hasClaimantAskedToSignSettlementAgreement
+    ),
+    PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE (
+        Claim::isPassedToCountyCourtBusinessCentre
+    ),
+    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT (
+        Claim::hasClaimantAcceptedPartialAdmissionAmount
+    ),
+    SETTLEMENT_SIGNED (
+       Claim::haveBothPartiesSignedSettlementAgreement
+    ),
     NO_STATUS(c -> false);
 
     @Getter

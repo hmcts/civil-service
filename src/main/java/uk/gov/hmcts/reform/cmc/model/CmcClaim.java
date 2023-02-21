@@ -60,10 +60,16 @@ public class CmcClaim implements Claim {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDateTime reDeterminationRequestedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
+    private Settlement settlement;
 
     public String getClaimantName() {
         return claimData.getClaimantName();
@@ -168,23 +174,50 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    @JsonIgnore
     public boolean isProceedOffline() {
         return ProceedOfflineReasonType.OTHER == proceedOfflineReason;
     }
 
     @Override
+    @JsonIgnore
     public boolean hasChangeRequestFromDefendant() {
         return ProceedOfflineReasonType.APPLICATION_BY_DEFENDANT == proceedOfflineReason;
     }
 
     @Override
+    @JsonIgnore
     public boolean hasChangeRequestedFromClaimant() {
         return ProceedOfflineReasonType.APPLICATION_BY_CLAIMANT == proceedOfflineReason;
     }
 
+    @Override
+    @JsonIgnore
+    public boolean isPassedToCountyCourtBusinessCentre() {
+        return state == ClaimState.BUSINESS_QUEUE;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasClaimantAskedToSignSettlementAgreement() {
+        return hasResponse() && hasClaimantResponse() && settlement != null && settlement.isAcceptedByClaimant();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean hasClaimantAcceptedPartialAdmissionAmount() {
+        return hasResponse() && response.isPartAdmitPayImmediately() && response.isPartAdmitPayImmediately()
+            && claimantAcceptedDefendantResponse() ;
+    }
+
+    @Override
+    public boolean haveBothPartiesSignedSettlementAgreement() {
+        return settlement != null && settlement.isThroughAdmissions() && settlement.isSettled();
+    }
+
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
-        return claimantResponse != null
+        return hasClaimantResponse()
             && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
     }
 
@@ -202,5 +235,9 @@ public class CmcClaim implements Claim {
     private boolean isResponseDeadlinePastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
+    }
+
+    private boolean hasClaimantResponse(){
+        return claimantResponse != null;
     }
 }
