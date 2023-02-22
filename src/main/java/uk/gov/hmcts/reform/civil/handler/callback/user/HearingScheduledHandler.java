@@ -187,13 +187,18 @@ public class HearingScheduledHandler extends CallbackHandler {
             if (isNull(caseData.getAllocatedTrack())) {
                 allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
             }
+            int claimAmount;
+            if (nonNull(caseData.getClaimValue())) {
+                claimAmount = caseData.getClaimValue().getStatementOfValueInPennies().intValue();
+            } else {
+                claimAmount = caseData.getTotalClaimAmount().intValue() * 100;
+            }
             switch (allocatedTrack) {
                 case SMALL_CLAIM:
                     hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                     break;
                 case FAST_CLAIM:
-                    hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(
-                        caseData.getClaimValue().getStatementOfValueInPennies().intValue()));
+                    hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(claimAmount));
                     break;
                 case MULTI_CLAIM:
                     hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
