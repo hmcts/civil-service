@@ -134,7 +134,7 @@ public class CmcClaim implements Claim {
 
     @Override
     @JsonIgnore
-    public boolean responseDeadlineHasBeenExtended() {
+    public boolean hasResponseDeadlineBeenExtended() {
         return hasResponsePending() && isMoreTimeRequested();
     }
 
@@ -212,7 +212,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately() && response.isPaymentDateOnTime()
-            && claimantAcceptedDefendantResponse() ;
+            && claimantAcceptedDefendantResponse();
     }
 
     @Override
@@ -226,7 +226,7 @@ public class CmcClaim implements Claim {
     public boolean hasCCJByRedetermination() {
         return reDeterminationRequestedAt != null
             || (hasClaimantResponse() && claimantResponse.hasCourtDetermination())
-            ||  (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
+            || (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
     }
 
     @Override
@@ -257,8 +257,8 @@ public class CmcClaim implements Claim {
     }
 
     @JsonIgnore
-    public BigDecimal getAdmittedAmount(){
-        return hasResponse()? response.getAmount() : null;
+    public BigDecimal getAdmittedAmount() {
+        return hasResponse() ? response.getAmount() : null;
     }
 
     private boolean isResponseDeadlinePastFourPmToday() {
@@ -266,7 +266,7 @@ public class CmcClaim implements Claim {
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
-    private boolean hasClaimantResponse(){
+    private boolean hasClaimantResponse() {
         return claimantResponse != null;
     }
 }

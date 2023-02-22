@@ -54,7 +54,7 @@ public class Response {
 
     @JsonIgnore
     public boolean isPartAdmitPayImmediately() {
-        return isPartAdmit() && paymentIntention.isPayImmediately();
+        return isPartAdmit() && paymentIntention !=null && paymentIntention.isPayImmediately();
     }
 
     @JsonIgnore

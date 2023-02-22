@@ -16,7 +16,7 @@ public enum DashboardClaimStatus {
         Claim::isEligibleForCCJ
     ),
     MORE_TIME_REQUESTED(
-        Claim::responseDeadlineHasBeenExtended
+        Claim::hasResponseDeadlineBeenExtended
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -36,17 +36,18 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-    SETTLED(
-        Claim::isSettled
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
     ),
+
     PROCEED_OFFLINE(
         Claim::isProceedOffline
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
     ),
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
@@ -69,11 +70,15 @@ public enum DashboardClaimStatus {
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
+
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
     DEFENDANT_PART_ADMIT(
         Claim::defendantRespondedWithPartAdmit
+    ),
+    SETTLED(
+        Claim::isSettled
     ),
     NO_STATUS(c -> false);
 

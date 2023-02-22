@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,10 +20,15 @@ public class Settlement {
 
     @JsonIgnore
     public boolean isAcceptedByClaimant() {
-        Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();
-        return partyStatementsStream.anyMatch(partyStatement -> partyStatement.isAccepted() && partyStatement.isMadeByClaimant())
-           && partyStatementsStream.noneMatch(partyStatement -> partyStatement.isRejected() && partyStatement.isMadeByDefendant());
+        boolean isAcceptedByClaimant = getPartyStatementStream()
+            .anyMatch(partyStatement -> partyStatement.isAccepted()
+                && partyStatement.isMadeByClaimant());
+        boolean isNotRejectedByDefendant = getPartyStatementStream()
+            .noneMatch(partyStatement -> partyStatement.isRejected()
+                && partyStatement.isMadeByDefendant());
+        return isAcceptedByClaimant && isNotRejectedByDefendant;
     }
+
 
     @JsonIgnore
     public boolean isSettled() {
@@ -37,7 +41,7 @@ public class Settlement {
         return partyStatementsStream.filter(PartyStatement::hasOffer)
             .reduce((first, second) -> second)
             .stream()
-            .noneMatch(offer-> offer.hasPaymentIntention());
+            .noneMatch(offer -> offer.hasPaymentIntention());
     }
 
     private Stream<PartyStatement> getPartyStatementStream() {

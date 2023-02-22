@@ -16,7 +16,7 @@ public interface Claim {
 
     boolean defendantRespondedWithFullAdmitAndPayByInstallments();
 
-    boolean responseDeadlineHasBeenExtended();
+    boolean hasResponseDeadlineBeenExtended();
 
     boolean isEligibleForCCJ();
 
@@ -31,6 +31,7 @@ public interface Claim {
     boolean isWaitingForClaimantToRespond();
 
     boolean isProceedOffline();
+
     boolean isPaperResponse();
 
     boolean hasChangeRequestFromDefendant();
