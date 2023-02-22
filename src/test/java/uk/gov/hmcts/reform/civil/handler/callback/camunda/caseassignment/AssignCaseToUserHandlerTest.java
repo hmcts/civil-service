@@ -33,6 +33,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -74,7 +76,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
@@ -82,6 +84,27 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
+        }
+    }
+
+    @Nested
+    class AssignHmctsServiceIdSpec {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC.name(), CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnSupplementaryDataWhenGlobalSearchEnabled() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
 
     }
@@ -276,6 +299,19 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
         Map<String, Object> hmctsServiceIdMap = new HashMap<>();
         hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
+    }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryDataSpec() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA6");
 
         Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
         supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
