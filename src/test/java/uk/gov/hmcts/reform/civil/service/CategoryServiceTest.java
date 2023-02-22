@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.crd.client.ListOfValuesApi;
-import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.crd.model.ListOfValues;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +37,7 @@ class CategoryServiceTest {
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "not found response body".getBytes(UTF_8));
 
-    private final Category expectedCategory = Category.builder().categoryKey(CATEGORY_ID).build();
+    private final ListOfValues expectedCategory = ListOfValues.builder().build();
 
     @Mock
     private ListOfValuesApi listOfValuesApi;
@@ -50,7 +50,11 @@ class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(any(), any(), any(), any())).willReturn(expectedCategory);
+        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(
+            any(),
+            any(),
+            any(),
+            any())).willReturn(expectedCategory);
         given(authTokenGenerator.generate()).willReturn(SERVICE_AUTH_TOKEN);
     }
 
@@ -58,18 +62,18 @@ class CategoryServiceTest {
     void shouldReturnCategory_whenInvoked() {
         var category = categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, CATEGORY_ID, SERVICE_ID);
 
-        verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, authTokenGenerator.generate(),
-                                                                     CATEGORY_ID, SERVICE_ID);
+        verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, SERVICE_ID, AUTH_TOKEN,
+                                                                     authTokenGenerator.generate());
         assertThat(category).isEqualTo(Optional.of(expectedCategory));
     }
 
     @Test
     void shouldReturnEmptyOptional_whenCategoryNotFound() {
-        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(any(), any(), any(), eq(WRONG_SERVICE_ID)))
+        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(any(), eq(WRONG_SERVICE_ID), any(), any()))
             .willThrow(notFoundFeignException);
         var category = categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, CATEGORY_ID, WRONG_SERVICE_ID);
-        verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, authTokenGenerator.generate(),
-                                                                     CATEGORY_ID, WRONG_SERVICE_ID);
+        verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, WRONG_SERVICE_ID, AUTH_TOKEN,
+                                                                     authTokenGenerator.generate());
         assertThat(category).isEmpty();
     }
 }

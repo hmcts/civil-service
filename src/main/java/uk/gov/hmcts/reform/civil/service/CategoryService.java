@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.crd.client.ListOfValuesApi;
-import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.crd.model.ListOfValues;
 
 import java.util.Optional;
 
@@ -18,11 +18,10 @@ public class CategoryService {
     private final ListOfValuesApi listOfValuesApi;
     private final AuthTokenGenerator authTokenGenerator;
 
-    public Optional<Category> findCategoryByCategoryIdAndServiceId(String authToken, String categoryId, String serviceId) {
+    public Optional<ListOfValues> findCategoryByCategoryIdAndServiceId(String authToken, String categoryId, String serviceId) {
         try {
-            return Optional.ofNullable(listOfValuesApi.findCategoryByCategoryIdAndServiceId(authToken,
-                                                                                            authTokenGenerator.generate(),
-                                                                                            categoryId, serviceId));
+            return Optional.ofNullable(listOfValuesApi.findCategoryByCategoryIdAndServiceId(categoryId, serviceId, authToken,
+                                                                                            authTokenGenerator.generate()));
         } catch (FeignException.NotFound ex) {
             log.error("Category not found", ex);
             return Optional.empty();
