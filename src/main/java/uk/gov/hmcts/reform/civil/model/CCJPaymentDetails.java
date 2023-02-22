@@ -30,6 +30,6 @@ public class CCJPaymentDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal ccjJudgmentAmountInterestToDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal ccjFixedCostAmount;
-    private YesOrNo ccjFixedCostOption;
+    private BigDecimal ccjJudgmentFixedCostAmount;
+    private YesOrNo ccjJudgmentFixedCostOption;
 }

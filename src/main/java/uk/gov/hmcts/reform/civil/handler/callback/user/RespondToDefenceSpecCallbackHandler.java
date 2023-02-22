@@ -108,6 +108,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
             .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
             .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
+            .put(callbackKey(V_1, MID, "set-up-ccj-amount-summary"), this::buildJudgmentAmountSummaryDetails)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -527,7 +528,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         if (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
             && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
@@ -538,14 +538,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .build();
         }
 
-        buildJudgmentAmountSummaryDetails(caseData, updatedCaseData);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
@@ -564,12 +564,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .ccjJudgmentTotalStillOwed(finalTotal)
             .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
             .ccjPaymentPaidSomeAmountInPounds(paidAmount)
+            .ccjJudgmentFixedCostAmount(setUpFixedCostAmount(claimAmount, caseData))
             .build();
 
         updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
     }
 
-    private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount) {
+    private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
+        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())){
+            return null;
+        }
         if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0){
             return ZERO;
         } else if (claimAmount.compareTo(BigDecimal.valueOf(5000)) <= 0) {
@@ -577,6 +585,5 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         } else {
             return BigDecimal.valueOf(55);
         }
-
     }
 }
