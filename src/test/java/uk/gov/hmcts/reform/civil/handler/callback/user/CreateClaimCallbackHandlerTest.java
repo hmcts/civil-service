@@ -155,8 +155,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallbackV0 {
 
-        private static final String SUPER_CLAIM_KEY = "superClaimType";
-
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -168,19 +166,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
-        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
@@ -952,7 +937,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
                                                                      + " for example john.smith@example.com");
             }
-
         }
     }
 
@@ -978,17 +962,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-        }
-
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
-        @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
     }
 
@@ -1074,11 +1048,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ABOUT_TO_SUBMIT
                 ));
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
         }
 
         @Test
@@ -1129,6 +1105,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("respondent2OrgRegistered", "Yes");
+            assertThat(response.getData())
+                .containsEntry("respondentSolicitor2EmailAddress", "respondentsolicitor@example.com");
         }
 
         //TO DO remove V_1 when CIV-3278 is released
@@ -1208,6 +1186,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldSetCaseCategoryToUnspec_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
 
         @Nested
