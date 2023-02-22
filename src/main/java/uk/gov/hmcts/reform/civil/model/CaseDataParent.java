@@ -339,10 +339,23 @@ public class CaseDataParent implements MappableObject {
     private final String currentDateboxDefendantSpec;
     private final YesOrNo ccjPaymentPaidSomeOption;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountClaimAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjPaymentPaidSomeAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountClaimFee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentTotalStillOwed;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountInterestToDate;
     @JsonUnwrapped
     private final CaseDataLiP caseDataLip;
 
+    private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
     @JsonIgnore
@@ -359,5 +372,7 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo defendant2LIPAtClaimIssued;
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
+
+    private final IdamUserDetails claimantUserDetails;
 
 }
