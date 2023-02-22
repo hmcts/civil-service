@@ -85,13 +85,13 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        notificationService.sendMail(
-            getRecipientEmail(caseData),
-            getTemplateId(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
-
         if (NOTIFY_OTHER_SOLICITOR_2.equals(event)) {
+            log.info("sending email");
+            notificationService.sendMail(
+                getRecipientEmail(caseData),
+                getTemplateId(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
             log.info("email sent");
         }
 
