@@ -25,10 +25,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -532,7 +529,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
+        if (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
             errors.add("The amount paid must be less than the full claim amount.");
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -554,15 +552,31 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES) ?
+            MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
-        updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
-        updatedCaseData.ccjJudgmentAmountClaimFee(claimFee);
-        updatedCaseData.ccjJudgmentSummarySubtotalAmount(subTotal);
-        updatedCaseData.ccjJudgmentTotalStillOwed(finalTotal);
-        updatedCaseData.ccjJudgmentAmountInterestToDate(caseData.getTotalInterest());
-        updatedCaseData.ccjPaymentPaidSomeAmountInPounds(paidAmount);
+        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(claimAmount)
+            .ccjJudgmentAmountClaimFee(claimFee)
+            .ccjJudgmentSummarySubtotalAmount(subTotal)
+            .ccjJudgmentTotalStillOwed(finalTotal)
+            .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
+            .ccjPaymentPaidSomeAmountInPounds(paidAmount)
+            .build();
+
+        updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
+    }
+
+    private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount) {
+        if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0){
+            return ZERO;
+        } else if (claimAmount.compareTo(BigDecimal.valueOf(5000)) <= 0) {
+            return BigDecimal.valueOf(40);
+        } else {
+            return BigDecimal.valueOf(55);
+        }
+
     }
 }

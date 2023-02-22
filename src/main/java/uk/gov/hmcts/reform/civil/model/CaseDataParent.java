@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -335,21 +336,8 @@ public class CaseDataParent implements MappableObject {
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
-    private final YesOrNo ccjPaymentPaidSomeOption;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimFee;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentTotalStillOwed;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountInterestToDate;
+    @JsonUnwrapped
+    private final CCJPaymentDetails ccjPaymentDetails;
 
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
