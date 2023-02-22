@@ -72,7 +72,8 @@ class BundleCreationTriggerEventHandlerTest {
                                                    .stitchedDocument(null)
                                                    .fileName("Trial Bundle.pdf")
                                                    .description("This is trial bundle")
-                                                   .createdOn(LocalDateTime.of(2023, 12, 12, 1, 1, 1))
+                                            .stitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                                            .createdOn(LocalDateTime.of(2023, 12, 12, 1, 1, 1))
                                                    .build()).build();
         List<Bundle> bundlesList = new ArrayList<>();
         bundlesList.add(bundle);
@@ -210,7 +211,10 @@ class BundleCreationTriggerEventHandlerTest {
         );
         Assertions.assertEquals(bundle.getValue().getTitle(), generatedBundle.getValue().getTitle());
         Assertions.assertEquals(bundle.getValue().getFileName(), generatedBundle.getValue().getFilename());
+        Assertions.assertEquals(bundle.getValue().getStitchedDocument().getDocumentFileName(),
+                                generatedBundle.getValue().getStitchedDocument().get().getDocumentFileName());
         Assertions.assertEquals(caseData.getHearingDate(), generatedBundle.getValue().getBundleHearingDate().get());
+        Assertions.assertNotNull(generatedBundle.getValue().getCreatedOn());
     }
 
     @Test
