@@ -36,6 +36,11 @@ public class NotificationUtils {
         return caseEvent.equals(matchEvent);
     }
 
+    public static Boolean isDefendant1(CallbackParams callbackParams, CaseEvent matchEvent) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        return caseEvent.equals(matchEvent);
+    }
+
     public static boolean is1v1Or2v1Case(CaseData caseData) {
         return getMultiPartyScenario(caseData).equals(ONE_V_ONE)
             || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
@@ -56,8 +61,8 @@ public class NotificationUtils {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                        ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                        : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),

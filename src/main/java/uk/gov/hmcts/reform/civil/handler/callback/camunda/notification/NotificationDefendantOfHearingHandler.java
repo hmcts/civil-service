@@ -19,9 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isDefendant1;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +32,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_HEARING);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT1_HEARING, NOTIFY_DEFENDANT2_HEARING);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
-    public static final String TASK_ID_DEFENDANT = "NotifyDefendantHearing";
+    public static final String TASK_ID_DEFENDANT1 = "NotifyDefendant1Hearing";
+    public static final String TASK_ID_DEFENDANT2 = "NotifyDefendant2Hearing";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -42,7 +46,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID_DEFENDANT;
+        return isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING) ? TASK_ID_DEFENDANT1
+            : TASK_ID_DEFENDANT2;
     }
 
     private CallbackResponse notifyDefendantHearing(CallbackParams callbackParams) {
