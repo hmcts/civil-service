@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
@@ -94,6 +94,22 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCourtLocation(epimmsId),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<>() {
+                }
+            );
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
@@ -118,6 +134,13 @@ public class LocationRefDataService {
             .queryParam("is_case_management_location", "Y")
             .queryParam("court_type_id", "10")
             .queryParam("location_type", "Court");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    private URI buildURIforCourtLocation(String epimmsId) {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("epimms_id", epimmsId);
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
@@ -160,13 +183,13 @@ public class LocationRefDataService {
     }
 
     /**
-     * Centralized creation of CaseLocation from LocationRefData to reduce the places it can be done.
+     * Centralized creation of CaseLocationCivil from LocationRefData to reduce the places it can be done.
      *
      * @param location mandatory
      * @return case location built from location
      */
-    public static CaseLocation buildCaseLocation(LocationRefData location) {
-        return CaseLocation.builder()
+    public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
+        return CaseLocationCivil.builder()
             .region(location.getRegionId())
             .baseLocation(location.getEpimmsId())
             .build();

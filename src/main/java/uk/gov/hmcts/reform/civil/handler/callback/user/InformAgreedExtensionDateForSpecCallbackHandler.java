@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +55,6 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
-    private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
 
     @Override
@@ -72,11 +69,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
@@ -120,7 +113,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
                 .respondent1TimeExtensionDate(time.now())
                 .respondent1ResponseDeadline(newDeadline)
                 .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline);
+                .respondent2ResponseDeadline(newDeadline)
+                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
                 .respondent2TimeExtensionDate(time.now())

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,12 +16,12 @@ import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 public class PartyUtils {
 
@@ -132,6 +133,47 @@ public class PartyUtils {
         return stringBuilder.toString();
     }
 
+    public static String addTrialOrHearing(CaseData caseData) {
+
+        if (caseData.getAllocatedTrack() == AllocatedTrack.FAST_CLAIM) {
+            return "trial";
+        } else {
+            return "hearing";
+        }
+    }
+
+    public static String buildClaimantReferenceOnly(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresent(ref -> {
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            });
+
+        return stringBuilder.toString();
+    }
+
+    public static String buildRespondentReference(CaseData caseData, boolean isRespondentSolicitorNumber2) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (!isRespondentSolicitorNumber2) {
+            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .ifPresent(ref -> {
+                    stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
+                });
+        }
+
+        if (isRespondentSolicitorNumber2) {
+            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
+                .ifPresent(ref -> {
+                    stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference());
+                });
+        }
+        return stringBuilder.toString();
+    }
+
     public static PartyData respondent1Data(CaseData caseData) {
         return PartyData.builder()
             .role(RESPONDENT_ONE)
@@ -153,9 +195,8 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
-                                                                      boolean isAccessProfilesEnabled) {
-        if (isSpecCaseCategory(caseData, isAccessProfilesEnabled)) {
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -71,11 +72,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -156,8 +158,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallbackV0 {
 
-        private static final String SUPER_CLAIM_KEY = "superClaimType";
-
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -169,19 +169,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
-        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
@@ -953,7 +940,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
                                                                      + " for example john.smith@example.com");
             }
-
         }
     }
 
@@ -979,17 +965,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-        }
-
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
-        @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
     }
 
@@ -1047,12 +1023,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
-                .containsOnly(CREATE_CLAIM.name(), "READY");
+                .containsOnly(CREATE_SERVICE_REQUEST_CLAIM.name(), "READY");
         }
 
         @Test
@@ -1074,11 +1051,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ABOUT_TO_SUBMIT
                 ));
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
         }
 
         @Test
@@ -1105,6 +1084,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("respondent2OrgRegistered", "Yes");
+            assertThat(response.getData())
+                .containsEntry("respondentSolicitor2EmailAddress", "respondentsolicitor@example.com");
         }
 
         //TO DO remove V_1 when CIV-3278 is released
@@ -1184,6 +1165,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldSetCaseCategoryToUnspec_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
 
         @Nested
@@ -1594,6 +1583,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
@@ -1602,6 +1592,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimOneDefendantSolicitor().build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
