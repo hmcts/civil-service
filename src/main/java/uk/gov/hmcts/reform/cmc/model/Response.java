@@ -19,6 +19,7 @@ public class Response {
     private PaymentIntention paymentIntention;
     private BigDecimal amount;
     private PaymentDeclaration paymentDeclaration;
+    private ResponseMethod responseMethod;
 
 
     @JsonIgnore
@@ -64,5 +65,10 @@ public class Response {
     @JsonIgnore
     public boolean hasPaymentDeclaration(){
         return paymentDeclaration != null;
+    }
+
+    @JsonIgnore
+    public boolean isPaperResponse() {
+        return ResponseMethod.OFFLINE == responseMethod;
     }
 }

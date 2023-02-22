@@ -31,6 +31,7 @@ public interface Claim {
     boolean isWaitingForClaimantToRespond();
 
     boolean isProceedOffline();
+    boolean isPaperResponse();
 
     boolean hasChangeRequestFromDefendant();
 

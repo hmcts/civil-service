@@ -90,11 +90,17 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
-        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec();
+        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
+            && caseData.getApplicant1ResponseDate() == null;
     }
 
     @Override
     public boolean isProceedOffline() {
+        return false;
+    }
+
+    @Override
+    public boolean isPaperResponse() {
         return false;
     }
 

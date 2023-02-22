@@ -180,6 +180,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isPaperResponse() {
+        return hasResponse() && response.isPaperResponse();
+    }
+
+    @Override
     @JsonIgnore
     public boolean hasChangeRequestFromDefendant() {
         return ProceedOfflineReasonType.APPLICATION_BY_DEFENDANT == proceedOfflineReason;
