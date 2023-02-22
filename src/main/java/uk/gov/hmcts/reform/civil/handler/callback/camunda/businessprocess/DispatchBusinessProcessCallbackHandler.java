@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +67,7 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent(businessProcess.getCamundaEvent())
                                      .status(DISPATCHED)
+                                     .readyOn(LocalDateTime.now())
                                      .build());
         }
 
