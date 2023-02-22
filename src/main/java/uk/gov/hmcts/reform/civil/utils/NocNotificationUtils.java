@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.RecipientData;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
+@Slf4j
 public class NocNotificationUtils {
 
     private NocNotificationUtils() {
@@ -64,6 +66,7 @@ public class NocNotificationUtils {
      */
     private static RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
+            log.info("respondent 2 new sol");
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
                 Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
                 String respondent1OrgID = respondent1Org != null
@@ -112,6 +115,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor2Email(CaseData caseData) {
         RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
         if (otherSolicitor2 != null) {
+            log.info("Other sol 2 email " + otherSolicitor2.getEmail());
             return otherSolicitor2.getEmail();
         }
         return null;
@@ -120,6 +124,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor2Name(CaseData caseData) {
         RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
         if (otherSolicitor2 != null) {
+            log.info("Other sol 2 orgID " + otherSolicitor2.getOrgId());
             return otherSolicitor2.getOrgId();
         }
         return null;
