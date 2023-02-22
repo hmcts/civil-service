@@ -24,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 
@@ -42,7 +44,6 @@ class StateFlowEngineSpecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
         given(featureToggleService.isSpecRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
@@ -94,6 +95,32 @@ class StateFlowEngineSpecTest {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented().build())
+        );
+    }
+
+    static Stream<Arguments> caseDataStreamOneRespondentClaimFeePaymentSuccessful() {
+        return Stream.of(
+            //AC1 - Payment Successful in 1v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1PaymentSuccessful().build()),
+            //AC3 - Payment Successful in 1v2 case (same solicitor - both represented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful().build()),
+            //AC5 - Payment Succesful in 1v2 case (different solicitor - one unrepresented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful().build())
+        );
+    }
+
+    static Stream<Arguments> caseDataStreamOneRespondentClaimFeePaymentFailure() {
+        return Stream.of(
+            //AC 2 - Payment Failed in 1v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1PaymentFailed().build()),
+            //AC4 - Payment Failed in 1v2 case (different solicitor- both represented)
+            arguments(CaseDataBuilderSpec.builder()
+                          .atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed().build()),
+            //AC6 - Payment Failed in 2v1 case
+            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1PaymentFailure().build())
+
         );
     }
 
@@ -191,6 +218,44 @@ class StateFlowEngineSpecTest {
 
         // Then: The corresponding flag in the StateFlow must be set to true
         assertThat(stateFlow.getFlags()).contains(entry(flagName, true));
+    }
+
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_SUBMITTED"
+                        + " to CLAIM_ISSUED_PAYMENT_SUCCESSFUL")
+    @MethodSource("caseDataStreamOneRespondentClaimFeePaymentSuccessful")
+    void shouldReturnClaimIssuedPaymentSuccessful_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then Claim will go through state CLAIM_SUBMITTED and finish at state CLAIM_ISSUED_PAYMENT_SUCCESSFUL
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(3)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+    }
+
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_SUBMITTED"
+        + " to CLAIM_ISSUED_PAYMENT_FAILED")
+    @MethodSource("caseDataStreamOneRespondentClaimFeePaymentFailure")
+    void shouldReturnClaimIssuedPaymentFailed_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then Claim will go through state CLAIM_SUBMITTED and finish at state CLAIM_ISSUED_PAYMENT_SUCCESSFUL
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED_PAYMENT_FAILED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(3)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
     }
 }
 
