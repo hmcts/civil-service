@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 public class AdmitProceedConfText implements RespondToResponseConfirmationTextGenerator {
 
     private static final Set<RespondentResponseTypeSpec> ADMISSION = EnumSet.of(
