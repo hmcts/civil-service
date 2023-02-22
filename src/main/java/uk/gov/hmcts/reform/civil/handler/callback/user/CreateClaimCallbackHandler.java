@@ -394,6 +394,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder
                 .respondent2OrgRegistered(YES)
                 .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            if (references.isPresent()) {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
+                    .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
+                    .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
+                    .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            }
+            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
+            dataBuilder
+                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor2ServiceAddress());
         }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
