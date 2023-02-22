@@ -60,6 +60,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
+            log.info("Returned service request reference: {}", serviceRequestReference);
 
             if (caseData.getHearingDate() != null) {
                 caseData = caseData.toBuilder()
