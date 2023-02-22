@@ -202,7 +202,9 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(NO)
                 .listingOrRelisting(ListingOrRelisting.LISTING)
                 .hearingDate(LocalDate.now().plusWeeks(5))
-                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .allocatedTrack(null)
+                .claimValue(null)
+                .totalClaimAmount(new BigDecimal(123))
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                      .build())
@@ -214,7 +216,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
 
         }
 
