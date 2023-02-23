@@ -20,9 +20,7 @@ class CaseReadyBusinessProcessSearchServiceTest extends ElasticSearchServiceTest
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(matchQuery("data.businessProcess.status", "READY"))
-            .must(rangeQuery("data.businessProcess.readyOn")
-                      .lt("now-5m"));
+            .must(matchQuery("data.businessProcess.status", "READY"));
         return new Query(query, List.of(), fromValue);
     }
 }
