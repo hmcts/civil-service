@@ -1035,6 +1035,13 @@ public class FlowStateAllowedEventService {
                 RESET_PIN,
                 migrateCase
             )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_SDO.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                AMEND_PARTY_DETAILS
+            )
         )
     );
 
