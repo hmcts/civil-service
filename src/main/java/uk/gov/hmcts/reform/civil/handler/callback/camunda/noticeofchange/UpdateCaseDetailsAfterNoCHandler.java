@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -40,8 +39,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     public static final String TASK_ID = "UpdateCaseDetailsAfterNoC";
 
     private final ObjectMapper objectMapper;
-
-    private final StateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -115,8 +112,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 caseDataBuilder.respondent2SameLegalRepresentative(NO);
             }
         }
-
-        stateFlowEngine.evaluate(caseDataBuilder.build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
