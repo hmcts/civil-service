@@ -46,7 +46,7 @@ public class HearingUtils {
         return result;
     }
 
-    public static BigDecimal getFastTrackFee(int claimFee) {
+    public static BigDecimal getSmallTrackFee(int claimFee) {
         if (claimFee == 0) {
             return new BigDecimal(0);
         } else if (claimFee < 300_00) {

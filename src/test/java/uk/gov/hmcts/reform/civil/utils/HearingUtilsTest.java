@@ -45,41 +45,41 @@ public class HearingUtilsTest {
     @DisplayName("HearingUtils.getFastTrackFee should return the appropriate fast-track fee"
         + " based on the claim fee amount.")
     void shouldReturnFee_whenGivenAnyClaimFee(int intClaimFee, int expectedFastTrackFee) {
-        assertThat(HearingUtils.getFastTrackFee(intClaimFee)).isEqualTo(new BigDecimal(expectedFastTrackFee));
+        assertThat(HearingUtils.getSmallTrackFee(intClaimFee)).isEqualTo(new BigDecimal(expectedFastTrackFee));
     }
 
     @Test
     void shouldReturnFee2_whenGivenAnyClaimFee() {
 
-        assertThat(HearingUtils.getFastTrackFee(15000)).isEqualTo(new BigDecimal(2700));
+        assertThat(HearingUtils.getSmallTrackFee(15000)).isEqualTo(new BigDecimal(2700));
 
     }
 
     @Test
     void shouldReturnFee3_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(35000)).isEqualTo(new BigDecimal(5900));
+        assertThat(HearingUtils.getSmallTrackFee(35000)).isEqualTo(new BigDecimal(5900));
 
     }
 
     @Test
     void shouldReturnFee4_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(90000)).isEqualTo(new BigDecimal(8500));
+        assertThat(HearingUtils.getSmallTrackFee(90000)).isEqualTo(new BigDecimal(8500));
 
     }
 
     @Test
     void shouldReturnFee5_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(140000)).isEqualTo(new BigDecimal(12300));
+        assertThat(HearingUtils.getSmallTrackFee(140000)).isEqualTo(new BigDecimal(12300));
     }
 
     @Test
     void shouldReturnFee6_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(290000)).isEqualTo(new BigDecimal(18100));
+        assertThat(HearingUtils.getSmallTrackFee(290000)).isEqualTo(new BigDecimal(18100));
     }
 
     @Test
     void shouldReturnFee7_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(500000)).isEqualTo(new BigDecimal(34600));
+        assertThat(HearingUtils.getSmallTrackFee(500000)).isEqualTo(new BigDecimal(34600));
     }
 
     @DisplayName("HearingUtils.formatHearingFee should return <null> when the hearing fee is zero.")
