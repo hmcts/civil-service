@@ -554,7 +554,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES) ?
             MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal fixedCost = setUpFixedCostAmount(claimAmount, caseData);
+        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -564,7 +565,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .ccjJudgmentTotalStillOwed(finalTotal)
             .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
             .ccjPaymentPaidSomeAmountInPounds(paidAmount)
-            .ccjJudgmentFixedCostAmount(setUpFixedCostAmount(claimAmount, caseData))
+            .ccjJudgmentFixedCostAmount(fixedCost)
             .build();
 
         updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
@@ -576,7 +577,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
         if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())){
-            return null;
+            return ZERO;
         }
         if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0){
             return ZERO;
