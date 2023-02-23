@@ -119,11 +119,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private static final String UPON_CONSIDERING =
         "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
     public static final String HEARING_TIME_TEXT_AFTER =
-        "The claimant must by no later than 14 days before the hearing date, pay the court the "
-            + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
-            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
-            + "struck without further order.";
-    public static final String HEARING_TIME_TEXT_AFTER_HNL =
         "The claimant must by no later than 4 weeks before the hearing date, pay the court the "
             + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
@@ -254,29 +249,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            // updated Hearing time field copy of the above field, leaving above field in as requested to not break
-            // existing cases
-            DisposalHearingHearingTime tempDisposalHearingHearingTime =
-                DisposalHearingHearingTime.builder()
-                    .input(
-                        "This claim will be listed for final disposal before a judge on the first available date after")
-                    .dateTo(LocalDate.now().plusWeeks(16))
-                    .build();
+        // updated Hearing time field copy of the above field, leaving above field in as requested to not break
+        // existing cases
+        DisposalHearingHearingTime tempDisposalHearingHearingTime =
+            DisposalHearingHearingTime.builder()
+                .input(
+                    "This claim will be listed for final disposal before a judge on the first available date after")
+                .dateTo(LocalDate.now().plusWeeks(16))
+                .build();
 
-            updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
+        updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
-            DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-                .input(String.format("This order has been made without hearing. "
-                        + "Each party has the right to apply to have this Order set "
-                        + "aside or varied. Any such application must be received "
-                        + "by the Court (together with the appropriate fee) "
-                        + "by 4pm on %s.",
-                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-                )).build();
-            updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
-        }
+        DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
+            .input(String.format("This order has been made without hearing. "
+                    + "Each party has the right to apply to have this Order set "
+                    + "aside or varied. Any such application must be received "
+                    + "by the Court (together with the appropriate fee) "
+                    + "by 4pm on %s.",
+                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                    .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+            )).build();
+        updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
@@ -363,19 +356,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
-                .helpText1("If either party considers that the time estimate is insufficient, "
-                               + "they must inform the court within 7 days of the date of this order.")
-                .helpText2("Not more than seven nor less than three clear days before the trial, "
-                               + "the claimant must file at court and serve an indexed and paginated bundle of "
-                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                               + "the contents of the bundle before it is filed. The bundle will include a case "
-                               + "summary and a chronology.")
-                .build();
-            updatedData.fastTrackHearingTime(tempFastTrackHearingTime);
-        }
+        FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+            .helpText1("If either party considers that the time estimate is insufficient, "
+                           + "they must inform the court within 7 days of the date of this order.")
+            .helpText2("Not more than seven nor less than three clear days before the trial, "
+                           + "the claimant must file at court and serve an indexed and paginated bundle of "
+                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                           + "the contents of the bundle before it is filed. The bundle will include a case "
+                           + "summary and a chronology.")
+            .build();
+        updatedData.fastTrackHearingTime(tempFastTrackHearingTime);
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
@@ -386,20 +377,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
 
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format("This order has been made without hearing. "
-                        + "Each party has the right to apply "
-                        + "to have this Order set aside or varied. Any such application must be "
-                        + "received by the Court (together with the appropriate fee) by 4pm "
-                        + "on %s.",
-                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-                ))
-                .build();
+        FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
+            .input(String.format("This order has been made without hearing. "
+                    + "Each party has the right to apply "
+                    + "to have this Order set aside or varied. Any such application must be "
+                    + "received by the Court (together with the appropriate fee) by 4pm "
+                    + "on %s.",
+                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                    .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+            ))
+            .build();
 
-            updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
-        }
+        updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
 
         FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
             .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
@@ -561,28 +550,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
-            .input2(featureToggleService.isHearingAndListingSDOEnabled() ? HEARING_TIME_TEXT_AFTER_HNL
-                        : HEARING_TIME_TEXT_AFTER)
+            .input2(HEARING_TIME_TEXT_AFTER)
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
 
         SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            tempSmallClaimsNotes.input("This order has been made without hearing. "
-                                           + "Each party has the right to apply to have this Order set aside or varied. "
-                                           + "Any such application must be received by the Court "
-                                           + "(together with the appropriate fee) by 4pm on "
-                                           + DateFormatHelper.formatLocalDate(
-                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
-            );
-        } else {
-            tempSmallClaimsNotes.input(
-                    "This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any such application must be received by the Court, "
-                        + "together with the appropriate fee by 4pm on")
-                .date(LocalDate.now().plusWeeks(1));
-        }
+        tempSmallClaimsNotes.input("This order has been made without hearing. "
+                                       + "Each party has the right to apply to have this Order set aside or varied. "
+                                       + "Any such application must be received by the Court "
+                                       + "(together with the appropriate fee) by 4pm on "
+                                       + DateFormatHelper.formatLocalDate(
+            deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
+        );
 
         updatedData.smallClaimsNotes(tempSmallClaimsNotes.build()).build();
 
