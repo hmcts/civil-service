@@ -403,10 +403,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
             }
-            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
             dataBuilder
                 .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor2ServiceAddress());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
         }
 
         // moving statement of truth value to correct field, this was not possible in mid event.

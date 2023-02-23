@@ -452,10 +452,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
             }
-            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
             dataBuilder
                 .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
-            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor2ServiceAddress());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -468,10 +467,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
-
+            if (respondent1OrganisationPolicy != null) {
+                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                    .build();
+            }
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
