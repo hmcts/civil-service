@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 class CategoryServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer token";
+    private static final String AUTH_TOKEN_UNAUTHORISED = "Bearer token unauthorised";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-token";
     private static final String CATEGORY_ID = "HearingChannel";
     private static final String SERVICE_ID = "AAA6";
@@ -36,6 +37,11 @@ class CategoryServiceTest {
         "not found message",
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "not found response body".getBytes(UTF_8));
+
+    private final FeignException forbiddenException = new FeignException.Forbidden(
+        "forbidden message",
+        Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+        "forbidden response body".getBytes(UTF_8));
 
     private final CategorySearchResult categorySearchResult = CategorySearchResult.builder().build();
 
@@ -73,6 +79,16 @@ class CategoryServiceTest {
             .willThrow(notFoundFeignException);
         var category = categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, CATEGORY_ID, WRONG_SERVICE_ID);
         verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, WRONG_SERVICE_ID, AUTH_TOKEN,
+                                                                     authTokenGenerator.generate());
+        assertThat(category).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyOptional_whenAccessForbidden() {
+        given(listOfValuesApi.findCategoryByCategoryIdAndServiceId(any(), any(), eq(AUTH_TOKEN_UNAUTHORISED), any()))
+            .willThrow(forbiddenException);
+        var category = categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN_UNAUTHORISED, CATEGORY_ID, SERVICE_ID);
+        verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, SERVICE_ID, AUTH_TOKEN_UNAUTHORISED,
                                                                      authTokenGenerator.generate());
         assertThat(category).isEmpty();
     }
