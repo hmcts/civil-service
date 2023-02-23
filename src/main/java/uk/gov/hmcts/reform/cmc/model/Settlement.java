@@ -50,5 +50,4 @@ public class Settlement {
         return partyStatementsStream;
     }
 
-
 }
