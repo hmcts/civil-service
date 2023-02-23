@@ -40,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
@@ -84,7 +85,8 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario);
+            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
+                                                               params.getParams().get(BEARER_TOKEN).toString());
         }
 
         @Test
