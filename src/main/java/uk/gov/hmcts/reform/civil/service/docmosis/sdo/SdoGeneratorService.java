@@ -46,18 +46,12 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-
-            if (toggleService.isHearingAndListingSDOEnabled()) {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
-            }
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
-                ? DocmosisTemplates.SDO_HNL_FAST : DocmosisTemplates.SDO_FAST;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
-            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
-                ? DocmosisTemplates.SDO_HNL_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
@@ -155,15 +149,13 @@ public class SdoGeneratorService {
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
             );
 
-        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
-            sdoDocumentBuilder
-                .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-                .disposalHearingTime(caseData.getDisposalHearingHearingTime());
-            Optional.ofNullable(caseData.getDisposalHearingHearingTime())
-                .map(DisposalHearingHearingTime::getTime)
-                .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
-                .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
-        }
+        sdoDocumentBuilder
+            .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
+        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
 
         return sdoDocumentBuilder.build();
     }
@@ -263,15 +255,13 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
             );
 
-        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
-            sdoDocumentFormBuilder
-                .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .fastTrackHearingTime(caseData.getFastTrackHearingTime());
-            Optional.ofNullable(caseData.getFastTrackHearingTime())
-                .map(FastTrackHearingTime::getHearingDuration)
-                .map(FastTrackHearingTimeEstimate::getLabel)
-                .ifPresent(sdoDocumentFormBuilder::fastTrackHearingTimeEstimate);
-        }
+        sdoDocumentFormBuilder
+            .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
+            .fastTrackHearingTime(caseData.getFastTrackHearingTime());
+        Optional.ofNullable(caseData.getFastTrackHearingTime())
+            .map(FastTrackHearingTime::getHearingDuration)
+            .map(FastTrackHearingTimeEstimate::getLabel)
+            .ifPresent(sdoDocumentFormBuilder::fastTrackHearingTimeEstimate);
 
         return sdoDocumentFormBuilder.build();
     }
