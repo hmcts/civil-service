@@ -55,6 +55,7 @@ withNightlyPipeline(type, product, component) {
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
+  env.NIGHTLY_RUN = true
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
@@ -69,17 +70,20 @@ withNightlyPipeline(type, product, component) {
   afterSuccess('fullFunctionalTest') {
     //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
     sh """ ./gradlew runEndToEndUnspecTests """
+  }
+
+  afterAlways('fullFunctionalTest') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
   }
-
+  
   enableCrossBrowserTest()
 
-  afterSuccess('crossBrowserTest') {
+  afterAlways('crossBrowserTest') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
-  afterSuccess('fortify-scan') {
+  afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
 }
