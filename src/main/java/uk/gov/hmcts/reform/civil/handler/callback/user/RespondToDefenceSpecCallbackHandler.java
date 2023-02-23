@@ -314,13 +314,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        boolean notVersion0 = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
+        boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
 
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (notVersion0 && featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if (hasVersion && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             updatedCaseData.applicant1DQ(
                 Applicant1DQ.builder().applicant1DQRequestedCourt(
