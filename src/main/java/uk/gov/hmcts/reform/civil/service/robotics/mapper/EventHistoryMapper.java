@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -52,6 +52,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -102,13 +103,13 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 @Slf4j
 public class EventHistoryMapper {
 
-    public static final String BS_REF = "Breathing space reference";
-    public static final String BS_START_DT = "actual start date";
-    public static final String BS_END_DATE = "actual end date";
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
     private final Time time;
+    public static final String BS_REF = "Breathing space reference";
+    public static final String BS_START_DT = "actual start date";
+    public static final String BS_END_DATE = "actual end date";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -259,7 +260,7 @@ public class EventHistoryMapper {
         buildDefaultJudgment(builder, caseData);
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
-
+        buildClaimTakenOfflineAfterDJ(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -470,7 +471,7 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 RespondentResponseTypeSpec respondent1SpecResponseType =
                     MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
                         ? caseData.getClaimant1ClaimResponseTypeForSpec()
@@ -486,7 +487,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec());
             } else {
@@ -507,7 +508,7 @@ public class EventHistoryMapper {
         }
 
         if (defendant2DivergentResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
                                                     caseData.getRespondent2ClaimResponseTypeForSpec(),
                                                     respondent2ResponseDate, RESPONDENT2_ID
@@ -519,7 +520,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec());
             } else {
@@ -787,16 +788,16 @@ public class EventHistoryMapper {
                 "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
-                isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+                SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? getResponseTypeForRespondentSpec(caseData, respondent)
-                    : getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled())
+                    : getResponseTypeForRespondent(caseData, respondent)
             ));
         }
         return defaultText;
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
                 buildMiscellaneousCaseNotesEvent(builder, caseData);
             }
@@ -826,7 +827,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
@@ -855,7 +856,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
@@ -900,7 +901,7 @@ public class EventHistoryMapper {
     }
 
     private boolean rpaEnabledForClaim(CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return featureToggleService.isSpecRpaContinuousFeedEnabled();
         } else {
             return featureToggleService.isRpaContinuousFeedEnabled();
@@ -1090,7 +1091,8 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
         builder.replyToDefence(replyDefenceForProceedingApplicants);
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        CaseCategory claimType = caseData.getCaseAccessCategory();
+        if (SPEC_CLAIM.equals(claimType)) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1181,7 +1183,6 @@ public class EventHistoryMapper {
             YesOrNo respondent1MediationRequired;
             YesOrNo respondent2MediationRequired;
 
-            SuperClaimType claimType = caseData.getSuperClaimType();
             String track = caseData.getResponseClaimTrack();
 
             switch (getMultiPartyScenario(caseData)) {
@@ -1190,7 +1191,7 @@ public class EventHistoryMapper {
 
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
-                    if (claimType == SuperClaimType.SPEC_CLAIM
+                    if (claimType == SPEC_CLAIM
                         && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                         && respondent1MediationRequired == YesOrNo.YES
                         && applicant1MediationRequired == YesOrNo.YES
@@ -1212,7 +1213,7 @@ public class EventHistoryMapper {
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SuperClaimType.SPEC_CLAIM
+                        || (claimType == SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && applicant1MediationRequired == YesOrNo.YES
@@ -1237,7 +1238,7 @@ public class EventHistoryMapper {
                     respondent2MediationRequired = caseData.getResponseClaimMediationSpec2Required();
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SuperClaimType.SPEC_CLAIM
+                        || (claimType == SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && respondent2MediationRequired == YesOrNo.YES
@@ -1260,7 +1261,7 @@ public class EventHistoryMapper {
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
                     if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
-                        || (claimType == SuperClaimType.SPEC_CLAIM
+                        || (claimType == SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && applicant1MediationRequired == YesOrNo.YES
@@ -1299,10 +1300,7 @@ public class EventHistoryMapper {
                                           .dq(caseData.getApplicant2DQ())
                                           .litigiousPartyID(APPLICANT2_ID)
                                           .responseDate(
-                                              isSpecCaseCategory(
-                                                  caseData,
-                                                  featureToggleService.isAccessProfilesEnabled()
-                                              )
+                                              SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                   ? caseData.getApplicant1ResponseDate()
                                                   : caseData.getApplicant2ResponseDate())
                                           .build());
@@ -1353,7 +1351,7 @@ public class EventHistoryMapper {
             case TWO_V_ONE: {
                 YesOrNo app1Proceeds;
                 YesOrNo app2Proceeds;
-                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                     app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
                     app2Proceeds = app1Proceeds;
                 } else {
@@ -1584,7 +1582,7 @@ public class EventHistoryMapper {
                 + "preferredCourtCode: %s; stayClaim: %s",
             paginatedMessage,
             respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled()),
+            getResponseTypeForRespondent(caseData, respondent),
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         ));
@@ -1781,7 +1779,7 @@ public class EventHistoryMapper {
                 break;
             }
             default: {
-                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                     buildAcknowledgementOfServiceSpec(builder, caseData.getRespondent1AcknowledgeNotificationDate());
                     return;
                 }
@@ -1794,7 +1792,7 @@ public class EventHistoryMapper {
                 builder
                     .acknowledgementOfServiceReceived(
                         List.of(
-                            isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+                            SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ?
                                 Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
@@ -2064,7 +2062,7 @@ public class EventHistoryMapper {
     }
 
     private void buildInformAgreedExtensionDateForSpec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null
             || caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
             buildConsentExtensionFilingDefence(builder, caseData);
@@ -2121,7 +2119,7 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
-                                                CaseData caseData) {
+                                                             CaseData caseData) {
         String detailsText = "RPA Reason: Case Proceeds in Caseman.";
         builder.miscellaneous(
             Event.builder()
@@ -2215,6 +2213,14 @@ public class EventHistoryMapper {
 
         return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
             : claimCost != null ? claimCost.setScale(2) : BigDecimal.ZERO;
+
+    }
+
+    private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
+                                               CaseData caseData) {
+        if (caseData.getTakenOfflineDate() != null && caseData.getOrderSDODocumentDJ() != null) {
+            buildClaimTakenOfflineAfterSDO(builder, caseData);
+        }
 
     }
 
