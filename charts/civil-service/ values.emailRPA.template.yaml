@@ -1,0 +1,6 @@
+robotics:
+  notification:
+    sender: hmcts.civil@gmail.com
+    recipient: demo_rpa_email@HMCTS.NET
+    multipartyrecipient: demo_rpa_email@HMCTS.NET
+    specRecipient: demo_rpa_email@HMCTS.NET

@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
@@ -107,7 +105,31 @@ class SendGridClientTest {
             );
         }
     }
-
+//    @Nested
+//    class DoNotSendEmailToTestAddress {
+//
+//        @BeforeEach
+//        void setup() {
+//            clearInvocations(sendGrid);
+//        }
+//
+//        @Test
+//        @SneakyThrows
+//        void ShouldNotSendEmail_whenEmailRecipientIsTestAddress() {
+//            when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
+//
+//            sendGridClient.sendEmail(EMAIL_FROM, EmailData.builder()
+//                .to("test@test.com")
+//                .subject("subject")
+//                .message("message")
+//                .attachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf")))
+//                .build());
+//
+//            verify(sendGrid).api(requestCaptor.capture());  //remove?
+//            Request capturedRequest = requestCaptor.getValue();
+//            assertFalse(capturedRequest.getBody().contains("\"filename\":\"test.pdf\"")); //change?
+//        }
+//    }
     @Nested
     class SuccessfulSendEmail {
 
