@@ -11,15 +11,12 @@ import com.sendgrid.helpers.mail.objects.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -32,6 +29,7 @@ public class SendGridClient {
     @Retryable(value = EmailSendFailedException.class, backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(String from, EmailData emailData) {
         verifyData(from, emailData);
+
         try {
             Email sender = new Email(from);
             String subject = emailData.getSubject();
