@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.launchdarkly.shaded.com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
+import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -137,6 +140,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final CategoryService categoryService;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -175,6 +179,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
+        // TODO - remove the following block of code before merging
+        {
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            Optional<CategorySearchResult> category = categoryService.findCategoryByCategoryIdAndServiceId(
+                authToken, "HearingChannel", "AAA6");
+            Gson gson = new Gson();
+            log.info(gson.toJson(category.orElse(null)));
+        }
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
