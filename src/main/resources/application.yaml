@@ -366,9 +366,9 @@ rd_professional:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    recipient: test@test.com
+    multipartyrecipient: test@test.com
+    specRecipient: test@test.com
 
 notification:
   caseworker:
