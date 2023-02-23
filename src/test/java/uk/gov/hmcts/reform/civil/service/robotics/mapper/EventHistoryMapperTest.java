@@ -7587,7 +7587,6 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
                 .totalClaimAmount(new BigDecimal(1000))
@@ -7622,7 +7621,6 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJWithDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
                 .totalClaimAmount(new BigDecimal(1000))
