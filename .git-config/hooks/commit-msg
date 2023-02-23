@@ -20,8 +20,6 @@ fi
 
 if [[ $COMMIT_MESSAGE =~ $REGEX_RENOVATE ]]; then
   # This is a Renovate commit message. We need to check the branch name
-  echo "$COMMIT_MESSAGE"
-  echo "Test"
   BRANCH_NAME=$(git symbolic-ref --short HEAD)
   if [[ $BRANCH_NAME =~ $REGEX_RENOVATE_BRANCH ]]; then
     # Renovate commit message in renovate branch. All good.
