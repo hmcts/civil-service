@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+LOCAL_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+VALID_BRANCH_REGEX="^(feat|spike|fix|test|refactor|renovate)\/CIV-[0-9]+|renovate\/"
+
+MESSAGE="The branch names in this project must adhere to this contract: $VALID_BRANCH_REGEX. You should rename your branch to a valid name and try again. Eg:feat/CIV-1234, fix/CIV-1234-something,renovate/something"
+
+if [[ ! $LOCAL_BRANCH =~ $VALID_BRANCH_REGEX ]]
+then
+    echo "$MESSAGE"
+    exit 1
+fi
+
+exit 0
