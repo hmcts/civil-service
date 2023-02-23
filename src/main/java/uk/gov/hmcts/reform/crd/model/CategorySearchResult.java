@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListOfValues {
+public class CategorySearchResult {
 
     @JsonProperty("list_of_values")
     private List<Category> categories;

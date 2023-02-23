@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.crd.client.ListOfValuesApi;
-import uk.gov.hmcts.reform.crd.model.ListOfValues;
+import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +37,7 @@ class CategoryServiceTest {
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "not found response body".getBytes(UTF_8));
 
-    private final ListOfValues expectedCategory = ListOfValues.builder().build();
+    private final CategorySearchResult categorySearchResult = CategorySearchResult.builder().build();
 
     @Mock
     private ListOfValuesApi listOfValuesApi;
@@ -54,7 +54,7 @@ class CategoryServiceTest {
             any(),
             any(),
             any(),
-            any())).willReturn(expectedCategory);
+            any())).willReturn(categorySearchResult);
         given(authTokenGenerator.generate()).willReturn(SERVICE_AUTH_TOKEN);
     }
 
@@ -64,7 +64,7 @@ class CategoryServiceTest {
 
         verify(listOfValuesApi).findCategoryByCategoryIdAndServiceId(CATEGORY_ID, SERVICE_ID, AUTH_TOKEN,
                                                                      authTokenGenerator.generate());
-        assertThat(category).isEqualTo(Optional.of(expectedCategory));
+        assertThat(category).isEqualTo(Optional.of(categorySearchResult));
     }
 
     @Test
