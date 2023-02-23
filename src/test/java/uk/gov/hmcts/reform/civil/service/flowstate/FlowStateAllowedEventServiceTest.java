@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -298,7 +299,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        GENERATE_DIRECTIONS_ORDER
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS
                     }
                 ),
                 of(
@@ -522,7 +524,8 @@ class FlowStateAllowedEventServiceTest {
                         GENERATE_DIRECTIONS_ORDER,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS
                     }
                 ),
                 of(
