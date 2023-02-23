@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import com.launchdarkly.shaded.com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -184,8 +184,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             Optional<CategorySearchResult> category = categoryService.findCategoryByCategoryIdAndServiceId(
                 authToken, "HearingChannel", "AAA6");
-            Gson gson = new Gson();
-            log.info(gson.toJson(category.orElse(null)));
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                log.info(mapper.writeValueAsString(category.orElse(null)));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+            }
+
         }
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
