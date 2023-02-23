@@ -72,6 +72,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             );
             data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
         } catch (ValueMapperException | IllegalArgumentException e) {
+            log.error("CaseEventHandler : ExternalTask ", externalTask.getAllVariables());
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
     }
