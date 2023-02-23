@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.trialready.TrialReadyForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -81,20 +81,35 @@ public class TrialReadyFormGenerator implements TemplateDataGenerator<TrialReady
     }
 
     private String getUserLastName(CaseData caseData, String authorisation) {
-        if(coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
                                                userService.getUserInfo(authorisation).getUid(),
                                                CaseRole.APPLICANTSOLICITORONE)) {
-            return caseData.getApplicant1().getIndividualLastName();
+            return getTypeUserLastName(caseData.getApplicant1());
         } else if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
                                                        userService.getUserInfo(authorisation).getUid(),
                                                        CaseRole.RESPONDENTSOLICITORONE)) {
-            return caseData.getRespondent1().getIndividualLastName();
+            return getTypeUserLastName(caseData.getRespondent1());
         } else if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
                                                        userService.getUserInfo(authorisation).getUid(),
                                                        CaseRole.RESPONDENTSOLICITORTWO)) {
-            return caseData.getRespondent2().getIndividualLastName();
+            return getTypeUserLastName(caseData.getRespondent2());
         } else {
             throw new IllegalArgumentException("Invalid user type");
+        }
+    }
+
+    private String getTypeUserLastName(Party party) {
+        switch (party.getType()) {
+            case INDIVIDUAL:
+                return party.getIndividualLastName();
+            case COMPANY:
+                return party.getCompanyName();
+            case SOLE_TRADER:
+                return party.getSoleTraderLastName();
+            case ORGANISATION:
+                return party.getOrganisationName();
+            default:
+                throw new IllegalArgumentException("Invalid user type");
         }
     }
 }

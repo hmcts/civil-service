@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -41,11 +42,10 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
 public class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
-    private static final String REFERENCE_NUMBER = "000DC001";
     private static final String USER_UID = "userUid";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileName_application = String.format(
-        TRIAL_READY.getDocumentTitle(), REFERENCE_NUMBER, formatLocalDate(LocalDate.now(), DATE));
+        TRIAL_READY.getDocumentTitle(), "Rambo", formatLocalDate(LocalDate.now(), DATE));
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
@@ -68,21 +68,66 @@ public class TrialReadyFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided() {
+        //GIVEN
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
         when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.APPLICANTSOLICITORONE))).thenReturn(true);
-
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
-
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        //WHEN
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
+        //THEN
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT));
+    }
+
+    @Test
+    void shouldHearingFormGeneratorOneForm_whenRespondent1GenerateDocs() {
+        //GIVEN
+        String fileName = String.format(
+            TRIAL_READY.getDocumentTitle(), "Trader", formatLocalDate(LocalDate.now(), DATE));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
+            .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
+        when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
+            .thenReturn(CASE_DOCUMENT);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        //WHEN
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        //THEN
+        assertThat(caseDocument).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
+    }
+
+    @Test
+    void shouldHearingFormGeneratorOneForm_whenRespondent2GenerateDocs() {
+        //GIVEN
+        String fileName = String.format(
+            TRIAL_READY.getDocumentTitle(), "Company", formatLocalDate(LocalDate.now(), DATE));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
+            .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
+        when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
+            .thenReturn(CASE_DOCUMENT);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Company").build()).build();
+        //WHEN
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        //THEN
+        assertThat(caseDocument).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
     }
 }
