@@ -98,7 +98,6 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
                 .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
-         //   assertThrows(UnsupportedOperationException.class, () -> handler.handle(params));
         }
     }
 
