@@ -108,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -812,7 +813,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        TAKEN_OFFLINE_AFTER_SDO.fullName()
                     }
                 )
             );
