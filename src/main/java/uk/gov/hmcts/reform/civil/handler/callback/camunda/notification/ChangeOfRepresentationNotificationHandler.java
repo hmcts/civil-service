@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChangeOfRepresentationNotificationHandler extends CallbackHandler implements NotificationData {
 
@@ -83,11 +85,13 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
+        log.info("Sending NoC notification email");
         notificationService.sendMail(
             getRecipientEmail(caseData),
             getTemplateId(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
+        log.info("NoC email sent successfully");
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
