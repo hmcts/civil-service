@@ -167,7 +167,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean claimantRequestedCountyCourtJudgement() {
-        return hasResponse() && getCountyCourtJudgmentRequestedAt() != null;
+        return getCountyCourtJudgmentRequestedAt() != null;
     }
 
     @Override
