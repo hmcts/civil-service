@@ -108,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 
 @Service
 @RequiredArgsConstructor
@@ -650,6 +651,13 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_SDO.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                AMEND_PARTY_DETAILS
             )
         ),
         entry(
