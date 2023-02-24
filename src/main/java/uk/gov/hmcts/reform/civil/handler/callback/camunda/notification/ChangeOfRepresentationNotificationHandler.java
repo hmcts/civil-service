@@ -129,9 +129,9 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
-            FORMER_SOL, getSolicitorOrganisationName(caseData, event),
+            FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, getSolicitorOrganisationName(caseData, event));
+            OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event));
     }
 
     private String getOrganisationName(String orgToName) {
@@ -143,13 +143,11 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         return LITIGANT_IN_PERSON;
     }
 
-    private String getSolicitorOrganisationName(CaseData caseData, CaseEvent event) {
-        if (event.equals(NOTIFY_FORMER_SOLICITOR)) {
-            return getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID());
-        } else if (event.equals(NOTIFY_OTHER_SOLICITOR_1)) {
-            return getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData));
-        } else {
+    private String getOtherSolicitorOrganisationName(CaseData caseData, CaseEvent event) {
+        if (event.equals(NOTIFY_OTHER_SOLICITOR_2)) {
             return getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData));
+        } else {
+            return getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData));
         }
     }
 
