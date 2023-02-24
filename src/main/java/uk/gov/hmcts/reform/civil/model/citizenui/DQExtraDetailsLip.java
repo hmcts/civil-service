@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespondentLiPResponse {
-
-    private MediationLiP respondent1MediationLiPResponse;
-    private DQExtraDetailsLip respondent1DQExtraDetails;
+public class DQExtraDetailsLip {
+    private YesOrNo phoneOrVideoHearing;
+    private String  whyUnavailableForHearing;
+    private String  giveEvidenceYourSelf;
 }
