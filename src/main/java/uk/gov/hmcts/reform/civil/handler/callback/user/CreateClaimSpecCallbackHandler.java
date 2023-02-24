@@ -491,6 +491,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
             }
         }
+
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
