@@ -137,9 +137,12 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     }
 
     private String getOrganisationName(String orgToName) {
-        return organisationService.findOrganisationById(orgToName).orElseThrow(() -> {
-            throw new CallbackException("Organisation is not valid for: " + orgToName);
-        }).getName();
+        if (orgToName != null) {
+            return organisationService.findOrganisationById(orgToName).orElseThrow(() -> {
+                throw new CallbackException("Organisation is not valid for: " + orgToName);
+            }).getName();
+        }
+        return null;
     }
 
     private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {
