@@ -41,6 +41,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_1 = "NotifyOtherSolicitor1";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_2 = "NotifyOtherSolicitor2";
 
+    private static final String LITIGANT_IN_PERSON = "LiP";
+
     private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
     private static final String REFERENCE_TEMPLATE = "notice-of-change-%s";
@@ -127,13 +129,9 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
-            FORMER_SOL,
-            caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null
-                ? getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()) : "LiP",
+            FORMER_SOL, getSolicitorOrganisationName(caseData, event),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, event.equals(NOTIFY_OTHER_SOLICITOR_2)
-                ? getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData)) :
-                getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)));
+            OTHER_SOL_NAME, getSolicitorOrganisationName(caseData, event));
     }
 
     private String getOrganisationName(String orgToName) {
@@ -142,7 +140,17 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
                 throw new CallbackException("Organisation is not valid for: " + orgToName);
             }).getName();
         }
-        return "LiP";
+        return LITIGANT_IN_PERSON;
+    }
+
+    private String getSolicitorOrganisationName(CaseData caseData, CaseEvent event) {
+        if (event.equals(NOTIFY_FORMER_SOLICITOR)) {
+            return getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID());
+        } else if (event.equals(NOTIFY_OTHER_SOLICITOR_1)) {
+            return getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData));
+        } else {
+            return getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData));
+        }
     }
 
     private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {
