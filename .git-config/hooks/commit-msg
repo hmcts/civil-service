@@ -31,7 +31,7 @@ fi
 echo "The provided commit message is invalid. Commit messages must start with CIV-nnnn or CIV-TASK"
 echo " (mind the uppercase) and there must be a space afterwards, to separate from the commit title."
 echo "Also be advised that usage of CIV-TASK should be cleared beforehand by a Technical Lead as its use is meant"
-echo " as en exception for corner cases."
+echo " as an exception for corner cases."
 echo ""
 echo "Examples of valid commit messages:"
 echo " CIV-1234 Fixing a bug"
