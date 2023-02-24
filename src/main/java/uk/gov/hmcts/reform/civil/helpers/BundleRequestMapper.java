@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class BundleRequestMapper {
         BundlingCaseData bundlingCaseData =
             BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
                 bundleConfigFileName)
-                .systemGeneratedCaseDocuments(mapSystemGeneratedcaseDocument(caseData.getSystemGeneratedCaseDocuments()))
+                .systemGeneratedCaseDocuments(mapSystemGeneratedcaseDocument(caseData.getSystemGeneratedCaseDocuments(), caseData.getOrderSDODocumentDJ()))
                 .servedDocumentFiles(mapServedDocuments(caseData.getServedDocumentFiles()))
                 .documentWitnessStatement(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatement(),
                                                                       EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
@@ -127,7 +128,8 @@ public class BundleRequestMapper {
                 .documentEvidenceForTrial(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrial()))
                 .documentEvidenceForTrialRes(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialRes()))
                 .documentEvidenceForTrialRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialRes2()))
-                .defendantResponseDocuments(mapSystemGeneratedcaseDocument(caseData.getDefendantResponseDocuments()))
+                .defendantResponseDocuments(mapSystemGeneratedcaseDocument(caseData.getDefendantResponseDocuments(),
+                                                                           null))
                 .applicant1(caseData.getApplicant1())
                 .respondent1(caseData.getRespondent1())
                 .courtLocation(caseData.getHearingLocation().getValue().getLabel())
@@ -172,7 +174,7 @@ public class BundleRequestMapper {
         return  ServedDocument.builder().particularsOfClaimDocument(particulars).build();
     }
 
-    private List<Element<BundlingRequestDocument>> mapSystemGeneratedcaseDocument(List<Element<CaseDocument>> systemGeneratedCaseDocuments) {
+    private List<Element<BundlingRequestDocument>> mapSystemGeneratedcaseDocument(List<Element<CaseDocument>> systemGeneratedCaseDocuments, Document orderSDODocumentDJ) {
         List<BundlingRequestDocument> bundlingSystemGeneratedCaseDocs = new ArrayList<>();
         if (!Optional.ofNullable(systemGeneratedCaseDocuments).isEmpty()) {
             systemGeneratedCaseDocuments.forEach(sysGeneratedCaseDocuments -> {
@@ -189,6 +191,15 @@ public class BundleRequestMapper {
                 );
 
             });
+            if (null != orderSDODocumentDJ) {
+                bundlingSystemGeneratedCaseDocs.add(BundlingRequestDocument.builder()
+                                                        .documentFileName(orderSDODocumentDJ.getDocumentFileName())
+                                                        .documentLink(DocumentLink.builder()
+                                                                          .documentUrl(orderSDODocumentDJ.getDocumentUrl())
+                                                                          .documentBinaryUrl(orderSDODocumentDJ.getDocumentBinaryUrl())
+                                                                          .documentFilename(orderSDODocumentDJ.getDocumentFileName()).build())
+                                                        .documentType(DocumentType.SDO_ORDER.name()).build());
+            }
         }
         return ElementUtils.wrapElements(bundlingSystemGeneratedCaseDocs);
     }
