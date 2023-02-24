@@ -195,11 +195,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                                                         .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                                           .organisationID(value.getOrganisationIdentifier()).build())
-                                                                                         .orgPolicyReference(null)
-                                                                                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                                                                                         .build()));
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -560,7 +560,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
-    //------remove bool for v1 callback----------
     private String getBody(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
@@ -625,12 +624,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             participantString.append(caseData.getApplicant1().getPartyName())
                 .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
 
         } else {
             participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
         }
         return participantString;
 
