@@ -13,5 +13,5 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 public class DQExtraDetailsLip {
     private YesOrNo phoneOrVideoHearing;
     private String  whyUnavailableForHearing;
-    private String  giveEvidenceYourSelf;
+    private YesOrNo  giveEvidenceYourSelf;
 }
