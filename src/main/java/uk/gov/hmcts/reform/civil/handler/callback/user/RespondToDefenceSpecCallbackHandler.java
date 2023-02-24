@@ -25,7 +25,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -552,8 +556,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES) ?
-            MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
+            ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
         BigDecimal fixedCost = setUpFixedCostAmount(claimAmount, caseData);
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
@@ -576,10 +580,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
-        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())){
+        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return ZERO;
         }
-        if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0){
+        if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0) {
             return ZERO;
         } else if (claimAmount.compareTo(BigDecimal.valueOf(5000)) <= 0) {
             return BigDecimal.valueOf(40);
