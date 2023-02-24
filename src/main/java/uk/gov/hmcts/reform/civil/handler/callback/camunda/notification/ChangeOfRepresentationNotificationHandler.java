@@ -142,7 +142,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
                 throw new CallbackException("Organisation is not valid for: " + orgToName);
             }).getName();
         }
-        return null;
+        return "LiP";
     }
 
     private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {
