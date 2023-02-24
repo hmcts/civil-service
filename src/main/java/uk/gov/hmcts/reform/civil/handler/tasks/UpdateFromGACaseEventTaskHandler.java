@@ -86,43 +86,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
-//        List<Element<CaseDocument>> generalOrderDocument = ofNullable(civilCaseData.getGeneralOrderDocument())
-//            .orElse(newArrayList());
-//
-//        if (generalAppCaseData.getGeneralOrderDocument() != null
-//            && checkIfDocumentExists(generalOrderDocument, generalAppCaseData.getGeneralOrderDocument()) < 1) {
-//            generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
-//        }
-//
-//        List<Element<CaseDocument>> dismissalOrderDocument = ofNullable(civilCaseData.getDismissalOrderDocument())
-//            .orElse(newArrayList());
-//
-//        if (generalAppCaseData.getDismissalOrderDocument() != null
-//            && checkIfDocumentExists(dismissalOrderDocument, generalAppCaseData.getDismissalOrderDocument()) < 1) {
-//            dismissalOrderDocument.addAll(generalAppCaseData.getDismissalOrderDocument());
-//        }
-//
-//        List<Element<CaseDocument>> directionOrderDocument = ofNullable(civilCaseData.getDirectionOrderDocument())
-//            .orElse(newArrayList());
-//
-//        if (generalAppCaseData.getDirectionOrderDocument() != null
-//            && checkIfDocumentExists(directionOrderDocument, generalAppCaseData.getDirectionOrderDocument()) < 1) {
-//            directionOrderDocument.addAll(generalAppCaseData.getDirectionOrderDocument());
-//        }
-//
-//        List<Element<CaseDocument>> hearingNoticeDocument = ofNullable(civilCaseData.getHearingNoticeDocument())
-//                .orElse(newArrayList());
-//
-//        if (generalAppCaseData.getHearingNoticeDocument() != null
-//                && checkIfDocumentExists(hearingNoticeDocument, generalAppCaseData.getHearingNoticeDocument()) < 1) {
-//            hearingNoticeDocument.addAll(generalAppCaseData.getHearingNoticeDocument());
-//        }
-
         Map<String, Object> output = civilCaseData.toMap(mapper);
-//        output.put("generalOrderDocument", generalOrderDocument.isEmpty() ? null : generalOrderDocument);
-//        output.put("dismissalOrderDocument", dismissalOrderDocument.isEmpty() ? null : dismissalOrderDocument);
-//        output.put("directionOrderDocument", directionOrderDocument.isEmpty() ? null : directionOrderDocument);
-//        output.put("hearingNoticeDocument", hearingNoticeDocument.isEmpty() ? null : hearingNoticeDocument);
         try {
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "generalOrder");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "dismissalOrder");
