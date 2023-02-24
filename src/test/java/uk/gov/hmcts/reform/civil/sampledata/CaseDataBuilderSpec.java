@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -20,8 +21,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -65,6 +69,15 @@ public class CaseDataBuilderSpec {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
+
+    protected LocalDateTime respondent1ResponseDeadline;
+    protected LocalDateTime respondent2ResponseDeadline;
+
+    //Deadline extension
+    protected LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
+    protected LocalDateTime respondent1TimeExtensionDate;
+    protected LocalDateTime respondent2TimeExtensionDate;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -161,6 +174,36 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
+    public CaseDataBuilderSpec respondent1ResponseDeadline(LocalDateTime deadline) {
+        this.respondent1ResponseDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent2ResponseDeadline(LocalDateTime deadline) {
+        this.respondent2ResponseDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent1TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent1TimeExtensionDate = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent2TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent2TimeExtensionDate = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondentSolicitor1AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
     public CaseDataBuilderSpec atState(FlowState.Main flowState) {
         return atState(flowState, ONE_V_ONE);
     }
@@ -171,6 +214,8 @@ public class CaseDataBuilderSpec {
                 return atStateClaimDraft();
             case CLAIM_SUBMITTED:
                 return atStateSpec1v1ClaimSubmitted();
+            case CLAIM_ISSUED_PAYMENT_SUCCESSFUL:
+                return atStateSpec1v1PaymentSuccessful();
 
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
@@ -341,6 +386,66 @@ public class CaseDataBuilderSpec {
         respondent2Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateClaim1v2SameSolicitorTimeExtension() {
+        atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent1TimeExtensionDate = submittedDate.plusDays(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
+        atStateSpec1v1ClaimSubmitted();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v1PaymentFailed() {
+        atStateSpec1v1ClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful() {
+        atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
+        atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
+        atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+            .customerReference("12345")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateSpec2v1PaymentFailure() {
+        atStateClaimSubmitted2v1();
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
+            .customerReference("12345")
+            .build();
         return this;
     }
 
