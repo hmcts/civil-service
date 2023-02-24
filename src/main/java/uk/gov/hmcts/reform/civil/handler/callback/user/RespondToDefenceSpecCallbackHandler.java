@@ -533,9 +533,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        if (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
-            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
-            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+        if (isPaidSomeAmountMoreThanClaimAmount(caseData)) {
             errors.add("The amount paid must be less than the full claim amount.");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -590,5 +588,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         } else {
             return BigDecimal.valueOf(55);
         }
+    }
+
+    private boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
+        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
     }
 }
