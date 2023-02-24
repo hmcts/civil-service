@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -75,7 +75,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = isCcNotification(callbackParams)
                 ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
                 : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
@@ -89,7 +89,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
         notificationService.sendMail(
             recipient,
             template,
-            isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+            SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? addPropertiesSpec(caseData, caseEvent)
                 : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
