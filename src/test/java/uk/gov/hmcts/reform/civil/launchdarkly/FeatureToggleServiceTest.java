@@ -188,4 +188,10 @@ class FeatureToggleServiceTest {
             eq(false)
         );
     }
+
+    @Test
+    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
+
+        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
+    }
 }
