@@ -146,19 +146,19 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
 
-    protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData){
+    protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
         if (Objects.isNull(gaAppDetails)) {
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(x->generalAppCaseData.getCcdCaseReference()
+                .anyMatch(x -> generalAppCaseData.getCcdCaseReference()
                         .equals(parseLong(x.getValue().getCaseLink().getCaseReference())));
     }
 
     protected boolean canViewResp(CaseData civilCaseData, CaseData generalAppCaseData, String respondent) {
         List<Element<GADetailsRespondentSol>> gaAppDetails;
-        if(respondent.equals("2")) {
+        if (respondent.equals("2")) {
             gaAppDetails = civilCaseData.getRespondentSolTwoGaAppDetails();
         } else {
             gaAppDetails = civilCaseData.getRespondentSolGaAppDetails();
@@ -167,7 +167,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(x->generalAppCaseData.getCcdCaseReference()
+                .anyMatch(x -> generalAppCaseData.getCcdCaseReference()
                         .equals(parseLong(x.getValue().getCaseLink().getCaseReference())));
     }
 }
