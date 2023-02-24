@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.RecipientData;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
+@Slf4j
 public class NocNotificationUtils {
 
     private NocNotificationUtils() {
@@ -96,6 +98,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor1Email(CaseData caseData) {
         RecipientData otherSolicitor1 = getOtherSolicitor1(caseData);
         if (otherSolicitor1 != null) {
+            log.info("Other solicitor 1 email: {}", otherSolicitor1.getEmail());
             return otherSolicitor1.getEmail();
         }
         return null;
@@ -104,6 +107,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor1Name(CaseData caseData) {
         RecipientData otherSolicitor1 = getOtherSolicitor1(caseData);
         if (otherSolicitor1 != null) {
+            log.info("Other solicitor 1 org: {}", otherSolicitor1.getOrgId());
             return otherSolicitor1.getOrgId();
         }
         return null;
@@ -112,6 +116,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor2Email(CaseData caseData) {
         RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
         if (otherSolicitor2 != null) {
+            log.info("Other solicitor 2 email: {}", otherSolicitor2.getEmail());
             return otherSolicitor2.getEmail();
         }
         return null;
@@ -120,6 +125,7 @@ public class NocNotificationUtils {
     public static String getOtherSolicitor2Name(CaseData caseData) {
         RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
         if (otherSolicitor2 != null) {
+            log.info("Other solicitor 2 org: {}", otherSolicitor2.getOrgId());
             return otherSolicitor2.getOrgId();
         }
         return null;
