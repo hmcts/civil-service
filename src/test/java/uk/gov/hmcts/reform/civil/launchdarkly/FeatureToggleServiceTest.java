@@ -132,15 +132,6 @@ class FeatureToggleServiceTest {
     // }
 
     @Test
-    void shouldCallBoolVariation_whenIsAccessProfilesEnabledInvoked() {
-        var accessProfilesKey = "access-profiles";
-        givenToggle(accessProfilesKey, true);
-
-        assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
-        verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
-    }
-
-    @Test
     void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
         var enableSDOKey = "enableSDO";
         givenToggle(enableSDOKey, true);
