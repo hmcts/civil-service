@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
@@ -11,7 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DQExtraDetailsLip {
-    private YesOrNo phoneOrVideoHearing;
-    private String  whyUnavailableForHearing;
-    private YesOrNo  giveEvidenceYourSelf;
+    private YesOrNo wantPhoneOrVideoHearing;
+    private String whyPhoneOrVideoHearing;
+    private String whyUnavailableForHearing;
+    private YesOrNo giveEvidenceYourSelf;
 }
