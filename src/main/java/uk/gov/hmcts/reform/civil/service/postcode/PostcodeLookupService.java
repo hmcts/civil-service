@@ -47,6 +47,10 @@ public class PostcodeLookupService {
         String countryName = null;
         String postcodeFromApilookup = null;
         HttpEntity<String> response = null;
+        String key1 = configuration.getAccessKey();
+        if (key1 == null || key1.equals("")) {
+            return "England";
+        }
         try {
 
             Map<String, String> params = new HashMap<>();
