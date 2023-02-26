@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -148,8 +147,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(V_1, MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
@@ -198,11 +196,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                                                         .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                                           .organisationID(value.getOrganisationIdentifier()).build())
-                                                                                         .orgPolicyReference(null)
-                                                                                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                                                                                         .build()));
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -423,9 +421,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if (toggleService.isAccessProfilesEnabled()) {
-            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-        }
+        dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
@@ -565,7 +561,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
-    //------remove bool for v1 callback----------
     private String getBody(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
@@ -617,20 +612,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return errorsMessages;
     }
 
-    /**
-     * Sets the super claim type in case data to un-specified claims.
-     * @param callbackParams callback containing case data
-     * @return AboutToStartOrSubmitCallback response with super claim type set to un-specified claim
-     */
-    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.superClaimType(SuperClaimType.UNSPEC_CLAIM);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
     public StringBuilder caseParticipants(CaseData caseData) {
         StringBuilder participantString = new StringBuilder();
         MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
@@ -644,12 +625,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             participantString.append(caseData.getApplicant1().getPartyName())
                 .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
 
         } else {
             participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
         }
         return participantString;
 
