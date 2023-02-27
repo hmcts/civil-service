@@ -127,6 +127,20 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         }
     }
 
+    /**
+     * Update GA document collection at civil case.
+     *
+     * @param output      output map for update civil case.
+     * @param civilCaseData civil case data.
+     * @param generalAppCaseData    GA case data.
+     * @param fromGaList base ga field name.
+     *                     when get from GA data,
+     *                     add 'get' to the name then call getter to access related GA document field.
+     * @param toCivilList base civil field name.
+     *                     when get from Civil data,
+     *                     add 'get' to the name then call getter to access related Civil document field.
+     *                    when update output, use name as key to hold to-be-update collection
+     */
     @SuppressWarnings("unchecked")
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                         CaseData civilCaseData, String toCivilList) throws Exception {
@@ -152,8 +166,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(x -> generalAppCaseData.getCcdCaseReference()
-                        .equals(parseLong(x.getValue().getCaseLink().getCaseReference())));
+                .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
+                        .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
     }
 
     protected boolean canViewResp(CaseData civilCaseData, CaseData generalAppCaseData, String respondent) {
@@ -167,7 +181,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             return false;
         }
         return gaAppDetails.stream()
-                .anyMatch(x -> generalAppCaseData.getCcdCaseReference()
-                        .equals(parseLong(x.getValue().getCaseLink().getCaseReference())));
+                .anyMatch(civilGaData -> generalAppCaseData.getCcdCaseReference()
+                        .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
     }
 }
