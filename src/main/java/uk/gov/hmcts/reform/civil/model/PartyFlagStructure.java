@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 @Data
 @Builder(toBuilder = true)
-public class DQPartyFlagStructure {
+public class PartyFlagStructure {
 
     private final String firstName;
     private final String lastName;

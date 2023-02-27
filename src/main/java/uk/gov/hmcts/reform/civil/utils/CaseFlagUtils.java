@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.DQPartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -43,9 +43,9 @@ public class CaseFlagUtils {
             .build();
     }
 
-    private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
+    private static PartyFlagStructure createPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
         String partyName = String.format("%s %s", firstName, lastName);
-        return DQPartyFlagStructure.builder()
+        return PartyFlagStructure.builder()
             .firstName(firstName)
             .lastName(lastName)
             .flags(createFlags(partyName, roleOnCase))
@@ -68,25 +68,25 @@ public class CaseFlagUtils {
             roleOnCase)).build() : null;
     }
 
-    private static List<Element<DQPartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
+    private static List<Element<PartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
         List<Witness> witnessList,
         String roleOnCase) {
-        List<Element<DQPartyFlagStructure>> list = new ArrayList<>();
+        List<Element<PartyFlagStructure>> list = new ArrayList<>();
         for (Witness witness : witnessList) {
-            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(witness.getFirstName(), witness.getLastName(),
-                                                                       roleOnCase);
+            PartyFlagStructure build = createPartiesCaseFlagsField(witness.getFirstName(), witness.getLastName(),
+                                                                   roleOnCase);
             list.add(element(build));
         }
         return list;
     }
 
-    private static List<Element<DQPartyFlagStructure>> getTopLevelFieldForExpertsWithFlagsStructure(
+    private static List<Element<PartyFlagStructure>> getTopLevelFieldForExpertsWithFlagsStructure(
         List<Expert> expertList,
         String roleOnCase) {
-        List<Element<DQPartyFlagStructure>> list = new ArrayList<>();
+        List<Element<PartyFlagStructure>> list = new ArrayList<>();
         for (Expert expert : expertList) {
-            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(expert.getFirstName(), expert.getLastName(),
-                                                                       roleOnCase);
+            PartyFlagStructure build = createPartiesCaseFlagsField(expert.getFirstName(), expert.getLastName(),
+                                                                   roleOnCase);
             list.add(element(build));
         }
         return list;

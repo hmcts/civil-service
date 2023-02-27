@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.DQPartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -34,12 +34,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -157,8 +151,8 @@ class CaseFlagUtilsTest {
                 updatedCaseData);
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<DQPartyFlagStructure>> respondentSolicitor1ExpertsWithFlags = caseDataWithFlags.getRespondentSolicitor1Experts();
-            List<Element<DQPartyFlagStructure>> respondentSolicitor2ExpertsWithFlags = caseDataWithFlags.getRespondentSolicitor2Experts();
+            List<Element<PartyFlagStructure>> respondentSolicitor1ExpertsWithFlags = caseDataWithFlags.getRespondentSolicitor1Experts();
+            List<Element<PartyFlagStructure>> respondentSolicitor2ExpertsWithFlags = caseDataWithFlags.getRespondentSolicitor2Experts();
 
             Flags expectedExpert1Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
                 .partyName("First Name")
@@ -224,8 +218,8 @@ class CaseFlagUtilsTest {
                 updatedCaseData);
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<DQPartyFlagStructure>> respondentSolicitor1WitnessWithFlags = caseDataWithFlags.getRespondentSolicitor1Witnesses();
-            List<Element<DQPartyFlagStructure>> respondentSolicitor2WitnessWithFlags = caseDataWithFlags.getRespondentSolicitor2Witnesses();
+            List<Element<PartyFlagStructure>> respondentSolicitor1WitnessWithFlags = caseDataWithFlags.getRespondentSolicitor1Witnesses();
+            List<Element<PartyFlagStructure>> respondentSolicitor2WitnessWithFlags = caseDataWithFlags.getRespondentSolicitor2Witnesses();
 
             Flags expectedWitness1Flags = Flags.builder().roleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
                 .partyName("First Name")
@@ -291,7 +285,7 @@ class CaseFlagUtilsTest {
                 updatedCaseData);
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<DQPartyFlagStructure>> applicantSolicitorWitnesses = caseDataWithFlags.getApplicantSolicitorWitnesses();
+            List<Element<PartyFlagStructure>> applicantSolicitorWitnesses = caseDataWithFlags.getApplicantSolicitorWitnesses();
 
             Flags expectedWitness1Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_WITNESS)
                 .partyName("First Name")
@@ -354,7 +348,7 @@ class CaseFlagUtilsTest {
                 updatedCaseData);
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
-            List<Element<DQPartyFlagStructure>> applicantSolicitorExperts = caseDataWithFlags.getApplicantSolicitorExperts();
+            List<Element<PartyFlagStructure>> applicantSolicitorExperts = caseDataWithFlags.getApplicantSolicitorExperts();
 
             Flags expectedExpert1Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_EXPERT)
                 .partyName("First Name")
