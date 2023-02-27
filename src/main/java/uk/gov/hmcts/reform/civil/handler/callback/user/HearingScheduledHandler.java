@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -48,7 +47,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HearingScheduledHandler extends CallbackHandler {
@@ -80,16 +78,14 @@ public class HearingScheduledHandler extends CallbackHandler {
         return format(HEARING_TASKS);
     }
 
-    private String getHeader(CaseData caseData) {
-        log.info("hearing number is assigned to casedata" + caseData.getHearingReferenceNumber());
-        log.info("confirmation page content is" + format(HEARING_CREATED_HEADER, caseData.getHearingReferenceNumber()));
-        return format(HEARING_CREATED_HEADER, caseData.getHearingReferenceNumber());
+    private String getHeader() {
+        return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader())
             .confirmationBody(getBody())
             .build();
     }
@@ -170,9 +166,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.hearingReferenceNumber(hearingReferenceNumberRepository.getHearingReferenceNumber());
-        log.info("hearing number should be assigned to casedata" + hearingReferenceNumberRepository.getHearingReferenceNumber());
-
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
