@@ -6,6 +6,7 @@ Civil CCD Callback Service.
 
 - [Building and deploying application](#building-and-deploying-the-application)
 - [Pact or contract testing](#pact-or-contract-testing)
+- [Adding Git Conventions](#adding-git-conventions)
 
 ## Building and deploying the application
 
@@ -139,6 +140,15 @@ To publish your contracts:
 ```
 
 * If connecting to Pactflow, please disable the HMCTS VPN.
+
+## Adding Git Conventions
+
+### Include the git conventions.
+ * Make sure your git version is at least 2.9 using the `git --version` command
+ * Run the following command:
+```
+git config --local core.hooksPath .git-config/hooks
+```
 
 ## License
 
