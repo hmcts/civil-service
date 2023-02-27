@@ -7,6 +7,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 @Data
@@ -19,6 +20,28 @@ public class RepaymentPlanLRspec {
     private final PaymentFrequencyLRspec repaymentFrequency;
     private final LocalDate firstRepaymentDate;
 
+    public LocalDate finalPaymentBy(BigDecimal totalAmount) {
+        if (firstRepaymentDate != null && paymentAmount != null && repaymentFrequency != null) {
+            long installmentsAfterFirst = totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING)
+                .longValue() - 1;
+            switch (repaymentFrequency) {
+                case ONCE_ONE_WEEK:
+                    return firstRepaymentDate.plusWeeks(installmentsAfterFirst);
+                case ONCE_TWO_WEEKS:
+                    return firstRepaymentDate.plusWeeks(2 * installmentsAfterFirst);
+                case ONCE_FOUR_WEEKS:
+                    return firstRepaymentDate.plusWeeks(4 * installmentsAfterFirst);
+                case ONCE_THREE_WEEKS:
+                    return firstRepaymentDate.plusWeeks(3 * installmentsAfterFirst);
+                case ONCE_ONE_MONTH:
+                    return firstRepaymentDate.plusMonths(installmentsAfterFirst);
+            }
+        }
+        return null;
+    }
 
+    public String getPaymentFrequencyDisplay() {
+        return repaymentFrequency.getLabel();
+    }
 
 }
