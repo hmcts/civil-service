@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative.fromOrganisation;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
                 representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
             }
@@ -80,7 +80,7 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
         }
