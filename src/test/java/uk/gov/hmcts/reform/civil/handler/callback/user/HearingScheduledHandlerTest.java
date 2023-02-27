@@ -283,8 +283,6 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnHearingNoticeCreated_WhenSubmitted() {
-            when(hearingReferenceNumberRepository.getHearingReferenceNumber()).thenReturn("000HN001");
-
             String header = "# Hearing notice created\n"
                 + "# Your reference number\n" + "# 000HN001";
 
@@ -292,6 +290,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                 + ", for example, book an interpreter.";
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .hearingReferenceNumber("000HN001")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
