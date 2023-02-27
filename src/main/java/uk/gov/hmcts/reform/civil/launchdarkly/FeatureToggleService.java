@@ -31,11 +31,6 @@ public class FeatureToggleService {
         return internalClient.boolVariation(feature, user, false);
     }
 
-    public boolean isOrganisationOnboarded(String orgId) {
-        LDUser ldUser = createLDUser().custom("orgId", orgId).build();
-        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
-    }
-
     public boolean isRpaContinuousFeedEnabled() {
         return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
     }
@@ -54,10 +49,6 @@ public class FeatureToggleService {
             createLDUser().build(),
             false
         );
-    }
-
-    public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
     }
 
     public boolean isSdoEnabled() {
@@ -92,10 +83,6 @@ public class FeatureToggleService {
 
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
-    }
-
-    public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
     }
 
     public boolean isPbaV3Enabled() {

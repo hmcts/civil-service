@@ -10,14 +10,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +27,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Component
@@ -137,8 +138,8 @@ public class LocationHelper {
             .orElse(BigDecimal.ZERO);
     }
 
-    private CaseLocation getCcmccCaseLocation() {
-        return CaseLocation.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
+    private CaseLocationCivil getCcmccCaseLocation() {
+        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
     }
 
     /**
@@ -168,7 +169,7 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-        if (CaseCategoryUtils.isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return getSpecClaimantRequestedCourt(caseData);
         } else {
             return getUnspecClaimantRequestedCourt(caseData);
@@ -247,12 +248,12 @@ public class LocationHelper {
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
-                                        .findFirst().orElseGet(CaseLocation::new));
+                                        .findFirst().orElseGet(CaseLocationCivil::new));
         matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
         return matchingLocation;
     }
 
-    private boolean isValidCaseLocation(CaseLocation caseLocation) {
+    private boolean isValidCaseLocation(CaseLocationCivil caseLocation) {
         return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
             && StringUtils.isNotBlank(caseLocation.getRegion());
     }

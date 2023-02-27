@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -37,9 +38,12 @@ public class NocNotificationUtils {
                 .build();
         } else if (isApplicant1NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
+                Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
+                String respondent1OrgID = respondent1Org != null
+                    ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
                 return RecipientData.builder()
                     .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .orgId(respondent1OrgID)
                     .build();
             }
         } else if (isRespondent1NewSolicitor(caseData)) {
@@ -61,9 +65,12 @@ public class NocNotificationUtils {
     private static RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
+                Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
+                String respondent1OrgID = respondent1Org != null
+                    ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
                 return RecipientData.builder()
                     .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .orgId(respondent1OrgID)
                     .build();
             }
         } else {
@@ -74,9 +81,11 @@ public class NocNotificationUtils {
                     .build();
             } else {
                 if (!isOtherPartyLip(caseData.getRespondent2OrganisationPolicy())) {
+                    Organisation respondent2Org = caseData.getRespondent2OrganisationPolicy().getOrganisation();
+                    String respondent2OrgID = respondent2Org != null ? respondent2Org.getOrganisationID() : caseData.getRespondent2OrganisationIDCopy();
                     return RecipientData.builder()
                         .email(caseData.getRespondentSolicitor2EmailAddress())
-                        .orgId(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                        .orgId(respondent2OrgID)
                         .build();
                 }
             }
@@ -137,7 +146,8 @@ public class NocNotificationUtils {
      * @return true if the organisation is null meaning the party is a LiP
      */
     private static boolean isOtherPartyLip(OrganisationPolicy organisationToCheck) {
-        return organisationToCheck == null;
+        return organisationToCheck == null
+            || organisationToCheck.getOrganisation() == null;
     }
 
     /**
