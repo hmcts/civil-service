@@ -412,7 +412,16 @@ public class CaseDataBuilderSpec {
                                                             .build();
         return this;
     }
-
+    
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
+        atStateSpec1v1ClaimSubmitted();
+        ccdState = CASE_ISSUED;
+        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
+                                                            .customerReference("12345")
+                                                            .build();
+        return this;
+    }
+    
     public CaseDataBuilderSpec atStateClaim1v2SameSolicitorTimeExtension() {
         atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -420,15 +429,6 @@ public class CaseDataBuilderSpec {
         respondent1TimeExtensionDate = submittedDate.plusDays(1);
         respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
 
-        return this;
-    }
-
-    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
-        atStateSpec1v1ClaimSubmitted();
-        ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-                                                            .customerReference("12345")
-                                                            .build();
         return this;
     }
 
