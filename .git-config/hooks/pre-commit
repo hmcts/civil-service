@@ -1,21 +1,56 @@
 #!/usr/bin/env bash
 LOCAL_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
-VALID_BRANCH_REGEX="^(feat|spike|fix|test|refactor)\/CIV-[0-9]|CIV-[a-zA-Z]+|renovate\/"
+RENOVATE_PREFIX="^renovate/"
 
-MESSAGE="The branch names in this project must adhere to this contract: $VALID_BRANCH_REGEX. You should rename your branch to a valid name and try again."
+VALID_PREFIXES="^(feat|spike|fix|test|refactor)\/"
+VALID_TICKET='^CIV-[0-9]{1,5}$|CIV-[0-9]{1,5}[\-_][a-zA-Z0-9]+.*'
+VALID_TASK='^CIV-TASK$|CIV-TASK[\-_][a-zA-Z0-9]+.*'
 
-if [[ ! $LOCAL_BRANCH =~ $VALID_BRANCH_REGEX ]]
-then
-    echo "$MESSAGE"
-    echo "Example for valid branch names"
-    echo "feat/CIV-1234,renovate/something"
-    echo "spike/CIV-2345"
-    echo "fix/CIV-1234 or fix/CIV-1234-taskname"
-    echo "test/CIV-2346"
-    echo "refactor/CIV-2349"
-    echo "renovate/CIV-2347 or renovate/taskname"
-    exit 1
+echo $VALID_TICKET
+echo $VALID_TASK
+
+if [[ $LOCAL_BRANCH =~ $RENOVATE_PREFIX ]]; then
+  # This is a renovate branch. We don't check anything else.
+  exit 0
 fi
 
-exit 0
+if [[ ! $LOCAL_BRANCH =~ $VALID_PREFIXES ]]; then
+  # No valid prefix, we need to fail the script
+  echo "No valid branch name prefix. All branches must start with one of: feat,spike,fix,test,refactor,renovate"
+  echo ""
+  echo "Please rename your branch. To rename your branch you can use the following command:"
+  echo "  git branch -m <newname>"
+  exit 1
+fi
+
+if [[ $LOCAL_BRANCH =~ $VALID_TICKET ]]; then
+  exit 0
+fi
+
+if [[ $LOCAL_BRANCH =~ $VALID_TASK ]]; then
+  exit 0
+fi
+
+echo "The provided branch name is invalid. Branches must start with one of the following prefixes:"
+echo "  feat,spike,fix,test,refactor,renovate"
+echo "followed by either CIV-nnnn or CIV-TASK. Optionally, they can be followed by a dash symbol and a description."
+echo ""
+echo "Please rename your branch. To rename your branch you can use the following command:"
+echo "  git branch -m <newname>"
+echo ""
+echo "Examples of valid branch names:"
+echo "  feat/CIV-1234"
+echo "  feat/CIV-1234-updating-something"
+echo "  feat/CIV-TASK-DET-3456-some-external-change"
+echo "  renovate/something"
+echo ""
+echo "Examples of invalid branch names:"
+echo "  feat/CIV-1234-"
+echo "  feat/civ-1234"
+echo "  feat/DET-3456-some-external-change"
+echo "  $LOCAL_BRANCH"
+
+
+exit 1
+
