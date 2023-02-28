@@ -99,7 +99,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final BigDecimal midCostAmount = BigDecimal.valueOf(40);
     private final BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
