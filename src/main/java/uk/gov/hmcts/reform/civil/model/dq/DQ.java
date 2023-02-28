@@ -20,7 +20,8 @@ public interface DQ {
     Experts getExperts();
 
     default Experts getExperts(Experts experts) {
-        if (experts != null && experts.getExpertRequired().equals(NO)) {
+        if (experts != null && experts.getExpertRequired() != null
+            && experts.getExpertRequired().equals(NO)) {
             return experts.toBuilder().details(null).build();
         }
         return experts;
@@ -29,7 +30,8 @@ public interface DQ {
     Witnesses getWitnesses();
 
     default Witnesses getWitnesses(Witnesses witnesses) {
-        if (witnesses != null && witnesses.getWitnessesToAppear().equals(NO)) {
+        if (witnesses != null && witnesses.getWitnessesToAppear() != null
+            && witnesses.getWitnessesToAppear().equals(NO)) {
             return witnesses.toBuilder().details(null).build();
         }
         return witnesses;
@@ -38,7 +40,8 @@ public interface DQ {
     Hearing getHearing();
 
     default Hearing getHearing(Hearing hearing) {
-        if (hearing != null && hearing.getUnavailableDatesRequired().equals(NO)) {
+        if (hearing != null && hearing.getUnavailableDatesRequired() != null
+            && hearing.getUnavailableDatesRequired().equals(NO)) {
             return hearing.toBuilder().unavailableDates(null).build();
         }
         return hearing;
@@ -47,7 +50,8 @@ public interface DQ {
     SmallClaimHearing getSmallClaimHearing();
 
     default SmallClaimHearing getSmallClaimHearing(SmallClaimHearing smallClaimHearing) {
-        if (smallClaimHearing != null && smallClaimHearing.getUnavailableDatesRequired().equals(NO)) {
+        if (smallClaimHearing != null && smallClaimHearing.getUnavailableDatesRequired() != null
+            && smallClaimHearing.getUnavailableDatesRequired().equals(NO)) {
             return smallClaimHearing.toBuilder().smallClaimUnavailableDate(null).build();
         }
         return smallClaimHearing;
