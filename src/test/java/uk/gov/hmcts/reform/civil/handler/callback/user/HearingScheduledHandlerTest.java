@@ -198,7 +198,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertThat(response.getErrors().get(0)).isEqualTo("Time is required");
-        assertThat(response.getErrors().get(1)).isEqualTo("The Date & Time must be 24hs in advance from now");
     }
 
     @ParameterizedTest

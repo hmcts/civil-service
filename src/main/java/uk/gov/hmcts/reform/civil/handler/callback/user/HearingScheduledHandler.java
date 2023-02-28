@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -143,19 +144,18 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     CallbackResponse checkFutureDate(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        LocalDateTime hearingDateTime = null;
         var caseData = callbackParams.getCaseData();
         LocalDate date = caseData.getHearingDate();
         String hourMinute = caseData.getHearingTimeHourMinute();
         if (hourMinute != null) {
             int hours = Integer.parseInt(hourMinute.substring(0, 2));
             int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-            hearingDateTime = LocalDateTime.of(date, LocalTime.of(hours, minutes, 0));
+            LocalDateTime hearingDateTime = LocalDateTime.of(date, LocalTime.of(hours, minutes, 0));
+            errors.addAll(isFutureDate(hearingDateTime));
         } else {
             errors.add("Time is required");
         }
 
-        errors.addAll(isFutureDate(hearingDateTime));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -171,21 +171,17 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
+        CaseState caseState = HEARING_READINESS;
         if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(
                 calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
                                                                    publicHolidaysCollection.getPublicHolidays()));
             calculateAndApplyFee(caseData, caseDataBuilder);
-        } else {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(HEARING_READINESS.name())
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
+            .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
@@ -235,7 +231,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private boolean checkFutureDateValidation(LocalDateTime localDateTime) {
-        return localDateTime != null && localDateTime.isAfter(LocalDateTime.now().plusHours(24));
+        return localDateTime.isAfter(LocalDateTime.now().plusHours(24));
     }
 
     @Override
