@@ -93,6 +93,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
     private static final String datePattern = "dd MMMM yyyy";
+    private final BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
+    private final BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
+    private final BigDecimal lowCostAmount = ZERO;
+    private final BigDecimal midCostAmount = BigDecimal.valueOf(40);
+    private final BigDecimal highCostAmount = BigDecimal.valueOf(55);
+
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -581,12 +587,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return ZERO;
         }
-        if (claimAmount.compareTo(BigDecimal.valueOf(25)) < 0) {
-            return ZERO;
-        } else if (claimAmount.compareTo(BigDecimal.valueOf(5000)) <= 0) {
-            return BigDecimal.valueOf(40);
+        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
+            return lowCostAmount;
+        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+            return midCostAmount;
         } else {
-            return BigDecimal.valueOf(55);
+            return highCostAmount;
         }
     }
 
