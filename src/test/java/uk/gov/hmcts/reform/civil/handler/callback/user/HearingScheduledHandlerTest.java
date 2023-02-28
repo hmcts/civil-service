@@ -262,7 +262,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getHearingLocation()).isNull();
     }
 
-
     @Test
     void shouldTriggerBusinessProcessHearingScheduledOnRelisting_whenAboutToSubmit() {
         // Given
