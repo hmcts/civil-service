@@ -427,6 +427,44 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_DISMISSED)
+            .build();
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
+
+        caseData = caseData.toBuilder()
+            .applicant1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                    .build())
+            .respondent1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                    .build())
+            .respondent2OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                    .build())
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(roboticsCaseData.getNoticeOfChange()).isEqualTo(
+            List.of(
+                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build())
+        );
+    }
+
+    @Test
     void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
