@@ -191,8 +191,7 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                HEARING_SCHEDULED
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
