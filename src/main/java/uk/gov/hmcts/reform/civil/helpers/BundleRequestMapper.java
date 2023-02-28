@@ -158,7 +158,7 @@ public class BundleRequestMapper {
 
     private ServedDocument mapServedDocuments(ServedDocumentFiles servedDocumentFiles) {
         List<BundlingRequestDocument> bundlingServedDocFiles = new ArrayList<>();
-        if (!Optional.ofNullable(servedDocumentFiles).isEmpty()) {
+        if (!Optional.ofNullable(servedDocumentFiles).isEmpty() && null != servedDocumentFiles.getParticularsOfClaimDocument()) {
             servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
                 bundlingServedDocFiles.add(BundlingRequestDocument.builder()
                                                .documentFileName(document.getValue().getDocumentFileName())
