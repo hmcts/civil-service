@@ -22,8 +22,8 @@
 ./bin/utils/ccd-add-role.sh "civil-administrator-basic"
 ./bin/utils/ccd-add-role.sh "hearing-schedule-access"
 ./bin/utils/ccd-add-role.sh "payment-access"
-./bin/utils/ccd-add-role.sh "hearings-admin"
-./bin/utils/ccd-add-role.sh "hearings-viewer"
+./bin/utils/ccd-add-role.sh "hearing-manager"
+./bin/utils/ccd-add-role.sh "hearing-viewer"
 
 roles=("solicitor" "systemupdate" "admin" "staff")
 for role in "${roles[@]}"
