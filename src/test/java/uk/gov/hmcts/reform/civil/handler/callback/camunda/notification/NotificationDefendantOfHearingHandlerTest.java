@@ -170,6 +170,6 @@ public class NotificationDefendantOfHearingHandlerTest {
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
-                "NOTIFY_DEFENDANT_HEARING").build()).build())).isEqualTo(TASK_ID_DEFENDANT1);
+                "NOTIFY_DEFENDANT1_HEARING").build()).build())).isEqualTo(TASK_ID_DEFENDANT1);
     }
 }
