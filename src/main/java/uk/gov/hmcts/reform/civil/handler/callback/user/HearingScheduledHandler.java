@@ -131,18 +131,17 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private List<String> isPastDate(LocalDate dateOfApplication) {
-        List<String> errors = new ArrayList<>();
         if (!checkPastDateValidation(dateOfApplication)) {
-            errors.add("The Date must be in the past");
+            return List.of("The Date must be in the past");
         }
-        return errors;
+        return Collections.emptyList();
     }
 
     private boolean checkPastDateValidation(LocalDate localDate) {
-        return localDate != null && localDate.isBefore(LocalDate.now());
+        return localDate.isBefore(LocalDate.now());
     }
 
-    private CallbackResponse checkFutureDate(CallbackParams callbackParams) {
+    CallbackResponse checkFutureDate(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         LocalDateTime hearingDateTime = null;
         var caseData = callbackParams.getCaseData();
@@ -151,14 +150,12 @@ public class HearingScheduledHandler extends CallbackHandler {
         if (hourMinute != null) {
             int hours = Integer.parseInt(hourMinute.substring(0, 2));
             int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-            LocalTime time = LocalTime.of(hours, minutes, 0);
-            hearingDateTime = LocalDateTime.of(date, time);
+            hearingDateTime = LocalDateTime.of(date, LocalTime.of(hours, minutes, 0));
         } else {
             errors.add("Time is required");
         }
 
-        errors = (Objects.isNull(hearingDateTime)) ? null :
-            isFutureDate(hearingDateTime);
+        errors.addAll(isFutureDate(hearingDateTime));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -234,11 +231,10 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {
-        List<String> errors = new ArrayList<>();
         if (!checkFutureDateValidation(hearingDateTime)) {
-            errors.add("The Date & Time must be 24hs in advance from now");
+            return List.of("The Date & Time must be 24hs in advance from now");
         }
-        return errors;
+        return Collections.emptyList();
     }
 
     private boolean checkFutureDateValidation(LocalDateTime localDateTime) {

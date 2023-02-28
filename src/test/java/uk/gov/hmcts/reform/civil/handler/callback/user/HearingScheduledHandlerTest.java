@@ -32,6 +32,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -45,6 +47,7 @@ import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -54,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
+class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
 
@@ -182,6 +185,24 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "checkFutureDate" })
+    void shouldReturnError_whenHearingTimeNotProvided(String pageId) {
+        // Given
+        LocalDateTime localDateTime = time.now();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(null).build();
+
+        CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getErrors().get(0)).isEqualTo("Time is required");
+        assertThat(response.getErrors().get(1)).isEqualTo("The Date & Time must be 24hs in advance from now");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "checkFutureDate" })
     void shouldNotReturnError_whenDateFromDateIsTwentyFourHoursAfterOfPresentDateProvided(String pageId) {
         // Given
         LocalDateTime localDateTime = time.now().plusHours(24).plusMinutes(1);
@@ -216,6 +237,51 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
             Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+    }
+
+    @Test
+    void shouldSetHearingLocationListItemsNull_whenHearingLocationProvided() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingLocation(DynamicList.builder().listItems(List.of(
+                DynamicListElement.builder().label("element 1").code("E0").build(),
+                DynamicListElement.builder().label("element 2").code("E1").build())).build())
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingLocation()).isNull();
+    }
+
+
+    @Test
+    void shouldTriggerBusinessProcessHearingScheduledOnRelisting_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(HEARING_SCHEDULED.name());
     }
 
     @Test
