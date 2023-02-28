@@ -3,9 +3,13 @@ LOCAL_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
 RENOVATE_PREFIX="^renovate/"
 
-VALID_PREFIXES="^(feat|spike|fix|test|refactor)\/"
-VALID_TICKET='CIV-[0-9]{1,5}$|CIV-[0-9]{1,5}[\-_][a-zA-Z0-9]+.*'
-VALID_TASK='^CIV-TASK$|CIV-TASK[\-_][a-zA-Z0-9]+.*'
+VALID_PREFIXES="^(feat|spike|fix|test|refactor)\/(.*)"
+VALID_TICKET_1='CIV-[0-9]{1,5}$'
+VALID_TICKET_2='CIV-[0-9]{1,5}[-_][a-zA-Z0-9]+.*'
+VALID_TASK_1='CIV-TASK$'
+VALID_TASK_2='CIV-TASK[-_][a-zA-Z0-9]+.*'
+
+
 
 if [[ $LOCAL_BRANCH =~ $RENOVATE_PREFIX ]]; then
   # This is a renovate branch. We don't check anything else.
@@ -14,38 +18,54 @@ fi
 
 if [[ ! $LOCAL_BRANCH =~ $VALID_PREFIXES ]]; then
   # No valid prefix, we need to fail the script
-  echo "No valid branch name prefix. All branches must start with one of: feat,spike,fix,test,refactor,renovate"
+  echo "The provided branch prefix is missing or invalid. All branches must start with one of:"
+  echo "  feat/"
+  echo "  spike/"
+  echo "  fix/"
+  echo "  test/"
+  echo "  refactor/"
+  echo "  renovate/"
   echo ""
   echo "Please rename your branch. To rename your branch you can use the following command:"
   echo "  git branch -m <newname>"
   exit 1
 fi
 
-if [[ $LOCAL_BRANCH =~ $VALID_TICKET ]]; then
+BRANCH_PREFIX=${BASH_REMATCH[1]}
+BRANCH_NAME=${BASH_REMATCH[2]}
+
+if [[ $BRANCH_NAME =~ $VALID_TICKET_1 ]]; then
   exit 0
 fi
 
-if [[ $LOCAL_BRANCH =~ $VALID_TASK ]]; then
+if [[ $BRANCH_NAME =~ $VALID_TICKET_2 ]]; then
   exit 0
 fi
 
-echo "The provided branch name is invalid. Branches must start with one of the following prefixes:"
-echo "  feat,spike,fix,test,refactor,renovate"
-echo "followed by either CIV-nnnn or CIV-TASK. Optionally, they can be followed by a dash symbol and a description."
+if [[ $BRANCH_NAME =~ $VALID_TASK_1 ]]; then
+  exit 0
+fi
+
+if [[ $BRANCH_NAME =~ $VALID_TASK_2 ]]; then
+  exit 0
+fi
+
+echo "The provided branch name is invalid. Branches names (minus the prefix) must start with CIV-nnnn or CIV-TASK."
+echo "Optionally, they can be followed by a dash symbol and a description."
 echo ""
 echo "Please rename your branch. To rename your branch you can use the following command:"
 echo "  git branch -m <newname>"
 echo ""
-echo "Examples of valid branch names:"
-echo "  feat/CIV-1234"
-echo "  feat/CIV-1234-updating-something"
-echo "  feat/CIV-TASK-DET-3456-some-external-change"
+echo "Examples of valid branch names (with prefix):"
+echo "  ${BRANCH_PREFIX}/CIV-1234"
+echo "  ${BRANCH_PREFIX}/CIV-1234-updating-something"
+echo "  ${BRANCH_PREFIX}/CIV-TASK-DET-3456-some-external-change"
 echo "  renovate/something"
 echo ""
-echo "Examples of invalid branch names:"
-echo "  feat/CIV-1234-"
-echo "  feat/civ-1234"
-echo "  feat/DET-3456-some-external-change"
+echo "Examples of invalid branch names (with prefix):"
+echo "  ${BRANCH_PREFIX}/CIV-1234-"
+echo "  ${BRANCH_PREFIX}/civ-1234"
+echo "  ${BRANCH_PREFIX}/DET-3456-some-external-change"
 echo "  $LOCAL_BRANCH"
 
 
