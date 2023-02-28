@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.util.Map;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
@@ -138,7 +139,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Component
 @RequiredArgsConstructor
@@ -537,7 +537,7 @@ public class StateFlowEngine {
     }
 
     public StateFlow evaluate(CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return build(SPEC_DRAFT).evaluate(caseData);
         }
         return build(DRAFT).evaluate(caseData);
