@@ -120,8 +120,10 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
+        // FIXME: 2023-02-28 verify the following condition. Seems to me that if there is no date of application it should be an error
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
-            isPastDate(dateOfApplication);
+            checkTrueOrElseAddError(dateOfApplication.isBefore(time.now().toLocalDate()),
+                                    "The Date must be in the past");
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
@@ -129,17 +131,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
-    }
-
-    private List<String> isPastDate(LocalDate dateOfApplication) {
-        if (!checkPastDateValidation(dateOfApplication)) {
-            return List.of("The Date must be in the past");
-        }
-        return Collections.emptyList();
-    }
-
-    private boolean checkPastDateValidation(LocalDate localDate) {
-        return localDate.isBefore(LocalDate.now());
     }
 
     CallbackResponse checkFutureDate(CallbackParams callbackParams) {
@@ -151,7 +142,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             int hours = Integer.parseInt(hourMinute.substring(0, 2));
             int minutes = Integer.parseInt(hourMinute.substring(2, 4));
             LocalDateTime hearingDateTime = LocalDateTime.of(date, LocalTime.of(hours, minutes, 0));
-            errors.addAll(isFutureDate(hearingDateTime));
+            errors.addAll(checkTrueOrElseAddError(hearingDateTime.isAfter(time.now().plusHours(24)),
+                                                  "The Date & Time must be 24hs in advance from now"));
         } else {
             errors.add("Time is required");
         }
@@ -223,15 +215,11 @@ public class HearingScheduledHandler extends CallbackHandler {
         return calculatedHearingDueDate;
     }
 
-    private List<String> isFutureDate(LocalDateTime hearingDateTime) {
-        if (!checkFutureDateValidation(hearingDateTime)) {
-            return List.of("The Date & Time must be 24hs in advance from now");
+    private List<String> checkTrueOrElseAddError(boolean condition, String error) {
+        if(!condition) {
+            return List.of(error);
         }
         return Collections.emptyList();
-    }
-
-    private boolean checkFutureDateValidation(LocalDateTime localDateTime) {
-        return localDateTime.isAfter(LocalDateTime.now().plusHours(24));
     }
 
     @Override
