@@ -93,11 +93,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
     private static final String datePattern = "dd MMMM yyyy";
-    private final BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
-    private final BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-    private final BigDecimal lowCostAmount = ZERO;
-    private final BigDecimal midCostAmount = BigDecimal.valueOf(40);
-    private final BigDecimal highCostAmount = BigDecimal.valueOf(55);
+    private static final BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
+    private static final BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
+    private static final BigDecimal lowCostAmount = ZERO;
+    private static final BigDecimal midCostAmount = BigDecimal.valueOf(40);
+    private static final BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
     @Override
     public List<CaseEvent> handledEvents() {
