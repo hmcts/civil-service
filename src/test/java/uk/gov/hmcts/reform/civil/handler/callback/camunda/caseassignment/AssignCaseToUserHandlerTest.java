@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -37,6 +40,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLIC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID_SPEC;
 
 @SpringBootTest(classes = {
     AssignCaseToUserHandler.class,
@@ -280,6 +285,26 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(assignCaseToUserHandler.handledEvents()).contains(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
+                                                                     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+    }
+
+    @Test
+    void shouldReturnUnSpecCamundaTask_whenUnSpecEvent() {
+        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                                 .request(CallbackRequest.builder().eventId(
+            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
+    }
+
+    @Test
+    void shouldReturnSpecCamundaTask_whenSpecEvent() {
+        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                                 .request(CallbackRequest.builder().eventId(
+            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC").build()).build())).isEqualTo(TASK_ID_SPEC);
+    }
+
     private void verifyApplicantSolicitorOneRoles() {
         verify(coreCaseUserService).assignCase(
             caseData.getCcdCaseReference().toString(),
@@ -321,4 +346,6 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         return supplementaryDataUpdates;
     }
+
+
 }
