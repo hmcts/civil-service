@@ -171,14 +171,11 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
-        if (nonNull(caseData.getListingOrRelisting())
-            && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-                caseDataBuilder.hearingDueDate(
-                    calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
-                                                                       publicHolidaysCollection.getPublicHolidays()));
-                calculateAndApplyFee(caseData, caseDataBuilder);
-            }
+        if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+            caseDataBuilder.hearingDueDate(
+                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
+                                                                   publicHolidaysCollection.getPublicHolidays()));
+            calculateAndApplyFee(caseData, caseDataBuilder);
         } else {
             caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
             return AboutToStartOrSubmitCallbackResponse.builder()
