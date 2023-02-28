@@ -4,11 +4,8 @@ LOCAL_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 RENOVATE_PREFIX="^renovate/"
 
 VALID_PREFIXES="^(feat|spike|fix|test|refactor)\/"
-VALID_TICKET='^CIV-[0-9]{1,5}$|CIV-[0-9]{1,5}[\-_][a-zA-Z0-9]+.*'
+VALID_TICKET='CIV-[0-9]{1,5}$|CIV-[0-9]{1,5}[\-_][a-zA-Z0-9]+.*'
 VALID_TASK='^CIV-TASK$|CIV-TASK[\-_][a-zA-Z0-9]+.*'
-
-echo $VALID_TICKET
-echo $VALID_TASK
 
 if [[ $LOCAL_BRANCH =~ $RENOVATE_PREFIX ]]; then
   # This is a renovate branch. We don't check anything else.
