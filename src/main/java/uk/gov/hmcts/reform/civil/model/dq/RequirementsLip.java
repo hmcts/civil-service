@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class RequirementsLip {
+
     private final String name;
     private final List<SupportRequirements> requirements;
     private final String signLanguageRequired;

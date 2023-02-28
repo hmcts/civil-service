@@ -10,7 +10,8 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
-public class HearingSupportLip{
+public class HearingSupportLip {
+
     private final YesOrNo supportRequirementLip;
     private final List<Element<RequirementsLip>> requirementsLip;
 

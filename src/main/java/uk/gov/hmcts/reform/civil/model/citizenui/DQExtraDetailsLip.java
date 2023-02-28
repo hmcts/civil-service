@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DQExtraDetailsLip {
+
     private YesOrNo wantPhoneOrVideoHearing;
     private String whyPhoneOrVideoHearing;
     private String whyUnavailableForHearing;
