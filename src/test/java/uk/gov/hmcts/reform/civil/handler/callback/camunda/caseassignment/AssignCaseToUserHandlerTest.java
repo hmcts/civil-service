@@ -347,5 +347,4 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         return supplementaryDataUpdates;
     }
 
-
 }
