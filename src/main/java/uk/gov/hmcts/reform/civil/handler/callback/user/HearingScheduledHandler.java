@@ -216,7 +216,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private List<String> checkTrueOrElseAddError(boolean condition, String error) {
-        if(!condition) {
+        if (!condition) {
             return List.of(error);
         }
         return Collections.emptyList();
