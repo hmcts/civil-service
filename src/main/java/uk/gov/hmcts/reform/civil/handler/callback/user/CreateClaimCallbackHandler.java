@@ -369,7 +369,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         List<String> validationErrors;
 
         if (toggleService.isCourtLocationDynamicListEnabled()) {
@@ -384,6 +383,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         // temporarily remove respondent1OrgRegistered() for CIV-2659
@@ -509,7 +509,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
         dataBuilder.submittedDate(time.now());
 
