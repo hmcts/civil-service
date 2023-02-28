@@ -139,6 +139,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantPartyName;
 
     private final YesOrNo generalAppVaryJudgementType;
+    private final YesOrNo generalAppParentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 

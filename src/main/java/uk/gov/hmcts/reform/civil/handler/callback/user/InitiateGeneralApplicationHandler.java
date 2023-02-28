@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
@@ -120,7 +122,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
-
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
+            .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
@@ -133,6 +137,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
+
+       caseDataBuilder
+            .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
+                                           ? YES
+                                           : YesOrNo.NO).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

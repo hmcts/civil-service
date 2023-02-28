@@ -43,7 +43,7 @@ public class InitiateGeneralApplicationServiceHelper {
             && userDetails.getEmail().equals(email);
     }
 
-    public boolean isGA_ApplicantSameAsPC_Claimant(CaseData caseData, UserDetails userDetails) {
+    public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, UserDetails userDetails) {
 
         return caseData.getApplicantSolicitor1UserDetails() != null
             && caseData.getApplicant1OrganisationPolicy() != null
@@ -177,7 +177,7 @@ public class InitiateGeneralApplicationServiceHelper {
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
-        boolean isGAApplicantSameAsParentCaseClaimant = isGA_ApplicantSameAsPC_Claimant(caseData, userDetails);
+        boolean isGAApplicantSameAsParentCaseClaimant = isGAApplicantSameAsPCClaimant(caseData, userDetails);
 
         return applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
