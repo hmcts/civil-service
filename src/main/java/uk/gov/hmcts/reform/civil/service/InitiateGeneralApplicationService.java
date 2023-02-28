@@ -293,7 +293,7 @@ public class InitiateGeneralApplicationService {
         return true;
     }
 
-    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails){
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
         return helper.isGAApplicantSameAsPCClaimant(caseData, userDetails);
     }
 

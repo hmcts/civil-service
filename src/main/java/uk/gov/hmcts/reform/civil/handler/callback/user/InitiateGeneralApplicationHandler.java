@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -118,6 +117,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
@@ -138,10 +138,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
 
-       caseDataBuilder
-            .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
-                                           ? YES
-                                           : YesOrNo.NO).build();
+        caseDataBuilder
+            .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -239,12 +237,18 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             first.ifPresent(dynamicLocationList::setValue);
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
                 .hearingPreferredLocation(dynamicLocationList).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppHearingDetails(generalAppHearingDetails)
+                .generalAppParentClaimantIsApplicant(null)
+                .build();
             caseData = updatedCaseData;
         } else {
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
                 .hearingPreferredLocation(DynamicList.builder().build()).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppHearingDetails(generalAppHearingDetails)
+                .generalAppParentClaimantIsApplicant(null)
+                .build();
             caseData = updatedCaseData;
         }
 
