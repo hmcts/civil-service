@@ -238,8 +238,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
-                        EVIDENCE_UPLOAD_RESPONDENT,
-                        HEARING_SCHEDULED
+                        EVIDENCE_UPLOAD_RESPONDENT
 
                     }
                 ),
