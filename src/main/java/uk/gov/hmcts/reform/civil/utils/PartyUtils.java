@@ -15,10 +15,10 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 public class PartyUtils {
 
@@ -192,9 +192,8 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
-                                                                      boolean isAccessProfilesEnabled) {
-        if (isSpecCaseCategory(caseData, isAccessProfilesEnabled)) {
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
