@@ -175,7 +175,7 @@ class DeadlineExtensionValidatorTest {
                                                                          true);
 
             assertThat(errors)
-               .containsOnly("You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed.");
+                .containsOnly("You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed.");
         }
 
         @Test
