@@ -5,9 +5,9 @@ RENOVATE_PREFIX="^renovate/"
 
 VALID_PREFIXES="^(feat|spike|fix|test|refactor)\/(.*)"
 VALID_TICKET_1='CIV-[0-9]{1,5}$'
-VALID_TICKET_2='CIV-[0-9]{1,5}[-_][a-zA-Z0-9]+.*'
+VALID_TICKET_2='CIV-[0-9]{1,5}[-_][a-z0-9]+.*'
 VALID_TASK_1='CIV-TASK$'
-VALID_TASK_2='CIV-TASK[-_][a-zA-Z0-9]+.*'
+VALID_TASK_2='CIV-TASK[-_][a-z0-9]+.*'
 
 
 
@@ -51,7 +51,7 @@ if [[ $BRANCH_NAME =~ $VALID_TASK_2 ]]; then
 fi
 
 echo "The provided branch name is invalid. Branches names (minus the prefix) must start with CIV-nnnn or CIV-TASK."
-echo "Optionally, they can be followed by a dash symbol and a description."
+echo "Optionally, they can be followed by a dash symbol and a description, rigorously lowercase."
 echo ""
 echo "Please rename your branch. To rename your branch you can use the following command:"
 echo "  git branch -m <newname>"
@@ -59,13 +59,14 @@ echo ""
 echo "Examples of valid branch names (with prefix):"
 echo "  ${BRANCH_PREFIX}/CIV-1234"
 echo "  ${BRANCH_PREFIX}/CIV-1234-updating-something"
-echo "  ${BRANCH_PREFIX}/CIV-TASK-DET-3456-some-external-change"
+echo "  ${BRANCH_PREFIX}/CIV-TASK-det-3456-some-external-change"
 echo "  renovate/something"
 echo ""
 echo "Examples of invalid branch names (with prefix):"
 echo "  ${BRANCH_PREFIX}/CIV-1234-"
 echo "  ${BRANCH_PREFIX}/civ-1234"
 echo "  ${BRANCH_PREFIX}/DET-3456-some-external-change"
+echo "  ${BRANCH_PREFIX}/CIV-1234-Some-Change-WIth-Uppercase-Letters-In-Branch-Name"
 echo "  $LOCAL_BRANCH"
 
 
