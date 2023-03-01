@@ -54,7 +54,6 @@ public class CaseFlagsInitialiser {
                 addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
                 break;
             }
-            break;
             case CLAIMANT_RESPONSE:
             case CLAIMANT_RESPONSE_SPEC: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
