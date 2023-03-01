@@ -27,6 +27,7 @@ class SwaggerPublisherTest extends BaseIntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
+        Files.createDirectories(Paths.get("/tmp/"));    // needed on Windows systems as the directory won't exist by default
         try (OutputStream outputStream = Files.newOutputStream(Paths.get("/tmp/swagger-specs.json"))) {
             outputStream.write(specs);
         }
