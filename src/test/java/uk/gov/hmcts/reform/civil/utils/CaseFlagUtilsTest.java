@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DQPartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -21,6 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_EXPERT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_WITNESS;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR_ONE_EXPERT;
@@ -41,6 +45,72 @@ class CaseFlagUtilsTest {
             Flags expected = Flags.builder().partyName("partyName").roleOnCase("roleOnCase").details(List.of()).build();
             Flags actual = CaseFlagUtils.createFlags("partyName", "roleOnCase");
             assertEquals(expected, actual);
+        }
+    }
+
+    @Nested
+    class UpdateParty {
+
+        @Test
+        void shouldUpdatePartyWithFlagsMeta() {
+            Party party = PartyBuilder.builder().individual().build();
+            Flags flags = Flags.builder().partyName("Mr. John Rambo").roleOnCase("applicant").details(List.of()).build();
+            Party expected = party.toBuilder().flags(flags).build();
+
+            Party actual = CaseFlagUtils.updateParty("applicant", party);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldNotUpdatePartyFlagsIfFlagsExist() {
+            Party existingParty = PartyBuilder.builder().individual().build()
+                .toBuilder()
+                .flags(Flags.builder().partyName("Mr. John Rambo").roleOnCase("applicant").details(List.of()).build())
+                .build();
+
+            Party actual = CaseFlagUtils.updateParty("updatedField", existingParty);
+
+            assertEquals(existingParty, actual);
+        }
+
+        @Test
+        void shouldReturnNullWhenPartyIsNull() {
+            Party actual = CaseFlagUtils.updateParty("applicant", null);
+            assertNull(actual);
+        }
+    }
+
+    @Nested
+    class UpdateLitFriend {
+
+        @Test
+        void shouldUpdateLitigationFriendWithFlagsMeta() {
+            LitigationFriend litFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build();
+            Flags flags = Flags.builder().partyName("John Rambo").roleOnCase("applicant").details(List.of()).build();
+            LitigationFriend expected = litFriend.toBuilder().flags(flags).build();
+
+            LitigationFriend actual = CaseFlagUtils.updateLitFriend("applicant", litFriend);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldNotUpdateLitigationFriendFlagsIfFlagsExist() {
+            LitigationFriend existingLitFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build()
+                .toBuilder()
+                .flags(Flags.builder().partyName("John Rambo").roleOnCase("applicant").details(List.of()).build())
+                .build();
+
+            LitigationFriend actual = CaseFlagUtils.updateLitFriend("updatedField", existingLitFriend);
+
+            assertEquals(existingLitFriend, actual);
+        }
+
+        @Test
+        void shouldReturnNullWhenLitigationFriendIsNull() {
+            LitigationFriend actual = CaseFlagUtils.updateLitFriend("applicant", null);
+            assertNull(actual);
         }
     }
 
@@ -305,5 +375,4 @@ class CaseFlagUtilsTest {
             assertThat(applicantSolicitorExperts.get(2).getValue().getLastName()).isEqualTo("experto");
         }
     }
-
 }

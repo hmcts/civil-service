@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DQPartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -38,6 +41,22 @@ public class CaseFlagUtils {
             .roleOnCase(roleOnCase)
             .details(List.of())
             .build();
+    }
+
+    public static Party updateParty(String roleOnCase, Party partyToUpdate) {
+        return partyToUpdate != null ? partyToUpdate.getFlags() != null ? partyToUpdate :
+            partyToUpdate.toBuilder().flags(createFlags(partyToUpdate.getPartyName(), roleOnCase)).build() : null;
+    }
+
+    public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
+        return litFriendToUpdate != null ? litFriendToUpdate.getFlags() != null ? litFriendToUpdate
+            : litFriendToUpdate.toBuilder().flags(createFlags(
+                // LitigationFriend was updated to split fullName into firstname and lastname for H&L =================
+                // ToDo: Remove the use of fullName after H&L changes are default =====================================
+                litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
+                    // ====================================================================================================
+                    : String.format("%s %s", litFriendToUpdate.getFirstName(), litFriendToUpdate.getLastName()),
+            roleOnCase)).build() : null;
     }
 
     private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
@@ -75,8 +94,8 @@ public class CaseFlagUtils {
         addRespondent1ExpertAndWitnessFlagsStructure(builder, caseData);
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)) || (
             ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-            && NO.equals(caseData.getRespondentResponseIsSame())
-            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
+                && NO.equals(caseData.getRespondentResponseIsSame())
+                && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
             addRespondent2ExpertAndWitnessFlagsStructure(builder, caseData);
         }
     }

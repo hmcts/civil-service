@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -152,6 +153,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -434,6 +436,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (featureToggleService.isNoticeOfChangeEnabled()) {
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
+
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
 
         CaseData temporaryCaseData = dataBuilder.build();
 
