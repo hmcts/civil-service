@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -144,7 +143,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LocationRefDataService locationRefDataService;
     @Mock
     private CourtLocationUtils courtLocationUtils;
-    @MockBean
+    @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Spy
