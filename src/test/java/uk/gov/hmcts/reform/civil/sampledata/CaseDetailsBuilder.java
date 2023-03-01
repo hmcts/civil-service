@@ -6,17 +6,19 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 
 @SuppressWarnings("unchecked")
@@ -113,7 +115,7 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStateFullDefenceSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .ccdState(AWAITING_APPLICANT_INTENTION)
@@ -125,7 +127,7 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStateFullAdmitSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .ccdState(AWAITING_APPLICANT_INTENTION)
@@ -137,13 +139,23 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStatePartAdmitSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .ccdState(AWAITING_APPLICANT_INTENTION)
             .build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_APPLICANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateDecisionOutcome() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+            .hearingDate(LocalDate.now())
+            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PREPARE_FOR_HEARING_CONDUCT_HEARING.name();
         return this;
     }
 

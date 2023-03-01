@@ -30,6 +30,8 @@ public class PartyBuilder {
     private LocalDate soleTraderDateOfBirth;
     private Address primaryAddress;
     private String partyName;
+    private String partyEmail;
+    private String partyPhone;
 
     public static PartyBuilder builder() {
         return new PartyBuilder();
@@ -59,6 +61,8 @@ public class PartyBuilder {
         soleTraderTradingAs = "Sole Trader co";
         partyName = soleTraderTitle + " " + soleTraderFirstName + " " + soleTraderLastName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "sole.trader@email.com";
         return this;
     }
 
@@ -67,6 +71,8 @@ public class PartyBuilder {
         companyName = "Company ltd";
         partyName = companyName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "company@email.com";
         return this;
     }
 
@@ -83,6 +89,8 @@ public class PartyBuilder {
         companyName = repeat("C", MAX_ALLOWED);
         partyName = companyName;
         primaryAddress = AddressBuilder.maximal().build();
+        partyPhone = "0123456789";
+        partyEmail = "company@email.com";
         return this;
     }
 
@@ -91,6 +99,8 @@ public class PartyBuilder {
         organisationName = "The Organisation";
         partyName = organisationName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "organisation@email.com";
         return this;
     }
 
@@ -106,6 +116,8 @@ public class PartyBuilder {
         individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "rambo@email.com";
         return this;
     }
 
@@ -130,6 +142,11 @@ public class PartyBuilder {
         return this;
     }
 
+    public PartyBuilder partyEmail(String email) {
+        partyEmail = email;
+        return this;
+    }
+
     public Party build() {
         return Party.builder()
             .type(type)
@@ -146,6 +163,8 @@ public class PartyBuilder {
             .soleTraderLastName(soleTraderLastName)
             .soleTraderDateOfBirth(soleTraderDateOfBirth)
             .soleTraderTradingAs(soleTraderTradingAs)
+            .partyPhone(partyPhone)
+            .partyEmail(partyEmail)
             .build();
     }
 }

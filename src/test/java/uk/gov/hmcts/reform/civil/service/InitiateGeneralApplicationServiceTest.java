@@ -16,10 +16,9 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -47,11 +46,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -85,7 +84,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
                     .responseCourtCode("applicant1DQRequestedCourt")
-                                                                  .caseLocation(CaseLocation.builder()
+                                                                  .caseLocation(CaseLocationCivil.builder()
                                                                                     .region("2")
                                                                                     .baseLocation("00000")
                                                                                     .build())
@@ -93,7 +92,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Respondent1DQ respondent1DQ =
             Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
                     .responseCourtCode("respondent1DQRequestedCourt")
-                                                                    .caseLocation(CaseLocation.builder()
+                                                                    .caseLocation(CaseLocationCivil.builder()
                                                                                       .region("2")
                                                                                       .baseLocation("11111")
                                                                                       .build())
@@ -101,7 +100,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Respondent2DQ respondent2DQ =
         Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                 .responseCourtCode("respondent2DQRequestedCourt")
-                                                                .caseLocation(CaseLocation.builder()
+                                                                .caseLocation(CaseLocationCivil.builder()
                                                                                   .region("3")
                                                                                   .baseLocation("22222")
                                                                                   .build())
@@ -452,7 +451,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shoulAddSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataSPEC(SuperClaimType.SPEC_CLAIM);
+            .getTestCaseDataSPEC(SPEC_CLAIM);
         when(locationRefDataService.getCcmccLocation(any()))
             .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()

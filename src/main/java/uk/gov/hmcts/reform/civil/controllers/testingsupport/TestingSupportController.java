@@ -48,6 +48,8 @@ public class TestingSupportController {
 
     private final ClaimDismissedHandler claimDismissedHandler;
 
+    private static final String BEARER_TOKEN = "Bearer Token";
+
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
@@ -90,14 +92,6 @@ public class TestingSupportController {
     @ApiOperation("Check if court location dynamic list feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkCourtLocationsDynamicListEnabled() {
         boolean featureEnabled = featureToggleService.isCourtLocationDynamicListEnabled();
-        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
-        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
-    }
-
-    @GetMapping("/testing-support/feature-toggle/access-profiles")
-    @ApiOperation("Check if access profiles feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkAccessProfilesEnabled() {
-        boolean featureEnabled = featureToggleService.isAccessProfilesEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
@@ -153,7 +147,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
     }
 
     @GetMapping("/testing-support/trigger-case-dismissal-scheduler")

@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -37,18 +38,25 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.math.BigDecimal.ZERO;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -62,9 +70,11 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +92,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private static final String datePattern = "dd MMMM yyyy";
     private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
@@ -97,6 +108,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
+            .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
+            .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
+            .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
+            .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -132,14 +148,45 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData updatedCaseData = setApplicant1ProceedFlagToYes(callbackParams.getCaseData());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
+
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             updatedCaseData.applicant1ProceedWithClaim(YES);
         }
+        return updatedCaseData.build();
+    }
+
+    private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            return YES;
+        }
+        return NO;
+    }
+
+    private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
+        var updatedCaseData = caseData.toBuilder();
+        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+
+        return updatedCaseData.build();
+    }
+
+    private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
+        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(callbackParams.getCaseData()));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
@@ -260,33 +307,28 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
-        } else {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM);
-        }
+        updatedCaseData.respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
-            updatedCaseData.applicant1DQ(Applicant1DQ.builder()
-                                             .applicant1DQRequestedCourt(
-                                                 RequestedCourt.builder()
-                                                     .responseCourtLocations(
-                                                         courtLocationUtils.getLocationsFromList(locations))
-                                                     .build()
-                                             )
-                                             .build());
+            updatedCaseData.applicant1DQ(
+                Applicant1DQ.builder().applicant1DQRequestedCourt(
+                    RequestedCourt.builder().responseCourtLocations(
+                        courtLocationUtils.getLocationsFromList(locations)).build()
+                    ).build());
         }
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
+
+            Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .map(RespondToClaim::getHowMuchWasPaid);
+
+            howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
+                MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -385,44 +427,147 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+        }
+        if (caseData.getRespondToAdmittedClaim() != null
+            && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
+            return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return caseData.getRespondent1ResponseDate().plusDays(5)
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
     }
 
     private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
-        if (caseData.getSpecDefenceAdmittedRequired() == NO) {
-            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                case IMMEDIATELY:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-                case BY_SET_DATE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-                case SUGGESTION_OF_REPAYMENT_PLAN:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-                default:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-            }
+        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
         }
-        return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+        }
     }
 
     private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
-        if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
-            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                case IMMEDIATELY:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-                case BY_SET_DATE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-                case SUGGESTION_OF_REPAYMENT_PLAN:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-                default:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-            }
+        if (YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
         }
-        return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+        }
+    }
+
+    private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>(1);
+
+        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+            errors.add("Enter a date that is today or in the future");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse getPaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //Set the hint date for repayment to be 30 days in the future
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse suggestInstalmentsValidation(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        //Check repayment amount requested is less than the overall claim amount
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+
+        if (regularRepaymentAmountPounds.compareTo(ZERO) <= 0) {
+            errors.add("Enter an amount of £1 or more");
+        }
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount.subtract(BigDecimal.ONE)) > 0) {
+            errors.add("Enter a valid amount for equal instalments");
+        }
+
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
+            1))) {
+            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+    private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+        if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+            errors.add("The amount paid must be less than the full claim amount.");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+
+        buildJudgmentAmountSummaryDetails(caseData, updatedCaseData);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+
+        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+        if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
+            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        }
+        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal finalTotal = subTotal.subtract(paidAmount);
+
+        updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
+        updatedCaseData.ccjJudgmentAmountClaimFee(claimFee);
+        updatedCaseData.ccjJudgmentSummarySubtotalAmount(subTotal);
+        updatedCaseData.ccjJudgmentTotalStillOwed(finalTotal);
+        updatedCaseData.ccjJudgmentAmountInterestToDate(caseData.getTotalInterest());
+        updatedCaseData.ccjPaymentPaidSomeAmountInPounds(paidAmount);
     }
 }

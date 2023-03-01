@@ -128,7 +128,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
@@ -488,8 +487,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("Each party "
-                                             + "has the right to apply to have this order "
+                .isEqualTo(String.format("This order has been made without a hearing. Each party "
+                                             + "has the right to apply to have this Order "
                                              + "set aside or varied. Any such application must be "
                                              + "received by the Court "
                                              + "(together with the appropriate fee) by 4pm on %s.",
@@ -515,7 +514,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "summary and a chronology.");
 
             assertThat(response.getData()).extracting("trialOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("Each party has the right to "
+                .isEqualTo(String.format("This order has been made without a hearing. Each party has the right to "
                                              + "apply to have this Order set aside or varied. Any such application "
                                              + "must be received by the Court (together with the appropriate fee) "
                                              + "by 4pm on %s.",
@@ -531,19 +530,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
-        }
-
-        @Test
-        void shouldNotPopulateOrderMadeWithoutHearingWhenHnlSdoDisabled() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedTrialHearing().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").isNull();
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").isNull();
         }
     }
 
