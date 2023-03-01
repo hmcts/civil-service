@@ -162,8 +162,20 @@ class DeadlineExtensionValidatorTest {
                 currentResponseDeadline,
                 true
             );
-
             assertThat(errors).contains("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
+        }
+
+        @Test
+        void shouldReturnErrors_whenExtensionIsMoreThan28DaysFromResponseDeadlineForSpec() {
+            LocalDate agreedExtension = NOW.plusDays(29);
+            LocalDateTime currentResponseDeadline = NOW.atTime(16, 0);
+
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension,
+                                                                         currentResponseDeadline,
+                                                                         true);
+
+            assertThat(errors)
+               .containsOnly("You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed.");
         }
 
         @Test
