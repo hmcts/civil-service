@@ -31,10 +31,8 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
         try {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
         } catch (Exception ex) {
-            log.error(
-                "Payment callback is unsuccessful for the CaseID: {}",
-                serviceRequestUpdateDto.getCcdCaseNumber()
-            );
+            log.error("Payment callback is unsuccessful for the CaseID: {}", serviceRequestUpdateDto.getCcdCaseNumber());
+            throw ex;
         }
     }
 

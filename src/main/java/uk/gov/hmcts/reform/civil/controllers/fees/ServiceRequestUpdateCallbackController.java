@@ -31,10 +31,8 @@ public class ServiceRequestUpdateCallbackController {
         try {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
         } catch (Exception ex) {
-            log.error(
-                "Payment callback is unsuccessful for the CaseID: {} {}",
-                serviceRequestUpdateDto.getCcdCaseNumber(), ex.toString()
-            );
+            log.error("Payment callback is unsuccessful for the CaseID: {} {}", serviceRequestUpdateDto.getCcdCaseNumber(), ex.toString());
+            throw ex;
         }
     }
 }
