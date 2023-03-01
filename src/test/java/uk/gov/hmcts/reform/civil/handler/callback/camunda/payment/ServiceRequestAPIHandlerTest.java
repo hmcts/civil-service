@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -72,14 +73,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
+            //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //THEN
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
@@ -88,14 +90,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvokedWithoutClaimIssuedPbaDetails() {
+            //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //THEN
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
@@ -104,8 +107,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotMakePaymentServiceRequestForClaimFee_whenInvokedWithClaimIssuedPbaDetails() {
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //THEN
             verifyNoInteractions(paymentsService);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
@@ -114,14 +118,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
+            //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //THEN
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
@@ -130,14 +135,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithoutClaimIssuedPbaDetails() {
+            //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //THEN
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
@@ -146,10 +152,29 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotMakePaymentServiceRequestForHearingFee_whenInvokedWithClaimIssuedPbaDetails() {
+            //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //THEN
+            verifyNoInteractions(paymentsService);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
+            assertThat(serviceRequestReference).isEqualTo(CaseDataBuilder.CUSTOMER_REFERENCE);
+        }
 
+        @Test
+        void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
+            //GIVEN
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails()
+                .toBuilder()
+                .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //WHEN
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //THEN
             verifyNoInteractions(paymentsService);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
@@ -158,13 +183,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
+            //THEN
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
         }
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
+            //GIVEN
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+            //THEN
             assertThat(handler.camundaActivityId(params)).isEqualTo("ServiceRequestAPI");
         }
     }

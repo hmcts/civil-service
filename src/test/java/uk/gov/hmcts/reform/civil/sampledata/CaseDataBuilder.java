@@ -4218,6 +4218,7 @@ public class CaseDataBuilder {
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
@@ -4256,7 +4257,7 @@ public class CaseDataBuilder {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
-            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
