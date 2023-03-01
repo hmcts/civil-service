@@ -332,21 +332,19 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = CaseEvent.class,
-        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1", "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC"
-    },
-        mode = EnumSource.Mode.EXCLUDE
+        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1", "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC" } , mode = EnumSource.Mode.EXCLUDE
     )
     void shouldThrowExceptionWhenCaseEventIsInvalid(CaseEvent caseEvent) {
         // Given: an invalid event id
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .request(CallbackRequest.builder().eventId(caseEvent.name()).build()).build();
-
         // When: I call the camundaActivityId
         // Then: an exception is thrown
         CallbackException ex = assertThrows(CallbackException.class,
                                             () -> assignCaseToUserHandler.camundaActivityId(callbackParams),
                                             "A CallbackException was expected to be thrown but wasn't.");
-        assertThat(ex.getMessage()).contains("Callback handler received illegal event");}
+        assertThat(ex.getMessage()).contains("Callback handler received illegal event");
+    }
 
     private void verifyApplicantSolicitorOneRoles() {
         verify(coreCaseUserService).assignCase(
