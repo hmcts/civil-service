@@ -277,7 +277,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).contains(GENERATE_DJ_FORM, GENERATE_DJ_FORM_SPEC);
+        assertThat(handler.handledEvents()).containsOnly(GENERATE_DJ_FORM, GENERATE_DJ_FORM_SPEC);
     }
 
     @Test

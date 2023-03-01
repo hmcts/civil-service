@@ -312,7 +312,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(assignCaseToUserHandler.handledEvents()).contains(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
+        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
                                                                      ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
     }
 
