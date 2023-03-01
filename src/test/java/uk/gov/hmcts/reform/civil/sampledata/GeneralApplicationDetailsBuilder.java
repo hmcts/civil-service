@@ -6,9 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.lang.Collections;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -643,10 +643,10 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
-    public CaseData getTestCaseDataSPEC(SuperClaimType claimType) {
+    public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
         return CaseData.builder()
             .ccdCaseReference(1234L)
-            .superClaimType(claimType)
+            .caseAccessCategory(claimType)
             .courtLocation(CourtLocation.builder()
                                .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")
@@ -743,7 +743,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getCaseDataForWorkAllocation(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type claimant1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
@@ -842,13 +842,13 @@ public class GeneralApplicationDetailsBuilder {
                 .respondent2DQ(respondent2DQ)
                 .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }
 
     public CaseData getCaseDataForWorkAllocation1V1(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type respondent1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ) {
@@ -940,13 +940,13 @@ public class GeneralApplicationDetailsBuilder {
             .respondent1DQ(respondent1DQ)
             .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }
 
     public CaseData getMultiCaseDataForWorkAllocationForOne_V_Two(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type claimant1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
@@ -1047,7 +1047,7 @@ public class GeneralApplicationDetailsBuilder {
             .respondent2DQ(respondent2DQ)
             .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }

@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -71,6 +70,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
@@ -266,7 +266,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -454,7 +454,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
@@ -490,7 +490,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .applicant1ProceedWithClaimSpec2v1(YES)
                     .addApplicant2(YES)
                     .build();
@@ -531,7 +531,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .applicant1ProceedWithClaim(YES)
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
                     .build();
@@ -567,7 +567,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .applicant1ProceedWithClaim(YES)
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(NO)
                     .build();
 
@@ -901,7 +901,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 int witnessesIncludingDefendant = 2;
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
                     .responseClaimExpertSpecRequired(YES)
@@ -940,7 +940,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .build();
 
@@ -956,7 +956,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .atStateRespondent1v1FullAdmissionSpec()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
@@ -979,7 +979,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .atStateRespondent1v1FullAdmissionSpec()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .build();
                 caseData = caseData.toBuilder()
                     .responseClaimExpertSpecRequired(YES)
@@ -2162,7 +2162,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 + "without an honest belief in its truth.";
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
             assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
         }
 
@@ -2190,7 +2190,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 + "without an honest belief in its truth.";
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
             assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
         }
     }
