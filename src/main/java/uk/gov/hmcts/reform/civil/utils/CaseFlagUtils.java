@@ -114,8 +114,8 @@ public class CaseFlagUtils {
                 respondent2Experts = unwrapElements(caseData.getRespondent2DQ().getExperts().getDetails());
             }
 
-            builder.respondentSolicitor2Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(respondent2Witnesses, RESPONDENT_SOLICITOR_TWO_WITNESS));
-            builder.respondentSolicitor2Experts(getTopLevelFieldForExpertsWithFlagsStructure(respondent2Experts, RESPONDENT_SOLICITOR_TWO_EXPERT));
+            builder.respondent2Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(respondent2Witnesses, RESPONDENT_SOLICITOR_TWO_WITNESS));
+            builder.respondent2Experts(getTopLevelFieldForExpertsWithFlagsStructure(respondent2Experts, RESPONDENT_SOLICITOR_TWO_EXPERT));
         }
     }
 
@@ -130,8 +130,8 @@ public class CaseFlagUtils {
             if (caseData.getRespondent1DQ().getExperts() != null) {
                 respondent1Experts = unwrapElements(caseData.getRespondent1DQ().getExperts().getDetails());
             }
-            builder.respondentSolicitor1Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(respondent1Witnesses, RESPONDENT_SOLICITOR_ONE_WITNESS));
-            builder.respondentSolicitor1Experts(getTopLevelFieldForExpertsWithFlagsStructure(respondent1Experts, RESPONDENT_SOLICITOR_ONE_EXPERT));
+            builder.respondent1Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(respondent1Witnesses, RESPONDENT_SOLICITOR_ONE_WITNESS));
+            builder.respondent1Experts(getTopLevelFieldForExpertsWithFlagsStructure(respondent1Experts, RESPONDENT_SOLICITOR_ONE_EXPERT));
         }
     }
 
@@ -156,8 +156,8 @@ public class CaseFlagUtils {
                 }
             }
 
-            updatedData.applicantSolicitorWitnesses(getTopLevelFieldForWitnessesWithFlagsStructure(applicant1Witnesses, APPLICANT_SOLICITOR_WITNESS));
-            updatedData.applicantSolicitorExperts(getTopLevelFieldForExpertsWithFlagsStructure(applicant1Experts, APPLICANT_SOLICITOR_EXPERT));
+            updatedData.applicantWitnesses(getTopLevelFieldForWitnessesWithFlagsStructure(applicant1Witnesses, APPLICANT_SOLICITOR_WITNESS));
+            updatedData.applicantExperts(getTopLevelFieldForExpertsWithFlagsStructure(applicant1Experts, APPLICANT_SOLICITOR_EXPERT));
         }
     }
 }
