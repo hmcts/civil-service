@@ -298,7 +298,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -336,7 +336,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .toBuilder()
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -374,7 +374,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .toBuilder()
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
