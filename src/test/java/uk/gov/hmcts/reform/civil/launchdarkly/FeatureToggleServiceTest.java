@@ -96,6 +96,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsHearingAndListingLegalRepEnabledInvoked() {
+        var hearingAndListingKey = "hearing-and-listing-legal-rep";
+        givenToggle(hearingAndListingKey, true);
+
+        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isTrue();
+        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked() {
         var courtLocationDynamicListKey = "court-location-dynamic-list";
         givenToggle(courtLocationDynamicListKey, true);

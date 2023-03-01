@@ -73,6 +73,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
     }
 
+    public boolean isHearingAndListingLegalRepEnabled() {
+        return internalClient.boolVariation("hearing-and-listing-legal-rep", createLDUser().build(), false);
+    }
+
     public boolean isCourtLocationDynamicListEnabled() {
         return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
