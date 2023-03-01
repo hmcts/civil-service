@@ -79,10 +79,33 @@ public class GeneralAppFeesService {
         return false;
     }
 
+    private boolean isOnlyVaryOrSuspendApplication(CaseData caseData) {
+        if (caseData.getGeneralAppType().getTypes().size() == 1) {
+            return caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
+                ? true
+                : caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_ORDER) ? true : false;
+        }
+        return false;
+    }
+
+    private boolean hasAppContainVaryOrder(CaseData caseData) {
+        return caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_ORDER);
+    }
+
     private String getKeyword(CaseData caseData) {
         if (isFreeApplication(caseData)) {
             return feesConfiguration.getFreeKeyword();
         }
+
+        if (isOnlyVaryOrSuspendApplication(caseData)) {
+            return feesConfiguration.getAppnToVaryOrSuspend();
+        }
+
+        if (hasAppContainVaryOrder(caseData)) {
+            // To be confirmed by Peter
+            return feesConfiguration.getAppnToVaryOrSuspend();
+        }
+
         boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
                 && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                 && caseData.getGeneralAppInformOtherParty() != null
