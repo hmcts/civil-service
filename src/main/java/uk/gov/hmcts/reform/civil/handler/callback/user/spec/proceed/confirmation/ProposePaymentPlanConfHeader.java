@@ -13,7 +13,7 @@ import java.util.Set;
 import static java.lang.String.format;
 
 @Component
-public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmationHeaderGenerator {
+public class ProposePaymentPlanConfHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     private static final Set<RespondentResponsePartAdmissionPaymentTimeLRspec> PAYMENT_PLAN = EnumSet.of(
         RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
@@ -22,17 +22,17 @@ public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmati
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if ((YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+        if ((YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
 
         String claimNumber = caseData.getLegacyCaseReference();
         return Optional.of(format(
-            "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            "# Payment plan rejected %n## The proposed payment plan for case %s has been rejected by the claimant."
+                + "%n## A new payment plan has been submitted and will be determined manually by the Court.",
             claimNumber
         ));
     }
 }
-
