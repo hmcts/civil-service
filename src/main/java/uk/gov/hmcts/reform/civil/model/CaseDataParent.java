@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -370,5 +371,8 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant2;
 
     private final IdamUserDetails claimantUserDetails;
+
+    @JsonUnwrapped
+    private final Mediation mediation;
 
 }
