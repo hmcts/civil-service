@@ -77,7 +77,6 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
             .andExpect(status().is5xxServerError());
     }
 
-
     private ServiceRequestUpdateDto buildServiceDto() {
         return ServiceRequestUpdateDto.builder()
             .ccdCaseNumber(CCD_CASE_NUMBER)
