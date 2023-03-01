@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -102,6 +103,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Nested
     class AboutToStartCallback {

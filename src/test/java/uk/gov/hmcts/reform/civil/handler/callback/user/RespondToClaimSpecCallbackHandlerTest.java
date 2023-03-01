@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -71,6 +72,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -142,6 +144,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LocationRefDataService locationRefDataService;
     @Mock
     private CourtLocationUtils courtLocationUtils;
+    @MockBean
+    private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
