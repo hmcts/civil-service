@@ -369,12 +369,12 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
-    private final List<Element<PartyFlagStructure>> applicantSolicitorExperts;
-    private final List<Element<PartyFlagStructure>> respondentSolicitor1Experts;
-    private final List<Element<PartyFlagStructure>> respondentSolicitor2Experts;
-    private final List<Element<PartyFlagStructure>> applicantSolicitorWitnesses;
-    private final List<Element<PartyFlagStructure>> respondentSolicitor1Witnesses;
-    private final List<Element<PartyFlagStructure>> respondentSolicitor2Witnesses;
+    private final List<Element<PartyFlagStructure>> applicantExperts;
+    private final List<Element<PartyFlagStructure>> respondent1Experts;
+    private final List<Element<PartyFlagStructure>> respondent2Experts;
+    private final List<Element<PartyFlagStructure>> applicantWitnesses;
+    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
 
     private final IdamUserDetails claimantUserDetails;
 
