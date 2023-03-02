@@ -12,12 +12,15 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.LipDefenceFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -61,6 +64,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean currentlyWorking;
     private final List<EmployerDetailsLRspec> employerDetails;
     private final Respondent1SelfEmploymentLRspec selfEmployment;
+    private List<AccountSimpleTemplateData> bankAccountList;
+    private final List<Respondent1CourtOrderDetails> courtOrderDetails;
+    private final List<DebtTemplateData> debtList;
+    private final List<ReasonMoneyTemplateData> incomeList;
+    private final List<ReasonMoneyTemplateData> expenseList;
+    private final int childrenMaintenance;
 
     public String getResponseTypeDisplay() {
         // TODO localization?
