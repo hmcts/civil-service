@@ -11,4 +11,6 @@ public class CaseDefinitionConstants {
     public static final String GENERALAPPLICATION_CASE_TYPE = "GENERALAPPLICATION";
     public static final String CMC_JURISDICTION = "CMC";
     public static final String CMC_CASE_TYPE = "MoneyClaimCase";
+    public static final String WA_3 = "WA3";
+    public static final String WA_3_5 = "WA3.5";
 }
