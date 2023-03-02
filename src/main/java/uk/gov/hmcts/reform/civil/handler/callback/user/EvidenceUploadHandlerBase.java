@@ -37,9 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONESPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -98,10 +96,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //set flag for respondent2
         if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
-                                                   .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
-            || coreCaseUserService.userHasCaseRole(caseData
-                                                    .getCcdCaseReference()
-                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
+                                                   .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
 
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
@@ -280,11 +275,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        
+
         applyDocumentUploadDate(caseDataBuilder, time.now());
 
-        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            || coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONESPEC)) {
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)) {
             setCategoryId(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosureList");
             setCategoryId(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosure");
             setCategoryId(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), "RespondentOneWitnessStatement");
@@ -302,8 +296,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryId(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialDocCorrespondence");
 
         }
-        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
-            || coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             setCategoryId(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosureList");
             setCategoryId(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosure");
             setCategoryId(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessStatement");
@@ -337,7 +330,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryId(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialCosts");
             setCategoryId(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialDocCorrespondence");
         }
-        
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

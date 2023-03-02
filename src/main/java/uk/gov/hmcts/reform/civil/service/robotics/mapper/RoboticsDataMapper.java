@@ -231,7 +231,7 @@ public class RoboticsDataMapper {
             ? RESPONDENT_SOLICITOR_ID : null;
 
         /*LocalDateTime dateOfService = null;
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             dateOfService = caseData.getIssueDate().atStartOfDay();
         } else {
             dateOfService = caseData.getClaimDetailsNotificationDate();
