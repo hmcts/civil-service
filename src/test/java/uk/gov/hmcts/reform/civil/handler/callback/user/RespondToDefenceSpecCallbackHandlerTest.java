@@ -868,7 +868,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_whenFuturePaymentDate() {
             PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
-                .paymentSetDate(LocalDate.now().minusDays(15)).build();
+                .paymentSetDate(LocalDate.now().plusDays(15)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
