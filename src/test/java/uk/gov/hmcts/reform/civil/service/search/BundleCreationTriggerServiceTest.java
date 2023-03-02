@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
 
@@ -22,8 +23,11 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(matchQuery("data.hearingDate", LocalDate.now().plusWeeks(3)))
-                        .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))));
+                        .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(3)))
+                        .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(3)))
+                        .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
         return new Query(query, List.of("reference"), fromValue);
     }
 }
