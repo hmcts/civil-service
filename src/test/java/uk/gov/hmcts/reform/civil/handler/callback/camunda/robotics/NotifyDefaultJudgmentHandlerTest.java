@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -42,13 +43,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 @SpringBootTest(classes = {
-    NotifyRoboticsOnContinuousFeedHandler.class,
+    NotifyDefaultJudgmentHandler.class,
     JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
-    RoboticsDataMapperForSpec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
     EventHistorySequencer.class,
@@ -59,7 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest {
+public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
 
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
@@ -73,55 +73,46 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
-    private Time time;
-    @MockBean
     LocationRefDataService locationRefDataService;
-
-    @Autowired
-    private NotifyRoboticsOnContinuousFeedHandler handler;
-
-    @MockBean
-    private JsonSchemaValidationService validationService;
 
     @Nested
     class ValidJsonPayload {
 
+        @Autowired
+        private NotifyDefaultJudgmentHandler handler;
+
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
-            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
+            boolean multiPartyScenario = isMultiPartyScenario(caseData);
             handler.handle(params);
 
-            // Then
-            verify(roboticsNotificationService).notifyRobotics(caseData, false,
-                                                               params.getParams().get(BEARER_TOKEN).toString()
-            );
+            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
+                                                               params.getParams().get(BEARER_TOKEN).toString());
         }
 
         @Test
-        void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentAdmitPartOfClaimFastTrack()
-                .build();
-            caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        void shouldNotNotifyRobotics_whenLrDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
+                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(roboticsNotificationService).notifyRobotics(caseData, false,
-                                                               params.getParams().get(BEARER_TOKEN).toString()
-            );
+            boolean multiPartyScenario = isMultiPartyScenario(caseData);
         }
     }
 
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    @MockBean
+    private Time time;
+
     @Nested
     class InValidJsonPayload {
+
+        @MockBean
+        private JsonSchemaValidationService validationService;
+        @Autowired
+        private NotifyDefaultJudgmentHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
