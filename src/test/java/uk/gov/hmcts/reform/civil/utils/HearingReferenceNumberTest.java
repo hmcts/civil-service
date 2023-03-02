@@ -8,7 +8,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber.generateHea
 public class HearingReferenceNumberTest {
 
     @Test
-    void ShouldGenerateHearingReferenceNumber() {
+    void shouldGenerateHearingReferenceNumber() {
         String result = generateHearingReference();
 
         Assertions.assertThat(result.equals("000HN001"));
