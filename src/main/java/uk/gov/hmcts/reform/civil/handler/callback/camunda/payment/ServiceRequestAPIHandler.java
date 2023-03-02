@@ -62,13 +62,10 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         try {
             if (isHearingFeeServiceRequest(caseData) || isClaimFeeServiceRequest(caseData)) {
                 log.info("calling payment service request {}", caseData.getCcdCaseReference());
-                String serviceRequestReference;
-                SRPbaDetails.SRPbaDetailsBuilder paymentDetails;
-                serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+                String serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                     .getServiceRequestReference();
-                paymentDetails = SRPbaDetails.builder()
-                    .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                    .serviceReqReference(serviceRequestReference);
+                SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(
+                    caseData, serviceRequestReference);
 
                 if (isHearingFeeServiceRequest(caseData)) {
                     paymentDetails.fee(caseData.getHearingFee());
@@ -77,8 +74,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                     paymentDetails.fee(caseData.getClaimFee());
                     caseData = caseData.toBuilder().claimIssuedPBADetails(paymentDetails.build()).build();
                 }
-            } else {
-                log.info("Service Request is already requested for this case {}", caseData.getCcdCaseReference());
             }
         } catch (FeignException e) {
             log.error("Http Status {}", e.status());
@@ -96,11 +91,19 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     }
 
     private boolean isClaimFeeServiceRequest(CaseData caseData) {
-        return isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails());
+        return isNull(caseData.getHearingDueDate())
+            && isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails());
     }
 
     private boolean isServiceRequestNotRequested(SRPbaDetails details) {
         return isNull(details) || isNull(details.getServiceReqReference());
     }
 
+    private SRPbaDetails.SRPbaDetailsBuilder prepareCommonPaymentDetails(
+        CaseData caseData, String serviceRequestReference) {
+        return SRPbaDetails.builder()
+            .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+            .serviceReqReference(serviceRequestReference);
+
+    }
 }
