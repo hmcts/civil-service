@@ -7,7 +7,6 @@ import lombok.Value;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -126,7 +125,7 @@ public class BundlingCaseData {
     @JsonProperty("respondant2")
     private final Party respondent2;
     @JsonProperty("hearingDate")
-    private final LocalDate hearingDate;
+    private final String hearingDate;
     @JsonProperty("ccdCaseReference")
     private final Long ccdCaseReference;
 }

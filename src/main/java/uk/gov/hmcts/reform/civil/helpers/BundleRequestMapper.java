@@ -133,7 +133,8 @@ public class BundleRequestMapper {
                 .applicant1(caseData.getApplicant1())
                 .respondent1(caseData.getRespondent1())
                 .courtLocation(caseData.getHearingLocation().getValue().getLabel())
-                .hearingDate(caseData.getHearingDate())
+                .hearingDate(null != caseData.getHearingDate()
+                                 ? DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "dd-MM-yyyy") : null)
                 .ccdCaseReference(caseData.getCcdCaseReference())
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
