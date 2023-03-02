@@ -62,8 +62,6 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
     @MockBean
-    private HearingReferenceNumber hearingReferenceNumber;
-    @MockBean
     private PublicHolidaysCollection publicHolidaysCollection;
 
     @Nested

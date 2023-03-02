@@ -60,7 +60,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
-    private final HearingReferenceNumber hearingReferenceNumber;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -166,7 +165,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.hearingReferenceNumber(hearingReferenceNumber.generateHearingReference());
+        caseDataBuilder.hearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
