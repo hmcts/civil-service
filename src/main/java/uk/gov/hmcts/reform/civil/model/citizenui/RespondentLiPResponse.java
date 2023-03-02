@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentLiPResponse {
 
+    private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private DQExtraDetailsLip respondent1DQExtraDetails;
     private HearingSupportLip respondent1DQHearingSupportLip;
 }
