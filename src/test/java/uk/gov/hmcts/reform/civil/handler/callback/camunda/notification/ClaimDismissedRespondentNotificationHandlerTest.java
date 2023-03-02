@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -22,8 +23,10 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
@@ -66,7 +69,12 @@ class ClaimDismissedRespondentNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
 
             handler.handle(params);
 
@@ -85,7 +93,12 @@ class ClaimDismissedRespondentNotificationHandlerTest {
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
             when(notificationsProperties.getSolicitorClaimDismissedWithinDeadline()).thenReturn(TEMPLATE_ID_1);
             handler.handle(params);
 
@@ -103,7 +116,12 @@ class ClaimDismissedRespondentNotificationHandlerTest {
                 .atStateClaimDismissedPastClaimNotificationDeadline()
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
             when(notificationsProperties.getSolicitorClaimDismissedWithin4Months()).thenReturn(TEMPLATE_ID_2);
 
             handler.handle(params);
@@ -122,7 +140,12 @@ class ClaimDismissedRespondentNotificationHandlerTest {
                 .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
             when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
 
             handler.handle(params);
@@ -133,6 +156,48 @@ class ClaimDismissedRespondentNotificationHandlerTest {
                 getNotificationDataMap(caseData),
                 "claim-dismissed-respondent-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotNotifyRespondentSolicitor1_whenRespondent1LiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
+                .respondent1Represented(NO)
+                .respondentSolicitor1EmailAddress(null)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
+            when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyRespondentSolicitor2_whenRespondent2LiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDismissedPastClaimDetailsNotificationDeadline()
+                .respondent2Represented(NO)
+                .respondentSolicitor2EmailAddress(null)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DISMISSED")
+                             .build())
+                .build();
+            when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
         }
     }
 
