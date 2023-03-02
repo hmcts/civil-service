@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.*;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
