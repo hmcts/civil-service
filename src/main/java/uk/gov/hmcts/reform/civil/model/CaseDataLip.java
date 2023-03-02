@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLip {
+
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
 }
