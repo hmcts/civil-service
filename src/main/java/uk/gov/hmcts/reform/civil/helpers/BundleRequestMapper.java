@@ -39,7 +39,7 @@ public class BundleRequestMapper {
                                                                 String caseTypeId, Long id) {
         String fileNameIdentifier =
             caseData.getCcdCaseReference() + "_" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(),
-                                                                                    "ddMMyyyy") + "_";
+                                                                                    "ddMMyyyy");
         BundleCreateRequest bundleCreateRequest = BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
                              .caseData(mapCaseData(caseData,
