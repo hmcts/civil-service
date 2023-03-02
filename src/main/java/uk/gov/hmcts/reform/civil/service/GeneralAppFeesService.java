@@ -50,6 +50,16 @@ public class GeneralAppFeesService {
                     .queryParam("service", "insolvency")
                     .queryParam("keyword", feesConfiguration.getFreeKeyword());
         }
+        if (feesConfiguration.getAppnToVaryOrSuspend().equals(keyword)) {
+            builder = UriComponentsBuilder.fromUriString(queryURL)
+                .queryParam("channel", feesConfiguration.getChannel())
+                .queryParam("event", "miscellaneous")
+                .queryParam("jurisdiction1", feesConfiguration.getJurisdiction1())
+                .queryParam("jurisdiction2", feesConfiguration.getJurisdiction2())
+                .queryParam("service", "other")
+                .queryParam("version", 2)
+                .queryParam("keyword", feesConfiguration.getAppnToVaryOrSuspend());
+        }
         URI uri;
         FeeLookupResponseDto feeLookupResponseDto;
         try {
