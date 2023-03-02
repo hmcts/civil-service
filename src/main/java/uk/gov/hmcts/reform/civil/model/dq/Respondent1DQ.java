@@ -44,8 +44,11 @@ public class Respondent1DQ implements DQ {
     private List<Element<AccountSimple>> respondent1BankAccountList;
     private HomeDetails respondent1DQHomeDetails;
     private YesOrNo respondent1DQCarerAllowanceCredit;
+    private YesOrNo respondent1DQCarerAllowanceCreditFullAdmission;
     private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
+    private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncomeFA;
     private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
+    private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpensesFA;
     private YesOrNo responseClaimCourtLocationRequired;
     private RequestedCourt respondToCourtLocation;
     private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
