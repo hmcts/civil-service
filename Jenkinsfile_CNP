@@ -9,7 +9,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def ccdBranch = "master"
-def camundaBranch = "fix/CIV-5160"
+def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
