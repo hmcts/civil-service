@@ -237,9 +237,6 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
 }
 
@@ -255,9 +252,6 @@ task runApiTests(type: Exec, description: 'Runs Api tests.') {
 }
 
 task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
 }
 
@@ -277,7 +271,7 @@ task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multipa
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:e2e-unspec'
+  commandLine '/usr/bin/yarn', '--silent', 'test:AATFunctional'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
