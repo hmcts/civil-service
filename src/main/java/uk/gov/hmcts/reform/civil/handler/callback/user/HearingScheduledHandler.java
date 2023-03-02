@@ -18,9 +18,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.math.BigDecimal;
@@ -60,7 +60,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
-    private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
+    private final HearingReferenceNumber hearingReferenceNumber;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,7 +79,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private String getHeader() {
-        return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
+        return format(HEARING_CREATED_HEADER, hearingReferenceNumber.generateHearingReference());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

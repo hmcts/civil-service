@@ -24,10 +24,10 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,7 +62,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
     @MockBean
-    private HearingReferenceNumberRepository hearingReferenceNumberRepository;
+    private HearingReferenceNumber hearingReferenceNumber;
     @MockBean
     private PublicHolidaysCollection publicHolidaysCollection;
 
@@ -283,8 +283,6 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnHearingNoticeCreated_WhenSubmitted() {
-            when(hearingReferenceNumberRepository.getHearingReferenceNumber()).thenReturn("000HN001");
-
             String header = "# Hearing notice created\n"
                 + "# Your reference number\n" + "# 000HN001";
 
