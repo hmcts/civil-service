@@ -3,11 +3,9 @@ package uk.gov.hmcts.reform.civil.service.docmosis.aos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -30,18 +28,15 @@ import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N10;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-    AcknowledgementOfClaimGeneratorForSpec.class,
-    JacksonAutoConfiguration.class
-})
-public class AcknowledgementOfClaimGeneratorForSpecTest {
+@ExtendWith(MockitoExtension.class)
+class AcknowledgementOfClaimGeneratorForSpecTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -54,16 +49,16 @@ public class AcknowledgementOfClaimGeneratorForSpecTest {
 
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
-    @MockBean
+    @Mock
     private UnsecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @Mock
     private RepresentativeService representativeService;
 
-    @Autowired
+    @InjectMocks
     private AcknowledgementOfClaimGeneratorForSpec generator;
 
     @BeforeEach
@@ -74,8 +69,9 @@ public class AcknowledgementOfClaimGeneratorForSpecTest {
 
     @Test
     void shouldGenerateAcknowledgementOfClaimForSpec_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N10)))
-            .thenReturn(new DocmosisDocument(N10.getDocumentTitle(), bytes));
+        // Given
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N10)))
+            .willReturn(new DocmosisDocument(N10.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE)))
@@ -102,7 +98,10 @@ public class AcknowledgementOfClaimGeneratorForSpecTest {
                     .build())
             .build();
 
+        // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        // Then
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
