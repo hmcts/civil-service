@@ -106,20 +106,24 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
+        //staff collection will hold ga doc accessible for judge and staff
         String fromGaList = docFieldName + gaDocSuffix;
         String toCivilStaffList = docFieldName + civilDocStaffSuffix;
         updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilStaffList);
+        //Claimant collection will hold ga doc accessible for Claimant
         String toCivilClaimantList = docFieldName + civilDocClaimantSuffix;
         if (canViewClaimant(civilCaseData, generalAppCaseData)) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                     civilCaseData, toCivilClaimantList);
         }
+        //RespondentSol collection will hold ga doc accessible for RespondentSol1
         String toCivilRespondentSol1List = docFieldName + civilDocRespondentSolSuffix;
         if (canViewResp(civilCaseData, generalAppCaseData, "1")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                     civilCaseData, toCivilRespondentSol1List);
         }
+        //Respondent2Sol collection will hold ga doc accessible for RespondentSol2
         String toCivilRespondentSol2List = docFieldName + civilDocRespondentSolTwoSuffix;
         if (canViewResp(civilCaseData, generalAppCaseData, "2")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
