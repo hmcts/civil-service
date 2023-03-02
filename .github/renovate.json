@@ -15,5 +15,6 @@
   ],
   "schedule": ["after 2am on sunday"],
   "prConcurrentLimit": 10,
-  "rebaseWhen": "never"
+  "rebaseWhen": "never",
+  "automerge": true
 }
