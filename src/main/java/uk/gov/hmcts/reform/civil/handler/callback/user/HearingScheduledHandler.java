@@ -78,14 +78,14 @@ public class HearingScheduledHandler extends CallbackHandler {
         return format(HEARING_TASKS);
     }
 
-    private String getHeader() {
-        return format(HEARING_CREATED_HEADER, hearingReferenceNumber.generateHearingReference());
+    private String getHeader(CaseData caseData) {
+        return format(HEARING_CREATED_HEADER, caseData.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
+            .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody())
             .build();
     }
@@ -166,6 +166,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.hearingReferenceNumber(hearingReferenceNumber.generateHearingReference());
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
