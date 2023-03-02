@@ -188,7 +188,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        
         Fee feeForGA = feesService.getFeeForGA(caseData);
+
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
                 .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
                 .fee(feeForGA)
