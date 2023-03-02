@@ -4,6 +4,9 @@ public class HearingReferenceNumber {
 
     private static String hearingReference = "000000";
 
+    private HearingReferenceNumber() {
+    }
+
     public static String generateHearingReference() {
         int hearingCount = Integer.parseInt(hearingReference);
         hearingCount++;
