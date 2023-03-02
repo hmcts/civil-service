@@ -46,11 +46,11 @@ public enum DocmosisTemplates {
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
 
     //HNL uplifted docs to be replaced with original once ready
-    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf"),
-    HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01213.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01219.docx", "%s_directions_questionnaire_form_%s.pdf");
+    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01208.docx", "%s_response_sealed_form.pdf"),
+    HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01215.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01212.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01214.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01220.docx", "%s_directions_questionnaire_form_%s.pdf");
 
 
     private final String template;
