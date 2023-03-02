@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -15,6 +18,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -24,15 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -408,5 +407,139 @@ class StateFlowEngineSpecTest {
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                 PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
     }
+
+    // Specified 1V1 represented with state transition from PENDING_CLAIM_ISSUED -> CLAIM_ISSUED
+    @Test()
+    void shouldGoClaimIssued_1v1_whenRepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpecClaimIssued()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        // Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName()
+            );
+    }
+
+    // Specified 1V2 both unrepresented with state transition from PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
+    // TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenBothUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued()
+            .takenOfflineDate(LocalDateTime.now())
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+            );
+    }
+
+    // Specified 1V1  unrepresented with state transition from  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC  ->
+    // CLAIM_ISSUED
+    @Test()
+    void shouldBeClaimIssued_1v1_whenCaseUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1UnrepresentedPendingClaimIssued()
+            .respondent1Represented(NO)
+            .claimNotificationDeadline(LocalDate.now().atStartOfDay().plusDays(14))
+            .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                               .expiryDate(LocalDate.now())
+                                               .citizenCaseRole("citizen")
+                                               .respondentCaseRole("respondent")
+                                               .accessCode("123").build())
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(), CLAIM_ISSUED.fullName()
+            );
+    }
+
+    // Specified 1V2 one unregistered with state transition from
+    // PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT   -> TAKEN_OFFLINE_UNREGISTERED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneRegistered() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2SameSolicitorBothUnregisteredPendingClaimIssued()
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(NO)
+            .addRespondent2(YES)
+            .respondent2(Party.builder().build())
+            .respondent2Represented(YES)
+            .respondent2OrgRegistered(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .takenOfflineDate(LocalDateTime.now())
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
+            );
+    }
+
+    // Specified 1V2 one unregistered and one unrepresented with state transition from
+    // PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT   -> TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued()
+            .takenOfflineDate(LocalDateTime.now())
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
+            );
+    }
 }
+
+
+
 

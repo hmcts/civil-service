@@ -7,15 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -38,6 +30,7 @@ public class CaseDataBuilderSpec {
     public static final LocalDateTime SUBMITTED_DATE_TIME = LocalDateTime.now();
     public static final LocalDateTime RESPONSE_DEADLINE = SUBMITTED_DATE_TIME.toLocalDate().plusDays(14)
         .atTime(23, 59, 59);
+    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
 
     // Create Claim
     protected CaseCategory caseAccessCategory;
@@ -78,10 +71,14 @@ public class CaseDataBuilderSpec {
     protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
     protected LocalDateTime respondent1TimeExtensionDate;
     protected LocalDateTime respondent2TimeExtensionDate;
+    protected LocalDateTime claimNotificationDeadline;
 
     //dates
     protected LocalDateTime submittedDate;
     protected LocalDate issueDate;
+    protected LocalDateTime takenOfflineDate;
+
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
@@ -202,6 +199,21 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
         this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec claimNotificationDeadline(LocalDateTime deadline) {
+        this.claimNotificationDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec takenOfflineDate(LocalDateTime takenOfflineDate) {
+        this.takenOfflineDate = takenOfflineDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
         return this;
     }
 
@@ -405,14 +417,14 @@ public class CaseDataBuilderSpec {
         } else {
             atStateSpec1v1DefendantUnrepresentedClaimSubmitted();
         }
-        
+
         ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
                                                             .customerReference("12345")
                                                             .build();
         return this;
     }
-    
+
     public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
         atStateSpec1v1ClaimSubmitted();
         ccdState = CASE_ISSUED;
@@ -421,7 +433,7 @@ public class CaseDataBuilderSpec {
                                                             .build();
         return this;
     }
-    
+
     public CaseDataBuilderSpec atStateClaim1v2SameSolicitorTimeExtension() {
         atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
@@ -551,6 +563,12 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
+    public CaseDataBuilderSpec atStateSpecClaimIssued() {
+        atStateSpec1v1RepresentedPendingClaimIssued();
+        claimNotificationDeadline = NOTIFICATION_DEADLINE;
+        return this;
+    }
+
     public static CaseDataBuilderSpec builder() {
         return new CaseDataBuilderSpec();
     }
@@ -590,11 +608,14 @@ public class CaseDataBuilderSpec {
             //dates
             .submittedDate(submittedDate)
             .issueDate(issueDate)
+            .claimNotificationDeadline(claimNotificationDeadline)
+            .takenOfflineDate(takenOfflineDate)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .build();
     }
 
