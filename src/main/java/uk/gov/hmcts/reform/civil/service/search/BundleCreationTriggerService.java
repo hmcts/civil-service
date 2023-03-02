@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class BundleCreationTriggerService extends ElasticSearchService {
@@ -26,8 +27,11 @@ public class BundleCreationTriggerService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(matchQuery("data.hearingDate", LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
-                            .must(beState(CaseState.HEARING_READINESS))
+                            .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
+                            .must(beState(CaseState.HEARING_READINESS)))
+                .should(boolQuery()
+                            .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
+                            .must(beState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING))
                 ), List.of("reference"), startIndex
         );
     }
