@@ -4,18 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespondentLiPResponse {
+public class FinancialDetailsLiP {
 
-    private YesOrNo partialAdmissionAlreadyPaid;
-    private String timelineComment;
-    private String evidenceComment;
-    private FinancialDetailsLiP respondent1LiPFinancialDetails;
+    private YesOrNo partnerPensionLiP;
+    private YesOrNo partnerDisabilityLiP;
+    private YesOrNo partnerSevereDisabilityLiP;
+    private String childrenEducationLiP;
 }
