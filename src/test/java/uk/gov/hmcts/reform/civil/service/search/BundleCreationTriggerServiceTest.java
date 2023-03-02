@@ -23,10 +23,10 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(3)))
+                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusWeeks(3)))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(3)))
+                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusWeeks(3)))
                         .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
         return new Query(query, List.of("reference"), fromValue);
     }
