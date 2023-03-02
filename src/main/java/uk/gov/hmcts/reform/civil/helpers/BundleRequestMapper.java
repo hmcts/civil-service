@@ -39,7 +39,7 @@ public class BundleRequestMapper {
                                                                 String caseTypeId, Long id) {
         String fileNameIdentifier =
             caseData.getCcdCaseReference() + "_" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(),
-            "ddMMyyyy") + "_";
+                                                                                    "ddMMyyyy") + "_";
         BundleCreateRequest bundleCreateRequest = BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
                              .caseData(mapCaseData(caseData,
@@ -61,7 +61,7 @@ public class BundleRequestMapper {
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName, Long id) {
         BundlingCaseData bundlingCaseData =
             BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
-                bundleConfigFileName)
+                    bundleConfigFileName)
                 .systemGeneratedCaseDocuments(mapSystemGeneratedcaseDocument(caseData.getSystemGeneratedCaseDocuments(), caseData.getOrderSDODocumentDJ()))
                 .servedDocumentFiles(mapServedDocuments(caseData.getServedDocumentFiles()))
                 .documentWitnessStatement(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatement(),
@@ -133,7 +133,8 @@ public class BundleRequestMapper {
                 .applicant1(caseData.getApplicant1())
                 .respondent1(caseData.getRespondent1())
                 .courtLocation(caseData.getHearingLocation().getValue().getLabel())
-                .hearingDate(caseData.getHearingDate())
+                .hearingDate(null != caseData.getHearingDate()
+                                 ? DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "dd-MM-yyyy") : null)
                 .ccdCaseReference(caseData.getCcdCaseReference())
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
@@ -215,7 +216,7 @@ public class BundleRequestMapper {
                 }
                 if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionUploadDate()).isPresent()) {
                     fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(witnessDocs.getValue()
-                                       .getWitnessOptionUploadDate(), "ddMMyyyy"));
+                                                                                      .getWitnessOptionUploadDate(), "ddMMyyyy"));
                 }
                 Document document = witnessDocs.getValue().getWitnessOptionDocument();
                 bundlingWitnessDocs.add(BundlingRequestDocument.builder()
@@ -224,7 +225,7 @@ public class BundleRequestMapper {
                                                               .documentUrl(document.getDocumentUrl())
                                                               .documentBinaryUrl(document.getDocumentBinaryUrl())
                                                               .documentFilename(document.getDocumentFileName()).build())
-                    .build());
+                                            .build());
 
             });
         }

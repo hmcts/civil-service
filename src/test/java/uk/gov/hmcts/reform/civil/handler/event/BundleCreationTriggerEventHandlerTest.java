@@ -68,16 +68,16 @@ class BundleCreationTriggerEventHandlerTest {
     @BeforeEach
     public void setup() {
         bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
-                                                   .stitchStatus("new")
-                                                   .stitchedDocument(null)
-                                                   .fileName("Trial Bundle.pdf")
-                                                   .description("This is trial bundle")
+                                            .stitchStatus("new")
+                                            .stitchedDocument(null)
+                                            .fileName("Trial Bundle.pdf")
+                                            .description("This is trial bundle")
+                                            .bundleHearingDate(LocalDate.of(2023, 12, 12))
                                             .stitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
-                                            .createdOn(LocalDateTime.of(2023, 12, 12, 1, 1, 1))
-                                                   .build()).build();
+                                            .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
+                                            .build()).build();
         List<Bundle> bundlesList = new ArrayList<>();
         bundlesList.add(bundle);
-
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
@@ -130,6 +130,7 @@ class BundleCreationTriggerEventHandlerTest {
             .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
             .hearingDate(LocalDate.of(2023, 3, 12))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .caseBundles(prepareCaseBundles())
             .build();
     }
 
@@ -237,6 +238,46 @@ class BundleCreationTriggerEventHandlerTest {
         Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
         Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
-                                );
+        );
+    }
+
+    @Test
+    void shouldReturnFalseWhenBundleHearingDateIsNotEqualToHearingDate() {
+        //Given: caseData with hearing date different from caseBundles hearing date
+        caseData.setHearingDate(LocalDate.of(2023, 10, 12));
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        //When: getIsBundleCreatedForHearingDate is called
+        //Then: its should return false indicating that bundle is not already created for this hearingDate
+        Assertions.assertEquals(bundleCreationTriggerEventHandler.getIsBundleCreatedForHearingDate(1L), false);
+    }
+
+    @Test
+    void shouldReturnTrueWhenBundleHearingDateIsEqualToHearingDate() {
+        //Given : caseData with hearing date same as caseBundles hearing date
+        caseData.setHearingDate(LocalDate.of(2023, 12, 12));
+        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        //When: getIsBundleCreatedForHearingDate is called
+        //Then: its should return true indicating that bundle is already created for this hearingDate
+        Assertions.assertEquals(true, bundleCreationTriggerEventHandler.getIsBundleCreatedForHearingDate(1L));
+    }
+
+    private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
+        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.of(LocalDateTime.now()))
+            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
+            .build()));
+        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.of(LocalDateTime.now()))
+            .bundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))
+            .build()));
+        return caseBundles;
     }
 }
