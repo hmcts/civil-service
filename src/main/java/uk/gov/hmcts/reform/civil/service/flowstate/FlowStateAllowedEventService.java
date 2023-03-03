@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -108,6 +109,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 
 @Service
 @RequiredArgsConstructor
@@ -252,7 +254,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS
             )
         ),
 
@@ -484,6 +487,7 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 TAKE_CASE_OFFLINE,
                 GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE
@@ -650,6 +654,13 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_SDO.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                AMEND_PARTY_DETAILS
             )
         ),
         entry(
@@ -929,6 +940,7 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 TAKE_CASE_OFFLINE,
                 GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE

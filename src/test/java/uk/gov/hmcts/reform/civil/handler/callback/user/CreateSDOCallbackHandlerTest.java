@@ -355,6 +355,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -390,6 +392,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -431,6 +435,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -461,7 +467,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
         }
 
         private final LocalDate date = LocalDate.of(2020, 1, 15);
@@ -974,36 +979,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPrePopulateOrderDetailsPages_ForSmallClaims_WhenIsHearingAndListingSDOEnabledIsFalse() {
-            CaseData caseData = CaseDataBuilder.builder().setClaimTypeToSpecClaim().atStateClaimDraft()
-                .applicant1DQWithLocation().build();
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
-                .isEqualTo("The claimant must by no later than 14 days before the hearing date, pay the court the "
-                               + "required hearing fee or submit a fully completed application for Help with Fees. \n"
-                               + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
-                               + "claim will be struck without further order.");
-
-            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
-                .isEqualTo("Each party must upload to the Digital Portal copies of all documents which they wish the"
-                               + " court to consider when reaching its decision not less than 14 days before "
-                               + "the hearing.");
-            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
-                .isEqualTo("The court may refuse to consider any document which has not been uploaded to the "
-                               + "Digital Portal by the above date.");
-
-            assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
-                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have this "
-                               + "Order set aside or varied. Any such application must be received by the Court, "
-                               + "together with the appropriate fee by 4pm on");
-        }
-
-        @Test
         void testSDOSortsLocationListThroughOrganisationPartyType() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
@@ -1093,21 +1068,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
                 .isEqualTo("12.0%");
-        }
-
-        @Test
-        void shouldNotSetValuesForHnLIfToggleDisabled() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("disposalHearingHearingTime").isNull();
-            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").isNull();
-            assertThat(response.getData()).extracting("fastTrackHearingTime").isNull();
-            assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").isNull();
         }
     }
 

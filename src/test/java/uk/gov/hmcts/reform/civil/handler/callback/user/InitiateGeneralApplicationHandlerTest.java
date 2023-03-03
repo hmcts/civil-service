@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -37,10 +36,8 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -548,12 +545,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             DynamicList dynamicList = getDynamicList(response);
-            List<String> actualPbas = dynamicList.getListItems().stream()
-                    .map(DynamicListElement::getLabel)
-                    .collect(Collectors.toList());
-
-            assertThat(actualPbas).containsOnly("12345", "98765");
-            assertThat(dynamicList.getValue()).isEqualTo(DynamicListElement.EMPTY);
+            assertThat(dynamicList).isEqualTo(null);
         }
 
         @Test
@@ -571,9 +563,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(getDynamicList(response))
-                    .isEqualTo(DynamicList.builder()
-                            .value(DynamicListElement.builder().code(null).label(null).build())
-                            .listItems(Collections.<DynamicListElement>emptyList()).build());
+                    .isEqualTo(null);
         }
 
         @Test
