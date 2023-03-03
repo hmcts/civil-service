@@ -64,7 +64,6 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
     @BeforeEach
     void setup() {
         when(representativeService.getRespondent1Representative(any())).thenReturn(representative);
-        when(representativeService.getRespondent2Representative(any())).thenReturn(representative);
     }
 
     @Test
@@ -79,7 +78,23 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.getSolicitorReferences().setRespondentSolicitor2Reference("Not Provided");
-        AcknowledgementOfClaimFormForSpec expectedDocmosisData = AcknowledgementOfClaimFormForSpec.builder()
+        AcknowledgementOfClaimFormForSpec expectedDocmosisData = getExpectedFormData(caseData);
+
+        // When
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        // Then
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(expectedDocmosisData, N10);
+    }
+
+    private AcknowledgementOfClaimFormForSpec getExpectedFormData(CaseData caseData) {
+        return AcknowledgementOfClaimFormForSpec.builder()
             .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
             .referenceNumber(LEGACY_CASE_REFERENCE)
             .submittedOn(LocalDate.now())
@@ -97,17 +112,5 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
                             .orElse(""))
                     .build())
             .build();
-
-        // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        // Then
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-
-        verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_SERVICE));
-        verify(documentGeneratorService)
-            .generateDocmosisDocument(expectedDocmosisData, N10);
     }
 }
