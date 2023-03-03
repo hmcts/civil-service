@@ -163,6 +163,7 @@ public class CaseDataParent implements MappableObject {
 
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
+    private final DynamicList hearingMethodValues;
     private final DynamicList smallClaimsMethodInPerson;
     private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
