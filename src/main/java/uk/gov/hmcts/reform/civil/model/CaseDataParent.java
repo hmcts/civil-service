@@ -358,7 +358,11 @@ public class CaseDataParent implements MappableObject {
 
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
-    private final MediationCUI applicant1ClaimMediationSpecRequiredCUI;
+
+    @JsonUnwrapped
+    private final MediationLip applicant1ClaimMediationSpecRequiredLip;
+
+    private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
