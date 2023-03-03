@@ -68,11 +68,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         );
 
         if (stitchEnabled) {
-
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            System.out.println(" documentMetaDataList list here " + documentMetaDataList.size());
             if (documentMetaDataList.size() > 1) {
-                System.out.println(" inside if condition ");
                 CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
@@ -80,14 +77,10 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                     sealedForm.getDocumentName(),
                     caseData
                 );
-                System.out.println(" inside if condition 2 ");
                 if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                    System.out.println(" inside if condition 3 ");
                     builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
                 }
-                System.out.println(" before adding this list to system ");
                 caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-                System.out.println(" after adding this list to system ");
 
             }
             //caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
