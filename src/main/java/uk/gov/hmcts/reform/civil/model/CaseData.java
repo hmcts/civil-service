@@ -734,13 +734,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isNotRejectDefendantPaymentPlan() {
-        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> PAYMENT_PLAN = EnumSet.of(
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
         return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !PAYMENT_PLAN.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 }
