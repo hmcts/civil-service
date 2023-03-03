@@ -83,7 +83,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
 
             }
-            //caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(sealedForm);
