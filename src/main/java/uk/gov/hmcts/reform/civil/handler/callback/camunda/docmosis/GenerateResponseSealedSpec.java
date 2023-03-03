@@ -29,7 +29,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +73,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             System.out.println(" documentMetaDataList list here " + documentMetaDataList.size());
             if (documentMetaDataList.size() > 1) {
                 System.out.println(" inside if condition ");
-            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+                CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 sealedForm.getDocumentName(),
@@ -82,14 +81,15 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData
             );
                 System.out.println(" inside if condition 2 ");
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                System.out.println(" inside if condition 3 ");
-                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
-            }
+                if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
+                    System.out.println(" inside if condition 3 ");
+                    builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+                }
                 System.out.println(" before adding this list to system ");
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+                caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
                 System.out.println(" after adding this list to system ");
-           }
+
+            }
             //caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
