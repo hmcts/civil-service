@@ -5,14 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -22,6 +27,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -29,12 +35,19 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID_SPEC;
 
 @SpringBootTest(classes = {
     AssignCaseToUserHandler.class,
@@ -74,14 +87,49 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
-        void shouldReturnSupplementaryDataOnSubmitted() {
+        void shouldNotUpdateSupplementaryDataOnSubmittedWhenGlobalSearchOff() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService, never()).setSupplementaryData(any(), any());
+        }
+
+        @Test
+        void shouldReturnSupplementaryDataOnSubmittedWhenGlobalSearchOn() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
+        }
+    }
+
+    @Nested
+    class AssignHmctsServiceIdSpec {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC.name(), CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldNotUpdateSpecSupplementaryDataOnSubmittedWhenGlobalSearchOff() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService, never()).setSupplementaryData(any(), any());
+        }
+
+        @Test
+        void shouldReturnSpecSupplementaryDataWhenGlobalSearchEnabled() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
 
     }
@@ -91,6 +139,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -132,6 +181,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -164,6 +214,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -193,6 +244,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2DS() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -227,6 +279,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator1v2DSUnregisteredRespondent2() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -257,6 +310,41 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
+                                                                     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+    }
+
+    @Test
+    void shouldReturnUnSpecCamundaTask_whenUnSpecEvent() {
+        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                                 .request(CallbackRequest.builder().eventId(
+            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
+    }
+
+    @Test
+    void shouldReturnSpecCamundaTask_whenSpecEvent() {
+        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                                 .request(CallbackRequest.builder().eventId(
+            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC").build()).build())).isEqualTo(TASK_ID_SPEC);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class,
+        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1", "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC" }, mode = EnumSource.Mode.EXCLUDE
+    )
+    void shouldThrowExceptionWhenCaseEventIsInvalid(CaseEvent caseEvent) {
+        // Given: an invalid event id
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .request(CallbackRequest.builder().eventId(caseEvent.name()).build()).build();
+        // When: I call the camundaActivityId
+        // Then: an exception is thrown
+        CallbackException ex = assertThrows(CallbackException.class, () -> assignCaseToUserHandler.camundaActivityId(callbackParams),
+                                            "A CallbackException was expected to be thrown but wasn't.");
+        assertThat(ex.getMessage()).contains("Callback handler received illegal event");
+    }
+
     private void verifyApplicantSolicitorOneRoles() {
         verify(coreCaseUserService).assignCase(
             caseData.getCcdCaseReference().toString(),
@@ -285,4 +373,18 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         return supplementaryDataUpdates;
     }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryDataSpec() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA6");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
+    }
+
 }

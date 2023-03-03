@@ -6,9 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.lang.Collections;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -643,10 +643,10 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
-    public CaseData getTestCaseDataSPEC(SuperClaimType claimType) {
+    public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
         return CaseData.builder()
             .ccdCaseReference(1234L)
-            .superClaimType(claimType)
+            .caseAccessCategory(claimType)
             .courtLocation(CourtLocation.builder()
                                .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")
@@ -743,7 +743,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getCaseDataForWorkAllocation(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type claimant1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
@@ -842,13 +842,13 @@ public class GeneralApplicationDetailsBuilder {
                 .respondent2DQ(respondent2DQ)
                 .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }
 
     public CaseData getCaseDataForWorkAllocation1V1(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type respondent1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ) {
@@ -940,13 +940,13 @@ public class GeneralApplicationDetailsBuilder {
             .respondent1DQ(respondent1DQ)
             .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }
 
     public CaseData getMultiCaseDataForWorkAllocationForOne_V_Two(CaseState state,
-                                                 SuperClaimType claimType,
+                                                 CaseCategory claimType,
                                                  Party.Type claimant1Type,
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
@@ -1047,7 +1047,7 @@ public class GeneralApplicationDetailsBuilder {
             .respondent2DQ(respondent2DQ)
             .ccdState(state);
         if (claimType != null) {
-            builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+            builder.caseAccessCategory(claimType);
         }
         return builder.build();
     }
@@ -1229,6 +1229,19 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithGeneralOrderStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
     public CaseData getTestCaseDataWithDismissalOrderPDFDocument(CaseData caseData) {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
@@ -1238,6 +1251,17 @@ public class GeneralApplicationDetailsBuilder {
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
             .dismissalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
             .build();
+    }
+
+    public CaseData getTestCaseDataWithDismissalOrderStaffPDFDocument(CaseData caseData) {
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .dismissalOrderDocStaff(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+                .build();
     }
 
     public CaseData getTestCaseDataWithDirectionOrderPDFDocument(CaseData caseData) {
@@ -1256,7 +1280,23 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
-    public CaseData getTestCaseDataWithHearingOrderDocumentPDFDocument(CaseData caseData) {
+    public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                        .value(pdfDocument).build()))
+                .directionOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
+    public CaseData getTestCaseDataWithHearingNoticeDocumentPDFDocument(CaseData caseData) {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
@@ -1264,6 +1304,18 @@ public class GeneralApplicationDetailsBuilder {
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .hearingNoticeDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
+    public CaseData getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument(CaseData caseData) {
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .hearingNoticeDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                         .value(pdfDocument).build()))
                 .build();
     }
