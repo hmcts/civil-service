@@ -38,8 +38,8 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStatePendingClaimIssued()
                 .build()
                 .builder()
-                .mediation(Mediation.
-                               builder()
+                .mediation(Mediation
+                               .builder()
                                .mediationSettlementAgreedAt(LocalDate.now())
                                .build())
                 .build();
