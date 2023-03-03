@@ -74,12 +74,12 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             if (documentMetaDataList.size() > 1) {
                 System.out.println(" inside if condition ");
                 CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                documentMetaDataList,
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                sealedForm.getDocumentName(),
-                sealedForm.getDocumentName(),
-                caseData
-            );
+                    documentMetaDataList,
+                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    sealedForm.getDocumentName(),
+                    sealedForm.getDocumentName(),
+                    caseData
+                );
                 System.out.println(" inside if condition 2 ");
                 if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                     System.out.println(" inside if condition 3 ");
