@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -139,6 +140,9 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
+
+    @JsonUnwrapped
+    private final Mediation mediation;
 
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
