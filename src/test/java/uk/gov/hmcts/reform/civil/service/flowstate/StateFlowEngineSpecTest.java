@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -18,8 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -29,8 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
@@ -447,8 +441,7 @@ class StateFlowEngineSpecTest {
     @Test()
     void shouldGoOffline_1v2_whenBothUnrepresented() {
         //Given
-        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued()
-            .takenOfflineDate(LocalDateTime.now())
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineUnrepresentedDefendantSameSolicitor()
             .build();
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -471,14 +464,7 @@ class StateFlowEngineSpecTest {
     @Test()
     void shouldBeClaimIssued_1v1_whenCaseUnrepresented() {
         //Given
-        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1UnrepresentedPendingClaimIssued()
-            .respondent1Represented(NO)
-            .claimNotificationDeadline(LocalDate.now().atStartOfDay().plusDays(14))
-            .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                               .expiryDate(LocalDate.now())
-                                               .citizenCaseRole("citizen")
-                                               .respondentCaseRole("respondent")
-                                               .accessCode("123").build())
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimIssuedFromPendingClaimIssuedUnrepresentedDefendant1v1Spec()
             .build();
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -501,15 +487,7 @@ class StateFlowEngineSpecTest {
     @Test()
     void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneRegistered() {
         //Given
-        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2SameSolicitorBothUnregisteredPendingClaimIssued()
-            .respondent1Represented(YES)
-            .respondent1OrgRegistered(NO)
-            .addRespondent2(YES)
-            .respondent2(Party.builder().build())
-            .respondent2Represented(YES)
-            .respondent2OrgRegistered(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .takenOfflineDate(LocalDateTime.now())
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineOneUnregisteredDefendantDifferentSolicitor()
             .build();
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -532,8 +510,7 @@ class StateFlowEngineSpecTest {
     @Test()
     void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneUnrepresented() {
         //Given
-        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued()
-            .takenOfflineDate(LocalDateTime.now())
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineOneDefendantUnregisteredOtherUnrepresented()
             .build();
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

@@ -578,6 +578,42 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
+    public CaseDataBuilderSpec atStateClaimIssuedFromPendingClaimIssuedUnrepresentedDefendant1v1Spec() {
+        atStateSpec1v1UnrepresentedPendingClaimIssued();
+        respondent1Represented = NO;
+        claimNotificationDeadline = LocalDate.now().atStartOfDay().plusDays(14);
+        respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
+                                           .expiryDate(LocalDate.now())
+                                           .citizenCaseRole("citizen")
+                                           .respondentCaseRole("respondent")
+                                           .accessCode("123").build();
+
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateTakenOfflineUnrepresentedDefendantSameSolicitor() {
+        atStateSpec1v2SameSolicitorBothUnrepresentedPendingClaimIssued();
+        issueDate = LocalDate.now();
+        takenOfflineDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateTakenOfflineOneUnregisteredDefendantDifferentSolicitor() {
+        atStateSpec1v2DifferentSolicitorBothUnregisteredPendingClaimIssued();
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        issueDate = LocalDate.now();
+        takenOfflineDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateTakenOfflineOneDefendantUnregisteredOtherUnrepresented() {
+        atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPendingClaimIssued();
+        issueDate = LocalDate.now();
+        takenOfflineDate = LocalDateTime.now();
+        return this;
+    }
+
     public static CaseDataBuilderSpec builder() {
         return new CaseDataBuilderSpec();
     }
