@@ -12,5 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Mediation {
+
     private LocalDate mediationSettlementAgreedAt;
 }
