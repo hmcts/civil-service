@@ -674,7 +674,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (categorySearchResult.isPresent()) {
             List<Category> categories = categorySearchResult.get().getCategories().stream()
                 .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).collect(Collectors.toList());
-            hearingMethodList = DynamicList.fromList(categories, Category::getValueCy, null, false);
+            hearingMethodList = DynamicList.fromList(categories, Category::getValueEn, null, false);
         } else {
             hearingMethodList = DynamicList.fromList(List.of());
         }
