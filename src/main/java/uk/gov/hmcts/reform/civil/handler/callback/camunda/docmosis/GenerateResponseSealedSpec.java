@@ -69,17 +69,20 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                documentMetaDataList,
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                sealedForm.getDocumentName(),
-                sealedForm.getDocumentName(),
-                caseData
-            );
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+            if (documentMetaDataList.size() > 1) {
+                CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+                    documentMetaDataList,
+                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    sealedForm.getDocumentName(),
+                    sealedForm.getDocumentName(),
+                    caseData
+                );
+                if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
+                    builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+                }
+                caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+
             }
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(sealedForm);
