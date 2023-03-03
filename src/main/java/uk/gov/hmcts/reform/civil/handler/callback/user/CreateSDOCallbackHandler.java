@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -67,9 +68,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -95,6 +98,9 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
+    private static final String HEARING_CHANNEL = "HearingChannel";
+    private static final String SPEC_SERVICE_ID = "AAA6";
+    private static final String UNSPEC_SERVICE_ID = "AAA7";
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
         + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
@@ -131,6 +137,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final CategoryService categoryService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -168,7 +175,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
 
+        // Call to LoV API
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM) ?
+            SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
+        updatedData.hearingMethodValues(locationsList);
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
