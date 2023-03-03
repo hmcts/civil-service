@@ -22,9 +22,7 @@ public class ProposePaymentPlanConfText implements RespondToResponseConfirmation
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if ((YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+        if (caseData.isNotRejectDefendantPaymentPlan()) {
             return Optional.empty();
         }
 
