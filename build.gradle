@@ -234,9 +234,6 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
 }
 
@@ -248,16 +245,10 @@ task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  onlyIf {
-    return System.env.NIGHTLY_RUN != 'true'
-  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
 
 task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
 }
 
