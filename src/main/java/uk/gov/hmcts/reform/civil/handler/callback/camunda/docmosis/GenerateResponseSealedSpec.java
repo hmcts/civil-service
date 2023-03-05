@@ -29,6 +29,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +70,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            log.info("DocumentMetaDataList size: " + documentMetaDataList.size());
             if (documentMetaDataList.size() > 1) {
                 CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                     documentMetaDataList,
