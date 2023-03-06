@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Mediation {
 
-    private String unsuccessfulMediationReasons;
+    private String unsuccessfulMediationReason;
 
 }
