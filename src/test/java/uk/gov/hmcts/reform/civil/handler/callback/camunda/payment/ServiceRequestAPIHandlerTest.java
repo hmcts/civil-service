@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,7 +79,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+                .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -193,6 +195,33 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //THEN
             assertThat(handler.camundaActivityId(params)).isEqualTo("ServiceRequestAPI");
+        }
+
+        @Test
+        void shouldHandleException_whenServiceRequestFails() {
+            //GIVEN
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenThrow(FeignException.class);
+            //WHEN
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //THEN
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldNotMakePaymentServiceRequestForClaimFee_whenInvoked() {
+            //GIVEN
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference()
+                .toBuilder().hearingDueDate(LocalDate.now().plusWeeks(1))
+                .hearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build()).build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //WHEN
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //THEN
+            verifyNoInteractions(paymentsService);
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 }
