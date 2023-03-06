@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 
 @Service
@@ -56,11 +57,9 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
     void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
         List<Element<UploadEvidenceDocumentType>> applicantEvidenceUploadedAfterBundle = new ArrayList<>();
         Optional<Bundle> bundleDetails =
-            caseData.getCaseBundles().stream().map(IdValue::getValue).filter(bundle -> bundle.getCreatedOn().isPresent())
+            caseData.getCaseBundles().stream().map(IdValue::getValue)
                 .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
-        if (bundleDetails.isEmpty()) {
-            //If no bundle is created then return
-        } else {
+        if (bundleDetails.isPresent() && nonNull(bundleDetails.get().getCreatedOn())) {
             addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureList(), bundleDetails,
                              EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
             );
