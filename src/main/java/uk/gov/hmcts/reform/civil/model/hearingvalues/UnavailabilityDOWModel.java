@@ -5,8 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.hearing.DOW;
 import uk.gov.hmcts.reform.civil.enums.hearing.DOWUnavailabilityType;
+
+import java.time.DayOfWeek;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder(toBuilder = true)
@@ -15,6 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.hearing.DOWUnavailabilityType;
 @AllArgsConstructor
 public class UnavailabilityDOWModel {
 
-    private DOW dow;
+    private DayOfWeek dow;
     private DOWUnavailabilityType dowUnavailabilityType;
 }
