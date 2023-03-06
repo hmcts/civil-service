@@ -4201,7 +4201,7 @@ public class CaseDataBuilder {
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataWithHearingDate() {
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDate() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
@@ -4217,11 +4217,11 @@ public class CaseDataBuilder {
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
-            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
@@ -4237,7 +4237,7 @@ public class CaseDataBuilder {
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
-            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                                       .fee(
                                           Fee.builder()
@@ -4249,14 +4249,14 @@ public class CaseDataBuilder {
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
-            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
