@@ -186,7 +186,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
         switch (allocatedTrack) {
             case SMALL_CLAIM:
-                hearingFee.calculatedAmountInPence(new BigDecimal(54500));
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                 break;
             case FAST_CLAIM:
                 int claimAmount;
@@ -198,10 +198,10 @@ public class HearingScheduledHandler extends CallbackHandler {
                 hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(claimAmount));
                 break;
             case MULTI_CLAIM:
-                hearingFee.calculatedAmountInPence(new BigDecimal(117500));
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
                 break;
             default:
-                hearingFee.calculatedAmountInPence(new BigDecimal(0));
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(0));
         }
         caseDataBuilder.hearingFee(hearingFee).build();
     }
