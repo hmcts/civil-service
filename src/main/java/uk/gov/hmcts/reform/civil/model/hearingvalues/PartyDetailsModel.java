@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartyDetailsModel {
+
     private String partyID;
     private PartyType partyType;
     private String partyName;

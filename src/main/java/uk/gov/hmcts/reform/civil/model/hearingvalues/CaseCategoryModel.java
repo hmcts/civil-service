@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder(toBuilder = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseCategoryModel {
+
     private CategoryType categoryType;
     private String categoryValue;
     private String categoryParent;

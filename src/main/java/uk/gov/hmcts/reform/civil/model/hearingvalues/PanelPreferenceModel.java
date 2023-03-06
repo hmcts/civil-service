@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.RequirementType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PanelPreferenceModel {
+
     private String memberID;
     private MemberType memberType;
     private RequirementType requirementType;

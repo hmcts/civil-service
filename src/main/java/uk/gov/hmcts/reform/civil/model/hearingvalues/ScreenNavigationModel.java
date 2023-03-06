@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScreenNavigationModel {
+
     private String screenName;
     private String conditionKey;
     private List<NavigationModel> navigation;

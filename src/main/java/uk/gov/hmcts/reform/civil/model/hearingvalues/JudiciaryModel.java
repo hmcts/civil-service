@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.hearingvalues;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JudiciaryModel {
+
     private List<String> roleType;
     private List<String> authorisationTypes;
     private List<String> authorisationSubType;

@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartyFlagsDisplayModel {
+
     private String displayName;
     private List<String> displayPath;
 }

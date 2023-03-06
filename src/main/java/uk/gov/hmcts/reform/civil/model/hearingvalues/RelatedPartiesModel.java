@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RelatedPartiesModel {
+
     private String relatedPartyID;
     private String relationshipType;
 }

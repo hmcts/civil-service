@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PanelComposition {
+
     private String memberType;
     private Integer count;
 }

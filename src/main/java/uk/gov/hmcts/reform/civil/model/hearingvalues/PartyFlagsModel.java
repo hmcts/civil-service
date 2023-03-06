@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartyFlagsModel {
+
     private String partyID;
     private String partyName;
     private String flagParentId;

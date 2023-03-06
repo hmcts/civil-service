@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnavailabilityRangeModel {
+
     private String unavailableFromDate;
     private String unavailableToDate;
     private UnavailabilityType unavailabilityType;
