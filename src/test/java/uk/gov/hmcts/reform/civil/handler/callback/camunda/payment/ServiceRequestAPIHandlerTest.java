@@ -123,7 +123,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotMakePaymentServiceRequestForHearingFee_whenServiceRequestWasAlreadyIssued() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDate();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
 
