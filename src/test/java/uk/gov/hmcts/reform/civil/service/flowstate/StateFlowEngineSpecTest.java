@@ -4,6 +4,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
@@ -33,6 +35,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -408,5 +413,122 @@ class StateFlowEngineSpecTest {
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                 PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
     }
+
+    // Specified 1V1 represented with state transition from PENDING_CLAIM_ISSUED -> CLAIM_ISSUED
+    @Test()
+    void shouldGoClaimIssued_1v1_whenRepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpecClaimIssued()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        // Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName()
+            );
+    }
+
+    // Specified 1V2 both unrepresented with state transition from PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
+    // TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenBothUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineUnrepresentedDefendantSameSolicitor()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+            );
+    }
+
+    // Specified 1V1  unrepresented with state transition from  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC  ->
+    // CLAIM_ISSUED
+    @Test()
+    void shouldBeClaimIssued_1v1_whenCaseUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimIssuedFromPendingClaimIssuedUnrepresentedDefendant1v1Spec()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(), CLAIM_ISSUED.fullName()
+            );
+    }
+
+    // Specified 1V2 one unregistered with state transition from
+    // PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT   -> TAKEN_OFFLINE_UNREGISTERED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneRegistered() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineOneUnregisteredDefendantDifferentSolicitor()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
+            );
+    }
+
+    // Specified 1V2 one unregistered and one unrepresented with state transition from
+    // PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT   -> TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT
+    @Test()
+    void shouldGoOffline_1v2_whenCaseOneUnregisteredAndOneUnrepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineOneDefendantUnregisteredOtherUnrepresented()
+            .build();
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(5)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
+            );
+    }
 }
+
+
+
 
