@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -94,5 +95,15 @@ public class NotificationUtils {
         } else {
             return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
         }
+    }
+
+    public static boolean shouldSkipEventForRespondent1LiP(CaseData caseData) {
+        return NO.equals(caseData.getRespondent1Represented())
+            && caseData.getRespondentSolicitor1EmailAddress() == null;
+    }
+
+    public static boolean shouldSkipEventForRespondent2LiP(CaseData caseData) {
+        return NO.equals(caseData.getRespondent2Represented())
+            && caseData.getRespondentSolicitor2EmailAddress() == null;
     }
 }
