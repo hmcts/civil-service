@@ -100,7 +100,7 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
             caseData.getCaseBundles().stream().map(IdValue::getValue).filter(bundle -> bundle.getCreatedOn().isPresent())
                 .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
 
-        if (bundleDetails.isEmpty() || bundleDetails.get().getCreatedOn().isEmpty()) {
+        if (bundleDetails.isEmpty()) {
             //If no bundle is created then return
         } else {
             addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes(), bundleDetails,
