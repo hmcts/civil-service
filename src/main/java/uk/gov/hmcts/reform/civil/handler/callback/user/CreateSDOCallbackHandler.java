@@ -667,8 +667,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private DynamicList getHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM) ?
-            SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken, HEARING_CHANNEL, serviceId
         );
