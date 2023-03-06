@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NavigationModel {
+
     private String conditionOperator;
     private String conditionValue;
     private String resultValue;

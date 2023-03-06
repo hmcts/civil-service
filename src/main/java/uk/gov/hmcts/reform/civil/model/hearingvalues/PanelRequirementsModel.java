@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PanelRequirementsModel {
+
     private List<String> roleType;
     private List<String> authorisationTypes;
     private List<String> authorisationSubTypes;

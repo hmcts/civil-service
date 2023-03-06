@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.DOWUnavailabilityType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnavailabilityDOWModel {
-    private DOW DOW;
-    private DOWUnavailabilityType DOWUnavailabilityType;
+
+    private DOW dow;
+    private DOWUnavailabilityType dowUnavailabilityType;
 }
