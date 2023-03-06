@@ -179,7 +179,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .ifPresent(updatedData::caseManagementLocation);
 
         DynamicList hearingMethodList = getHearingMethodList(callbackParams, caseData);
-        updatedData.hearingMethodValues(hearingMethodList);
+        updatedData.hearingMethodValuesFastTrack(hearingMethodList);
+        updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
