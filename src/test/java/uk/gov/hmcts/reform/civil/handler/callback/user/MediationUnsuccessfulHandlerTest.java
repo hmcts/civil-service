@@ -14,8 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.time.LocalDate;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -25,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
     JacksonAutoConfiguration.class,
 })
 class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     private MediationUnsuccessfulHandler handler;
 
