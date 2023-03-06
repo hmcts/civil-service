@@ -147,6 +147,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Value("${court-location.unspecified-claim.epimms-id}")
     private String epimmsId;
 
+    @Value("${wa.featureToggle}")
+    private String featureToggle;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -179,7 +182,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
-
+        caseDataBuilder.featureToggleWA(featureToggle);
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
 
