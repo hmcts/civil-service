@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -838,6 +839,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -858,6 +860,7 @@ public class FlowStateAllowedEventService {
             FULL_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -877,6 +880,7 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
