@@ -68,7 +68,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
     private CallbackResponse getLitigationFriend(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
         String selectedOption = Optional.of(caseData).map(CaseData::getSelectLitigationFriend)
             .map(DynamicList::getValue).map(DynamicListElement::getLabel).orElse("").split(":")[0]
             .toUpperCase();
@@ -87,7 +87,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = time.now();
 
-        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(ADD_DEFENDANT_LITIGATION_FRIEND));
 
         boolean diffSolicitors = caseData.getRespondent2SameLegalRepresentative() == null
@@ -144,7 +144,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             caseDataBuilder.selectLitigationFriend(DynamicList.fromList(buildDefendantOptions(caseData)));
