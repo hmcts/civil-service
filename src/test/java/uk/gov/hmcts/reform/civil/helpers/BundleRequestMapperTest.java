@@ -56,6 +56,16 @@ class BundleRequestMapperTest {
         assertNotNull(bundleCreateRequest);
         assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
                          .getDocumentWitnessStatement().get(0).getValue().getDocumentFileName());
+        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
+            .getDocumentWitnessStatementRes().get(0).getValue().getDocumentFileName());
+        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
+            .getDocumentWitnessStatementRes2().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
+            .getDocumentExpertReport().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
+            .getDocumentExpertReportRes().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
+            .getDocumentExpertReportRes2().get(0).getValue().getDocumentFileName());
     }
 
     private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -88,6 +98,8 @@ class BundleRequestMapperTest {
             .documentJointStatementRes2(expertEvidenceDocs)
             .documentAnswersRes2(expertEvidenceDocs)
             .documentQuestionsRes2(expertEvidenceDocs)
+            .orderSDODocumentDJ(Document.builder().documentFileName("DJ SDO Order")
+                                    .documentBinaryUrl(TEST_URL).documentUrl(TEST_URL).build())
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .servedDocumentFiles(servedDocumentFiles)
             .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
@@ -122,7 +134,9 @@ class BundleRequestMapperTest {
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .expertOptionName("FirstName LastName").build()));
 
         return  expertEvidenceDocs;
     }
@@ -168,8 +182,28 @@ class BundleRequestMapperTest {
                                                                                                        "test", "test",
                                                                                                        1L
         );
-
         // Then
         assertNotNull(bundleCreateRequest);
+    }
+
+    @Test
+    void testBundleCreateRequestMapperForOneRespondentAndOneApplicant() {
+        // Given: Casedata with Applicant2 and Respondent2 as NO
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+            .hearingDate(LocalDate.now())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .addApplicant2(YesOrNo.NO)
+            .addRespondent2(YesOrNo.NO)
+            .build();
+
+        // When: mapCaseDataToBundleCreateRequest is called
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+                                                                                                           ".yaml",
+                                                                                                       "test", "test",
+                                                                                                       1L
+        );
+        // Then: hasApplicant2 and hasRespondant2 should return false
+        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
+        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
 }

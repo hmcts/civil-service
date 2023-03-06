@@ -97,9 +97,8 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
     void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
         List<Element<UploadEvidenceDocumentType>> respondentEvidenceUploadedAfterBundle = new ArrayList<>();
-        Optional<Bundle> bundleDetails =
-            caseData.getCaseBundles().stream().map(IdValue::getValue)
-                .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
+        Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
+            .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
         if (bundleDetails.isPresent() && nonNull(bundleDetails.get().getCreatedOn())) {
             addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes(), bundleDetails,
                              EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()

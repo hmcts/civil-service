@@ -132,11 +132,11 @@ public class Bundle implements MappableObject {
     }
 
     public Optional<LocalDate> getBundleHearingDate() {
-        return bundleHearingDate;
+        return checkIsOptional(bundleHearingDate);
     }
 
     public Optional<String> getStitchingFailureMessage() {
-        return stitchingFailureMessage;
+        return checkIsOptional(stitchingFailureMessage);
     }
 
     //It is possible for the Optional types to be instantiated as null e.g. through Jackson
