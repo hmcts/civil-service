@@ -144,12 +144,20 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private String getDescription(String eventId, Map data, String state, CaseData caseData) {
         Object claimProceedsInCaseman = data.get("claimProceedsInCaseman");
+        Object claimProceedsInCasemanLR = data.get("claimProceedsInCasemanLR");
         FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
 
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
+            String claimString;
+            String[] claimArray = new String[0];
             if (Objects.nonNull(claimProceedsInCaseman)) {
-                String claimString = claimProceedsInCaseman.toString();
-                String[] claimArray = claimString.split(",");
+                claimString = claimProceedsInCaseman.toString();
+                claimArray = claimString.split(",");
+            } else if (Objects.nonNull(claimProceedsInCasemanLR)) {
+                claimString = claimProceedsInCasemanLR.toString();
+                claimArray = claimString.split(",");
+            }
+            if (claimArray.length > 0) {
                 for (String value : claimArray) {
                     if (value.contains(APPLICATION.name())) {
                         return "Application.";
