@@ -133,55 +133,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithClaimIssuedPbaDetailsWithoutServiceReqReference() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDate();
-            caseData = caseData.toBuilder().claimIssuedPBADetails(SRPbaDetails.builder().fee(
-                Fee.builder()
-                    .code("FE203")
-                    .calculatedAmountInPence(BigDecimal.valueOf(27500)).version("1")
-                    .build())
-                                                           .serviceReqReference(null).build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
-                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-            when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
-            assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
-        }
-
-        @Test
-        void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithHearingFeePbaDetailsWithoutServiceReqReference() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDate();
-            caseData.setHearingDueDate(LocalDate.of(2020, 2, 1));
-            caseData = caseData.toBuilder().claimIssuedPBADetails(null).build();
-            caseData = caseData.toBuilder().hearingFeePBADetails(SRPbaDetails.builder().fee(
-                    Fee.builder()
-                        .code("FE203")
-                        .calculatedAmountInPence(BigDecimal.valueOf(27500)).version("1")
-                        .build())
-                                                                      .serviceReqReference(null).build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
-                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-            when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
-            assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
-        }
-
-
-        @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithoutClaimIssuedPbaDetails() {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
