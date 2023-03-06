@@ -544,8 +544,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            DynamicList dynamicList = getDynamicList(response);
-            assertThat(dynamicList).isEqualTo(null);
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -562,8 +561,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(getDynamicList(response))
-                    .isEqualTo(null);
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -640,11 +638,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         private GAPbaDetails getPBADetails(AboutToStartOrSubmitCallbackResponse response) {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getGeneralAppPBADetails();
-        }
-
-        private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            return responseCaseData.getGeneralAppPBADetails().getApplicantsPbaAccounts();
         }
     }
 
@@ -724,8 +717,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             GeneralApplication application = unwrapElements(responseData.getGeneralApplications()).get(0);
             assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
             assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-            assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
-                .isEqualTo(PBA_ACCOUNTS);
             assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);
             assertThat(application.getGeneralAppReasonsOfOrder()).isEqualTo(STRING_CONSTANT);
             assertThat(application.getGeneralAppInformOtherParty().getReasonsForWithoutNotice())
