@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -147,6 +148,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CourtLocationUtils courtLocationUtility;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
