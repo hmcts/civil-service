@@ -159,7 +159,7 @@ class PaymentsServiceTest {
     }
 
     @Test
-        void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+    void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
         SRPbaDetails hfPbaDetails = SRPbaDetails.builder()

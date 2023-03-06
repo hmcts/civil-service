@@ -70,7 +70,6 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @BeforeEach
     public void setup() {
-
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 

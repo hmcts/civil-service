@@ -60,23 +60,34 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
-            var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
-                .getServiceRequestReference();
-            log.info("Service Request Reference {}", serviceRequestReference);
+            String serviceRequestReference;
+
             if (caseData.getHearingDueDate() != null) {
-                caseData = caseData.toBuilder()
-                    .hearingFeePBADetails(SRPbaDetails.builder()
+                if (caseData.getHearingFeePBADetails() == null || (caseData.getHearingFeePBADetails() != null
+                    && caseData.getHearingFeePBADetails().getServiceReqReference() == null)) {
+                    serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+                        .getServiceRequestReference();
+
+                    caseData = caseData.toBuilder()
+                        .hearingFeePBADetails(SRPbaDetails.builder()
                                                   .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
                                                   .fee(caseData.getHearingFee())
                                                   .serviceReqReference(serviceRequestReference).build())
-                    .build();
+                        .build();
+                }
             } else {
-                caseData = caseData.toBuilder()
-                    .claimIssuedPBADetails(SRPbaDetails.builder()
-                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                                                  .fee(caseData.getClaimFee())
-                                                  .serviceReqReference(serviceRequestReference).build())
-                    .build();
+                if (caseData.getClaimIssuedPBADetails() == null || (caseData.getClaimIssuedPBADetails() != null
+                    && caseData.getClaimIssuedPBADetails().getServiceReqReference() == null)) {
+                    serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+                        .getServiceRequestReference();
+
+                    caseData = caseData.toBuilder()
+                        .claimIssuedPBADetails(SRPbaDetails.builder()
+                                                   .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                                   .fee(caseData.getClaimFee())
+                                                   .serviceReqReference(serviceRequestReference).build())
+                        .build();
+                }
             }
 
         } catch (FeignException e) {
