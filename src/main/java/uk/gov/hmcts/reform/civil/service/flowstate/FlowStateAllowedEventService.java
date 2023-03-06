@@ -177,6 +177,7 @@ public class FlowStateAllowedEventService {
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
@@ -839,7 +840,6 @@ public class FlowStateAllowedEventService {
             List.of(
                 CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
-                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -860,7 +860,6 @@ public class FlowStateAllowedEventService {
             FULL_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
-                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -880,7 +879,6 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
-                UPLOAD_TRANSLATED_DOCUMENT,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
