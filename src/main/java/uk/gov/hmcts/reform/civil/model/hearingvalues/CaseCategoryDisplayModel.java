@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseCategoryDisplayModel {
+
     private String categoryDisplayValue;
     private List<CaseCategoryDisplayModel> childNodes;
 }
