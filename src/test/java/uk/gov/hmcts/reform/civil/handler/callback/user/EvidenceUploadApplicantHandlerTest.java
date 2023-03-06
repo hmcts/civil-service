@@ -609,6 +609,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
         });
     }
+
     private List<IdValue<Bundle>> prepareCaseBundles(LocalDateTime bundleCreatedDate) {
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
