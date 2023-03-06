@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class RespondentLiPResponse {
 
     private MediationLiP respondent1MediationLiPResponse;
+    private FinancialDetailsLiP respondent1LiPFinancialDetails;
 }
