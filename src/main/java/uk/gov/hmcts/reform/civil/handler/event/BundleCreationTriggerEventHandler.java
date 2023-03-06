@@ -80,8 +80,7 @@ public class BundleCreationTriggerEventHandler {
             .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
             .filename(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
-            .description(null != bundle.getValue().getDescription()
-                             ? Optional.of(bundle.getValue().getDescription()).get() : "")
+            .description(null != bundle.getValue().getDescription() ? bundle.getValue().getDescription() : "")
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
             .createdOn(Optional.of(LocalDateTime.now()))
             .id(bundle.getValue().getId()).build();

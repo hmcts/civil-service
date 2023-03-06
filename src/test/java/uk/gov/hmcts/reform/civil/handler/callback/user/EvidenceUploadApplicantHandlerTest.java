@@ -74,7 +74,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private  CoreCaseUserService coreCaseUserService;
-
+    @MockBean
+    CaseData.CaseDataBuilder caseDataBuilder;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -547,6 +548,32 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
         // Then applicant docs uploaded after bundle should return size 0
         assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldNotUpdateListWhenThereIsNoCaseBundlesWithCreatedDate() {
+        // Given: No caseBundles exists with CreatedDate and new evidence is uploaded
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .build()));
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .caseBundles(caseBundles)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
+        // When: handler is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        // Then: ApplicantDocsUploadedAfterBundle list should be null
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle()).isNull();
     }
 
     private List<IdValue<Bundle>> prepareCaseBundles(LocalDateTime bundleCreatedDate) {

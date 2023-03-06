@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -98,9 +97,12 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
         List<Element<UploadEvidenceDocumentType>> respondentEvidenceUploadedAfterBundle = new ArrayList<>();
         Optional<Bundle> bundleDetails =
-            caseData.getCaseBundles().stream().map(IdValue::getValue)
+            caseData.getCaseBundles().stream().map(IdValue::getValue).filter(bundle -> bundle.getCreatedOn().isPresent())
                 .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
-        if (bundleDetails.isPresent() && nonNull(bundleDetails.get().getCreatedOn())) {
+
+        if (bundleDetails.isEmpty() || bundleDetails.get().getCreatedOn().isEmpty()) {
+            //If no bundle is created then return
+        } else {
             addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes(), bundleDetails,
                              EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
             );

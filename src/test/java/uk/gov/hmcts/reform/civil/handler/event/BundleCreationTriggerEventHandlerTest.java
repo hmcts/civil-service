@@ -42,7 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
@@ -279,5 +282,33 @@ class BundleCreationTriggerEventHandlerTest {
             .bundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))
             .build()));
         return caseBundles;
+    }
+
+    @Test
+    void shouldNotCreateNewBundleWhenAlreadyExistsForSameHearingDate() {
+        //Given : Bundles exists with BundleHearingDate same as hearingDate
+        caseData.setHearingDate(LocalDate.of(2023, 12, 12));
+        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        //When: Trigger is called
+        bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
+        //Then : Create bundle should not get called
+        verify(bundleCreationService, never()).createBundle(any());
+        verify(coreCaseDataService, never()).startUpdate(any(), any());
+    }
+
+    @Test
+    void shouldReturnBlankWhenDescriptionIsNull() {
+        //Given : bundle with null description
+        bundle.getValue().setDescription(null);
+        // When: I call the prepareNewBundle method
+        IdValue<uk.gov.hmcts.reform.civil.model.Bundle> generatedBundle =
+            bundleCreationTriggerEventHandler.prepareNewBundle(bundle, caseData);
+        // Then: the bundleHearingDate, stitchedDocument, filename, title, description, stitchStatus, createdOn and id fields must be populated
+        Assertions.assertEquals(
+            "", generatedBundle.getValue().getDescription()
+        );
     }
 }
