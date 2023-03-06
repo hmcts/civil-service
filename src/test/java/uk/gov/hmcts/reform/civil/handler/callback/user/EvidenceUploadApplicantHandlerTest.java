@@ -570,10 +570,10 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(caseBundles)
             .build();
 
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When: handler is called
         // Then: an exception is thrown
@@ -598,10 +598,10 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(caseBundles)
             .build();
 
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When: handler is called
         // Then: an exception is thrown
