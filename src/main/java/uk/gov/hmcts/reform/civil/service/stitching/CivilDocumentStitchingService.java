@@ -60,6 +60,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             );
         log.info("Called stitching api end point for {}", caseData.getLegacyCaseReference());
         if (caseData1 != null) {
+            log.info("CaseData1: " + caseData1);
             Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
 
             log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(),
@@ -85,7 +86,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         } else {
             log.info("Case data is null----------");
         }
-
+        log.info("Case Document is: " + caseDocument);
         return caseDocument;
     }
 
