@@ -12,7 +12,7 @@ Civil CCD Callback Service.
 
 ### Dependencies
 
-The project is dependent on other Civil repositories:
+The project is dependent on other Civil repositories: 
 
 - [civil-ccd-definition](https://github.com/hmcts/civil-ccd-definition)
 - [civil-camunda-bpmn-definition](https://github.com/hmcts/civil-camunda-bpmn-definition)
