@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +19,9 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -238,6 +242,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
+            assertThat(responseCaseData
+                    .getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -637,6 +643,29 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
         }
 
+        @Test
+        void shouldSet275Fees_whenVaryApplicationIsUnConsented() {
+            given(feesService.getFeeForGA(any()))
+                    .willReturn(Fee.builder()
+                            .code(FEE_CODE)
+                            .calculatedAmountInPence(fee275)
+                            .version(FEE_VERSION).build());
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .build()
+                    .toBuilder()
+                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+        }
+
         private GAPbaDetails getPBADetails(AboutToStartOrSubmitCallbackResponse response) {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getGeneralAppPBADetails();
@@ -765,6 +794,40 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             DynamicList dynamicList = getLocationDynamicList(data);
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
             assertThat(dynamicList).isNull();
+        }
+
+        @Test
+        void shouldWithNotice_whenVaryApplicationIsUnConsented() {
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
+
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .build()
+                    .toBuilder()
+                    .generalAppPBADetails(generalAppPBADetails)
+                    .generalAppHearingDetails(GAHearingDetails.builder().build())
+                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .build();
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                    .email(APPLICANT_EMAIL_ID_CONSTANT)
+                    .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer(new Answer() {
+                public Object answer(InvocationOnMock invocation) {
+                    return invocation.getArguments()[1];
+                }
+            });
+
+            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+                    any(CaseData.class), any(UserDetails.class)))
+                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(data.getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
         }
     }
 
