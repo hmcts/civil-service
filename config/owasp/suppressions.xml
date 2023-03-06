@@ -37,4 +37,11 @@
     <notes>Temporary suppression for commons-fileupload-1.4.jar</notes>
     <cve>CVE-2023-24998</cve>
   </suppress>
+
+  <suppress until="2023-05-05">
+    <notes>Temporary Suppression
+      CVE-2022-45688 refer CIV-7427
+    </notes>
+    <cve>CVE-2022-45688</cve>
+  </suppress>
 </suppressions>
