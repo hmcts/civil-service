@@ -188,7 +188,7 @@ class BundleRequestMapperTest {
 
     @Test
     void testBundleCreateRequestMapperForOneRespondentAndOneApplicant() {
-        // Given
+        // Given: Casedata with Applicant2 and Respondent2 as NO
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
@@ -196,13 +196,13 @@ class BundleRequestMapperTest {
             .addRespondent2(YesOrNo.NO)
             .build();
 
-        // When
+        // When: mapCaseDataToBundleCreateRequest is called
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
                                                                                                            ".yaml",
                                                                                                        "test", "test",
                                                                                                        1L
         );
-        // Then
+        // Then: hasApplicant2 and hasRespondant2 should return false
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
