@@ -45,6 +45,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
 
     @MockBean
+    private FeesService feesService;
+
+    @MockBean
     private PaymentsService paymentsService;
 
     @MockBean
@@ -121,10 +124,11 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails()
+                .toBuilder().hearingFeePBADetails(null).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+                .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -151,7 +155,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+                .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -178,7 +182,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldMakeHearingPaymentServiceRequest_whenInvoked() throws Exception {
             //Given
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+                .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
             when(feesService.getHearingFeeDataByTotalClaimAmount(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
@@ -211,10 +215,5 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getHearingFeePBADetails();
         }
-    }
-
-    private SRPbaDetails extractHearingPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getHearingFeePBADetails();
     }
 }
