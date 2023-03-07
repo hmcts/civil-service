@@ -6,6 +6,19 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+
+    CLAIMANT_ACCEPTED_STATES_PAID(
+        Claim::claimantConfirmedDefendantPaid
+    ),
+    SETTLED(
+        Claim::isSettled
+    ),
+    TRANSFERRED(
+        Claim::isSentToCourt
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
+    ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
@@ -18,9 +31,6 @@ public enum DashboardClaimStatus {
     MORE_TIME_REQUESTED(
         Claim::responseDeadlineHasBeenExtended
     ),
-    NO_RESPONSE(
-        Claim::hasResponsePending
-    ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
     ),
@@ -30,17 +40,8 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
-    CLAIMANT_ACCEPTED_STATES_PAID(
-        Claim::claimantConfirmedDefendantPaid
-    ),
-    TRANSFERRED(
-        Claim::isSentToCourt
-    ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
-    SETTLED(
-        Claim::isSettled
+    NO_RESPONSE(
+        Claim::hasResponsePending
     ),
     NO_STATUS(c -> false);
 
