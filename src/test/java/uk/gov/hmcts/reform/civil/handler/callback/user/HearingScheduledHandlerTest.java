@@ -235,7 +235,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
     }
 
     @Test
@@ -300,11 +300,11 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(117500)).build());
     }
 
     @Test
-    void shouldGetDueDateAndFeeFastClaim_whenAboutToSubmit() {
+    void shouldGetDueDateAndFeeFastAndClaimValueClaim_whenAboutToSubmit() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
@@ -321,7 +321,53 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+    }
+
+    @Test
+    void shouldGetDueDateAndFeeFastAndNoClaimValueClaim_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .claimValue(null)
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingFee()).isEqualTo(
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+    }
+
+    @Test
+    void shouldGetDueDateAndFeeFastClaim_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(null)
+            .claimValue(null)
+            .totalClaimAmount(new BigDecimal(123))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingFee()).isEqualTo(
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(2700)).build());
     }
 
     @Test
