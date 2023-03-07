@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Case;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -202,36 +201,54 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setMediationConditionFlag(CaseData updatedCaseData) {
-        if(isMediationRequired(updatedCaseData)) {
+        DefendantResponseShowTag mediationFlag = setMediationRequired(updatedCaseData);
+        if(mediationFlag != null) {
             Set<DefendantResponseShowTag> showConditionFlags = updatedCaseData.getShowConditionFlags();
-            showConditionFlags.add(DefendantResponseShowTag.CLAIMANT_MEDIATION);
+            showConditionFlags.add(mediationFlag);
             updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
         }
     }
 
-    private boolean isMediationRequired(CaseData caseData) {
-        if(SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
-            && caseData.getResponseClaimMediationSpecRequired().equals(YES))
-        {
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_DEFENCE:
-                    if(YES.equals(caseData.getApplicant1ProceedWithClaim())) {
-                        return true;
-                    }
-                case PART_ADMISSION:
-                    if(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != null
-                        && NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())) {
-                        return true;
-                    } else if (caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec() != null
-                        && NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
-                        return true;
-                    } else if (caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null
-                        && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())) {
-                        return true;
-                    }
+    private DefendantResponseShowTag setMediationRequired(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if(SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            if(multiPartyScenario.equals(ONE_V_ONE)) {
+                switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                    case FULL_DEFENCE:
+                        if(YES.equals(caseData.getApplicant1ProceedWithClaim())
+                            && YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
+                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                        }
+                    case PART_ADMISSION:
+                        if(YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
+                            if(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != null
+                                && NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            } else if (caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec() != null
+                                && NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            } else if (caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null
+                                && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            }
+                        }
+                    case FULL_ADMISSION:
+                        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
+                            && !YES.equals(caseData.getDefendantSingleResponseToBothClaimants())) {
+                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE;
+                        }
+                }
+            } else if (multiPartyScenario.equals(TWO_V_ONE)
+                && YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
+                return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
+            } else {
+                if (!YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                && YES.equals(caseData.getApplicant1ProceedWithClaim()))
+                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
             }
         }
-        return false;
+        return null;
     }
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
