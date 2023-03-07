@@ -98,6 +98,10 @@ public class FeatureToggleService {
                                             createLDUser().build(), false);
     }
 
+    public boolean isHmcEnabled() {
+        return internalClient.boolVariation("hmc", createLDUser().build(), false);
+    }
+
     private void close() {
         try {
             internalClient.close();

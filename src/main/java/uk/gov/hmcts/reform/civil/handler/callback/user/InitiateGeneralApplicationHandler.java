@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -38,7 +37,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -164,12 +162,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private List<String> getPbaAccounts(String authToken) {
-        return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
