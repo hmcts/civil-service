@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -79,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Slf4j
 @Service
@@ -137,6 +139,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -471,22 +475,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
+
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private String getAllPartyNames(CaseData caseData) {
-        return format("%s%s V %s%s",
-                      caseData.getApplicant1().getPartyName(),
-                      YES.equals(caseData.getAddApplicant2())
-                          ? ", " + caseData.getApplicant2().getPartyName() : "",
-                      caseData.getRespondent1().getPartyName(),
-                      YES.equals(caseData.getAddRespondent2())
-                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
