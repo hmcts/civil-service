@@ -32,6 +32,8 @@ import java.util.List;
 public class SealedClaimLipResponseForm implements MappableObject {
 
     private final String claimReferenceNumber;
+    private final String claimantReferenceNumber;
+    private final String defendantReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
@@ -51,6 +53,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final RespondentResponseTypeSpec responseType;
     // TODO enum, ALREADY_PAID, DISPUTE, COUNTER_CLAIM
     private final String whyReject;
+    private final String freeTextWhyReject;
     private final LipDefenceFormParty claimant1;
     private final LipDefenceFormParty defendant1;
     private final LipDefenceFormParty defendant2;
@@ -61,7 +64,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean mediation;
     private final String whereTheyLive;
     private final PartnerAndDependentsLRspec partnerAndDependent;
-    private final boolean currentlyWorking;
     private final List<EmployerDetailsLRspec> employerDetails;
     private final Respondent1SelfEmploymentLRspec selfEmployment;
     private List<AccountSimpleTemplateData> bankAccountList;
@@ -74,6 +76,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
     public String getResponseTypeDisplay() {
         // TODO localization?
         return responseType.getDisplayedValue();
+    }
+
+    public boolean isCurrentlyWorking() {
+        return (employerDetails != null && !employerDetails.isEmpty())
+            || selfEmployment != null && selfEmployment.getAnnualTurnover() != null;
     }
 
 }

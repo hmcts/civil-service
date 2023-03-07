@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.LoanCardDebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.LipDefenceFormParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -118,9 +120,13 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
-            .currentlyWorking(caseData.getDefenceAdmitPartEmploymentTypeRequired() == YesOrNo.YES)
             .selfEmployment(caseData.getSpecDefendant1SelfEmploymentDetails())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()));
+
+        Optional.ofNullable(caseData.getSolicitorReferences())
+            .ifPresent(references ->
+                           builder.claimantReferenceNumber(references.getApplicantSolicitor1Reference())
+                               .defendantReferenceNumber(references.getRespondentSolicitor1Reference()));
 
         Optional.ofNullable(caseData.getResponseClaimAdmitPartEmployer())
             .map(Respondent1EmployerDetailsLRspec::getEmployerDetails)
@@ -152,14 +158,14 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                 .map(list -> list.stream()
                     .sorted(EXPENSE_COMPARATOR)
                     .map(item ->
-                        ReasonMoneyTemplateData.builder()
-                            .type(item.getType() == ExpenseTypeLRspec.OTHER
-                            ? "Other: " + item.getTypeOtherDetails()
-                                : EXPENSE_TYPE_ORDER.stream()
-                                .filter(p -> item.getType() == p.getKey())
-                                .findFirst().map(Pair::getValue).orElse("Other"))
-                            .amountPounds(item.getAmount())
-                            .build()).collect(Collectors.toList()))
+                             ReasonMoneyTemplateData.builder()
+                                 .type(item.getType() == ExpenseTypeLRspec.OTHER
+                                           ? "Other: " + item.getTypeOtherDetails()
+                                           : EXPENSE_TYPE_ORDER.stream()
+                                     .filter(p -> item.getType() == p.getKey())
+                                     .findFirst().map(Pair::getValue).orElse("Other"))
+                                 .amountPounds(item.getAmount())
+                                 .build()).collect(Collectors.toList()))
                 .ifPresent(builder::expenseList);
         }
 
@@ -207,10 +213,48 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                         == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
                         builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
                             .payBy(caseData.getRespondent1RepaymentPlan()
-                                       .finalPaymentBy(caseData.getTotalClaimAmount()));
+                                       .finalPaymentBy(caseData.getTotalClaimAmount()))
+                            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
                     } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
                         == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
-                        // TODO
+                        builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                            .amountToPay(caseData.getTotalClaimAmount() + "")
+                            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+                    }
+                    break;
+                case PART_ADMISSION:
+                    builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+                        .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                               .map(event ->
+                                                        EventTemplateData.builder()
+                                                            .date(event.getValue().getTimelineDate())
+                                                            .explanation(event.getValue().getTimelineDescription())
+                                                            .build()).collect(Collectors.toList()));
+                    if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+                        builder.whyReject("ALREADY_PAID")
+                            .howMuchWasPaid(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid() + "")
+                            .paymentDate(caseData.getRespondToClaim().getWhenWasThisAmountPaid())
+                            .paymentHow(caseData.getRespondToClaim().getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                            ? caseData.getRespondToClaim().getHowWasThisAmountPaidOther()
+                                            : caseData.getRespondToClaim().getHowWasThisAmountPaid()
+                                .getHumanFriendly());
+                    } else {
+                        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
+                            builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
+                                .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
+                        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+                            builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+                                .payBy(caseData.getRespondent1RepaymentPlan()
+                                           .finalPaymentBy(caseData.getRespondToAdmittedClaimOwingAmount()))
+                                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+                        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+                            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                                .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "")
+                                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+                        }
                     }
                     break;
             }
