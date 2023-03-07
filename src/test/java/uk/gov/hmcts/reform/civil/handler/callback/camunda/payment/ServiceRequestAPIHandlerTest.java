@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -134,8 +136,19 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotMakePaymentServiceRequestForHearingFee_whenServiceRequestWasAlreadyIssued() {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
+
+            handler.handle(params);
+
+            verifyNoInteractions(paymentsService);
+        }
+
+        @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithoutClaimIssuedPbaDetails() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
@@ -151,7 +164,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotMakePaymentServiceRequestForHearingFee_whenInvokedWithClaimIssuedPbaDetails() {
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -165,19 +178,14 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldMakeHearingPaymentServiceRequest_whenInvoked() throws Exception {
             //Given
             when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
+                .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            when(feesService.getHearingFeeDataByTotalClaimAmount(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
             caseData = caseData.toBuilder()
-                .hearingDate(LocalDate.now().plusDays(20))
-                .hearingFee(
-                    Fee.builder()
-                        .code("code")
-                        .version("version")
-                        .calculatedAmountInPence(new BigDecimal(100))
-                        .build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(new BigDecimal(1000)).build())
-                .build();
+                .hearingDueDate(LocalDate.now())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build()).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -203,5 +211,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getHearingFeePBADetails();
         }
+    }
+
+    private SRPbaDetails extractHearingPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        return responseCaseData.getHearingFeePBADetails();
     }
 }
