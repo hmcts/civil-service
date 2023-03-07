@@ -44,10 +44,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         CaseData caseData
     ) {
         CaseDocument caseDocument = null;
-        log.info("document: " + documents);
-        log.info("bundleTitle: " + bundleTitle);
-        log.info("bundleFilename: " + bundleFilename);
-        log.info("caseData: " + caseData);
+        log.info("authorisation: " + authorisation);
         CaseDetails payload =
             createBundlePayload(
                 documents,
