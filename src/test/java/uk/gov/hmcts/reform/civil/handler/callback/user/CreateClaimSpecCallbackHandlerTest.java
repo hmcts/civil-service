@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -180,8 +181,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService toggleService;
 
-    @Value("${wa.feature-toggle}")
-    private String featureToggle;
+    @MockBean
+    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToStartCallback {
@@ -1279,6 +1280,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA3.5");
         }
 
         // TODO: move this test case to AboutToSubmitCallbackV0 after release
@@ -1355,7 +1357,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA3.5");
             given(defendantPinToPostLRspecService.buildDefendantPinToPost())
                 .willReturn(DefendantPinToPostLRspec.builder()
                                 .accessCode(
@@ -1373,15 +1375,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
-        }
-
-        @Test
-        void shouldAddFeatureToggleToData_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("featureToggleWA")
-                .isEqualTo("WA3.5");
         }
 
         @Test

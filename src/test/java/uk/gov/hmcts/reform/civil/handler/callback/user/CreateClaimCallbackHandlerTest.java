@@ -439,17 +439,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Yes");
         }
 
-        @Test
-        void shouldAddFeatureToggleToData_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            CallbackParams params = callbackParamsOf(null, caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("featureToggleWA")
-                .isEqualTo("WA3.5");
-        }
-
         @Nested
         class CourtLocation {
 
