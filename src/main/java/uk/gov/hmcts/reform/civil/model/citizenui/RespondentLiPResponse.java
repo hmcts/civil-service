@@ -18,5 +18,6 @@ public class RespondentLiPResponse {
     private PartAdmitResponseLiP partAdmitResponseLiP;
     private String timelineComment;
     private String evidenceComment;
+    private MediationLiP respondent1MediationLiPResponse;
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
 }
