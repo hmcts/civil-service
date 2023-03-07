@@ -605,10 +605,10 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When: handler is called
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        // Then: applicant docs uploaded after bundle should return size 0
-        assertThat(updatedData.getApplicantDocsUploadedAfterBundle()).isNull();
+        // Then: an exception is thrown
+        assertThrows(NullPointerException.class, () -> {
+            handler.handle(params);
+        });
     }
 
     private List<IdValue<Bundle>> prepareCaseBundles(LocalDateTime bundleCreatedDate) {

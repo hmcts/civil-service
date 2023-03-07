@@ -59,10 +59,6 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
             caseData.getCaseBundles().stream().map(IdValue::getValue)
                 .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
 
-        if (bundleDetails.get().getCreatedOn().isEmpty()) {
-            return;
-        }
-
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureList(), bundleDetails,
                          EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
         );

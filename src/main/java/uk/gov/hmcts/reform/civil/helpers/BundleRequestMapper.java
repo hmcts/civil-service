@@ -152,21 +152,21 @@ public class BundleRequestMapper {
 
     private ServedDocument mapServedDocuments(ServedDocumentFiles servedDocumentFiles) {
         List<BundlingRequestDocument> bundlingServedDocFiles = new ArrayList<>();
-        if (null == servedDocumentFiles || null == servedDocumentFiles.getParticularsOfClaimDocument()) {
-            ServedDocument.builder().particularsOfClaimDocument(ElementUtils.wrapElements(bundlingServedDocFilesd).build();
+        if (Optional.ofNullable(servedDocumentFiles).isEmpty() || null == servedDocumentFiles.getParticularsOfClaimDocument()) {
+            return ServedDocument.builder().particularsOfClaimDocument(ElementUtils.wrapElements(bundlingServedDocFiles)).build();
         }
         servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
             bundlingServedDocFiles.add(BundlingRequestDocument.builder()
-                                               .documentFileName(document.getValue().getDocumentFileName())
-                                               .documentLink(DocumentLink.builder()
-                                                                 .documentUrl(document.getValue().getDocumentUrl())
-                                                                 .documentBinaryUrl(document.getValue().getDocumentBinaryUrl())
-                                                                 .documentFilename(document.getValue().getDocumentFileName()).build())
-                                               .build());
+                                           .documentFileName(document.getValue().getDocumentFileName())
+                                           .documentLink(DocumentLink.builder()
+                                                             .documentUrl(document.getValue().getDocumentUrl())
+                                                             .documentBinaryUrl(document.getValue().getDocumentBinaryUrl())
+                                                             .documentFilename(document.getValue().getDocumentFileName()).build())
+                                           .build());
 
         });
         List<Element<BundlingRequestDocument>> particulars = ElementUtils.wrapElements(bundlingServedDocFiles);
-        return  ServedDocument.builder().particularsOfClaimDocument(particulars).build();
+        return ServedDocument.builder().particularsOfClaimDocument(particulars).build();
     }
 
     private List<Element<BundlingRequestDocument>> mapSystemGeneratedcaseDocument(List<Element<CaseDocument>> systemGeneratedCaseDocuments, Document orderSDODocumentDJ) {
