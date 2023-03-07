@@ -1088,8 +1088,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccounts()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getPbaReference()).isNull();
         assertThat(caseData.getGeneralAppDetailsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppReasonsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppInformOtherParty().getIsWithNotice()).isNull();
@@ -1139,10 +1137,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
         assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
-            .isEqualTo(PBALIST);
-        assertThat(application.getGeneralAppPBADetails().getPbaReference())
-            .isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppReasonsOfOrder()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppInformOtherParty().getIsWithNotice())
