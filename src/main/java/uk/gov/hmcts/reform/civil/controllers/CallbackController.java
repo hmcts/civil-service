@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,12 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.GetCaseCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
-import uk.gov.hmcts.reform.civil.handler.callback.user.GetCaseUrlCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
 import java.util.Optional;
@@ -70,26 +69,5 @@ public class CallbackController {
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);
-    }
-
-    @PostMapping(path = {
-        "/getWAToggle"
-    })
-    public ResponseEntity<GetCaseCallbackResponse> getWAToggle(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @NotNull @RequestBody CallbackRequest callback,
-        @PathVariable("version") Optional<CallbackVersion> version,
-        @PathVariable("page-id") Optional<String> pageId
-    ) {
-        GetCaseUrlCallbackHandler handler = new GetCaseUrlCallbackHandler();
-        CallbackParams callbackParams = CallbackParams.builder()
-            .request(callback)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
-            .version(version.orElse(null))
-            .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toCaseData(callback.getCaseDetails()))
-            .build();
-
-        return new ResponseEntity<GetCaseCallbackResponse>(handler.setWAToggleVal(callbackParams), HttpStatus.OK);
     }
 }
