@@ -180,6 +180,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService toggleService;
 
+    @Value("${wa.feature-toggle}")
+    private String featureToggle;
+
     @Nested
     class AboutToStartCallback {
 
@@ -1370,6 +1373,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
+        }
+
+        @Test
+        void shouldAddFeatureToggleToData_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("featureToggleWA")
+                .isEqualTo("WA3.5");
         }
 
         @Test

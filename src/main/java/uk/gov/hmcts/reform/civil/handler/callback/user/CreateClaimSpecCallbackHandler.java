@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -154,6 +155,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -417,7 +419,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
         dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
+        dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
         //assign case management category to the case and caseNameHMCTSinternal
         if (toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
