@@ -70,7 +70,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     public static final String  ERROR_EXTENSION_DATE_ALREADY_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
     public static final String ERROR_EXTENSION_DEADLINE_BEEN_PASSED =
-        "Inform Agreed Extension Date' as the deadline has passed.";
+        "You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed";
 
     @Override
     protected Map<String, Callback> callbacks() {
