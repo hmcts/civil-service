@@ -179,25 +179,31 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private static void calculateAndApplyFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        Fee hearingFee = Fee.builder().code("FEE0202").version("4").build();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         if (isNull(caseData.getAllocatedTrack())) {
             allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
         }
         switch (allocatedTrack) {
-            case SMALL_CLAIM:
-                caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
-                break;
             case FAST_CLAIM:
-                caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
-                    HearingUtils.getFastTrackFee(
-                        caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
+                break;
+            case SMALL_CLAIM:
+                int claimAmount;
+                if (nonNull(caseData.getClaimValue())) {
+                    claimAmount = caseData.getClaimValue().getStatementOfValueInPennies().intValue();
+                } else {
+                    claimAmount = caseData.getTotalClaimAmount().intValue() * 100;
+                }
+                hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(claimAmount));
                 break;
             case MULTI_CLAIM:
-                caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
                 break;
             default:
-                caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
+                hearingFee.setCalculatedAmountInPence(new BigDecimal(0));
         }
+        caseDataBuilder.hearingFee(hearingFee).build();
     }
 
     LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate, Set<LocalDate> holidays) {
