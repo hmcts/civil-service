@@ -235,7 +235,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
     }
 
     @Test
@@ -321,7 +321,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
     }
 
     @Test
@@ -344,7 +344,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(12300)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
     }
 
     @Test
@@ -367,7 +367,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(2700)).build());
     }
 
     @Test

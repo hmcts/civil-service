@@ -185,10 +185,10 @@ public class HearingScheduledHandler extends CallbackHandler {
             allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
         }
         switch (allocatedTrack) {
-            case SMALL_CLAIM:
+            case FAST_CLAIM:
                 hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                 break;
-            case FAST_CLAIM:
+            case SMALL_CLAIM:
                 int claimAmount;
                 if (nonNull(caseData.getClaimValue())) {
                     claimAmount = caseData.getClaimValue().getStatementOfValueInPennies().intValue();
