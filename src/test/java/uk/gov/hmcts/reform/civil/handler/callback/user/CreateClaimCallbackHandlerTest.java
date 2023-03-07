@@ -445,7 +445,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(null, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            System.out.println(response.getData());
             assertThat(response.getData())
                 .extracting("featureToggleWA")
                 .isEqualTo("WA3.5");
