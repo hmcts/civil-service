@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartAdmitResponseLiP {
+
     @JsonProperty("partialAdmissionAlreadyPaid")
     private YesOrNo partialAdmissionAlreadyPaid;
 }
