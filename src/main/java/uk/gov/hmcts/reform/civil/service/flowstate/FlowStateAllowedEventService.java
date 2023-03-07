@@ -136,7 +136,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                MEDIATION_UNSUCCESSFUL,
                 migrateCase
             )
         ),
@@ -152,7 +151,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                MEDIATION_UNSUCCESSFUL,
                 migrateCase
             )
         ),
@@ -167,7 +165,6 @@ public class FlowStateAllowedEventService {
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    MEDIATION_UNSUCCESSFUL,
                     CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
@@ -222,7 +219,6 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                MEDIATION_UNSUCCESSFUL,
                 EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
