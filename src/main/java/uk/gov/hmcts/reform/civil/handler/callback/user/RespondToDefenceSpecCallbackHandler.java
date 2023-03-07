@@ -113,6 +113,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
@@ -275,6 +276,26 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             }
         }
 
+        if (V_2.equals(callbackParams.getVersion())) {
+            if (multiPartyScenario.equals(ONE_V_ONE)
+                && caseData.getApplicant1ClaimMediationSpecRequired() != null
+                && YES.equals(caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation())
+                && featureToggleService.isPinInPostEnabled()) {
+                response.state(CaseState.IN_MEDIATION.name());
+            }
+        } else if (featureToggleService.isSdoEnabled()) {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
+                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+                    response.state(CaseState.JUDICIAL_REFERRAL.name());
+                } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    if (caseData.getRespondent2ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                        response.state(CaseState.JUDICIAL_REFERRAL.name());
+                    }
+                }
+            }
+        }
         return response.build();
     }
 
