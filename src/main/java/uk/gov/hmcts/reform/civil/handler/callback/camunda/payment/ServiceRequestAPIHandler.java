@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final FeesService feesService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -60,7 +62,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
             String serviceRequestReference;
 
-            if (caseData.getHearingDate() != null) {
+            if (caseData.getHearingDueDate() != null) {
                 if (caseData.getHearingFeePBADetails() == null || (caseData.getHearingFeePBADetails() != null
                     && caseData.getHearingFeePBADetails().getServiceReqReference() == null)) {
                     serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
