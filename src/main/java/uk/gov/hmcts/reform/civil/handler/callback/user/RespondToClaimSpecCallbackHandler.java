@@ -33,6 +33,8 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -46,6 +48,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -116,7 +119,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -140,6 +145,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CoreCaseUserService coreCaseUserService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1399,6 +1405,30 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
                     caseData.getRespondent2DQWitnessesSmallClaim()).build());
         }
+
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
+            updatedData.respondent1DQ(
+                updatedData.build().getRespondent1DQ().toBuilder()
+                    .respondent1DQExperts(Experts.builder()
+                                              .details(wrapElements(expert))
+                                              .build())
+                    .build());
+        }
+
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
+            updatedData.respondent2DQ(
+                updatedData.build().getRespondent2DQ().toBuilder()
+                    .respondent2DQExperts(Experts.builder()
+                                              .details(wrapElements(expert))
+                                              .build())
+                    .build());
+        }
+
+        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
