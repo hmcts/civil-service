@@ -33,5 +33,5 @@ public enum DefendantResponseShowTag {
     WHY_2_DOES_NOT_PAY_IMMEDIATELY,
     REPAYMENT_PLAN_2,
     MEDIATION,
-    MEDIATION_2
+    CLAIMANT_MEDIATION
 }

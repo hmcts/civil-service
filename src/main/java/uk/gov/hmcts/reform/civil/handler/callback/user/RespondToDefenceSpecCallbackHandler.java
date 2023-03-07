@@ -188,15 +188,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
 
-        /*((caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-            && caseData.getApplicant1ProceedWithClaim() == YES)
-            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
-            Set<DefendantResponseShowTag> showConditionFlags = caseData.getShowConditionFlags();
-            showConditionFlags.add(DefendantResponseShowTag.VULNERABILITY);
-            updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
-        }*/
-
-       setMediationConditionFlag(updatedCaseData);
+        setMediationConditionFlag(updatedCaseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
@@ -204,36 +196,36 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setMediationConditionFlag(CaseData updatedCaseData) {
-        if(isMediationRequired(updatedCaseData).equals(YES)) {
+        if(isMediationRequired(updatedCaseData)) {
             Set<DefendantResponseShowTag> showConditionFlags = updatedCaseData.getShowConditionFlags();
-            showConditionFlags.add(DefendantResponseShowTag.MEDIATION_2);
+            showConditionFlags.add(DefendantResponseShowTag.CLAIMANT_MEDIATION);
             updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
         }
     }
 
-    private YesOrNo isMediationRequired(CaseData caseData) {
+    private boolean isMediationRequired(CaseData caseData) {
         if(SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
             && caseData.getResponseClaimMediationSpecRequired().equals(YES))
         {
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
                 case FULL_DEFENCE:
-                    if(caseData.getApplicant1ProceedWithClaim().equals(YES)) {
-                        return YES;
+                    if(YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+                        return true;
                     }
                 case PART_ADMISSION:
                     if(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != null
                         && NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())) {
-                        return YES;
+                        return true;
                     } else if (caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec() != null
                         && NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
-                        return YES;
+                        return true;
                     } else if (caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null
                         && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())) {
-                        return YES;
+                        return true;
                     }
             }
         }
-        return NO;
+        return false;
     }
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {

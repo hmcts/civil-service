@@ -327,6 +327,7 @@ public class CaseDataParent implements MappableObject {
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
+    private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
     private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
@@ -360,11 +361,6 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
-    @JsonUnwrapped
-    private final MediationLip applicant1ClaimMediationSpecRequiredLip;
-
-    private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
-
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
         return  this.applicant1Represented == YesOrNo.NO;
@@ -379,6 +375,13 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo defendant2LIPAtClaimIssued;
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
+
+    private final List<Element<PartyFlagStructure>> applicantExperts;
+    private final List<Element<PartyFlagStructure>> respondent1Experts;
+    private final List<Element<PartyFlagStructure>> respondent2Experts;
+    private final List<Element<PartyFlagStructure>> applicantWitnesses;
+    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
 
     private final IdamUserDetails claimantUserDetails;
 
