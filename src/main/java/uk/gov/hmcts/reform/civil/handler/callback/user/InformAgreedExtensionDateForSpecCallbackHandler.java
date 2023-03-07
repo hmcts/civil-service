@@ -64,6 +64,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
     public static final String  ERROR_EXTENSION_DATE_ALREADY_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
+    public static final String ERROR_EXTENSION_DEADLINE_BEEN_PASSED =
+        "Inform Agreed Extension Date' as the deadline has passed.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -87,6 +89,14 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
             isRespondent1 = NO;
         }
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDate issueDate = caseData.getIssueDate();
+
+        if(LocalDate.now().isAfter(issueDate.plusDays(28))) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_EXTENSION_DEADLINE_BEEN_PASSED))
+                .build();
+        }
+
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1TimeExtensionDate() != null) {
@@ -112,6 +122,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
+
 
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             agreedExtension = caseData.getRespondentSolicitor2AgreedDeadlineExtension();

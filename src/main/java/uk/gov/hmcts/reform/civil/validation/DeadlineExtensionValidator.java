@@ -41,12 +41,12 @@ public class DeadlineExtensionValidator {
             return List.of("The agreed extension date must be a date in the future");
         }
 
-        if (dateToValidate.isBefore(responseDeadline.toLocalDate())) {
+        if (!dateToValidate.isAfter(responseDeadline.toLocalDate())) {
             return List.of("The agreed extension date must be after the current deadline");
         }
 
         if (LocalDateTime.of(dateToValidate, END_OF_BUSINESS_DAY).isAfter(responseDeadline.plusDays(28))) {
-            return List.of("You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed.");
+            return List.of("The agreed extension date cannot be more than 28 days after the current deadline");
         }
 
         LocalDateTime newResponseDeadline = workingDayIndicator.isWorkingDay(responseDeadline.plusDays(28)
