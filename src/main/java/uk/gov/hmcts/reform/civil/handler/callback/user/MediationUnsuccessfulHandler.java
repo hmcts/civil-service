@@ -20,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFU
 @RequiredArgsConstructor
 public class MediationUnsuccessfulHandler extends CallbackHandler {
 
+    private static final List<CaseEvent> EVENTS = List.of(MEDIATION_UNSUCCESSFUL);
+
     private final ObjectMapper objectMapper;
 
     @Override
@@ -31,7 +33,7 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return List.of(MEDIATION_UNSUCCESSFUL);
+        return EVENTS;
     }
 
     private CallbackResponse submitUnsuccessfulMediation(CallbackParams callbackParams) {
