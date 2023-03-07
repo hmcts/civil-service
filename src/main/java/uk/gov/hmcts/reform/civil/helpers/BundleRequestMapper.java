@@ -153,7 +153,7 @@ public class BundleRequestMapper {
     private ServedDocument mapServedDocuments(ServedDocumentFiles servedDocumentFiles) {
         List<BundlingRequestDocument> bundlingServedDocFiles = new ArrayList<>();
         if (null == servedDocumentFiles || null == servedDocumentFiles.getParticularsOfClaimDocument()) {
-            return null;
+            ServedDocument.builder().particularsOfClaimDocument(ElementUtils.wrapElements(bundlingServedDocFilesd).build();
         }
         servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
             bundlingServedDocFiles.add(BundlingRequestDocument.builder()
@@ -201,7 +201,7 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceWitnessDoc(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness, String displayName) {
         List<BundlingRequestDocument> bundlingWitnessDocs = new ArrayList<>();
-        if (null == uploadEvidenceWitness || uploadEvidenceWitness.isEmpty()) {
+        if (null == uploadEvidenceWitness) {
             return ElementUtils.wrapElements(bundlingWitnessDocs);
         }
         uploadEvidenceWitness.forEach(witnessDocs -> {
@@ -232,7 +232,7 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceExpertDoc(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert, String displayName) {
         List<BundlingRequestDocument> bundlingExpertDocs = new ArrayList<>();
-        if (null == uploadEvidenceExpert || uploadEvidenceExpert.isEmpty()) {
+        if (null == uploadEvidenceExpert) {
             return ElementUtils.wrapElements(bundlingExpertDocs);
         }
 
@@ -265,7 +265,7 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceOtherDoc(List<Element<UploadEvidenceDocumentType>> otherDocsEvidenceUpload) {
         List<BundlingRequestDocument> bundlingExpertDocs = new ArrayList<>();
-        if (null == otherDocsEvidenceUpload || otherDocsEvidenceUpload.isEmpty()) {
+        if (null == otherDocsEvidenceUpload) {
             return ElementUtils.wrapElements(bundlingExpertDocs);
         }
 
