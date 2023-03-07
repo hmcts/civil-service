@@ -31,11 +31,15 @@ import java.time.LocalDateTime;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -81,6 +85,18 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
 
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
+
+    @Test
+    void shouldContainExtendResponseDeadlineEvent_whenPinAndPostEnabled() {
+        given(toggleService.isPinInPostEnabled()).willReturn(true);
+        assertTrue(handler.handledEvents().contains(EXTEND_RESPONSE_DEADLINE));
+    }
+
+    @Test
+    void shouldNotContainExendResponseDeadlineEvent_whenPinAndPostDisabled() {
+        given(toggleService.isPinInPostEnabled()).willReturn(false);
+        assertFalse(handler.handledEvents().contains(EXTEND_RESPONSE_DEADLINE));
+    }
 
     @Nested
     class AboutToStartCallback {
