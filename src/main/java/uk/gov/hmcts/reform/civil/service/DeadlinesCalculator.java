@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,5 +97,23 @@ public class DeadlinesCalculator {
             currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
         }
         return currentDate;
+    }
+
+    public LocalDate getSlaStartDate(CaseData caseData) {
+        var caseIssueDate = caseData.getIssueDate();
+        switch(caseData.getAllocatedTrack()) {
+            case FAST_CLAIM: {
+                return caseIssueDate.plusWeeks(50);
+            }
+            case SMALL_CLAIM: {
+                return caseIssueDate.plusWeeks(30);
+            }
+            case MULTI_CLAIM: {
+                return caseIssueDate.plusWeeks(80);
+            }
+            default: {
+                throw new IllegalArgumentException("Invalid allocated track provided");
+            }
+        }
     }
 }

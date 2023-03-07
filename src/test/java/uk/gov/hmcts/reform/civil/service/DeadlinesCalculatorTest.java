@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidays;
 import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidaysApi;
 import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
@@ -38,6 +39,8 @@ import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
@@ -420,4 +423,44 @@ public class DeadlinesCalculatorTest {
         LocalDate wednesday = LocalDate.of(2022, 9, 28);
         assertThat(calculator.plusWorkingDays(wednesday, 0)).isWednesday();
     }
+
+    @Nested
+    class getSLAStartDate {
+        @Test
+        void shouldReturnADate30WeeksAfterClaimIssueData_whenSmallClaimTrack() {
+            var caseData = CaseData.builder()
+                .allocatedTrack(SMALL_CLAIM)
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2023, 07, 30);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void shouldReturnADate50WeeksAfterClaimIssueData_whenFastClaimTrack() {
+            var caseData = CaseData.builder()
+                .allocatedTrack(FAST_CLAIM)
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2023, 12, 17);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void shouldReturnADate80WeeksAfterClaimIssueData_whenMultiTrack() {
+            var caseData = CaseData.builder()
+                .allocatedTrack(MULTI_CLAIM)
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2024, 07, 14);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+    }
+
 }
