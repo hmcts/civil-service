@@ -736,7 +736,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isNotRejectDefendantPaymentPlan() {
+    public boolean isRejectDefendantPaymentPlanYes() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
@@ -744,6 +744,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
         return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isRejectDefendantPaymentPlanNo() {
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
+        );
+
+        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 }

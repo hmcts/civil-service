@@ -13,7 +13,7 @@ public class ProposePaymentPlanConfText implements RespondToResponseConfirmation
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isNotRejectDefendantPaymentPlan()) {
+        if (caseData.isRejectDefendantPaymentPlanYes()) {
             return Optional.empty();
         }
 
