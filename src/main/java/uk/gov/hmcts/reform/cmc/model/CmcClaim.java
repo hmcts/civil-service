@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 
 @Data
 @Builder
@@ -55,7 +54,7 @@ public class CmcClaim implements Claim {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate moneyReceivedOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime countyCourtJudgmentRequestedAt;
