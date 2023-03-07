@@ -256,6 +256,45 @@ class BundleCreationTriggerEventHandlerTest {
     }
 
     @Test
+    void shouldReturnFalseWhenBundleHearingDateIsNull() {
+        //Given: caseBundles with bundle hearing date null
+        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .build()));
+        caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        //When: getIsBundleCreatedForHearingDate is called
+        //Then: its should return false indicating that bundle is not already created for this hearingDate
+        Assertions.assertEquals(false, bundleCreationTriggerEventHandler.getIsBundleCreatedForHearingDate(1L));
+    }
+
+    @Test
+    void shouldReturnFalseWhenAnyBundleHearingDateIsNull() {
+        //Given: caseBundles with bundle hearing date null
+        caseData.setHearingDate(LocalDate.of(2023, 12, 12));
+        List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .build()));
+        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.of(LocalDateTime.now()))
+            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
+            .build()));
+        caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.of(2023, 12, 12)).build();
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        //When: getIsBundleCreatedForHearingDate is called
+        //Then: its should return false indicating that bundle is not already created for this hearingDate
+        Assertions.assertEquals(true, bundleCreationTriggerEventHandler.getIsBundleCreatedForHearingDate(1L));
+    }
+
+    @Test
     void shouldReturnTrueWhenBundleHearingDateIsEqualToHearingDate() {
         //Given : caseData with hearing date same as caseBundles hearing date
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));

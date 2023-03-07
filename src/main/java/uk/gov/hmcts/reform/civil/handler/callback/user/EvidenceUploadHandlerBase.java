@@ -355,57 +355,60 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     void addUploadDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
                                   List<Element<UploadEvidenceDocumentType>> documentUploadEvidenceType,
                                   Optional<Bundle> bundleDetails, String docType) {
-        if (null != documentUploadEvidenceType) {
-            documentUploadEvidenceType.forEach(uploadEvidenceDocumentType -> {
-                if (null != uploadEvidenceDocumentType.getValue().getCreatedDatetime()
-                    && bundleDetails.get().getCreatedOn().isPresent()
-                    && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
-                    .isAfter(bundleDetails.get().getCreatedOn().get())) {
-                    uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                             .typeOfDocument(docType)
-                                                                             .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
-                                                                             .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())
-                                                                             .build()));
-                }
-            });
+        if (null == documentUploadEvidenceType) {
+            return;
         }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentType -> {
+            if (null != uploadEvidenceDocumentType.getValue().getCreatedDatetime()
+                && bundleDetails.get().getCreatedOn().isPresent()
+                && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
+                .isAfter(bundleDetails.get().getCreatedOn().get())) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
+                                                                         .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())
+                                                                         .build()));
+            }
+        });
     }
 
     void addWitnessDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
                                    List<Element<UploadEvidenceWitness>> documentUploadEvidenceType,
                                    Optional<Bundle> bundleDetails, String docType) {
-        if (null != documentUploadEvidenceType) {
-            documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
-                if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
-                    null))) {
-                    uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                             .typeOfDocument(docType)
-                                                                             .createdDatetime(
-                                                                                 uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
-                                                                             .documentUpload(
-                                                                                 uploadEvidenceDocumentTypeElement.getValue().getWitnessOptionDocument())
-                                                                             .build()));
-                }
-            });
+        if (null == documentUploadEvidenceType) {
+            return;
         }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
+            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
+                null))) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
+                                                                         .documentUpload(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getWitnessOptionDocument())
+                                                                         .build()));
+            }
+        });
     }
 
     void addExpertDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
                                   List<Element<UploadEvidenceExpert>> documentUploadEvidenceType,
                                   Optional<Bundle> bundleDetails, String docType) {
-        if (null != documentUploadEvidenceType) {
-            documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
-                if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
-                    null))) {
-                    uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
-                                                                             .typeOfDocument(docType)
-                                                                             .createdDatetime(
-                                                                                 uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
-                                                                             .documentUpload(
-                                                                                 uploadEvidenceDocumentTypeElement.getValue().getExpertDocument())
-                                                                             .build()));
-                }
-            });
+        if (null == documentUploadEvidenceType) {
+            return;
         }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
+            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
+                null))) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
+                                                                         .documentUpload(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getExpertDocument())
+                                                                         .build()));
+            }
+        });
     }
 }

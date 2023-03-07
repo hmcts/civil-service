@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -99,88 +98,116 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
         List<Element<UploadEvidenceDocumentType>> respondentEvidenceUploadedAfterBundle = new ArrayList<>();
         Optional<Bundle> bundleDetails = caseData.getCaseBundles().stream().map(IdValue::getValue)
             .max(Comparator.comparing(bundle -> bundle.getCreatedOn().orElse(null)));
-        if (bundleDetails.isPresent() && nonNull(bundleDetails.get().getCreatedOn())) {
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes(), bundleDetails,
-                             EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
-            );
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes2(), bundleDetails,
-                             EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
-            );
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosureRes(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosureRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatementRes(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatementRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummaryRes(), bundleDetails,
-                             EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummaryRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgumentRes(),
-                             bundleDetails,
-                             EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgumentRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAuthoritiesRes(),
-                             bundleDetails,
-                             EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAuthoritiesRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCostsRes(), bundleDetails,
-                             EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCostsRes2(), bundleDetails,
-                             EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrialRes(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName());
-            addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrialRes2(),
-                             bundleDetails,
-                             EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatementRes(),
-                              bundleDetails,
-                              EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatementRes2(),
-                              bundleDetails,
-                              EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummaryRes(),
-                              bundleDetails,
-                              EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummaryRes2(),
-                              bundleDetails,
-                              EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNoticeRes(),
-                              bundleDetails,
-                              EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName());
-            addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNoticeRes2(),
-                              bundleDetails,
-                              EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentExpertReportRes(), bundleDetails,
-                             EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentExpertReportRes2(), bundleDetails,
-                             EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentJointStatementRes(), bundleDetails,
-                             EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentJointStatementRes2(), bundleDetails,
-                             EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentQuestionsRes(), bundleDetails,
-                             EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentQuestionsRes2(), bundleDetails,
-                             EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAnswersRes(), bundleDetails,
-                             EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName());
-            addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAnswersRes2(), bundleDetails,
-                             EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName());
-            caseDataBuilder.respondentDocsUploadedAfterBundle(respondentEvidenceUploadedAfterBundle);
+
+        if (bundleDetails.get().getCreatedOn().isEmpty()) {
+            return;
         }
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes(), bundleDetails,
+                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListRes2(), bundleDetails,
+                         EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosureRes(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName());
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosureRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName());
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatementRes(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatementRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummaryRes(), bundleDetails,
+                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummaryRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgumentRes(),
+                         bundleDetails,
+                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgumentRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAuthoritiesRes(),
+                         bundleDetails,
+                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAuthoritiesRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCostsRes(), bundleDetails,
+                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentCostsRes2(), bundleDetails,
+                         EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrialRes(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrialRes2(),
+                         bundleDetails,
+                         EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatementRes(),
+                          bundleDetails,
+                          EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatementRes2(),
+                          bundleDetails,
+                          EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummaryRes(),
+                          bundleDetails,
+                          EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummaryRes2(),
+                          bundleDetails,
+                          EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNoticeRes(),
+                          bundleDetails,
+                          EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNoticeRes2(),
+                          bundleDetails,
+                          EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentExpertReportRes(), bundleDetails,
+                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentExpertReportRes2(), bundleDetails,
+                         EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentJointStatementRes(), bundleDetails,
+                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentJointStatementRes2(), bundleDetails,
+                         EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentQuestionsRes(), bundleDetails,
+                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentQuestionsRes2(), bundleDetails,
+                         EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAnswersRes(), bundleDetails,
+                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(respondentEvidenceUploadedAfterBundle, caseData.getDocumentAnswersRes2(), bundleDetails,
+                         EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
+        caseDataBuilder.respondentDocsUploadedAfterBundle(respondentEvidenceUploadedAfterBundle);
     }
 }
 
