@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
@@ -177,6 +178,13 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return claimData != null && claimData.hasBreathingSpace();
+    }
+
+    @JsonIgnore
+    public LocalDate getBySpecifiedDate() {
+        return Optional.ofNullable(getResponse())
+            .map(Response::getPaymentIntention)
+            .map(PaymentIntention::getPaymentDate).orElse(null);
     }
 
     private boolean isResponseDeadlinePastFourPmToday() {
