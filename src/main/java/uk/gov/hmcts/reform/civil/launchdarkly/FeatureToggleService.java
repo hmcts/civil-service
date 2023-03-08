@@ -47,7 +47,7 @@ public class FeatureToggleService {
         return internalClient.boolVariation(
             "global-search-specified",
             createLDUser().build(),
-            false
+            true
         );
     }
 
@@ -74,7 +74,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), true);
     }
 
     public boolean isCaseFlagsEnabled() {
