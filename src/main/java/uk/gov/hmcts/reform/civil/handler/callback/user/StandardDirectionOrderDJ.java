@@ -197,7 +197,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         DynamicList locationsList = getLocationsFromList(locations);
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
-        DynamicList hearingMethodList = getHearingMethodList(callbackParams, caseData);
+        DynamicList hearingMethodList = getHearingMethodList(authToken, caseData);
         caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
         caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
@@ -605,8 +605,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
-    private DynamicList getHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+    private DynamicList getHearingMethodList(String authToken, CaseData caseData) {
         String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
             ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
