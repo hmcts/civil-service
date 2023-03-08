@@ -51,7 +51,6 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -510,6 +509,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
+    private final DynamicList hearingMethodValuesDisposalHearingDJ;
     private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
