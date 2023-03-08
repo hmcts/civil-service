@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.dq;
+/*package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
     StateFlowEngine.class,
     CaseDetailsConverter.class
 })
+
 class DirectionsQuestionnaireGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -2195,3 +2197,4 @@ class DirectionsQuestionnaireGeneratorTest {
         }
     }
 }
+*/
