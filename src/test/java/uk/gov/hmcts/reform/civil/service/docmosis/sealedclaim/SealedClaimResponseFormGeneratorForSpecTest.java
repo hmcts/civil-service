@@ -86,8 +86,9 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                              .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
+
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData);
+            caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
         Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
@@ -147,8 +148,9 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                              .build())
             .respondent2ResponseDate(LocalDateTime.now())
             .build();
+
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData);
+            caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
         Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),

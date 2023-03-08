@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -25,7 +24,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
@@ -43,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 
 @Service
 @RequiredArgsConstructor
-public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimResponseFormForSpec> {
+public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGeneratorWithAuth<SealedClaimResponseFormForSpec> {
 
     private final RepresentativeService representativeService;
     private final DocumentGeneratorService documentGeneratorService;
@@ -51,7 +50,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final LocationRefDataService locationRefDataService;
 
     @Override
-    public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData) {
+    public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         String requestedCourt = null;
         StatementOfTruth statementOfTruth = null;
         if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null) {
@@ -63,7 +62,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
         List<LocationRefData> courtLocations = (locationRefDataService
             .getCourtLocationsByEpimmsId(
-                CallbackParams.Params.BEARER_TOKEN.toString(),
+                authorisation,
                 requestedCourt));
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder
             = SealedClaimResponseFormForSpec.builder()
@@ -199,7 +198,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     public CaseDocument generate(CaseData caseData, String authorization) {
-        SealedClaimResponseFormForSpec templateData = getTemplateData(caseData);
+        SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
 
         DocmosisTemplates docmosisTemplate;
         if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
