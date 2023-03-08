@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEI
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
+class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ServiceRequestUpdateCallbackHandler handler;
