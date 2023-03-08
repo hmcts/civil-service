@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.enums;
+package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MediationDecision {
-    YES("I have read and understood the above"),
-    NO("Opt out of mediation");
+    Yes("I have read and understood the above"),
+    No("Opt out of mediation");
 
     private final String displayedValue;
 }
