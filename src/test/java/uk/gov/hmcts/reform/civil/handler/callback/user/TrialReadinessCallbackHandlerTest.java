@@ -170,7 +170,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void shouldReturnConfirmationScreen_when1v1ResponseSubmitted_ApplicantSolicitor() {
+        void shouldReturnConfirmationScreen_when1v1ReadySubmitted_ApplicantSolicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -188,7 +188,25 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnConfirmationScreen_when1v1ResponseSubmitted() {
+        void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_ApplicantSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyApplicant().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
+                .thenReturn(true);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(NOT_READY_HEADER)
+                    .confirmationBody(NOT_READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Respondent1Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -206,11 +224,29 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnConfirmationScreen_when1v1ResponseSubmitted() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
+        void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Respondent1Solicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent1().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
+                .thenReturn(true);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(NOT_READY_HEADER)
+                    .confirmationBody(NOT_READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Respondent2Solicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent2().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
                 .thenReturn(true);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -219,6 +255,24 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(READY_HEADER)
                     .confirmationBody(READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Respondent2Solicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent2().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
+                .thenReturn(true);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(NOT_READY_HEADER)
+                    .confirmationBody(NOT_READY_BODY)
                     .build()
             );
         }

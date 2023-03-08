@@ -3436,6 +3436,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialNotReadyApplicant() {
+        atStateTrialReadyCheck();
+        trialReadyApplicant = NO;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyRespondent1() {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = YES;
@@ -3446,6 +3457,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialNotReadyRespondent1() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent1 = NO;
+        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyRespondent2() {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = YES;
@@ -3453,6 +3474,16 @@ public class CaseDataBuilder {
                                                                         .revisedHearingRequirements(YES)
                                                                         .revisedHearingComments("Changes requested.")
                                                                         .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialNotReadyRespondent2() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent2 = NO;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
         return this;
     }
 
