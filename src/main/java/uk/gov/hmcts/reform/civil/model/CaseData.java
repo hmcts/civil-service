@@ -712,6 +712,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
 
+    // judge final orders
+    private final FreeFormOrderValues orderOnCourtInitiative;
+    private final FreeFormOrderValues orderWithoutNotice;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
