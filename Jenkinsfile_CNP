@@ -138,8 +138,8 @@ withPipeline(type, product, component) {
     sh """
       eval \$(./bin/variables/load-staging-environment-variables.sh)
       ./bin/add-roles.sh
-      ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
-      ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
+      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
       ./bin/import-ccd-definition.sh "-e *GAspec.json,*-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
     """
