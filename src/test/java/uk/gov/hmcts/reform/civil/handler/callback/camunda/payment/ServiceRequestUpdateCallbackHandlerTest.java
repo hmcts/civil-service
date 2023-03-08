@@ -35,23 +35,17 @@ public class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandler
     private CaseData caseData;
     private CallbackParams params;
 
-    @BeforeEach
-    public void setup() {
+    @Test
+    void shouldChangeApplicationState_whenInvoked() {
+        //Given: Case data with hearingFee PBA details
         caseData = CaseDataBuilder.builder()
             .buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-    }
-
-
-    @Test
-    void shouldChangeApplicationState_whenInvoked() {
-
-        //caseData = caseData.toBuilder().ccdState(CaseState.HEARING_READINESS).build();
-        params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //when: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+        //Then: response should contain hearingFeePBA details
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        
+        assertThat(caseData.getHearingFeePBADetails().getServiceReqReference()).isEqualTo(responseCaseData.getHearingFeePBADetails().getServiceReqReference());
     }
 
     @Test
