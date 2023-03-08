@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
@@ -259,6 +260,33 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
                         }
                     }
+                    break;
+                case FULL_DEFENCE:
+                    builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+                    .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                           .map(event ->
+                                                    EventTemplateData.builder()
+                                                        .date(event.getValue().getTimelineDate())
+                                                        .explanation(event.getValue().getTimelineDescription())
+                                                        .build()).collect(Collectors.toList()));
+                    if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+                        .equals(caseData.getDefenceRouteRequired())) {
+                        RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                            .orElse(caseData.getRespondToClaim());
+                        builder.whyReject("ALREADY_PAID")
+                            .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                            .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                            ? respondToClaim.getHowWasThisAmountPaidOther()
+                                            : respondToClaim.getHowWasThisAmountPaid()
+                                .getHumanFriendly());
+                    } else if (SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+                        .equals(caseData.getDefenceRouteRequired())) {
+                        builder.whyReject("DISPUTE");
+                    }
+                    break;
+                case COUNTER_CLAIM:
+                    builder.whyReject("COUNTER_CLAIM");
                     break;
             }
         }

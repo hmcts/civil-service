@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.DebtTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -67,8 +67,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     public void admitPayImmediate() throws JsonProcessingException {
@@ -82,8 +80,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
@@ -106,8 +102,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
@@ -128,8 +122,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
@@ -149,8 +141,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
@@ -177,12 +167,10 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
-    public void partAdmitPayByDate() throws JsonProcessingException {
+    public void partAdmitPayByDate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -203,8 +191,6 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
     @Test
@@ -227,16 +213,61 @@ public class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-
-        System.out.println(objectMapper.writeValueAsString(templateData));
     }
 
-    /*
-    TODO
-    part admit and not paid
-    reject and pay
-    reject and dispute
-     */
+    @Test
+    public void fullDefenseAlreadyPaid() throws JsonProcessingException {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                                .build())
+            .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
+
+        CaseData caseData = timeline(builder)
+            .build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
+
+    @Test
+    public void fullDefenseDispute() throws JsonProcessingException {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
+            .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
+
+        CaseData caseData = timeline(builder)
+            .build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
+
+    @Test
+    public void counterClaim() throws JsonProcessingException {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
+
+        CaseData caseData = timeline(builder)
+            .build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
 
     private static AccountSimple account(@NotNull AccountType type, @NotNull YesOrNo joint, @NotNull BigDecimal balance) {
         AccountSimple a = new AccountSimple();
