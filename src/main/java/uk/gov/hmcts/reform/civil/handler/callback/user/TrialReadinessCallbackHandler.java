@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,8 +18,6 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,10 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 
 @Service
@@ -44,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration
 public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(TRIAL_READINESS);
-    private final String NOT_VALID_READINESS = "Trial arrangements had to be confirmed more than 3 weeks before the trial.";
+    private static final String TOO_LATE = "Trial arrangements had to be confirmed more than 3 weeks before the trial.";
     public static final String READY_HEADER = "## You have said this case is ready for trial or hearing";
     public static final String READY_BODY = "### What happens next \n\n"
         + "You can view your and other party's trial arrangements in documents in the case details.\n\n "
@@ -76,15 +69,13 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
         var isRespondent2 = YesOrNo.NO;
-        if(checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE))
-        {
+        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
             isApplicant = YesOrNo.YES;
             updatedData.hearingDurationTextApplicant(formatHearingDuration(caseData.getHearingDuration()));
-        } else if(checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
             isRespondent1 = YesOrNo.YES;
             updatedData.hearingDurationTextRespondent1(formatHearingDuration(caseData.getHearingDuration()));
         } else {
@@ -99,7 +90,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getHearingDate())
             && caseData.getHearingDate().minusWeeks(3).isBefore(LocalDate.now())) {
-            errors.add(format(NOT_VALID_READINESS));
+            errors.add(format(TOO_LATE));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -117,10 +108,10 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private YesOrNo checkUserReady (CallbackParams callbackParams) {
+    private YesOrNo checkUserReady(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        if(checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
             return caseData.getTrialReadyApplicant();
         } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
             return caseData.getTrialReadyRespondent1();
