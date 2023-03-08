@@ -237,7 +237,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
                     List<LocationRefData> courtLocations = (locationRefDataService
-                        .getCourtLocationsByEpimmsId(CallbackParams.Params.BEARER_TOKEN.toString(),
+                        .getCourtLocationsByEpimmsId(callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                                                      caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
                     applicant1DQBuilder.applicant1DQRequestedCourt(
                         RequestedCourt.builder()
