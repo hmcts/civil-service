@@ -515,6 +515,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
             .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentDisclosureList(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -527,7 +528,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
         // Then applicant docs uploaded after bundle should return size 2
-        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(2);
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(3);
     }
 
     @Test
@@ -642,6 +643,17 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                                                             .documentFileName(TEST_FILE_NAME).build()).build()));
 
         return  expertEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate) {
+        List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocs = new ArrayList<>();
+        uploadEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                        .builder()
+                                                        .createdDatetime(uploadedDate)
+                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+
+        return  uploadEvidenceDocs;
     }
 
 }

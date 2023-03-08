@@ -47,29 +47,31 @@ public class BundleCreationTriggerEventHandler {
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
         boolean isBundleCreated = getIsBundleCreatedForHearingDate(event.getCaseId());
-        if (!isBundleCreated) {
-            BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
-
-            String caseId = event.getCaseId().toString();
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
-            CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
-
-            List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-            caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
-                                   .stream().map(bundle -> prepareNewBundle(bundle, caseData)
-                ).collect(Collectors.toList()));
-            CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
-            coreCaseDataService.submitUpdate(caseId, caseContent);
-        } else {
+        if (isBundleCreated) {
             log.info("Trial Bundle already exists for case {}", event.getCaseId());
+            return;
         }
+
+        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+
+        String caseId = event.getCaseId().toString();
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
+
+        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
+        caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
+                               .stream().map(bundle -> prepareNewBundle(bundle, caseData)
+            ).collect(Collectors.toList()));
+        CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
+        coreCaseDataService.submitUpdate(caseId, caseContent);
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {
         boolean isBundleCreated = false;
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId).getData());
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        isBundleCreated = !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue()
+        isBundleCreated =
+            !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
             .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
         return isBundleCreated;
     }

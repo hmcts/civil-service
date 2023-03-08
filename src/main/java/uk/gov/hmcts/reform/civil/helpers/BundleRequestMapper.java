@@ -41,7 +41,7 @@ public class BundleRequestMapper {
         BundleCreateRequest bundleCreateRequest = BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
                              .caseData(mapCaseData(caseData,
-                                                   bundleConfigFileName, id))
+                                                   bundleConfigFileName))
                              .filenamePrefix(fileNameIdentifier)
 
                              .build()
@@ -51,7 +51,7 @@ public class BundleRequestMapper {
         return bundleCreateRequest;
     }
 
-    private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName, Long id) {
+    private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
         BundlingCaseData bundlingCaseData =
             BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
                     bundleConfigFileName)
@@ -152,20 +152,21 @@ public class BundleRequestMapper {
 
     private ServedDocument mapServedDocuments(ServedDocumentFiles servedDocumentFiles) {
         List<BundlingRequestDocument> bundlingServedDocFiles = new ArrayList<>();
-        if (!Optional.ofNullable(servedDocumentFiles).isEmpty() && null != servedDocumentFiles.getParticularsOfClaimDocument()) {
-            servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
-                bundlingServedDocFiles.add(BundlingRequestDocument.builder()
-                                               .documentFileName(document.getValue().getDocumentFileName())
-                                               .documentLink(DocumentLink.builder()
-                                                                 .documentUrl(document.getValue().getDocumentUrl())
-                                                                 .documentBinaryUrl(document.getValue().getDocumentBinaryUrl())
-                                                                 .documentFilename(document.getValue().getDocumentFileName()).build())
-                                               .build());
-
-            });
+        if (Optional.ofNullable(servedDocumentFiles).isEmpty() || null == servedDocumentFiles.getParticularsOfClaimDocument()) {
+            return ServedDocument.builder().particularsOfClaimDocument(ElementUtils.wrapElements(bundlingServedDocFiles)).build();
         }
+        servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
+            bundlingServedDocFiles.add(BundlingRequestDocument.builder()
+                                           .documentFileName(document.getValue().getDocumentFileName())
+                                           .documentLink(DocumentLink.builder()
+                                                             .documentUrl(document.getValue().getDocumentUrl())
+                                                             .documentBinaryUrl(document.getValue().getDocumentBinaryUrl())
+                                                             .documentFilename(document.getValue().getDocumentFileName()).build())
+                                           .build());
+
+        });
         List<Element<BundlingRequestDocument>> particulars = ElementUtils.wrapElements(bundlingServedDocFiles);
-        return  ServedDocument.builder().particularsOfClaimDocument(particulars).build();
+        return ServedDocument.builder().particularsOfClaimDocument(particulars).build();
     }
 
     private List<Element<BundlingRequestDocument>> mapSystemGeneratedcaseDocument(List<Element<CaseDocument>> systemGeneratedCaseDocuments, Document orderSDODocumentDJ) {
@@ -185,88 +186,101 @@ public class BundleRequestMapper {
                 );
 
             });
-            if (null != orderSDODocumentDJ) {
-                bundlingSystemGeneratedCaseDocs.add(BundlingRequestDocument.builder()
-                                                        .documentFileName(orderSDODocumentDJ.getDocumentFileName())
-                                                        .documentLink(DocumentLink.builder()
-                                                                          .documentUrl(orderSDODocumentDJ.getDocumentUrl())
-                                                                          .documentBinaryUrl(orderSDODocumentDJ.getDocumentBinaryUrl())
-                                                                          .documentFilename(orderSDODocumentDJ.getDocumentFileName()).build())
-                                                        .documentType(DocumentType.SDO_ORDER.name()).build());
-            }
+        }
+        if (null != orderSDODocumentDJ) {
+            bundlingSystemGeneratedCaseDocs.add(BundlingRequestDocument.builder()
+                                                    .documentFileName(orderSDODocumentDJ.getDocumentFileName())
+                                                    .documentLink(DocumentLink.builder()
+                                                                      .documentUrl(orderSDODocumentDJ.getDocumentUrl())
+                                                                      .documentBinaryUrl(orderSDODocumentDJ.getDocumentBinaryUrl())
+                                                                      .documentFilename(orderSDODocumentDJ.getDocumentFileName()).build())
+                                                    .documentType(DocumentType.SDO_ORDER.name()).build());
         }
         return ElementUtils.wrapElements(bundlingSystemGeneratedCaseDocs);
     }
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceWitnessDoc(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness, String displayName) {
         List<BundlingRequestDocument> bundlingWitnessDocs = new ArrayList<>();
-        if (!Optional.ofNullable(uploadEvidenceWitness).isEmpty()) {
-            uploadEvidenceWitness.forEach(witnessDocs -> {
-                StringBuilder fileNameBuilder = new StringBuilder();
-                fileNameBuilder.append(displayName);
-                if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionName()).isPresent()) {
-                    fileNameBuilder.append("_" + witnessDocs.getValue().getWitnessOptionName());
-                }
-                if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionUploadDate()).isPresent()) {
-                    fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(witnessDocs.getValue()
-                                                                                      .getWitnessOptionUploadDate(), "ddMMyyyy"));
-                }
-                Document document = witnessDocs.getValue().getWitnessOptionDocument();
-                bundlingWitnessDocs.add(BundlingRequestDocument.builder()
-                                            .documentFileName(fileNameBuilder.toString())
-                                            .documentLink(DocumentLink.builder()
-                                                              .documentUrl(document.getDocumentUrl())
-                                                              .documentBinaryUrl(document.getDocumentBinaryUrl())
-                                                              .documentFilename(document.getDocumentFileName()).build())
-                                            .build());
-
-            });
+        if (null == uploadEvidenceWitness) {
+            return ElementUtils.wrapElements(bundlingWitnessDocs);
         }
+        uploadEvidenceWitness.forEach(witnessDocs -> {
+            StringBuilder fileNameBuilder = new StringBuilder();
+            fileNameBuilder.append(displayName);
+            if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionName()).isPresent()) {
+                fileNameBuilder.append("_" + witnessDocs.getValue().getWitnessOptionName());
+            }
+            if (Optional.ofNullable(witnessDocs.getValue().getWitnessOptionUploadDate()).isPresent()) {
+                fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(
+                    witnessDocs.getValue()
+                        .getWitnessOptionUploadDate(),
+                    "ddMMyyyy"
+                ));
+            }
+            Document document = witnessDocs.getValue().getWitnessOptionDocument();
+            bundlingWitnessDocs.add(BundlingRequestDocument.builder()
+                                        .documentFileName(fileNameBuilder.toString())
+                                        .documentLink(DocumentLink.builder()
+                                                          .documentUrl(document.getDocumentUrl())
+                                                          .documentBinaryUrl(document.getDocumentBinaryUrl())
+                                                          .documentFilename(document.getDocumentFileName()).build())
+                                        .build());
+
+        });
         return ElementUtils.wrapElements(bundlingWitnessDocs);
     }
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceExpertDoc(List<Element<UploadEvidenceExpert>> uploadEvidenceExpert, String displayName) {
         List<BundlingRequestDocument> bundlingExpertDocs = new ArrayList<>();
-        if (!Optional.ofNullable(uploadEvidenceExpert).isEmpty()) {
-            uploadEvidenceExpert.forEach(expertDocs -> {
-                StringBuilder fileNameBuilder = new StringBuilder();
-                fileNameBuilder.append(displayName);
-                if (Optional.ofNullable(expertDocs.getValue().getExpertOptionName()).isPresent()) {
-                    fileNameBuilder.append("_" + expertDocs.getValue().getExpertOptionName());
-                }
-                if (Optional.ofNullable(expertDocs.getValue().getExpertOptionUploadDate()).isPresent()) {
-                    fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(expertDocs.getValue()
-                                                                                      .getExpertOptionUploadDate(), "ddMMyyyy"));
-                }
-                Document document = expertDocs.getValue().getExpertDocument();
-                bundlingExpertDocs.add(BundlingRequestDocument.builder()
-                                           .documentFileName(fileNameBuilder.toString())
-                                           .documentLink(DocumentLink.builder()
-                                                             .documentUrl(document.getDocumentUrl())
-                                                             .documentBinaryUrl(document.getDocumentBinaryUrl())
-                                                             .documentFilename(document.getDocumentFileName()).build())
-                                           .build());
-
-            });
+        if (null == uploadEvidenceExpert) {
+            return ElementUtils.wrapElements(bundlingExpertDocs);
         }
+
+        uploadEvidenceExpert.forEach(expertDocs -> {
+            StringBuilder fileNameBuilder = new StringBuilder();
+            fileNameBuilder.append(displayName);
+            if (Optional.ofNullable(expertDocs.getValue().getExpertOptionName()).isPresent()) {
+                fileNameBuilder.append("_" + expertDocs.getValue().getExpertOptionName());
+            }
+            if (Optional.ofNullable(expertDocs.getValue().getExpertOptionUploadDate()).isPresent()) {
+                fileNameBuilder.append("_" + DateFormatHelper.formatLocalDate(
+                    expertDocs.getValue()
+                        .getExpertOptionUploadDate(),
+                    "ddMMyyyy"
+                ));
+            }
+            Document document = expertDocs.getValue().getExpertDocument();
+            bundlingExpertDocs.add(BundlingRequestDocument.builder()
+                                       .documentFileName(fileNameBuilder.toString())
+                                       .documentLink(DocumentLink.builder()
+                                                         .documentUrl(document.getDocumentUrl())
+                                                         .documentBinaryUrl(document.getDocumentBinaryUrl())
+                                                         .documentFilename(document.getDocumentFileName()).build())
+                                       .build());
+
+        });
+
         return ElementUtils.wrapElements(bundlingExpertDocs);
     }
 
     private List<Element<BundlingRequestDocument>> mapUploadEvidenceOtherDoc(List<Element<UploadEvidenceDocumentType>> otherDocsEvidenceUpload) {
         List<BundlingRequestDocument> bundlingExpertDocs = new ArrayList<>();
-        if (!Optional.ofNullable(otherDocsEvidenceUpload).isEmpty()) {
-            otherDocsEvidenceUpload.forEach(otherDocs -> {
-                Document document = otherDocs.getValue().getDocumentUpload();
-                bundlingExpertDocs.add(BundlingRequestDocument.builder()
-                                           .documentFileName(document.getDocumentFileName())
-                                           .documentLink(DocumentLink.builder()
-                                                             .documentUrl(document.getDocumentUrl())
-                                                             .documentBinaryUrl(document.getDocumentBinaryUrl())
-                                                             .documentFilename(document.getDocumentFileName()).build())
-                                           .build());
-
-            });
+        if (null == otherDocsEvidenceUpload) {
+            return ElementUtils.wrapElements(bundlingExpertDocs);
         }
+
+        otherDocsEvidenceUpload.forEach(otherDocs -> {
+            Document document = otherDocs.getValue().getDocumentUpload();
+            bundlingExpertDocs.add(BundlingRequestDocument.builder()
+                                       .documentFileName(document.getDocumentFileName())
+                                       .documentLink(DocumentLink.builder()
+                                                         .documentUrl(document.getDocumentUrl())
+                                                         .documentBinaryUrl(document.getDocumentBinaryUrl())
+                                                         .documentFilename(document.getDocumentFileName()).build())
+                                       .build());
+
+        });
+
         return ElementUtils.wrapElements(bundlingExpertDocs);
     }
 }
