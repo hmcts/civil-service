@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -63,6 +64,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
