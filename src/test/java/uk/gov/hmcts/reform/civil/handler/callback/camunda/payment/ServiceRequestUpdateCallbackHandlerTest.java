@@ -28,16 +28,13 @@ class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    private CaseData caseData;
-    private CallbackParams params;
-
+    
     @Test
     void shouldChangeApplicationState_whenInvoked() {
         //Given: Case data with hearingFee PBA details
-        caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
-        params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         //when: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         //Then: response should contain hearingFeePBA details
