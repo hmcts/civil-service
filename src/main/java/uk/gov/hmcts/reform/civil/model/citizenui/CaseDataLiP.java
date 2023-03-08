@@ -15,7 +15,5 @@ public class CaseDataLiP {
 
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
-
     private TranslatedDocument translatedDocument;
-
 }
