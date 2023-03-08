@@ -22,10 +22,11 @@ class HearingFeeUnpaidEventHandlerTest {
 
     @Test
     void shouldCallTriggerEventWithExpectedParams_WhenDismissClaimEvent() {
+        //Given: HearingFeeUnpaidEvent with caseId 1
         HearingFeeUnpaidEvent event = new HearingFeeUnpaidEvent(1L);
-
+        //When: moveCaseToStruckOut is called with HearingFeeUnpaidEvent
         handler.moveCaseToStruckOut(event);
-
+        //Then: it should trigger HEARING_FEE_UNPAID event
         verify(coreCaseDataService).triggerEvent(event.getCaseId(), HEARING_FEE_UNPAID);
     }
 
