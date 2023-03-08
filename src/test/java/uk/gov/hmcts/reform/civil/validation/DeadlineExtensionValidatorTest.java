@@ -189,7 +189,10 @@ class DeadlineExtensionValidatorTest {
             LocalDateTime currentResponseDeadline = NOW.atTime(16, 0);
 
             List<String> errors = validator.specValidateProposedDeadline(
-                agreedExtension, currentResponseDeadline,false);
+                agreedExtension,
+                currentResponseDeadline,
+                false
+            );
 
             assertThat(errors)
                 .containsOnly("The agreed extension date cannot be more than 28 days after the current deadline");
