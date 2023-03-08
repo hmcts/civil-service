@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,10 +43,10 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
                 .caseDataLiP(CaseDataLiP
                                  .builder()
                                  .translatedDocument(TranslatedDocument
-                                                          .builder()
-                                                          .documentType("DEFENDANT_RESPONSE")
-                                                          .file(Document.builder().build())
-                                                          .build())
+                                                         .builder()
+                                                         .documentType("DEFENDANT_RESPONSE")
+                                                         .file(Document.builder().build())
+                                                         .build())
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
