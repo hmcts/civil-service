@@ -22,7 +22,6 @@ public class ServiceHearingValuesModel {
     private boolean caseAdditionalSecurityFlag;
     private List<CaseCategoryModel> caseCategories;
     private String caseDeepLink;
-    @JsonProperty("caserestrictedFlag")
     private boolean caseRestrictedFlag;
     private String externalCaseReference;
     private String caseManagementLocationCode;
