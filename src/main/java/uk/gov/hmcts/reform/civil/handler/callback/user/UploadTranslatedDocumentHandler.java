@@ -20,16 +20,19 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOC
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentHandler extends CallbackHandler {
 
+    private static final List<CaseEvent> EVENTS =  List.of(UPLOAD_TRANSLATED_DOCUMENT);
     private final ObjectMapper objectMapper;
+
+    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument);
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument);
+        return callbackMap;
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return List.of(UPLOAD_TRANSLATED_DOCUMENT);
+        return EVENTS;
     }
 
     private CallbackResponse uploadDocument(CallbackParams callbackParams) {

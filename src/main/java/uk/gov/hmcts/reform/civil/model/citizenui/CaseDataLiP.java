@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 
 
 @Data
@@ -17,7 +16,6 @@ public class CaseDataLiP {
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
 
-    @JsonProperty("translationDocument")
-    private TranslationDocument translationDocument;
+    private TranslatedDocument translatedDocument;
 
 }

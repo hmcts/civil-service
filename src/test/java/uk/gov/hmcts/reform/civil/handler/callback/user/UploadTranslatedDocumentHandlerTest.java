@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslationDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -43,7 +43,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
                 .builder()
                 .caseDataLiP(CaseDataLiP
                                  .builder()
-                                 .translationDocument(TranslationDocument
+                                 .translatedDocument(TranslatedDocument
                                                           .builder()
                                                           .documentType("DEFENDANT_RESPONSE")
                                                           .file(Document.builder().build())
@@ -54,7 +54,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).extracting("translationDocument").isNotNull();
+            assertThat(response.getData()).extracting("translatedDocument").isNotNull();
         }
     }
 

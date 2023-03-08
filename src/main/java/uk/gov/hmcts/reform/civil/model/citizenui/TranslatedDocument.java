@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TranslationDocument {
+public class TranslatedDocument {
     private Document file;
     private String documentType;
 }
