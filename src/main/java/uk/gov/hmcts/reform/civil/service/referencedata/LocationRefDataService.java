@@ -96,6 +96,8 @@ public class LocationRefDataService {
 
     public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
         try {
+            log.info("authToke: " + authToken);
+            log.info("epimmsId: " + epimmsId);
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
                 buildURIforCourtLocation(epimmsId),
                 HttpMethod.GET,
