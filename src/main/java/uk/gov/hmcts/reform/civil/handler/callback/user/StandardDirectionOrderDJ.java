@@ -199,6 +199,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
         DynamicList hearingMethodList = getHearingMethodList(callbackParams, caseData);
         caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
+        caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
@@ -615,7 +616,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (categorySearchResult.isPresent()) {
             List<Category> categories = categorySearchResult.get().getCategories().stream()
                 .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).collect(Collectors.toList());
-            hearingMethodList = DynamicList.fromList(categories, Category::getValueCy, null, false);
+            hearingMethodList = DynamicList.fromList(categories, Category::getValueEn, null, false);
         } else {
             hearingMethodList = DynamicList.fromList(List.of());
         }
