@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.citizenui;
+package uk.gov.hmcts.reform.civil.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
