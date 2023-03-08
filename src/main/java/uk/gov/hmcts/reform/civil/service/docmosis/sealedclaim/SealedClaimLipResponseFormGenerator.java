@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.LoanCardDebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -231,12 +232,14 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                                                             .explanation(event.getValue().getTimelineDescription())
                                                             .build()).collect(Collectors.toList()));
                     if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+                        RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                            .orElse(caseData.getRespondToClaim());
                         builder.whyReject("ALREADY_PAID")
-                            .howMuchWasPaid(caseData.getRespondToAdmittedClaim().getHowMuchWasPaid() + "")
-                            .paymentDate(caseData.getRespondToClaim().getWhenWasThisAmountPaid())
-                            .paymentHow(caseData.getRespondToClaim().getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                                            ? caseData.getRespondToClaim().getHowWasThisAmountPaidOther()
-                                            : caseData.getRespondToClaim().getHowWasThisAmountPaid()
+                            .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                            .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                            ? respondToClaim.getHowWasThisAmountPaidOther()
+                                            : respondToClaim.getHowWasThisAmountPaid()
                                 .getHumanFriendly());
                     } else {
                         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()

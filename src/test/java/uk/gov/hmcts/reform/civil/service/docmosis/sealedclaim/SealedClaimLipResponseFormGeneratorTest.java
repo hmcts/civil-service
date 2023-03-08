@@ -27,7 +27,9 @@ import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.LoanCardDebtLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
@@ -196,6 +198,30 @@ public class SealedClaimLipResponseFormGeneratorTest {
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = timeline(financialDetails(builder))
+            .build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+
+        System.out.println(objectMapper.writeValueAsString(templateData));
+    }
+
+    @Test
+    public void partAdmitAlreadyPaid() throws JsonProcessingException {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.YES)
+            .respondToClaim(RespondToClaim.builder()
+                                        .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                                        .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                        .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                                        .build())
+            .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
+
+        CaseData caseData = timeline(builder)
             .build();
 
         SealedClaimLipResponseForm templateData = generator
