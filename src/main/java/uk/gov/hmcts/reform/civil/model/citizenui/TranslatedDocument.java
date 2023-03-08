@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @NoArgsConstructor
 @Builder
 public class TranslatedDocument {
+
     private Document file;
     private String documentType;
 }
