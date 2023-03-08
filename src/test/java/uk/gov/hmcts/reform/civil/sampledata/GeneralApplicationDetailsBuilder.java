@@ -103,8 +103,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -171,8 +169,6 @@ public class GeneralApplicationDetailsBuilder {
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -231,8 +227,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalApplications(wrapElements(getGeneralApplication()))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -370,8 +364,6 @@ public class GeneralApplicationDetailsBuilder {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalApplications(wrapElements(getGeneralApplication()))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -471,8 +463,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -623,8 +613,6 @@ public class GeneralApplicationDetailsBuilder {
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -720,8 +708,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -820,8 +806,6 @@ public class GeneralApplicationDetailsBuilder {
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -917,8 +901,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -1023,8 +1005,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -1061,8 +1041,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1150,8 +1128,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(10800L))
                                 .version("1").build())
                         .build())
@@ -1229,6 +1205,19 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithGeneralOrderStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
     public CaseData getTestCaseDataWithDismissalOrderPDFDocument(CaseData caseData) {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
@@ -1238,6 +1227,17 @@ public class GeneralApplicationDetailsBuilder {
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
             .dismissalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
             .build();
+    }
+
+    public CaseData getTestCaseDataWithDismissalOrderStaffPDFDocument(CaseData caseData) {
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .dismissalOrderDocStaff(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+                .build();
     }
 
     public CaseData getTestCaseDataWithDirectionOrderPDFDocument(CaseData caseData) {
@@ -1256,7 +1256,23 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
-    public CaseData getTestCaseDataWithHearingOrderDocumentPDFDocument(CaseData caseData) {
+    public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .generalOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                        .value(pdfDocument).build()))
+                .directionOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
+    public CaseData getTestCaseDataWithHearingNoticeDocumentPDFDocument(CaseData caseData) {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
@@ -1264,6 +1280,18 @@ public class GeneralApplicationDetailsBuilder {
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .hearingNoticeDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                        .value(pdfDocument).build()))
+                .build();
+    }
+
+    public CaseData getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument(CaseData caseData) {
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .hearingNoticeDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                         .value(pdfDocument).build()))
                 .build();
     }
@@ -1279,8 +1307,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
