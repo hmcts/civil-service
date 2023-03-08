@@ -91,7 +91,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
-            time.toString(),
+            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm"),
             HEARING_DUE_DATE,
             caseData.getHearingDueDate() == null ? "" :
                 caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),

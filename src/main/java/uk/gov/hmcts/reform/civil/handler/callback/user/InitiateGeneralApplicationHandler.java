@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -155,12 +153,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             .build();
     }
 
-    private List<String> getPbaAccounts(String authToken) {
-        return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
-    }
-
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAUrgencyRequirement generalAppUrgencyRequirement = caseData.getGeneralAppUrgencyRequirement();
@@ -188,11 +180,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
         Fee feeForGA = feesService.getFeeForGA(caseData);
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .applicantsPbaAccounts(fromList(pbaNumbers))
                 .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
                 .fee(feeForGA)
                 .build());

@@ -206,7 +206,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "15:30", "hearingDueDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022"
         );
     }
 
@@ -215,7 +215,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30", "hearingDueDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "23-11-2022"
         );
     }
 
