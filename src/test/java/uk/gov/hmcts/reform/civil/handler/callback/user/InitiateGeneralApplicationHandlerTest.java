@@ -805,10 +805,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer(new Answer() {
-                public Object answer(InvocationOnMock invocation) {
-                    return invocation.getArguments()[1];
-                }
-            });
+                        public Object answer(InvocationOnMock invocation) {
+                            return invocation.getArguments()[1];
+                        }
+                    }
+            );
 
             when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
                     any(CaseData.class), any(UserDetails.class)))
