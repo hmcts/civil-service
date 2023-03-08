@@ -33,7 +33,7 @@ public class RepaymentPlanLRspec {
                     return firstRepaymentDate.plusWeeks(4 * installmentsAfterFirst);
                 case ONCE_THREE_WEEKS:
                     return firstRepaymentDate.plusWeeks(3 * installmentsAfterFirst);
-                case ONCE_ONE_MONTH:
+                default:
                     return firstRepaymentDate.plusMonths(installmentsAfterFirst);
             }
         }

@@ -196,7 +196,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                         case JOINTLY_OWNED_HOME:
                             builder.whereTheyLive("Jointly-owned home (or jointly mortgaged home)");
                             break;
-                        case OTHER:
+                        default:
                             builder.whereTheyLive("Other");
                             break;
                     }
@@ -207,91 +207,103 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION:
-                    if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                        == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-                        builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
-                            .amountToPay(caseData.getTotalClaimAmount() + "");
-                    } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                        == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-                        builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
-                            .payBy(caseData.getRespondent1RepaymentPlan()
-                                       .finalPaymentBy(caseData.getTotalClaimAmount()))
-                            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-                    } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                        == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
-                        builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-                            .amountToPay(caseData.getTotalClaimAmount() + "")
-                            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-                    }
+                    fullAdmissionData(caseData, builder, caseData.getTotalClaimAmount());
                     break;
                 case PART_ADMISSION:
-                    builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-                        .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
-                                               .map(event ->
-                                                        EventTemplateData.builder()
-                                                            .date(event.getValue().getTimelineDate())
-                                                            .explanation(event.getValue().getTimelineDescription())
-                                                            .build()).collect(Collectors.toList()));
-                    if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
-                        RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                            .orElse(caseData.getRespondToClaim());
-                        builder.whyReject("ALREADY_PAID")
-                            .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
-                            .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
-                            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                                            ? respondToClaim.getHowWasThisAmountPaidOther()
-                                            : respondToClaim.getHowWasThisAmountPaid()
-                                .getHumanFriendly());
-                    } else {
-                        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-                            builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
-                                .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
-                        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-                            builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
-                                .payBy(caseData.getRespondent1RepaymentPlan()
-                                           .finalPaymentBy(caseData.getRespondToAdmittedClaimOwingAmount()))
-                                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-                        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
-                            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-                                .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "")
-                                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-                        }
-                    }
+                    partAdmissionData(caseData, builder);
                     break;
                 case FULL_DEFENCE:
-                    builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-                    .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
-                                           .map(event ->
-                                                    EventTemplateData.builder()
-                                                        .date(event.getValue().getTimelineDate())
-                                                        .explanation(event.getValue().getTimelineDescription())
-                                                        .build()).collect(Collectors.toList()));
-                    if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-                        .equals(caseData.getDefenceRouteRequired())) {
-                        RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                            .orElse(caseData.getRespondToClaim());
-                        builder.whyReject("ALREADY_PAID")
-                            .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
-                            .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
-                            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                                            ? respondToClaim.getHowWasThisAmountPaidOther()
-                                            : respondToClaim.getHowWasThisAmountPaid()
-                                .getHumanFriendly());
-                    } else if (SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-                        .equals(caseData.getDefenceRouteRequired())) {
-                        builder.whyReject("DISPUTE");
-                    }
+                    fullDefenceData(caseData, builder);
                     break;
-                case COUNTER_CLAIM:
+                default:
                     builder.whyReject("COUNTER_CLAIM");
                     break;
             }
         }
 
         return builder.build();
+    }
+
+    private void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                   .map(event ->
+                                            EventTemplateData.builder()
+                                                .date(event.getValue().getTimelineDate())
+                                                .explanation(event.getValue().getTimelineDescription())
+                                                .build()).collect(Collectors.toList()));
+        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(caseData.getDefenceRouteRequired())) {
+            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .orElse(caseData.getRespondToClaim());
+            builder.whyReject("ALREADY_PAID")
+                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                ? respondToClaim.getHowWasThisAmountPaidOther()
+                                : respondToClaim.getHowWasThisAmountPaid()
+                    .getHumanFriendly());
+        } else if (SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+            .equals(caseData.getDefenceRouteRequired())) {
+            builder.whyReject("DISPUTE");
+        }
+    }
+
+    private void partAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                   .map(event ->
+                                            EventTemplateData.builder()
+                                                .date(event.getValue().getTimelineDate())
+                                                .explanation(event.getValue().getTimelineDescription())
+                                                .build()).collect(Collectors.toList()));
+        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .orElse(caseData.getRespondToClaim());
+            builder.whyReject("ALREADY_PAID")
+                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                ? respondToClaim.getHowWasThisAmountPaidOther()
+                                : respondToClaim.getHowWasThisAmountPaid()
+                    .getHumanFriendly());
+        } else {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
+                builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
+                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
+            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+                builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+                    .payBy(caseData.getRespondent1RepaymentPlan()
+                               .finalPaymentBy(caseData.getRespondToAdmittedClaimOwingAmount()))
+                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+                builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "")
+                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            }
+        }
+    }
+
+    private void fullAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
+            builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
+                .amountToPay(totalClaimAmount + "");
+        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+            builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+                .payBy(caseData.getRespondent1RepaymentPlan()
+                           .finalPaymentBy(totalClaimAmount))
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                .amountToPay(totalClaimAmount + "")
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        }
     }
 
     private List<DebtTemplateData> mapToDebtList(Respondent1DebtLRspec debtLRspec) {
@@ -323,10 +335,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         DebtTemplateData.DebtTemplateDataBuilder builder = DebtTemplateData.builder()
             .debtOwedTo(debt.getDebtType().getLabel());
         switch (debt.getPaymentFrequency()) {
-            case ONCE_ONE_MONTH:
-            case ONCE_FOUR_WEEKS:
-                builder.paidPerMonth(debt.getPaymentAmount());
-                break;
             case ONCE_THREE_WEEKS:
                 builder.paidPerMonth(debt.getPaymentAmount()
                                          .multiply(BigDecimal.valueOf(4))
@@ -337,6 +345,9 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                 break;
             case ONCE_ONE_WEEK:
                 builder.paidPerMonth(debt.getPaymentAmount().multiply(BigDecimal.valueOf(4)));
+                break;
+            default:
+                builder.paidPerMonth(debt.getPaymentAmount());
                 break;
         }
         return builder.build();
