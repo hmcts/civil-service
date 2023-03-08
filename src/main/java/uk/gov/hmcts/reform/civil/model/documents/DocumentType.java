@@ -15,7 +15,6 @@ public enum DocumentType {
     SDO_ORDER,
     HEARING_FORM,
     PIP_LETTER,
-    RESPONSE_TRANSLATION,
 
     //General Application Document Type
     GENERAL_ORDER,

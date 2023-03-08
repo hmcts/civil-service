@@ -71,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -223,6 +224,7 @@ class FlowStateAllowedEventServiceTest {
                         NOTIFY_DEFENDANT_OF_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
+                        UPLOAD_TRANSLATED_DOCUMENT,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,

@@ -33,7 +33,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void shouldUploadTranslationFileSuccessfully() {
+        void shouldUploadTranslatedDocumentSuccessfully() {
             //Given
             CaseData caseData = CaseDataBuilder
                 .builder()
