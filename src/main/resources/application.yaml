@@ -370,9 +370,9 @@ rd_commondata:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    recipient: default@test.com
+    multipartyrecipient: default@test.com
+    specRecipient: default@test.com
 
 notification:
   caseworker:
