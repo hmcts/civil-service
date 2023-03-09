@@ -459,6 +459,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder
                 .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+        } else if (temporaryCaseData.getRespondent1OrgRegistered() == NO
+                && temporaryCaseData.getRespondent1Represented() == YES
+                && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            dataBuilder
+                    .respondent2OrgRegistered(NO)
+                    .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            if (references.isPresent()) {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
+                        .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            }
+            dataBuilder
+                  .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
