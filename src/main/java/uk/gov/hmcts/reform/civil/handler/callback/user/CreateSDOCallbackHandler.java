@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 
 import java.time.LocalDate;
@@ -82,7 +82,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -103,7 +102,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
     private static final String UNSPEC_SERVICE_ID = "AAA7";
-    private static final String ACTIVE_FLAG = "Y";
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
         + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
@@ -178,7 +176,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
 
-        DynamicList hearingMethodList = getHearingMethodList(callbackParams, caseData);
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
         updatedData.hearingMethodValuesFastTrack(hearingMethodList);
         updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
         updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
@@ -663,24 +667,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
                 updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
             });
-    }
-
-    private DynamicList getHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList;
-        if (categorySearchResult.isPresent()) {
-            List<Category> categories = categorySearchResult.get().getCategories().stream()
-                .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).collect(Collectors.toList());
-            hearingMethodList = DynamicList.fromList(categories, Category::getValueEn, null, false);
-        } else {
-            hearingMethodList = DynamicList.fromList(List.of());
-        }
-        return hearingMethodList;
     }
 
     /**

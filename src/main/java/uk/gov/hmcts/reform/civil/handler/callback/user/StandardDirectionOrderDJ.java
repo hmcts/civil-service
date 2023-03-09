@@ -52,7 +52,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -90,7 +90,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
     private static final String UNSPEC_SERVICE_ID = "AAA7";
-    private static final String ACTIVE_FLAG = "Y";
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
@@ -197,7 +196,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         DynamicList locationsList = getLocationsFromList(locations);
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
-        DynamicList hearingMethodList = getHearingMethodList(authToken, caseData);
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
         caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
         caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
@@ -603,23 +607,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private DynamicList getHearingMethodList(String authToken, CaseData caseData) {
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList;
-        if (categorySearchResult.isPresent()) {
-            List<Category> categories = categorySearchResult.get().getCategories().stream()
-                .filter(category -> category.getActiveFlag().equals(ACTIVE_FLAG)).collect(Collectors.toList());
-            hearingMethodList = DynamicList.fromList(categories, Category::getValueEn, null, false);
-        } else {
-            hearingMethodList = DynamicList.fromList(List.of());
-        }
-        return hearingMethodList;
     }
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
