@@ -1,6 +1,0 @@
-robotics:
-  notification:
-    sender: hmcts.civil@gmail.com
-    recipient: testvalues@test.com
-    multipartyrecipient: testvalues@test.com
-    specRecipient: testvalues@test.com
