@@ -189,12 +189,21 @@ class FeatureToggleServiceTest {
         );
     }
 
-    //@Test
-    //void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
-    //    var pbaV3Key = "pba-version-3-ways-to-pay";
-    //    givenToggle(pbaV3Key, true);
-    //
-    //    assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
-    //    verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
-    //}
+//    @Test
+//    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
+//        var pbaV3Key = "pba-version-3-ways-to-pay";
+//        givenToggle(pbaV3Key, true);
+//
+//        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
+//        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
+//    }
+
+    @Test
+    void shouldCallBoolVariation_whenHmcIsEnabled() {
+        var hmcKey = "hmc";
+        givenToggle(hmcKey, true);
+
+        assertThat(featureToggleService.isHmcEnabled()).isTrue();
+        verifyBoolVariationCalled(hmcKey, List.of("timestamp", "environment"));
+    }
 }
