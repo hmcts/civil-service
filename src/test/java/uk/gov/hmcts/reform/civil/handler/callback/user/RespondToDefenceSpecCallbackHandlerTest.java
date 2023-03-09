@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -58,18 +59,23 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -985,6 +991,151 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
+        }
+    }
+
+    @Nested
+    class MidEventCallbackSetMediationShowFlag {
+
+        private static final String PAGE_ID = "set-mediation-show-tag";
+        String resultFlag1 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE+"]";
+        String resultFlag2 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE+"]";
+        String resultFlag3 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE+"]";
+        String resultFlag4 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO+"]";
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsFD_ClaimantAgreeToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag1);
+
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsFD_ClaimantDisagreeToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1ProceedWithClaim(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("showConditionFlags").isNull();
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsFD_DefendantNotOptedMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .responseClaimMediationSpecRequired(NO)
+                .applicant1ProceedWithClaim(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("showConditionFlags").isNull();
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsPA_DefendantHasNotPaidToClaiment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag1);
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsPA_DefendantHasPaid_ButClaimantNotAgreeToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag1);
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsPA_DefendantHasNotPaid_ClaimantNotAcceptedDefendantPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag1);
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenItsFullAdmission() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .applicant1ProceedWithClaim(YES)
+                .defendantSingleResponseToBothClaimants(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag2);
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenIts2v1Claim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .multiPartyClaimTwoApplicants()
+                .defendantSingleResponseToBothClaimants(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag3);
+        }
+
+        @Test
+        void shouldSetMediationShowFlag_whenIts1V2Claim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM.toString())
+                .applicant1ProceedWithClaim(YES)
+                .defendantSingleResponseToBothClaimants(NO)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var showConditionFlags = response.getData().get("showConditionFlags").toString();
+            assertThat(showConditionFlags).isEqualTo(resultFlag4);
         }
     }
 }
