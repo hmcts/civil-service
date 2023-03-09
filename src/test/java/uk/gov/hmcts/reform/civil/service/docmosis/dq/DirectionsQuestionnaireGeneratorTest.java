@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -335,7 +334,7 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -368,7 +367,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
