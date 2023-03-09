@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.sendgrid;
+package uk.gov.hmcts.reform.sendgrid;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -18,6 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.sendgrid.EmailAttachment;
+import uk.gov.hmcts.reform.sendgrid.EmailData;
+import uk.gov.hmcts.reform.sendgrid.EmailSendFailedException;
+import uk.gov.hmcts.reform.sendgrid.SendGridClient;
 
 import java.io.IOException;
 import java.util.List;

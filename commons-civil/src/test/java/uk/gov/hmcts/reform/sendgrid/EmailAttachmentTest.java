@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.civil.sendgrid;
+package uk.gov.hmcts.reform.sendgrid;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ByteArrayResource;
+import uk.gov.hmcts.reform.sendgrid.EmailAttachment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

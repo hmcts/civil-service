@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.sendgrid.config;
+package uk.gov.hmcts.reform.sendgrid.config;
 
 import com.sendgrid.SendGrid;
 import org.junit.jupiter.api.AfterEach;
@@ -9,6 +9,7 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.sendgrid.config.SendGridAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
