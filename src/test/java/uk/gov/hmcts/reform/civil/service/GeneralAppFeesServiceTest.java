@@ -103,7 +103,7 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(3)).getAppnToVaryOrSuspend();
         assertThat(queryCaptor.getValue().toString())
             .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=miscellaneous&jurisdiction1"
-                           + "=civil&jurisdiction2=civil&service=other&version=2&keyword=AppnToVaryOrSuspend");
+                           + "=civil&jurisdiction2=civil&service=other&keyword=AppnToVaryOrSuspend");
     }
 
     @Test
@@ -134,7 +134,7 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(3)).getAppnToVaryOrSuspend();
         assertThat(queryCaptor.getValue().toString())
             .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=miscellaneous&jurisdiction1=civil&"
-                           + "jurisdiction2=civil&service=other&version=2&keyword=AppnToVaryOrSuspend");
+                           + "jurisdiction2=civil&service=other&keyword=AppnToVaryOrSuspend");
     }
 
     @Test
@@ -166,7 +166,7 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(3)).getAppnToVaryOrSuspend();
         assertThat(queryCaptor.getValue().toString())
             .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=miscellaneous&"
-                           + "jurisdiction1=civil&jurisdiction2=civil&service=other&version=2&keyword=AppnToVaryOrSuspend");
+                           + "jurisdiction1=civil&jurisdiction2=civil&service=other&keyword=AppnToVaryOrSuspend");
     }
 
     @Test

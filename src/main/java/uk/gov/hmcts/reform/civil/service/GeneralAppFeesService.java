@@ -64,7 +64,6 @@ public class GeneralAppFeesService {
                 .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
                 .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
                 .queryParam(SERVICE, "other")
-                .queryParam("version", 2)
                 .queryParam(KEYWORD, feesConfiguration.getAppnToVaryOrSuspend());
         }
         URI uri;

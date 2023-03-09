@@ -644,8 +644,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
-                                .calculatedAmountInPence(fee14)
-                                .version(FEE_VERSION).build());
+                                .calculatedAmountInPence(fee14).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -667,7 +666,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
-                                .version(FEE_VERSION).build());
+                                .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -688,8 +687,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(feesService.getFeeForGA(any()))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
-                                .calculatedAmountInPence(fee14)
-                                .version(FEE_VERSION).build());
+                                .calculatedAmountInPence(fee14).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
