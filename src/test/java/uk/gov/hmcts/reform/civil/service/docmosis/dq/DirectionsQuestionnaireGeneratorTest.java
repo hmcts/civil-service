@@ -2206,7 +2206,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 + "without an honest belief in its truth.";
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
-            
+
             assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
             assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
         }
