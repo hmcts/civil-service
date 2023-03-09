@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
+public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
@@ -75,6 +75,12 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    @MockBean
+    private JsonSchemaValidationService validationService;
+    @MockBean
+    private Time time;
 
     @Autowired
     private NotifyDefaultJudgmentHandler handler;
@@ -122,16 +128,8 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
         }
     }
 
-    @MockBean
-    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @MockBean
-    private Time time;
-
     @Nested
     class InValidJsonPayload {
-
-        @MockBean
-        private JsonSchemaValidationService validationService;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {

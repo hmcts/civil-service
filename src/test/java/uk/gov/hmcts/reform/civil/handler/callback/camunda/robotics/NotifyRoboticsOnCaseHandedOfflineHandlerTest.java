@@ -129,6 +129,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
