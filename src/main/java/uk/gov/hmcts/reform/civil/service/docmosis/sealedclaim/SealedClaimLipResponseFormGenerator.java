@@ -107,8 +107,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private final DocumentManagementService documentManagementService;
 
     private static final Set<Party.Type> INDIVIDUAL_TYPES = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    // TODO look for existing constant
-    private static final long DAYS_TO_PAY_IMMEDIATELY = 5;
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
@@ -270,7 +268,8 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         } else {
             if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
                 == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-                builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
+                builder.payBy(LocalDate.now()
+                                  .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
                     .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
             } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
                 == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
@@ -287,10 +286,13 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         }
     }
 
-    private void fullAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+    private void fullAdmissionData(CaseData caseData,
+                                   SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder,
+                                   BigDecimal totalClaimAmount) {
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
             == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-            builder.payBy(LocalDate.now().plusDays(DAYS_TO_PAY_IMMEDIATELY))
+            builder.payBy(LocalDate.now()
+                              .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
                 .amountToPay(totalClaimAmount + "");
         } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
             == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {

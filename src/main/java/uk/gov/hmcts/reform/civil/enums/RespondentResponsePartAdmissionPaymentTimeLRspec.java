@@ -11,4 +11,6 @@ public enum RespondentResponsePartAdmissionPaymentTimeLRspec {
     SUGGESTION_OF_REPAYMENT_PLAN("I'll suggest a repayment plan for my client");
 
     private final String displayedValue;
+
+    public static final int DAYS_TO_PAY_IMMEDIATELY = 5;
 }

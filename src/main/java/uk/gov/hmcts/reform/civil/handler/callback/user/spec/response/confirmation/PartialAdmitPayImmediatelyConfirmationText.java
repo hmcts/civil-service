@@ -20,7 +20,8 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
-        LocalDate whenWillYouPay = LocalDate.now().plusDays(5);
+        LocalDate whenWillYouPay = LocalDate.now()
+            .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
         String applicantName = caseData.getApplicant1().getPartyName();
 
         StringBuilder sb = new StringBuilder();
