@@ -119,7 +119,7 @@ public class GeneralAppFeesService {
         }
 
         if (hasAppContainVaryOrder(caseData)) {
-            // To be confirmed by Peter
+            //TODO:- CIV-7575 is been created to handle application to Vary Order fee when multiple application types
             return feesConfiguration.getAppnToVaryOrSuspend();
         }
 
