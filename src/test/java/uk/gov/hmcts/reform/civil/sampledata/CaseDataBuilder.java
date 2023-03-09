@@ -4160,7 +4160,6 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
