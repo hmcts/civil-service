@@ -78,6 +78,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenEnableRPAEmailsInvoked() {
+        var enableRPAEmailsKey = "enable-rpa-emails";
+        givenToggle(enableRPAEmailsKey, true);
+
+        assertThat(featureToggleService.isRPAEmailEnabled()).isTrue();
+        verifyBoolVariationCalled(enableRPAEmailsKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked() {
         var noticeOfChangeKey = "notice-of-change";
         givenToggle(noticeOfChangeKey, true);

@@ -37,9 +37,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
@@ -86,6 +84,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             // Given
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
@@ -95,6 +94,23 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
             // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
+                                                               params.getParams().get(BEARER_TOKEN).toString()
+            );
+        }
+
+        @Test
+        void shouldNotNotifyRobotics_whenRpaToggleOff() {
+            // Given
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            boolean multiPartyScenario = isMultiPartyScenario(caseData);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(roboticsNotificationService, times(0)).notifyRobotics(caseData, multiPartyScenario,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
         }
