@@ -282,7 +282,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
 
         if (toggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBASpec("PBAv3");
+            caseDataBuilder.paymentTypePBA("PBAv3");
         }
 
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
