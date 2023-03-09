@@ -98,7 +98,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
-            time.toString()
+            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
         ));
     }
 }

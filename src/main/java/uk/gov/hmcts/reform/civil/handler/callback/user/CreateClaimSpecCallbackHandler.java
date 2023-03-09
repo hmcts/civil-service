@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -152,6 +153,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -312,7 +314,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
@@ -435,6 +439,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+
         CaseData temporaryCaseData = dataBuilder.build();
 
         if (temporaryCaseData.getRespondent1OrgRegistered() == YES
@@ -491,6 +497,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
             }
         }
+
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
@@ -690,7 +697,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
