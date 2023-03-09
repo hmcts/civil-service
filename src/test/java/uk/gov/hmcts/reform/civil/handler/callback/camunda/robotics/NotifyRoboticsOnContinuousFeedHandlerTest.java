@@ -118,10 +118,11 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             handler.handle(params);
 
             // Then
-            verify(roboticsNotificationService)
-                .notifyRobotics(caseData, false, params.getParams().get(BEARER_TOKEN).toString()
+            verify(roboticsNotificationService).notifyRobotics(caseData, false,
+                                                               params.getParams().get(BEARER_TOKEN).toString()
             );
         }
+
         @Test
         void shouldNotNotifyRobotics_whenRpaToggleOff() {
             // Given
