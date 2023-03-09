@@ -37,7 +37,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -115,8 +118,8 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             handler.handle(params);
 
             // Then
-            verify(roboticsNotificationService).notifyRobotics(caseData, false,
-                                                               params.getParams().get(BEARER_TOKEN).toString()
+            verify(roboticsNotificationService)
+                .notifyRobotics(caseData, false, params.getParams().get(BEARER_TOKEN).toString()
             );
         }
         @Test
