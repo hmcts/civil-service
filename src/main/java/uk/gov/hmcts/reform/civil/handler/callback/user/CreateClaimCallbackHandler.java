@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -79,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Slf4j
 @Service
@@ -138,6 +140,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
 
+    private final CaseFlagsInitialiser caseFlagInitialiser;
+
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
     @Value("${court-location.unspecified-claim.epimms-id}")
@@ -195,11 +199,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                                                         .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                                           .organisationID(value.getOrganisationIdentifier()).build())
-                                                                                         .orgPolicyReference(null)
-                                                                                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                                                                                         .build()));
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -469,22 +473,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
+
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private String getAllPartyNames(CaseData caseData) {
-        return format("%s%s V %s%s",
-                      caseData.getApplicant1().getPartyName(),
-                      YES.equals(caseData.getAddApplicant2())
-                          ? ", " + caseData.getApplicant2().getPartyName() : "",
-                      caseData.getRespondent1().getPartyName(),
-                      YES.equals(caseData.getAddRespondent2())
-                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -560,7 +555,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
-    //------remove bool for v1 callback----------
     private String getBody(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
@@ -625,12 +619,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             participantString.append(caseData.getApplicant1().getPartyName())
                 .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
 
         } else {
             participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                            .getPartyName());
+                .getPartyName());
         }
         return participantString;
 
