@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -507,12 +506,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     authorisation,
                     rc.getCaseLocation().getBaseLocation()
                 ));
+            Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .findFirst();
+            String hearingCourtLocation = optionalCourtLocation
+                .map(LocationRefData::getCourtName)
+                .orElse(null);
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
-                .responseCourtName(courtLocations.isEmpty() ? null :
-                                       courtLocations.stream()
-                                           .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                                           .collect(Collectors.toList()).get(0).getCourtName())
+                .responseCourtName(hearingCourtLocation)
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .build();
         } else {

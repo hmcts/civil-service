@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
@@ -64,14 +63,19 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .getCourtLocationsByEpimmsId(
                 authorisation,
                 requestedCourt));
+
+        Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
+            .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+            .findFirst();
+        String hearingCourtLocation = optionalCourtLocation
+            .map(LocationRefData::getCourtName)
+            .orElse(null);
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .hearingCourtLocation(courtLocations.isEmpty() ? null : courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList()).get(0).getCourtName())
+            .hearingCourtLocation(hearingCourtLocation)
             .statementOfTruth(statementOfTruth);
 
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
