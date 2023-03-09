@@ -1,32 +1,27 @@
 package uk.gov.hmcts.reform.civil.model.caseflags;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
-
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Setter
 @Data
 @Builder(toBuilder = true)
-@AllArgsConstructor
 public class FlagDetail {
 
-    private String name;
-    private String subTypeValue;
-    private String subTypeKey;
-    private String otherDescription;
-    private String flagComment;
-    private LocalDateTime dateTimeModified;
-    private LocalDateTime dateTimeCreated;
-    private List<String> path;
-    private YesOrNo hearingRelevant;
-    private String flagCode;
-    private String status;
+    private final String name;
+    private final String subTypeValue;
+    private final String subTypeKey;
+    private final String otherDescription;
+    private final String flagComment;
+    private final LocalDateTime dateTimeModified;
+    private final LocalDateTime dateTimeCreated;
+    private final List<Element<String>> path;
+    private final YesOrNo hearingRelevant;
+    private final String flagCode;
+    private final String status;
 
 }
-
