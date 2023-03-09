@@ -25,6 +25,6 @@ public class HearingMethodUtilsTest {
     @Test
     void shouldReturnEmptyList_WhenCategorySearchResultNotProvided() {
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(null);
-        assertTrue( hearingMethodList.getListItems().isEmpty());
+        assertTrue(hearingMethodList.getListItems().isEmpty());
     }
 }
