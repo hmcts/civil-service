@@ -45,6 +45,8 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -483,6 +485,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 

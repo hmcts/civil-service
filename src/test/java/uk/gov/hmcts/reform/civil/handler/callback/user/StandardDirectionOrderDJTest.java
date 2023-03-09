@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.crd.model.Category;
+import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -37,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,6 +149,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
                               .epimmsId("123").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearing().build();
