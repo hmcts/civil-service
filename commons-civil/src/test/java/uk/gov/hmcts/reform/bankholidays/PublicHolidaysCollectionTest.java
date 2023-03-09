@@ -1,9 +1,12 @@
-package uk.gov.hmcts.reform.civil.service.bankholidays;
+package uk.gov.hmcts.reform.bankholidays;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.bankholidays.BankHolidays;
+import uk.gov.hmcts.reform.bankholidays.BankHolidaysApi;
+import uk.gov.hmcts.reform.bankholidays.PublicHolidaysCollection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

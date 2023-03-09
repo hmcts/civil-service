@@ -1,6 +1,7 @@
-package uk.gov.hmcts.reform.civil.service.bankholidays;
+package uk.gov.hmcts.reform.bankholidays;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.bankholidays.NonWorkingDaysCollection;
 
 import java.time.LocalDate;
 import java.time.Month;

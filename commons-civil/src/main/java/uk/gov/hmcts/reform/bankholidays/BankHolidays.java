@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.bankholidays;
+package uk.gov.hmcts.reform.bankholidays;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

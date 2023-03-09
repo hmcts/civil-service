@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.bankholidays;
+package uk.gov.hmcts.reform.bankholidays;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

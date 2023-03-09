@@ -8,10 +8,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
-import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidays;
-import uk.gov.hmcts.reform.civil.service.bankholidays.BankHolidaysApi;
-import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
-import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.bankholidays.BankHolidays;
+import uk.gov.hmcts.reform.bankholidays.BankHolidaysApi;
+import uk.gov.hmcts.reform.bankholidays.NonWorkingDaysCollection;
+import uk.gov.hmcts.reform.bankholidays.PublicHolidaysCollection;
 
 import java.io.IOException;
 import java.time.LocalDate;

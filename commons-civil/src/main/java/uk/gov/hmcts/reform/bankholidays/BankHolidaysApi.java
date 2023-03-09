@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.bankholidays;
+package uk.gov.hmcts.reform.bankholidays;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -52,6 +52,8 @@ dependencies {
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
 
+  implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
