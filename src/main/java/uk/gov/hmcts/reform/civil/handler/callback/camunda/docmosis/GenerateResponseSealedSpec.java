@@ -121,6 +121,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             ));
         }
         if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+            log.info("Supported doc: " + caseData.getRespondent1SpecDefenceResponseDocument().getFile());
             documents.add(new DocumentMetaData(
                 caseData.getRespondent1SpecDefenceResponseDocument().getFile(),
                 "Supported docs",
