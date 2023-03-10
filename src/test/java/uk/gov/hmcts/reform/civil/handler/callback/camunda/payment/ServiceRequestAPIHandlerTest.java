@@ -136,6 +136,17 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotMakePaymentServiceRequestForHearingFee_whenServiceRequestWasAlreadyIssued() {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(feesService.getHearingFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().build());
+
+            handler.handle(params);
+
+            verifyNoInteractions(paymentsService);
+        }
+
+        @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithoutClaimIssuedPbaDetails() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
@@ -184,6 +195,27 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldMakeHearingPaymentServiceRequest_whenInvoked() throws Exception {
+            //Given
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            when(feesService.getHearingFeeDataByTotalClaimAmount(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
+            caseData = caseData.toBuilder()
+                .hearingDueDate(LocalDate.now())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build()).build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            assertThat(extractHearingPaymentDetailsFromResponse(response).getServiceReqReference())
+                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+        }
+
+        @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             //THEN
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
@@ -222,6 +254,11 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //THEN
             verifyNoInteractions(paymentsService);
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        private SRPbaDetails extractHearingPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getHearingFeePBADetails();
         }
     }
 }

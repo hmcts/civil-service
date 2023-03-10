@@ -4160,6 +4160,7 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
@@ -4201,7 +4202,7 @@ public class CaseDataBuilder {
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataWithHearingDate() {
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
@@ -4239,6 +4240,7 @@ public class CaseDataBuilder {
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                                       .fee(
                                           Fee.builder()
@@ -4250,7 +4252,7 @@ public class CaseDataBuilder {
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
