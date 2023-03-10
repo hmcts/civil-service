@@ -59,23 +59,18 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -998,10 +993,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventCallbackSetMediationShowFlag {
 
         private static final String PAGE_ID = "set-mediation-show-tag";
-        String resultFlag1 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE+"]";
-        String resultFlag2 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE+"]";
-        String resultFlag3 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE+"]";
-        String resultFlag4 = "["+DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO+"]";
+        String resultFlag1 = "[" + DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE + "]";
+        String resultFlag2 = "[" + DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE + "]";
+        String resultFlag3 = "[" + DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE + "]";
+        String resultFlag4 = "[" + DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO + "]";
 
         @Test
         void shouldSetMediationShowFlag_whenItsFD_ClaimantAgreeToProceed() {
