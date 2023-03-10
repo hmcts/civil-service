@@ -33,10 +33,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @Autowired
     private GenerateDirectionOrderCallbackHandler handler;
 
-    private static final String onInitiativeSelectionText = "As this order was made on the court's own initiative "
+    private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
-    private static final String withoutNoticeSelectionText = "If you were not notified of the application before "
+    private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
 
@@ -63,11 +63,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionTextArea")
-            .isEqualTo(onInitiativeSelectionText);
+            .isEqualTo(ON_INITIATIVE_SELECTION_TEST);
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
             .isEqualTo(LocalDate.now().toString());
         assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
-            .isEqualTo(withoutNoticeSelectionText);
+            .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
         assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionDate")
             .isEqualTo(LocalDate.now().toString());
 
