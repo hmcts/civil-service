@@ -13,6 +13,12 @@
       ]
     }
   ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
   "schedule": ["after 2am on sunday"],
   "prConcurrentLimit": 20
 }
