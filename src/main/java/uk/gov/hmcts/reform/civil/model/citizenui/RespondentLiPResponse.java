@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RespondentLiPResponse {
 
+    private MediationLiP respondent1MediationLiPResponse;
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private DQExtraDetailsLip respondent1DQExtraDetails;
     private HearingSupportLip respondent1DQHearingSupportLip;
