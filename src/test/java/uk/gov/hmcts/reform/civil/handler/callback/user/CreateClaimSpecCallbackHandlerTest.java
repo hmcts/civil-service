@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
@@ -172,6 +173,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.n215-url}")
     private String n215Link;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @MockBean
     private FeatureToggleService toggleService;
@@ -507,6 +511,23 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(getDynamicList(response))
                 .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+        }
+
+        @Test
+        void shouldSetPBAv3SpecFlagOn_whenPBAv3IsActivated() {
+            // Given
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            when(toggleService.isPbaV3Enabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData())
+                .extracting("paymentTypePBASpec").isEqualTo("PBAv3");
         }
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
