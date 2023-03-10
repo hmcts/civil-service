@@ -695,6 +695,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime caseDocumentUploadDateRes;
     private final HearingNotes hearingNotes;
     private final Flags caseFlags;
+    private final String caseProgAllocatedTrack;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
