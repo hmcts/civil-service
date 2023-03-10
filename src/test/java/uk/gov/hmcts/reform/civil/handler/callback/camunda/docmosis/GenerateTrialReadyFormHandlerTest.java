@@ -14,12 +14,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +33,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.TRIAL_READY_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -49,6 +53,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     public void shouldGenerateForm_when1v1() {
+        // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")
@@ -66,12 +71,45 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM.name());
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+        // Then
         verify(trialReadyFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getTrialReadyDocuments().size()).isEqualTo(1);
+
+    }
+
+    @Test
+    public void shouldGenerateForm_when1v2AndOneSeveralPartiesGeneratesDocument() {
+        // Given
+        CaseDocument document = CaseDocument.builder()
+            .createdBy("John")
+            .documentName("document name")
+            .documentSize(0L)
+            .documentType(TRIAL_READY_DOCUMENT)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(document));
+        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(document);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .trialReadyDocuments(systemGeneratedCaseDocuments).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM.name());
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        verify(trialReadyFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getTrialReadyDocuments().size()).isEqualTo(2);
 
     }
 }

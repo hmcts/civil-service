@@ -7,20 +7,18 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 
@@ -42,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
 public class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
-    private static final String USER_UID = "userUid";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileName_application = String.format(
         TRIAL_READY.getDocumentTitle(), "Rambo", formatLocalDate(LocalDate.now(), DATE));
@@ -57,29 +54,26 @@ public class TrialReadyFormGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
-    private UserService userService;
-
-    @MockBean
-    private CoreCaseUserService coreCaseUserService;
-
     @Autowired
     private TrialReadyFormGenerator generator;
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided() {
-        //GIVEN
+        // Given
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
-        when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.APPLICANTSOLICITORONE))).thenReturn(true);
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        //WHEN
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build().toBuilder().isApplicant1(YesOrNo.YES).trialReadyApplicant(YesOrNo.YES)
+            .applicantRevisedHearingRequirements(
+                RevisedHearingRequirements.builder()
+                    .revisedHearingRequirements(YesOrNo.YES)
+                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+        // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        //THEN
+        // Then
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
@@ -88,20 +82,23 @@ public class TrialReadyFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenRespondent1GenerateDocs() {
-        //GIVEN
+        // Given
         String fileName = String.format(
             TRIAL_READY.getDocumentTitle(), "Trader", formatLocalDate(LocalDate.now(), DATE));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
-        when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.RESPONDENTSOLICITORONE))).thenReturn(true);
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        //WHEN
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build().toBuilder().isRespondent1(YesOrNo.YES).trialReadyRespondent1(YesOrNo.YES)
+            .respondent1RevisedHearingRequirements(
+                RevisedHearingRequirements.builder()
+                    .revisedHearingRequirements(YesOrNo.YES)
+                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+        // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        //THEN
+        // Then
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
@@ -110,21 +107,50 @@ public class TrialReadyFormGeneratorTest {
 
     @Test
     void shouldHearingFormGeneratorOneForm_whenRespondent2GenerateDocs() {
-        //GIVEN
+        // Given
         String fileName = String.format(
             TRIAL_READY.getDocumentTitle(), "Company", formatLocalDate(LocalDate.now(), DATE));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
-        when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_UID).build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(CaseRole.RESPONDENTSOLICITORTWO))).thenReturn(true);
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Company").build()).build();
-        //WHEN
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Company").build())
+            .build().toBuilder().isRespondent2(YesOrNo.YES).trialReadyRespondent2(YesOrNo.YES)
+            .respondent2RevisedHearingRequirements(
+                RevisedHearingRequirements.builder()
+                    .revisedHearingRequirements(YesOrNo.YES)
+                    .revisedHearingComments("Revised Hearing Comments").build()).build();;
+        // When
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-        //THEN
+        // Then
+        assertThat(caseDocument).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
+    }
+
+    @Test
+    void shouldHearingFormGeneratorOneForm_whenRespondent2OrganisationGenerateDocs() {
+        // Given
+        String fileName = String.format(
+            TRIAL_READY.getDocumentTitle(), "Organisation", formatLocalDate(LocalDate.now(), DATE));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
+            .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
+            .thenReturn(CASE_DOCUMENT);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .respondent2(Party.builder().type(Party.Type.ORGANISATION).organisationName("Organisation").build())
+            .build().toBuilder().isRespondent2(YesOrNo.YES).trialReadyRespondent2(YesOrNo.NO)
+            .respondent2RevisedHearingRequirements(
+                RevisedHearingRequirements.builder()
+                    .revisedHearingRequirements(YesOrNo.NO)
+                    .revisedHearingComments("Revised Hearing Comments").build()).build();
+        // When
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        // Then
         assertThat(caseDocument).isNotNull();
 
         verify(documentManagementService)
