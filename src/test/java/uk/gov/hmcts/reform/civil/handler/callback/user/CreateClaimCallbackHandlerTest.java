@@ -418,6 +418,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
         }
 
+        @Test
+        void shouldSetPBAv3FlagOn_whenPBAv3IsActivated() {
+            // Given
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            // Then
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("paymentTypePBA").isEqualTo("PBAv3");
+        }
+
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
             return mapper.convertValue(response.getData().get("applicantSolicitor1PbaAccounts"), DynamicList.class);
         }
