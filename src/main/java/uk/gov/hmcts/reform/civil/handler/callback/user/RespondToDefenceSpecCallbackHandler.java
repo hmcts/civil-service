@@ -52,6 +52,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -155,21 +156,22 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
-        CaseData updatedCaseData = setApplicant1ProceedFlagToYes(callbackParams.getCaseData());
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+       setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData) {
-        var updatedCaseData = caseData.toBuilder();
+    private void setApplicant1ProceedFlagToYes(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
 
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
-            updatedCaseData.applicant1ProceedWithClaim(YES);
+            caseDataBuilder.applicant1ProceedWithClaim(YES);
         }
-        return updatedCaseData.build();
     }
 
     private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
@@ -182,30 +184,29 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return NO;
     }
 
-    private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
-        var updatedCaseData = caseData.toBuilder();
-        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
-
-        return updatedCaseData.build();
+    private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        setMediationConditionFlag(updatedCaseData);
+        setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
+        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
+        setMediationConditionFlag(caseData,caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void setMediationConditionFlag(CaseData updatedCaseData) {
-        DefendantResponseShowTag mediationFlag = setMediationRequired(updatedCaseData);
+    private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+        DefendantResponseShowTag mediationFlag = setMediationRequired(caseData);
         if (mediationFlag != null) {
-            Set<DefendantResponseShowTag> showConditionFlags = updatedCaseData.getShowConditionFlags();
+            Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
             showConditionFlags.add(mediationFlag);
-            updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
+            updatedCaseData.showConditionFlags(showConditionFlags);
         }
     }
 
@@ -258,12 +259,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
-        CaseData updatedCaseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        setMediationConditionFlag(updatedCaseData);
+        setMediationConditionFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
