@@ -35,12 +35,13 @@ public class HearingValuesController {
         @ApiResponse(code = 401, message = "Incorrect authorisation"),
         @ApiResponse(code = 400, message = "Bad Request")
     })
-    public ResponseEntity<ServiceHearingValuesModel> getCaseList(
+    public ResponseEntity<ServiceHearingValuesModel> getHearingValues(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @NonNull @RequestBody HearingValuesRequest requestDetails) {
 
         var hearingValues = hearingValuesService.getValues(
             requestDetails.getCaseReference(), requestDetails.getHearingId());
+
         return new ResponseEntity<>(hearingValues, HttpStatus.OK);
     }
 }
