@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.internal.matchers.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -23,6 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
@@ -86,6 +92,45 @@ public class CivilDocumentStitchingServiceTest {
         );
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
         when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
+        CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
+                                                                         "Title", "FileName", caseData);
+        Assertions.assertNull(caseDocument);
+    }
+    @Test
+    public void whenCaseDataIsNullAndStitchingDocumentNotPresent() {
+        List<DocumentMetaData> documentMetaDataList = Arrays.asList(
+            new DocumentMetaData(
+                CLAIM_FORM.getDocumentLink(),
+                "Sealed Claim Form",
+                LocalDate.now().toString()
+            )
+        );
+        List<IdValue<Bundle>> caseBundles = Arrays.asList(new IdValue<>("1", mock(Bundle.class)));
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
+        CaseData caseData1 = CaseDataBuilder.builder().caseBundles(caseBundles).build();
+        when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
+        when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
+        CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
+                                                                         "Title", "FileName", caseData);
+        Assertions.assertNull(caseDocument);
+    }
+    @Test
+    public void whenCaseDataIsNullAndStitchingDocumentIsPresent() {
+        List<DocumentMetaData> documentMetaDataList = Arrays.asList(
+            new DocumentMetaData(
+                CLAIM_FORM.getDocumentLink(),
+                "Sealed Claim Form",
+                LocalDate.now().toString()
+            )
+        );
+//        List<IdValue<BundleDocument>> documents = singletonList(mock(IdValue.class));
+        Bundle bundle = new Bundle("Id1", "BundleTitle", "BundleDescription", "Yes",
+                                   new ArrayList<>(), "BundleFilename");
+        List<IdValue<Bundle>> caseBundles = Arrays.asList(new IdValue<>("1", bundle));
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
+        CaseData caseData1 = CaseDataBuilder.builder().caseBundles(caseBundles).build();
+        when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
+        when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                          "Title", "FileName", caseData);
         Assertions.assertNull(caseDocument);
