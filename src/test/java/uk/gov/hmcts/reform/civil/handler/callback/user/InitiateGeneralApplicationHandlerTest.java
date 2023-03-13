@@ -664,6 +664,50 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
         }
 
+        @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrder() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14)
+                                .build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            caseDataBuilder.generalAppType(GAApplicationType.builder()
+                                               .types(singletonList(VARY_ORDER))
+                                               .build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
+        @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14).build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            List<GeneralApplicationTypes> types = List.of(VARY_ORDER, STAY_THE_CLAIM);
+            caseDataBuilder.generalAppType(GAApplicationType.builder()
+                                               .types(types)
+                                               .build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
         private GAPbaDetails getPBADetails(AboutToStartOrSubmitCallbackResponse response) {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getGeneralAppPBADetails();
