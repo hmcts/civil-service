@@ -159,7 +159,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-       setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
+        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -194,14 +194,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
         setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
-        setMediationConditionFlag(caseData,caseDataBuilder);
+        setMediationConditionFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+    private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         DefendantResponseShowTag mediationFlag = setMediationRequired(caseData);
         if (mediationFlag != null) {
             Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
