@@ -1,14 +1,22 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Bundle implements MappableObject {
 
     private String id;
@@ -22,6 +30,11 @@ public class Bundle implements MappableObject {
     private YesOrNo hasCoversheets;
     private YesOrNo hasTableOfContents;
     private String filename;
+
+    //Added for case progression trial bundling
+    private Optional<LocalDateTime> createdOn;
+    private Optional<LocalDate> bundleHearingDate;
+    private Optional<String> stitchingFailureMessage;
 
     private Bundle() {
         // noop -- for deserializer
@@ -112,6 +125,18 @@ public class Bundle implements MappableObject {
 
     public String getFilename() {
         return filename;
+    }
+
+    public Optional<LocalDateTime> getCreatedOn() {
+        return checkIsOptional(createdOn);
+    }
+
+    public Optional<LocalDate> getBundleHearingDate() {
+        return checkIsOptional(bundleHearingDate);
+    }
+
+    public Optional<String> getStitchingFailureMessage() {
+        return checkIsOptional(stitchingFailureMessage);
     }
 
     //It is possible for the Optional types to be instantiated as null e.g. through Jackson

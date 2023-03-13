@@ -43,6 +43,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -80,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String DEFENDANT_EMAIL_ID_CONSTANT = "testUser1@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
@@ -814,6 +817,26 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
+            .email(DEFENDANT_EMAIL_ID_CONSTANT).build());
+        assertFalse(result);
+    }
+
+    @Test
     void shouldPopulateApplicantDetails() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
@@ -1065,8 +1088,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getApplicantsPbaAccounts()).isNull();
-        assertThat(caseData.getGeneralAppPBADetails().getPbaReference()).isNull();
         assertThat(caseData.getGeneralAppDetailsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppReasonsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppInformOtherParty().getIsWithNotice()).isNull();
@@ -1116,10 +1137,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(application.getGeneralAppType().getTypes().contains(EXTEND_TIME)).isTrue();
         assertThat(application.getGeneralAppRespondentAgreement().getHasAgreed()).isEqualTo(NO);
-        assertThat(application.getGeneralAppPBADetails().getApplicantsPbaAccounts())
-            .isEqualTo(PBALIST);
-        assertThat(application.getGeneralAppPBADetails().getPbaReference())
-            .isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppDetailsOfOrder()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppReasonsOfOrder()).isEqualTo(STRING_CONSTANT);
         assertThat(application.getGeneralAppInformOtherParty().getIsWithNotice())
