@@ -436,6 +436,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         if (featureToggleService.isNoticeOfChangeEnabled()) {
+            log.info("Adding org policies");
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 

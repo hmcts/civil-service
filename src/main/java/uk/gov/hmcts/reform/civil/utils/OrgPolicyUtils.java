@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,6 +9,7 @@ import java.util.Comparator;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
+@Slf4j
 public class OrgPolicyUtils {
 
     private OrgPolicyUtils() {
@@ -40,10 +42,13 @@ public class OrgPolicyUtils {
                                                    .build());
         }
         if (caseData.getRespondent2OrganisationPolicy() == null) {
+            log.info("Adding respondent 2 org policy");
             dataBuilder
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                                                    .build());
+        } else {
+            log.info("The org policy was null.");
         }
     }
 
