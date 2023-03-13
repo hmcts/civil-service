@@ -45,8 +45,10 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @ExtendWith(SpringExtension.class)
@@ -349,5 +351,37 @@ class BundleCreationTriggerEventHandlerTest {
         Assertions.assertEquals(
             "", generatedBundle.getValue().getDescription()
         );
+    }
+
+    @Test
+    void verifyBundleNotificationEventTriggeredWhenBundleCreated() {
+        // Given: Case details with all type of documents require for bundles
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
+            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+
+        // When: Bundle creation trigger is called
+        // Then: BUNDLE_CREATION_NOTIFICATION Event should be triggered
+        Assertions.assertDoesNotThrow(() -> bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event));
+        verify(coreCaseDataService, times(1)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
+    }
+
+    @Test
+    void verifyNoBundleNotificationEventTriggeredWhenBundleNotCreated() {
+        // Given: Case details with all type of documents require for bundles and throws exception from
+        // createBundle service
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
+            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        when(bundleCreationService.createBundle(event)).thenThrow(new RuntimeException("Runtime Exception"));
+        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+
+        // When: Bundle creation trigger is called
+        // Then: BUNDLE_CREATION_NOTIFICATION Event should not be triggered
+        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 }
