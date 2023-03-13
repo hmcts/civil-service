@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder(toBuilder = true)
 @Data
@@ -13,6 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CaseFlags {
 
-    private PartyFlagsModel flags;
+    private List<PartyFlagsModel> flags;
     private String flagAmendURL;
 }
