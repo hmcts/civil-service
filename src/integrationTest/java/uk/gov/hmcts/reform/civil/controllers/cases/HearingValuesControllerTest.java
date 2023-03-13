@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
-import uk.gov.hmcts.reform.civil.model.TempHearingValuesModel;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -25,8 +25,8 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp200() {
-        TempHearingValuesModel expectedHearingValues =
-            TempHearingValuesModel.builder().publicCaseName("mock case name").build();
+        ServiceHearingValuesModel expectedHearingValues =
+            ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
 
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenReturn(expectedHearingValues);

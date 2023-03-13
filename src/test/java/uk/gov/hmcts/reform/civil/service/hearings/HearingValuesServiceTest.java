@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.TempHearingValuesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,7 +37,7 @@ public class HearingValuesServiceTest {
         var caseId = 1L;
         var caseDetails = CaseDetails.builder().id(caseId).build();
         var caseData = CaseData.builder().ccdCaseReference(caseId).build();
-        var expected = TempHearingValuesModel.builder().build();
+        var expected = ServiceHearingValuesModel.builder().build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);

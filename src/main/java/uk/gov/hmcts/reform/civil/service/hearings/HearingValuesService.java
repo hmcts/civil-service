@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.TempHearingValuesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Slf4j
@@ -18,15 +18,13 @@ public class HearingValuesService {
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    public TempHearingValuesModel getValues(Long caseId, String hearingId) {
+    public ServiceHearingValuesModel getValues(Long caseId, String hearingId) {
         CaseData caseData = retrieveCaseData(caseId);
 
         //ToDo: Use lov refdata model and retrieve data from lov ref data service;
-        Object lovRefData = "ref data placeholder";
 
         //ToDo: Utilise hearing mapper;
-
-        return TempHearingValuesModel.builder().build();
+        return ServiceHearingValuesModel.builder().build();
     }
 
     private CaseData retrieveCaseData(long caseId) {
