@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -22,4 +23,6 @@ public class UploadEvidenceExpert {
     private String expertDocumentAnswer;
     private LocalDate expertOptionUploadDate;
     private Document expertDocument;
+    @Builder.Default
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }
