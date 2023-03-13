@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -85,7 +85,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
 @RequiredArgsConstructor
-public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<DirectionsQuestionnaireForm> {
+public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
@@ -110,7 +110,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             templateId = getDocmosisTemplate(caseData);
         }
 
-        templateData = getTemplateData(caseData);
+        templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
         return documentManagementService.uploadDocument(
@@ -251,7 +251,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     @Override
-    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
+    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
@@ -306,7 +306,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .requestedCourt(getRequestedCourt(dq));
+            .requestedCourt(getRequestedCourt(dq, authorisation));
 
         return builder.build();
     }
@@ -501,12 +501,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private RequestedCourt getRequestedCourt(DQ dq) {
+    private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsId(
-                    CallbackParams.Params.BEARER_TOKEN.toString(),
+                .getCourtLocationsByEpimmsId(authorisation,
                     rc.getCaseLocation().getBaseLocation()
                 ));
             return RequestedCourt.builder()

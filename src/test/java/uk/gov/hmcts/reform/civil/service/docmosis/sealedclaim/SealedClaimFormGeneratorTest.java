@@ -193,7 +193,7 @@ class SealedClaimFormGeneratorTest {
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .build();
 
-            var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
+            var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
 
             verify(representativeService).getApplicantRepresentative(caseData);
             verify(representativeService).getRespondent1Representative(caseData);
@@ -208,7 +208,7 @@ class SealedClaimFormGeneratorTest {
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .build();
 
-            final var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
+            final var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
 
             verify(representativeService).getApplicantRepresentative(caseData);
             verify(representativeService).getRespondent1Representative(caseData);
@@ -225,7 +225,7 @@ class SealedClaimFormGeneratorTest {
                 .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant2 LF").build())
                 .build();
 
-            var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
+            var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
 
             verify(representativeService).getApplicantRepresentative(caseData);
             verify(representativeService).getRespondent1Representative(caseData);
@@ -240,7 +240,7 @@ class SealedClaimFormGeneratorTest {
                 .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                 .build();
 
-            var templateData = sealedClaimFormGenerator.getTemplateData(caseData);
+            var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
 
             verify(representativeService).getApplicantRepresentative(caseData);
             verify(representativeService).getRespondent1Representative(caseData);

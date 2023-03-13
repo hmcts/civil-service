@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -16,10 +15,10 @@ import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MU
 
 @Service
 @RequiredArgsConstructor
-public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedClaimForm> {
+public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<SealedClaimForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
@@ -43,7 +42,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     private final LocationRefDataUtil locationRefDataUtil;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        SealedClaimForm templateData = getTemplateData(caseData);
+        SealedClaimForm templateData = getTemplateData(caseData, authorisation);
 
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(caseData);
 
@@ -63,12 +62,11 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     }
 
     @Override
-    public SealedClaimForm getTemplateData(CaseData caseData) {
+    public SealedClaimForm getTemplateData(CaseData caseData, String authorisation) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String hearingCourtLocation = locationRefDataUtil.getPreferredCourtData(
-            caseData,
-            CallbackParams.Params.BEARER_TOKEN.toString(), false);
+            caseData, authorisation, false);
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
             .applicants(getApplicants(caseData, multiPartyScenario))
             .respondents(getRespondents(caseData, multiPartyScenario))
