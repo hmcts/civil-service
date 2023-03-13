@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.cases;
+package uk.gov.hmcts.reform.civil.controllers.hearings;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,9 +38,6 @@ public class HearingValuesController {
     public ResponseEntity<ServiceHearingValuesModel> getHearingValues(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @NonNull @RequestBody HearingValuesRequest requestDetails) {
-        log.info("Retrieving hearing values");
-        log.info("CaseId: " + requestDetails.getCaseReference());
-        log.info("HearingId: " + requestDetails.getHearingId());
 
         var hearingValues = hearingValuesService.getValues(
             requestDetails.getCaseReference(), requestDetails.getHearingId());
