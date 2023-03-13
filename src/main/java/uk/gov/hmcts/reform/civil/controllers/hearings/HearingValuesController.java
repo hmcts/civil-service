@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.cases;
+package uk.gov.hmcts.reform.civil.controllers.hearings;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
