@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -51,11 +52,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
@@ -117,6 +120,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
             .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
             .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
+            .put(callbackKey(V_1, MID, "set-mediation-show-tag"), this::setMediationShowTag)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -152,21 +156,22 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
-        CaseData updatedCaseData = setApplicant1ProceedFlagToYes(callbackParams.getCaseData());
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData) {
-        var updatedCaseData = caseData.toBuilder();
+    private void setApplicant1ProceedFlagToYes(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
 
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
-            updatedCaseData.applicant1ProceedWithClaim(YES);
+            caseDataBuilder.applicant1ProceedWithClaim(YES);
         }
-        return updatedCaseData.build();
     }
 
     private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
@@ -179,18 +184,88 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return NO;
     }
 
-    private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
-        var updatedCaseData = caseData.toBuilder();
-        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
-
-        return updatedCaseData.build();
+    private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
-        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(callbackParams.getCaseData()));
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
+        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
+        setMediationConditionFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        DefendantResponseShowTag mediationFlag = setMediationRequired(caseData);
+        if (mediationFlag != null) {
+            Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
+            showConditionFlags.add(mediationFlag);
+            updatedCaseData.showConditionFlags(showConditionFlags);
+        }
+    }
+
+    private DefendantResponseShowTag setMediationRequired(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            if (multiPartyScenario.equals(ONE_V_ONE)) {
+                switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                    case FULL_DEFENCE:
+                        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
+                            && YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
+                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                        }
+                        break;
+                    case PART_ADMISSION:
+                        if (YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
+                            if (caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != null
+                                && NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            } else if (caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec() != null
+                                && NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            } else if (caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null
+                                && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())) {
+                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
+                            }
+                        }
+                        break;
+                    case FULL_ADMISSION:
+                        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
+                            && !YES.equals(caseData.getDefendantSingleResponseToBothClaimants())) {
+                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE;
+                        }
+                        break;
+                    default:
+                        return null;
+                }
+            } else if (multiPartyScenario.equals(TWO_V_ONE)
+                && YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
+                return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
+            } else {
+                if (!YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                    && YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
+                }
+            }
+        }
+        return null;
+    }
+
+    private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        setMediationConditionFlag(caseData, caseDataBuilder);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

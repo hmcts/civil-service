@@ -381,6 +381,9 @@ public class CaseDataBuilder {
     private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
+    private YesOrNo responseClaimMediationSpecRequired;
+    private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4411,6 +4414,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo intentionToSettle) {
+        this.applicant1PartAdmitIntentionToSettleClaimSpec = intentionToSettle;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimTrack(String claimType) {
+        this.responseClaimTrack = claimType;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimMediationSpecRequired(YesOrNo mediationRequired) {
+        this.responseClaimMediationSpecRequired = mediationRequired;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo confirmation) {
+        this.applicant1PartAdmitConfirmAmountPaidSpec = confirmation;
+        return this;
+    }
+
+    public CaseDataBuilder defendantSingleResponseToBothClaimants(YesOrNo response) {
+        this.defendantSingleResponseToBothClaimants = response;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4638,6 +4666,9 @@ public class CaseDataBuilder {
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
+            .responseClaimMediationSpecRequired(responseClaimMediationSpecRequired)
+            .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .build();
     }
 
