@@ -71,6 +71,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         "This action cannot currently be performed because it has already been completed";
     public static final String ERROR_EXTENSION_DEADLINE_BEEN_PASSED =
         "You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed";
+    public static final String  ERROR_DEADLINE_CANT_BE_MORE_THAN_56 =
+        "Date must be from claim issue date plus a maximum of between 29 and 56 days.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -137,6 +139,14 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         }
         if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP) && solicitorRepresentsOnlyRespondent2(callbackParams)) {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        }
+
+        LocalDate issueDate = caseData.getIssueDate();
+
+        if (currentResponseDeadline.toLocalDate().isAfter(issueDate.plusDays(56))) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEADLINE_CANT_BE_MORE_THAN_56))
+                .build();
         }
 
         var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
