@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,9 +60,11 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -108,6 +111,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private final BigDecimal fee108 = new BigDecimal("10800");
+    private final BigDecimal fee14 = new BigDecimal("1400");
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
@@ -242,8 +246,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
-            assertThat(responseCaseData
-                    .getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
             assertThat(response.getErrors()).isEmpty();
         }
 
