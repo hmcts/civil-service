@@ -425,7 +425,7 @@ public class DeadlinesCalculatorTest {
     }
 
     @Nested
-    class getSLAStartDate {
+    class GetSLAStartDate {
         @Test
         void shouldReturnADate30WeeksAfterClaimIssueData_whenSmallClaimTrack() {
             var caseData = CaseData.builder()

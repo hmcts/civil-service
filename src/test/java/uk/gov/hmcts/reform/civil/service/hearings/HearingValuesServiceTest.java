@@ -14,11 +14,17 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.TempHearingValuesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+
+import java.time.LocalDate;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -28,6 +34,8 @@ public class HearingValuesServiceTest {
     private CoreCaseDataService caseDataService;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
 
     @InjectMocks
     private HearingValuesService hearingValuesService;
@@ -35,15 +43,18 @@ public class HearingValuesServiceTest {
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
         var caseId = 1L;
-        var caseDetails = CaseDetails.builder().id(caseId).build();
         var caseData = CaseData.builder().ccdCaseReference(caseId).build();
-        var expected = TempHearingValuesModel.builder().build();
+        var caseDetails = CaseDetails.builder().id(caseId).data(new HashMap<>()).build();
+        var expected = ServiceHearingValuesModel.builder().caseSLAStartDate("2023-01-30").build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
 
         var actual = hearingValuesService.getValues(caseId, "8AB87C89");
 
+        verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
+        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         assertThat(actual).isEqualTo(expected);
     }
 

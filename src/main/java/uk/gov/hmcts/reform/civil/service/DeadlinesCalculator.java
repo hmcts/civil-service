@@ -101,7 +101,7 @@ public class DeadlinesCalculator {
 
     public LocalDate getSlaStartDate(CaseData caseData) {
         var caseIssueDate = caseData.getIssueDate();
-        switch(caseData.getAllocatedTrack()) {
+        switch (caseData.getAllocatedTrack()) {
             case FAST_CLAIM: {
                 return caseIssueDate.plusWeeks(50);
             }
