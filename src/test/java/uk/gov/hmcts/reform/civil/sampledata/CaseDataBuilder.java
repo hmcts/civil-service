@@ -382,7 +382,6 @@ public class CaseDataBuilder {
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
     private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
-    private YesOrNo responseClaimMediationSpecRequired;
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -4432,8 +4431,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder responseClaimMediationSpecRequired(YesOrNo mediationRequired) {
-        this.responseClaimMediationSpecRequired = mediationRequired;
+    public CaseDataBuilder setClaimantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
         return this;
     }
 
@@ -4676,7 +4675,6 @@ public class CaseDataBuilder {
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
-            .responseClaimMediationSpecRequired(responseClaimMediationSpecRequired)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .build();
     }

@@ -996,7 +996,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .responseClaimMediationSpecRequired(YES)
+                .setClaimantMediationFlag(YES)
                 .applicant1ProceedWithClaim(YES)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -1011,7 +1011,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .responseClaimMediationSpecRequired(YES)
+                .setClaimantMediationFlag(YES)
                 .applicant1ProceedWithClaim(NO)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -1025,7 +1025,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .responseClaimMediationSpecRequired(NO)
+                .setClaimantMediationFlag(NO)
                 .applicant1ProceedWithClaim(NO)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -1039,7 +1039,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .responseClaimMediationSpecRequired(YES)
+                .setClaimantMediationFlag(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -1054,7 +1054,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .responseClaimMediationSpecRequired(YES)
+                .setClaimantMediationFlag(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(YES)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .build();
@@ -1070,7 +1070,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .responseClaimMediationSpecRequired(YES)
+                .setClaimantMediationFlag(YES)
                 .applicant1AcceptAdmitAmountPaidSpec(NO)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
