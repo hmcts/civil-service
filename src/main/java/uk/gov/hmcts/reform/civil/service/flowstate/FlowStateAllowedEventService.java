@@ -281,7 +281,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -306,7 +307,8 @@ public class FlowStateAllowedEventService {
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -331,7 +333,8 @@ public class FlowStateAllowedEventService {
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 

@@ -51,7 +51,6 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -291,6 +290,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
+    private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -695,6 +695,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
     private final HearingNotes hearingNotes;
+    private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
     private final Flags caseFlags;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
