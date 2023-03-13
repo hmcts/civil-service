@@ -323,6 +323,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
                         migrateCase
 
@@ -348,6 +349,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase
                     }
                 ),
@@ -371,6 +373,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase
                     }
                 ),
