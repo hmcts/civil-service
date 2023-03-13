@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
-import uk.gov.hmcts.reform.civil.model.TempHearingValuesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 
 @Api
@@ -35,7 +35,7 @@ public class HearingValuesController {
         @ApiResponse(code = 401, message = "Incorrect authorisation"),
         @ApiResponse(code = 400, message = "Bad Request")
     })
-    public ResponseEntity<TempHearingValuesModel> getCaseList(
+    public ResponseEntity<ServiceHearingValuesModel> getCaseList(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @NonNull @RequestBody HearingValuesRequest requestDetails) {
         log.info("Retrieving hearing values");
@@ -43,7 +43,7 @@ public class HearingValuesController {
         log.info("HearingId: " + requestDetails.getHearingId());
 
         var hearingValues = hearingValuesService.getValues(
-            requestDetails.getCaseReference(), requestDetails.getHearingId());
+            requestDetails.getCaseReference(), requestDetails.getHearingId(), authorization);
 
         return new ResponseEntity<>(hearingValues, HttpStatus.OK);
     }

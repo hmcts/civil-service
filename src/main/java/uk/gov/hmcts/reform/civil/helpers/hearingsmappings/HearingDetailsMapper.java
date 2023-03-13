@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 public class HearingDetailsMapper {
 
     private static String EMPTY_STRING = "";
+    public static String STANDARD_PRIORITY = "Standard";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -34,8 +35,8 @@ public class HearingDetailsMapper {
         return 0;
     }
 
-    public static String getHearingPriorityType(CaseData caseData) {
-        return "STANDARD"; // todo ref data code
+    public static String getHearingPriorityType() {
+        return STANDARD_PRIORITY;
     }
 
     public static Integer getNumberOfPhysicalAttendees() {
@@ -55,14 +56,13 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
-        // todo "Secure Dock" Code (11) should be passed when Case Flag -> PF0019 / Detained Individual
-        // is enabled present for any hearing attendee
+        // todo civ-6888
         return null;
     }
 
     public static String getListingComments(CaseData caseData) {
         return EMPTY_STRING;
-        //todo populate with selected case flags type : party/case details : comments
+        //todo CIV-6855
     }
 
     public static String getHearingRequester() {
@@ -75,7 +75,7 @@ public class HearingDetailsMapper {
 
     public static boolean getCaseInterpreterRequiredFlag() {
         return false;
-        //todo based on number of interpreters
+        // todo civ-6888
     }
 
     public static PanelRequirementsModel getPanelRequirements() {

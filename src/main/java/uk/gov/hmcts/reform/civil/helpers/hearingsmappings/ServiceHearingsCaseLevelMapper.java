@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import org.apache.ibatis.annotations.Case;
+import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
+import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
 
-import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceHearingsCaseLevelMapper {
@@ -25,9 +26,9 @@ public class ServiceHearingsCaseLevelMapper {
         return null;
     }
 
-    //todo
-    public static String getCaseDeepLink(String caseReference, CaseData caseData) {
-        return String.format(CASE_DETAILS_URL, "todo get exui url", caseReference);
+    public static String getCaseDeepLink(Long caseId,
+                                         String baseUrl) {
+        return String.format(CASE_DETAILS_URL, baseUrl, caseId);
     }
 
     public static boolean getCaseRestrictedFlag() {
@@ -52,10 +53,28 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static boolean getCaseAdditionalSecurityFlag() {
+        // todo civ-6888
         return false;
     }
 
-    public static List<CaseCategoryModel> getCaseCategories(CaseData caseData) {
-        return null;// todo
+    public static List<CaseCategoryModel> getCaseCategories(CaseData caseData, CaseCategoriesService caseCategoriesService, String authToken) {
+        ArrayList<CaseCategoryModel> caseCategories = new ArrayList<>();
+        CaseCategoryModel caseType = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            authToken
+        );
+        if (caseType != null) {
+            caseCategories.add(caseType);
+        }
+        CaseCategoryModel caseSubType = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_SUBTYPE,
+            caseData,
+            authToken
+        );
+        if (caseSubType != null) {
+            caseCategories.add(caseSubType);
+        }
+        return caseCategories;
     }
 }
