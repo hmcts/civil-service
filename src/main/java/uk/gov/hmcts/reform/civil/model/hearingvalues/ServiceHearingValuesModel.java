@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.hearingvalues;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class ServiceHearingValuesModel {
     private boolean caseAdditionalSecurityFlag;
     private List<CaseCategoryModel> caseCategories;
     private String caseDeepLink;
+    @JsonProperty("caserestrictedFlag")
     private boolean caseRestrictedFlag;
     private String externalCaseReference;
     private String caseManagementLocationCode;
