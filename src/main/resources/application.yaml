@@ -238,6 +238,10 @@ notifications:
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
 
+  notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
+  notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
+
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
