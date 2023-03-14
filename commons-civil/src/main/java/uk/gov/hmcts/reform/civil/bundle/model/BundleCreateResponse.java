@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.bundle;
+package uk.gov.hmcts.reform.civil.bundle.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.BundleApiClient;
+import uk.gov.hmcts.reform.civil.bundle.client.BundleApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.reform.civil.bundle.model.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.bundle.model.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 

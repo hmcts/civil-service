@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.reform.civil.bundle.model.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -76,7 +76,7 @@ public class BundleCreationTriggerEventHandler {
         return isBundleCreated;
     }
 
-    IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
+    IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.bundle.model.Bundle bundle, CaseData caseData) {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
             .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))

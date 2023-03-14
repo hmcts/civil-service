@@ -8,12 +8,12 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 
-import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
-import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseData;
-import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseDetails;
-import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
-import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
-import uk.gov.hmcts.reform.civil.model.bundle.ServedDocument;
+import uk.gov.hmcts.reform.civil.bundle.model.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.bundle.model.BundlingCaseData;
+import uk.gov.hmcts.reform.civil.bundle.model.BundlingCaseDetails;
+import uk.gov.hmcts.reform.civil.bundle.model.BundlingRequestDocument;
+import uk.gov.hmcts.reform.civil.bundle.model.DocumentLink;
+import uk.gov.hmcts.reform.civil.bundle.model.ServedDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
