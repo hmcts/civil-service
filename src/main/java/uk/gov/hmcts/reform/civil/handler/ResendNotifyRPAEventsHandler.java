@@ -65,8 +65,8 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
                     log.error("ERROR Resend CaseId: {}", caseId);
                     log.error(String.format("Updating case data failed: %s", e.getMessage()));
                 }
-                log.info("Resend notify RPA Finished for event: {}", caseEvent);
             });
+            log.info("Resend notify RPA Finished for event: {}", caseEvent);
         } else {
             log.info("List id empty for: {}", caseEvent);
         }
