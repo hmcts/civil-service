@@ -16,8 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.CREATOR;
-
 @Service
 @RequiredArgsConstructor
 public class CoreCaseUserService {
@@ -50,10 +48,10 @@ public class CoreCaseUserService {
 
         String caaAccessToken = getCaaAccessToken();
 
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CREATOR)) {
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR)) {
             removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
         } else {
-            log.info("User doesn't have {} role", CREATOR.getFormattedName());
+            log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
         }
     }
 
@@ -93,7 +91,7 @@ public class CoreCaseUserService {
             = CaseAssignedUserRoleWithOrganisation.builder()
             .caseDataId(caseId)
             .userId(userId)
-            .caseRole(CREATOR.getFormattedName())
+            .caseRole(CaseRole.CREATOR.getFormattedName())
             .organisationId(organisationId)
             .build();
 
