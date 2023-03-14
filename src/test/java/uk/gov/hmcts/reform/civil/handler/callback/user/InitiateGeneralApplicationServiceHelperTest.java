@@ -525,28 +525,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
     }
 
-    @Test
-    void shouldReturnsTrueifClaimantIDMatchesWithLogin() {
-
-        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
-
-        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
-        )).isEqualTo(true);
-    }
-
-    @Test
-    void shouldReturnsfalseifClaimantIDMatchesWithLogin() {
-
-        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
-
-        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getUserDetails(STRING_NUM_CONSTANT, TEST_USER_EMAILID)
-        )).isEqualTo(false);
-    }
-
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -59,6 +60,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
+    private final InitiateGeneralApplicationServiceHelper initiateGeneralApplicationServiceHelper;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
@@ -121,7 +123,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         List<String> errors = new ArrayList<>();
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
+        boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationServiceHelper
             .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
         if (generalAppTypes.size() > 1

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -37,20 +36,12 @@ public class InitiateGeneralApplicationServiceHelper {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
 
-    public boolean isPCClaimantEmailIDSameAsLoginUser(String email, UserDetails userDetails) {
-
-        return StringUtils.isNotBlank(email)
-            && userDetails.getEmail().equals(email);
-    }
-
-    public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, UserDetails userDetails) {
+    public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
         return caseData.getApplicantSolicitor1UserDetails() != null
             && caseData.getApplicant1OrganisationPolicy() != null
-            && isPCClaimantEmailIDSameAsLoginUser(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            userDetails
-        );
+            && caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+            .equals(organisationIdentifier);
     }
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
@@ -177,7 +168,9 @@ public class InitiateGeneralApplicationServiceHelper {
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
-        boolean isGAApplicantSameAsParentCaseClaimant = isGAApplicantSameAsPCClaimant(caseData, userDetails);
+        boolean isGAApplicantSameAsParentCaseClaimant = isGAApplicantSameAsPCClaimant(caseData,
+                                                                                      applicantBuilder.build()
+                                                                                          .getOrganisationIdentifier());
 
         return applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
@@ -216,6 +209,33 @@ public class InitiateGeneralApplicationServiceHelper {
             }
         }
         return EMPTY;
+    }
+
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
+        String parentCaseId = caseData.getCcdCaseReference().toString();
+
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+
+        List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles().stream()
+            .filter(CA -> CA.getUserId().equals(userDetails.getId()))
+            .collect(Collectors.toList());
+
+        String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
+
+        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
+
+            CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
+
+            if (applnSol.getCaseRole() != null) {
+
+                if (applnSol.getCaseRole().equals(applicant1OrgCaseRole)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public String getCaaAccessToken() {
