@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -709,12 +711,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
     // judge final orders
+    private final FinalOrderSelection finalOrderSelection;
+    private final String freeFormRecitalTextArea;
+    private final String freeFormRecordedTextArea;
+    private final String freeFormOrderedTextArea;
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
+    private final OrderOnCourtsList orderOnCourtsList;
 
-    // judge final orders
-    private final FreeFormOrderValues orderOnCourtInitiative;
-    private final FreeFormOrderValues orderWithoutNotice;
+    private Document freeFormOrderDocument;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
