@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.bankholidays;
+package uk.gov.hmcts.reform.civil.bankholidays;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;

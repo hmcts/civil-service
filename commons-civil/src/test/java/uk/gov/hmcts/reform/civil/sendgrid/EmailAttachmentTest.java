@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sendgrid;
+package uk.gov.hmcts.reform.civil.sendgrid;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
