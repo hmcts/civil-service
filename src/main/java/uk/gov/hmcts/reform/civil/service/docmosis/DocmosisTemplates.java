@@ -50,7 +50,10 @@ public enum DocmosisTemplates {
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01213.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01219.docx", "%s_directions_questionnaire_form_%s.pdf");
+    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01219.docx", "%s_directions_questionnaire_form_%s.pdf"),
+
+    // judge final Order
+    FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01077.docx", "Order_%s.pdf");
 
 
     private final String template;

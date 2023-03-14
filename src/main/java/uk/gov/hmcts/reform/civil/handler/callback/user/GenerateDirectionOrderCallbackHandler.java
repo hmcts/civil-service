@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseProgression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -35,12 +39,15 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
     private final ObjectMapper objectMapper;
+    private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "populate-freeForm-values"), this::populateFreeFormValues,
+            callbackKey(MID, "generate-document-preview"), this::generateDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -51,7 +58,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
+    private CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
@@ -63,6 +70,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                    .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
                                                    .withoutNoticeSelectionDate(LocalDate.now())
                                                    .build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse generateDocument(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        CaseDocument document = judgeFinalOrderGenerator.generate(
+            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.freeFormOrderDocument(document.getDocumentLink());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
