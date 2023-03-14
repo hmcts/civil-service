@@ -325,9 +325,10 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
-                        migrateCase
-
+                        migrateCase,
+                        TAKE_CASE_OFFLINE
                     }
                 ),
                 of(
@@ -350,7 +351,9 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE
                     }
                 ),
                 of(
@@ -373,7 +376,9 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE
                     }
                 ),
                 of(
