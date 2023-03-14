@@ -15,5 +15,5 @@ public class RespondentLiPResponse {
     private MediationLiP respondent1MediationLiPResponse;
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private String respondent1LiPContactPerson;
-    private Address  respondent1LiPCorrespondenceAddress;
+    private Address respondent1LiPCorrespondenceAddress;
 }
