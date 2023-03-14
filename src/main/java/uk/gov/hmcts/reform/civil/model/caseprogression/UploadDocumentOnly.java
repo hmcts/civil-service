@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -13,4 +15,6 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 public class UploadDocumentOnly {
 
     private Document documentUpload;
+    @Builder.Default
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }
