@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.service.postcode.PostcodeLookupService;
+import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 
 import java.util.List;
 

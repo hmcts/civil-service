@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.enums;
+package uk.gov.hmcts.reform.civil.postcode;
 
 public enum CountriesAllowed {
     ENGLAND,

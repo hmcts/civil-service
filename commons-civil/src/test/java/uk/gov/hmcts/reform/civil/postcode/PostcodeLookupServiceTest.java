@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.postcode;
+package uk.gov.hmcts.reform.civil.postcode;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -10,7 +10,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.civil.config.PostcodeLookupConfiguration;
+import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupConfiguration;
+import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

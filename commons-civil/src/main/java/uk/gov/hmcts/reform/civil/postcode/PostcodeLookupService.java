@@ -1,7 +1,7 @@
-package uk.gov.hmcts.reform.civil.service.postcode;
+package uk.gov.hmcts.reform.civil.postcode;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.hmcts.reform.civil.config.PostcodeLookupConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CountriesAllowed;
 
 import java.util.HashMap;
 import java.util.Locale;

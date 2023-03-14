@@ -5,4 +5,9 @@ bankHolidays:
 
 nonworking-days:
   datafile: /data/non-working_days.dat
-  
+
+# Postcode Lookup Service
+os-postcode-lookup:
+  url: https://api.os.uk/search/names/v1/find
+  key: ${OS_POSTCODE_LOOKUP_API_KEY:}
+  offline-mode: false

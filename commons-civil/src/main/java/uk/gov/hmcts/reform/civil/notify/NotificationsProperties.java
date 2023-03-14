@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.config.properties.notification;
+package uk.gov.hmcts.reform.civil.notify;
 
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.notify;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

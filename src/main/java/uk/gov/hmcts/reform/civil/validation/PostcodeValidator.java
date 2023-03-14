@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.validation;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.service.postcode.PostcodeLookupService;
+import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 
 import java.util.ArrayList;
 import java.util.List;
