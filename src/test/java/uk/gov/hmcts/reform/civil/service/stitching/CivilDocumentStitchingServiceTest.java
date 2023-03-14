@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +42,6 @@ public class CivilDocumentStitchingServiceTest {
     private CivilDocumentStitchingService civilDocumentStitchingService;
     @MockBean
     private BundleRequestExecutor bundleRequestExecutor;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
     private StitchingConfiguration stitchingConfiguration;
     private static final CaseDocument CLAIM_FORM =
@@ -59,6 +57,7 @@ public class CivilDocumentStitchingServiceTest {
                               .documentBinaryUrl("binary-url")
                               .build())
             .build();
+    //Optional should be removed after refactoring
     private final Optional<String> stitchStatus = Optional.of(randomAlphabetic(8));
     private final Optional<Document> stitchedDocument = Optional.of(mock(Document.class));
 
@@ -71,8 +70,13 @@ public class CivilDocumentStitchingServiceTest {
             )
         );
     }
+
+    public CaseData buildCaseData(Bundle bundle){
+        List<IdValue<Bundle>> caseBundles = List.of(new IdValue<>("1", bundle));
+        return CaseDataBuilder.builder().caseBundles(caseBundles).build();
+    }
     @Test
-    public void whenCaseDataIsNull() {
+    public void whenCaseDataIsNullWithPayloadAndNoCaseBundlesNoStitchingDocument() {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
@@ -80,7 +84,7 @@ public class CivilDocumentStitchingServiceTest {
         Assertions.assertNull(caseDocument);
     }
     @Test
-    public void whenCaseDataIsNullAndPayloadNotNull() {
+    public void whenCaseDataIsNullWithNoCaseBundles() {
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
         when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
@@ -89,11 +93,10 @@ public class CivilDocumentStitchingServiceTest {
         Assertions.assertNull(caseDocument);
     }
     @Test
-    public void whenCaseDataIsNullAndStitchingDocumentNotPresent() {
+    public void whenCaseDataIsNotNullWithCaseBundlesAndNoStitchingDocumentThenCaseDocumentIsNull() {
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
-        List<IdValue<Bundle>> caseBundles = List.of(new IdValue<>("1", mock(Bundle.class)));
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
-        CaseData caseData1 = CaseDataBuilder.builder().caseBundles(caseBundles).build();
+        CaseData caseData1 = buildCaseData(mock(Bundle.class));
         when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
         when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
@@ -101,7 +104,7 @@ public class CivilDocumentStitchingServiceTest {
         Assertions.assertNull(caseDocument);
     }
     @Test
-    public void whenStitchingDocumentIsPresentThenCaseDataIsNull() {
+    public void whenStitchingDocumentIsPresentAndCaseDataNotNullThenCaseDocumentNotNull() {
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
         Bundle bundle = new Bundle(
             "Id1",
@@ -114,9 +117,8 @@ public class CivilDocumentStitchingServiceTest {
             YesOrNo.YES,
             YesOrNo.NO,
             "BundleFilename");
-        List<IdValue<Bundle>> caseBundles = List.of(new IdValue<>("1", bundle));
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
-        CaseData caseData1 = CaseDataBuilder.builder().caseBundles(caseBundles).build();
+        CaseData caseData1 = buildCaseData(bundle);
         when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
         when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
