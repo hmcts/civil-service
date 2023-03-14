@@ -1498,6 +1498,7 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
+        respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
