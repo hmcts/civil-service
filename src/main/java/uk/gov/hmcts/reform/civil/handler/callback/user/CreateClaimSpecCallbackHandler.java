@@ -454,7 +454,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             if (references.isPresent()) {
                 SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
+                        .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
                     .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
             }
@@ -470,6 +472,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             if (references.isPresent()) {
                 SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
                         .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
                         .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
