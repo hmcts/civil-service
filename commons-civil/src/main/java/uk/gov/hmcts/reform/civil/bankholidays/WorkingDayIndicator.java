@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.bankholidays;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
