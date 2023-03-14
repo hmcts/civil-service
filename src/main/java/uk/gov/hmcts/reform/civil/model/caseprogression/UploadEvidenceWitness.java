@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -17,4 +18,6 @@ public class UploadEvidenceWitness {
     private String witnessOptionName;
     private LocalDate witnessOptionUploadDate;
     private Document witnessOptionDocument;
+    @Builder.Default
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }
