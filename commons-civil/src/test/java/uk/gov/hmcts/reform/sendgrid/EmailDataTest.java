@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sendgrid;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import uk.gov.hmcts.reform.sendgrid.EmailAttachment;
-import uk.gov.hmcts.reform.sendgrid.EmailData;
+import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
+import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 
 import java.util.List;
 

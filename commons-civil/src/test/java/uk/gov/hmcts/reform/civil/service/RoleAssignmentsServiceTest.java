@@ -8,9 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ras.client.RoleAssignmentsApi;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 
 import java.util.List;
 

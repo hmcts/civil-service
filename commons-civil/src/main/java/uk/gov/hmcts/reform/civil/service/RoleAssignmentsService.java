@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ras.client.RoleAssignmentsApi;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 
 @Service
 @RequiredArgsConstructor

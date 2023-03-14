@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.bankholidays.BankHolidays;
-import uk.gov.hmcts.reform.bankholidays.BankHolidaysApi;
-import uk.gov.hmcts.reform.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.BankHolidays;
+import uk.gov.hmcts.reform.civil.bankholidays.BankHolidaysApi;
+import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
