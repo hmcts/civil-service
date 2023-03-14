@@ -169,6 +169,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                 calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
                                                                    publicHolidaysCollection.getPublicHolidays()));
             calculateAndApplyFee(caseData, caseDataBuilder);
+        } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
