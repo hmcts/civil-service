@@ -29,14 +29,14 @@ public class PostCodeValidatorTest {
 
         @Test
         void returnError_whenStartswithBT() {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant("BT11SS");
+            List<String> errors = postcodeValidator.validate("BT11SS");
 
             assertThat(errors).containsOnly("Postcode must be in England or Wales");
         }
 
         @Test
         void returnError_whenInputisNull() {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(null);
+            List<String> errors = postcodeValidator.validate(null);
 
             assertThat(errors).containsOnly("Please enter Postcode");
         }
@@ -44,7 +44,7 @@ public class PostCodeValidatorTest {
         @Test
         void returnError_whenInputisNotFound() {
             when(postcodeLookupService.validatePostCodeForDefendant(any())).thenReturn(false);
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant("TEST");
+            List<String> errors = postcodeValidator.validate("TEST");
 
             assertThat(errors).containsOnly("Postcode must be in England or Wales");
         }
@@ -52,7 +52,7 @@ public class PostCodeValidatorTest {
         @Test
         void returnTrue_whenInputisFound() {
             when(postcodeLookupService.validatePostCodeForDefendant(any())).thenReturn(true);
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant("BA12SS");
+            List<String> errors = postcodeValidator.validate("BA12SS");
 
             assertThat(errors).isEmpty();
         }

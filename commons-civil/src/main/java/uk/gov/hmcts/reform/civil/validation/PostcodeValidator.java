@@ -16,7 +16,7 @@ public class PostcodeValidator {
         this.postcodeLookupService = postcodeLookupService;
     }
 
-    public List<String> validatePostCodeForDefendant(String postcode) {
+    public List<String> validate(String postcode) {
         List<String> errors = new ArrayList<>();
         if (postcode != null) {
             /*

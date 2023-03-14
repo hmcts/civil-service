@@ -226,7 +226,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
+            errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
@@ -578,7 +578,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validatePostCode(String postCode) {
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
+        List<String> errors = postcodeValidator.validate(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
