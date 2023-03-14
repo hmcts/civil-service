@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.bankholidays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
 import java.util.Arrays;
