@@ -45,7 +45,7 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
     }
 
     private void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
-        if (!caseIdList.isEmpty() || caseIdList != null) {
+        if (caseIdList != null && !caseIdList.isEmpty()) {
             log.info("Resend notify RPA started for event: {}", caseEvent);
             caseIdList.forEach(caseId -> {
                 try {
@@ -64,7 +64,6 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
                 } catch (Exception e) {
                     log.error("ERROR Resend CaseId: {}", caseId);
                     log.error(String.format("Updating case data failed: %s", e.getMessage()));
-                    throw e;
                 }
                 log.info("Resend notify RPA Finished for event: {}", caseEvent);
             });
