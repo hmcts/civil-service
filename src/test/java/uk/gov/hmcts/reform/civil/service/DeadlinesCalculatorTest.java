@@ -37,6 +37,8 @@ import static java.time.Month.JULY;
 import static java.time.Month.JUNE;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
@@ -460,6 +462,32 @@ public class DeadlinesCalculatorTest {
             var expectedDate = LocalDate.of(2024, 07, 14);
 
             Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentException_whenAllocatedTrackIsNull() {
+            var caseData = CaseData.builder()
+                .issueDate(LocalDate.of(2024, 07, 14))
+                .build();
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.getSlaStartDate(caseData)
+            );
+            assertEquals(exception.getMessage(), "Allocated track cannot be null");
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentException_whenIssueDateIsNull() {
+            var caseData = CaseData.builder()
+                .allocatedTrack(MULTI_CLAIM)
+                .build();
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.getSlaStartDate(caseData)
+            );
+            assertEquals(exception.getMessage(), "Case issue data cannot be null");
         }
     }
 

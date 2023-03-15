@@ -101,6 +101,13 @@ public class DeadlinesCalculator {
 
     public LocalDate getSlaStartDate(CaseData caseData) {
         var caseIssueDate = caseData.getIssueDate();
+        if (caseIssueDate == null) {
+            throw new IllegalArgumentException("Case issue data cannot be null");
+        }
+        if (caseData.getAllocatedTrack() == null) {
+            throw new IllegalArgumentException("Allocated track cannot be null");
+        }
+
         switch (caseData.getAllocatedTrack()) {
             case FAST_CLAIM: {
                 return caseIssueDate.plusWeeks(50);
