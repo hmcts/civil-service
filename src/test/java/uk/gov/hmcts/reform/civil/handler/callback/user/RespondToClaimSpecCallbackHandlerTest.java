@@ -194,7 +194,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         params = params.toBuilder().request(request).build();
 
         List<String> errors = Collections.singletonList("error 1");
-        Mockito.when(postcodeValidator.validatePostCodeForDefendant(postCode)).thenReturn(errors);
+        Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
 
         // When
         CallbackResponse response = handler.handle(params);
