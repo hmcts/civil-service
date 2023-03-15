@@ -45,24 +45,32 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
     }
 
     private void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
-        log.info("Resend notify RPA started for event: {}", caseEvent);
-        caseIdList.forEach(caseId -> {
-            try {
-                log.info("Resend CaseId: {} started", caseId);
-                var startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
+        if (caseIdList != null && !caseIdList.isEmpty()) {
+            log.info("Resend notify RPA started for event: {}", caseEvent);
+            caseIdList.forEach(caseId -> {
+                try {
+                    log.info("Resend CaseId: {} started", caseId);
+                    var startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
 
-                Map<String, Object> caseDataMap = coreCaseDataService.getCase(Long.valueOf(caseId)).getData();
+                    Map<String, Object> caseDataMap = coreCaseDataService.getCase(Long.valueOf(caseId)).getData();
 
-                coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, caseDataMap));
-                log.info("Resend CaseId: {} finished", caseId);
+                    coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, caseDataMap));
+                    log.info("Resend CaseId: {} finished", caseId);
 
-            } catch (FeignException e) {
-                log.error("ERROR Resend CaseId: {}", caseId);
-                log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
-                throw e;
-            }
-        });
-        log.info("Resend notify RPA Finished for event: {}", caseEvent);
+                } catch (FeignException e) {
+                    log.error("ERROR Resend CaseId: {}", caseId);
+                    log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
+                    throw e;
+                } catch (Exception e) {
+                    log.error("ERROR Resend CaseId: {}", caseId);
+                    log.error(String.format("Updating case data failed: %s", e.getMessage()));
+                }
+                log.info("Resend notify RPA Finished for event: {}", caseEvent);
+            });
+        } else {
+            log.info("List id empty for: {}", caseEvent);
+        }
+
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, Map<String, Object> caseDataMap) {
