@@ -11,8 +11,8 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
-import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 
 import java.time.LocalDate;
 import java.util.Arrays;

@@ -254,8 +254,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
-                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
+            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+                dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
             builder.applicant1DQ(dq.build());

@@ -30,9 +30,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -122,6 +126,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -1467,11 +1472,50 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
+        assembleResponseDocumentsSpec(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+
+        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        Optional.ofNullable(caseData.getRespondent1SpecDefenceResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                                      updatedCaseData.build().getRespondent1ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQDraftDirections)
+            .ifPresent(respondent1DQ -> defendantUploads.add(
+                buildElemCaseDocument(
+                    respondent1DQ,
+                    "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        Optional.ofNullable(caseData.getRespondent2SpecDefenceResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                      updatedCaseData.build().getRespondent2ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getRespondent2DQDraftDirections)
+            .ifPresent(respondent2DQ -> defendantUploads.add(
+                buildElemCaseDocument(
+                    respondent2DQ,
+                    "Defendant 2",
+                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
