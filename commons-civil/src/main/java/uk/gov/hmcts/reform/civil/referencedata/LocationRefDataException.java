@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.referencedata;
+package uk.gov.hmcts.reform.civil.referencedata;
 
 public class LocationRefDataException  extends RuntimeException {
 
