@@ -19,6 +19,6 @@
       "automerge": true
     }
   ],
-  "schedule": ["after 2am on sunday"],
-  "prConcurrentLimit": 20
+  "schedule": ["after 2am on wednesday", "after 2am on sunday"],
+  "prConcurrentLimit": 10
 }
