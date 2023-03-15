@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

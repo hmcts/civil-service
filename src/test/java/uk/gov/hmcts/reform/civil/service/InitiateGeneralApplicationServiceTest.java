@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -147,7 +147,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(weekdayDate);
 
         when(organisationApi.findUserOrganisation(any(), any()))
-            .thenReturn(uk.gov.hmcts.reform.prd.model.Organisation
+            .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
                             .builder().organisationIdentifier("OrgId1").build());
 
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
