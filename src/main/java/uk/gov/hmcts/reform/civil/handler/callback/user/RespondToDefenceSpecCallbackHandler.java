@@ -30,12 +30,15 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -69,12 +72,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +96,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
 
     @Override
@@ -247,14 +252,39 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
-                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
+            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+                dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+
+        if (caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant1DQ().getSmallClaimExperts());
+            builder.applicant1DQ(
+                builder.build().getApplicant1DQ().toBuilder()
+                    .applicant1DQExperts(Experts.builder()
+                                              .details(wrapElements(expert))
+                                              .build())
+                    .build());
+        }
+
+        if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant2DQ().getSmallClaimExperts());
+            builder.applicant2DQ(
+                builder.build().getApplicant2DQ().toBuilder()
+                    .applicant2DQExperts(Experts.builder()
+                                              .details(wrapElements(expert))
+                                              .build())
+                    .build());
+        }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -303,17 +333,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
-
-        } else {
-            updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM);
-        }
+        updatedCaseData.respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);

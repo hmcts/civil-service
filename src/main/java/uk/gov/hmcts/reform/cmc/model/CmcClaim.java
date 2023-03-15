@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
@@ -55,7 +56,7 @@ public class CmcClaim implements Claim {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate moneyReceivedOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime countyCourtJudgmentRequestedAt;
@@ -257,6 +258,13 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasBreathingSpace() {
         return claimData != null && claimData.hasBreathingSpace();
+    }
+
+    @JsonIgnore
+    public LocalDate getBySpecifiedDate() {
+        return Optional.ofNullable(getResponse())
+            .map(Response::getPaymentIntention)
+            .map(PaymentIntention::getPaymentDate).orElse(null);
     }
 
     @JsonIgnore

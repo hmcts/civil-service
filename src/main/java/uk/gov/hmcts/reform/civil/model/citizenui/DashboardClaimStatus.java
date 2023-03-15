@@ -6,6 +6,18 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    CLAIMANT_ACCEPTED_STATES_PAID(
+        Claim::claimantConfirmedDefendantPaid
+    ),
+    SETTLED(
+        Claim::isSettled
+    ),
+    TRANSFERRED(
+        Claim::isSentToCourt
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
+    ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
@@ -18,9 +30,6 @@ public enum DashboardClaimStatus {
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
     ),
-    NO_RESPONSE(
-        Claim::hasResponsePending
-    ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
     ),
@@ -30,19 +39,9 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
-    CLAIMANT_ACCEPTED_STATES_PAID(
-        Claim::claimantConfirmedDefendantPaid
+    NO_RESPONSE(
+        Claim::hasResponsePending
     ),
-    TRANSFERRED(
-        Claim::isSentToCourt
-    ),
-    REQUESTED_CCJ_BY_REDETERMINATION(
-        Claim::hasCCJByRedetermination
-    ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
-
     PROCEED_OFFLINE(
         Claim::isProceedOffline
     ),
@@ -69,16 +68,6 @@ public enum DashboardClaimStatus {
     ),
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
-    ),
-
-    DEFENDANT_PART_ADMIT_PAID(
-        Claim::hasDefendantStatedTheyPaid
-    ),
-    DEFENDANT_PART_ADMIT(
-        Claim::defendantRespondedWithPartAdmit
-    ),
-    SETTLED(
-        Claim::isSettled
     ),
     NO_STATUS(c -> false);
 

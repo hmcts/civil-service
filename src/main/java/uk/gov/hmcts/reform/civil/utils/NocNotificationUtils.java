@@ -146,7 +146,8 @@ public class NocNotificationUtils {
      * @return true if the organisation is null meaning the party is a LiP
      */
     private static boolean isOtherPartyLip(OrganisationPolicy organisationToCheck) {
-        return organisationToCheck == null;
+        return organisationToCheck == null
+            || organisationToCheck.getOrganisation() == null;
     }
 
     /**

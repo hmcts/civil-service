@@ -33,6 +33,7 @@ public class ClaimStoreService {
             .defendantName(cmcClaim.getDefendantName())
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
+            .paymentDate(cmcClaim.getBySpecifiedDate())
             .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
             .ocmc(true)
             .admittedAmount(cmcClaim.getAdmittedAmount())

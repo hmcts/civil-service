@@ -8,15 +8,15 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,9 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Service
@@ -70,13 +70,13 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
-                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 templateID = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
         }
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
                 sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
@@ -102,8 +102,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(
-            caseData, featureToggleService.isAccessProfilesEnabled());
+        return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
     }
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {

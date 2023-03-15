@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -23,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @SpringBootTest(classes = {
@@ -71,7 +71,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked_spec() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
@@ -93,7 +93,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked_spec_blocked() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When

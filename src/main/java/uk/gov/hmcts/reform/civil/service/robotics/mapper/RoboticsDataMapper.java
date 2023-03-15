@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -174,7 +174,7 @@ public class RoboticsDataMapper {
         return solicitorBuilder.build();
     }
 
-    private Consumer<uk.gov.hmcts.reform.prd.model.Organisation> buildOrganisation(
+    private Consumer<uk.gov.hmcts.reform.civil.prd.model.Organisation> buildOrganisation(
         Solicitor.SolicitorBuilder solicitorBuilder, Address providedServiceAddress
     ) {
         return organisation -> {
@@ -247,7 +247,7 @@ public class RoboticsDataMapper {
             ? RESPONDENT_SOLICITOR_ID : null;
 
         /*LocalDateTime dateOfService = null;
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             dateOfService = caseData.getIssueDate().atStartOfDay();
         } else {
             dateOfService = caseData.getClaimDetailsNotificationDate();

@@ -42,7 +42,6 @@ public class StateFlowEngineUnspecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
         given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);

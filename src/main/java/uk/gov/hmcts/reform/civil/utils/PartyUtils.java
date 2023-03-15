@@ -14,11 +14,14 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class PartyUtils {
 
@@ -192,9 +195,8 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
-                                                                      boolean isAccessProfilesEnabled) {
-        if (isSpecCaseCategory(caseData, isAccessProfilesEnabled)) {
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
@@ -304,6 +306,17 @@ public class PartyUtils {
                 break;
         }
         return defendantNames.toString();
+    }
+
+    public static String getAllPartyNames(CaseData caseData) {
+        return format("%s%s V %s%s",
+                      caseData.getApplicant1().getPartyName(),
+                      YES.equals(caseData.getAddApplicant2())
+                          ? ", " + caseData.getApplicant2().getPartyName() : "",
+                      caseData.getRespondent1().getPartyName(),
+                      YES.equals(caseData.getAddRespondent2())
+                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                          ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
 }

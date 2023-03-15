@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +25,9 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -33,10 +37,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -59,6 +64,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 })
 class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String TEST_URL = "url";
+    private static final String TEST_FILE_NAME = "testFileName.pdf";
+
     @Autowired
     private EvidenceUploadApplicantHandler handler;
 
@@ -67,7 +75,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private  CoreCaseUserService coreCaseUserService;
-
+    @MockBean
+    CaseData.CaseDataBuilder caseDataBuilder;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -92,7 +101,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -108,7 +116,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -501,5 +508,153 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                                                        method, argument.getClass()), target, argument);
         return target;
     }
+
+    @Test
+    void shouldAddApplicantEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
+        // Given caseBundles with bundle created date is before witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentDisclosureList(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        // Then applicant docs uploaded after bundle should return size 2
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(3);
+    }
+
+    @Test
+    void shouldNotAddApplicantEvidenceDocWhenBundleCreatedDateIsAfterEvidenceUploaded() {
+        // Given caseBundles with bundle created date is after witness and expert doc created date
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12))).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        // Then applicant docs uploaded after bundle should return size 0
+        assertThat(updatedData.getApplicantDocsUploadedAfterBundle().size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldBreakWhenThereIsAnyCaseBundlesWithoutCreatedDate() {
+        // Given: No caseBundles exists with CreatedDate and new evidence is uploaded
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.of(LocalDateTime.of(2022, 05, 15, 12, 12, 12)))
+            .build()));
+        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .build()));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .caseBundles(caseBundles)
+            .build();
+
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When: handler is called
+        // Then: an exception is thrown
+        assertThrows(NullPointerException.class, () -> {
+            handler.handle(params);
+        });
+    }
+
+    @Test
+    void shouldBreakWhenThereIsAnyCaseBundlesWithNullCreatedDate() {
+        // Given: No caseBundles exists with CreatedDate and new evidence is uploaded
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.ofNullable(null))
+            .build()));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .documentQuestions(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .documentWitnessSummary(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12)))
+            .caseBundles(caseBundles)
+            .build();
+
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When: handler is called
+        // Then: an exception is thrown
+        assertThrows(NullPointerException.class, () -> {
+            handler.handle(params);
+        });
+    }
+
+    private List<IdValue<Bundle>> prepareCaseBundles(LocalDateTime bundleCreatedDate) {
+        List<IdValue<Bundle>> caseBundles = new ArrayList<>();
+        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
+            .title("Trial Bundle")
+            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+            .createdOn(Optional.of(bundleCreatedDate))
+            .build()));
+        return caseBundles;
+    }
+
+    private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate) {
+        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
+        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).build())
+                                                         .witnessOptionName("FirstName LastName")
+                                                         .createdDatetime(uploadedDate)
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10)).build()));
+        return witnessEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate) {
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .createdDatetime(uploadedDate)
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+
+        return  expertEvidenceDocs;
+    }
+
+    private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate) {
+        List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocs = new ArrayList<>();
+        uploadEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                        .builder()
+                                                        .createdDatetime(uploadedDate)
+                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+
+        return  uploadEvidenceDocs;
+    }
+
 }
 
