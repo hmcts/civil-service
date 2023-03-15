@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static java.util.Objects.nonNull;
@@ -66,6 +69,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     abstract CallbackResponse createShowCondition(CaseData caseData);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
+
+    abstract void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData);
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -277,6 +282,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         applyDocumentUploadDate(caseDataBuilder, time.now());
+        if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
+            updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
+        }
 
         if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)) {
             setCategoryId(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosureList");
@@ -342,5 +350,65 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .confirmationBody("You can continue uploading documents or return later. To upload more "
                                   + "documents, go to Next step and select \"Document Upload\".")
             .build();
+    }
+
+    void addUploadDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
+                                  List<Element<UploadEvidenceDocumentType>> documentUploadEvidenceType,
+                                  Optional<Bundle> bundleDetails, String docType) {
+        if (null == documentUploadEvidenceType) {
+            return;
+        }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentType -> {
+            if (null != uploadEvidenceDocumentType.getValue().getCreatedDatetime()
+                && bundleDetails.get().getCreatedOn().isPresent()
+                && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
+                .isAfter(bundleDetails.get().getCreatedOn().get())) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
+                                                                         .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())
+                                                                         .build()));
+            }
+        });
+    }
+
+    void addWitnessDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
+                                   List<Element<UploadEvidenceWitness>> documentUploadEvidenceType,
+                                   Optional<Bundle> bundleDetails, String docType) {
+        if (null == documentUploadEvidenceType) {
+            return;
+        }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
+            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
+                null))) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
+                                                                         .documentUpload(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getWitnessOptionDocument())
+                                                                         .build()));
+            }
+        });
+    }
+
+    void addExpertDocList(List<Element<UploadEvidenceDocumentType>> uploadedEvidenceAfterBundle,
+                                  List<Element<UploadEvidenceExpert>> documentUploadEvidenceType,
+                                  Optional<Bundle> bundleDetails, String docType) {
+        if (null == documentUploadEvidenceType) {
+            return;
+        }
+        documentUploadEvidenceType.forEach(uploadEvidenceDocumentTypeElement -> {
+            if (uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().isAfter(bundleDetails.get().getCreatedOn().orElse(
+                null))) {
+                uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .typeOfDocument(docType)
+                                                                         .createdDatetime(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime())
+                                                                         .documentUpload(
+                                                                             uploadEvidenceDocumentTypeElement.getValue().getExpertDocument())
+                                                                         .build()));
+            }
+        });
     }
 }

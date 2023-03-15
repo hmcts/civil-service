@@ -99,7 +99,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         List<String> errors = dateOfBirthValidator.validate(respondent);
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecAoSRespondentCorrespondenceAddressRequired().equals(NO)) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
+            errors = postcodeValidator.validate(
                 caseData.getSpecAoSRespondentCorrespondenceAddressdetails().getPostCode());
         }
 

@@ -266,7 +266,6 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
-    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;

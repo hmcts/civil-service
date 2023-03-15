@@ -275,12 +275,14 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -302,9 +304,11 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -326,9 +330,11 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
