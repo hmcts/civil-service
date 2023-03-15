@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,7 +21,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -157,7 +158,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
         return Optional.ofNullable(organisationPolicy)
             .map(OrganisationPolicy::getOrganisation)
-            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
             .flatMap(value -> value.map(o -> Party.builder()
                 .name(o.getName())
