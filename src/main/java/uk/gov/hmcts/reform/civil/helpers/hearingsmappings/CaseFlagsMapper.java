@@ -12,8 +12,6 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getNonRACodeFlags;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getNonSMCodeFlags;
 
 public class CaseFlagsMapper {
 
@@ -26,8 +24,6 @@ public class CaseFlagsMapper {
     public static CaseFlags getCaseFlags(CaseData caseData) {
         List<Flags> allActiveFlags = getAllActiveFlags(caseData);
         getAllHearingRelevantCaseFlags(allActiveFlags);
-        getNonSMCodeFlags(allActiveFlags);
-        getNonRACodeFlags(allActiveFlags);
 
         if (allActiveFlags.isEmpty()) {
             return CaseFlags.builder()

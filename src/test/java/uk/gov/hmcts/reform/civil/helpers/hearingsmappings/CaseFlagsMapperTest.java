@@ -42,6 +42,14 @@ public class CaseFlagsMapperTest {
                                .flagId("AB001")
                                .flagDescription("Vulnerable user")
                                .flagStatus("Active")
+                               .build(),
+                           PartyFlagsModel.builder()
+                               .partyID("")
+                               .partyName(caseData.getRespondent1().getPartyName())
+                               .flagParentId("")
+                               .flagId("SM001")
+                               .flagDescription("Flight risk")
+                               .flagStatus("Active")
                                .build()))
             .build();
 

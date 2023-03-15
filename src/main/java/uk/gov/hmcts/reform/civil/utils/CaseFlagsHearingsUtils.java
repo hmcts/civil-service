@@ -114,17 +114,17 @@ public class CaseFlagsHearingsUtils {
         return flags;
     }
 
-    public static List<Flags> getNonSMCodeFlags(List<Flags> flags) {
+    public static List<Flags> getSMCodeFlags(List<Flags> flags) {
         if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> d.getValue().getFlagCode().contains(
+            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getFlagCode().contains(
                 SPECIAL_MEASURES_FLAG_CODE)));
         }
         return flags;
     }
 
-    public static List<Flags> getNonRACodeFlags(List<Flags> flags) {
+    public static List<Flags> getRACodeFlags(List<Flags> flags) {
         if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> d.getValue().getFlagCode().contains(
+            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getFlagCode().contains(
                 REASONABLE_ADJUSTMENTS_FLAG_CODE)));
         }
         return flags;

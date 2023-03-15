@@ -69,7 +69,7 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     @Test
-    void shouldReturnAllCaseFlags_withoutSMFlagCode() {
+    void shouldReturnAllCaseFlags_withSMFlagCode() {
         CaseData caseData = CaseDataBuilder.builder()
             .addRespondent1LitigationFriend()
             .atStateRespondentFullDefence()
@@ -82,20 +82,20 @@ public class CaseFlagsHearingsUtilsTest {
 
         List<Flags> expectedFlags = new ArrayList<>();
 
-        expectedFlags.add(getRespondent1Flags(caseData, getAllActiveNonSMCodeFlagDetails()));
-        expectedFlags.add(getApplicant1Flags(caseData, getAllActiveNonSMCodeFlagDetails()));
-        expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveNonSMCodeFlagDetails()));
-        expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveNonSMCodeFlagDetails()));
-        expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveNonSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1Flags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getApplicant1Flags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveSMCodeFlagDetails()));
+        expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveSMCodeFlagDetails()));
 
         List<Flags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getNonSMCodeFlags(activeFlags);
+        List<Flags> actualFlags = CaseFlagsHearingsUtils.getSMCodeFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
 
     @Test
-    void shouldReturnAllCaseFlags_withoutRAFlagCode() {
+    void shouldReturnAllCaseFlags_withRAFlagCode() {
         CaseData caseData = CaseDataBuilder.builder()
             .addRespondent1LitigationFriend()
             .atStateRespondentFullDefence()
@@ -108,14 +108,14 @@ public class CaseFlagsHearingsUtilsTest {
 
         List<Flags> expectedFlags = new ArrayList<>();
 
-        expectedFlags.add(getRespondent1Flags(caseData, getAllActiveNonRACodeFlagDetails()));
-        expectedFlags.add(getApplicant1Flags(caseData, getAllActiveNonRACodeFlagDetails()));
-        expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveNonRACodeFlagDetails()));
-        expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveNonRACodeFlagDetails()));
-        expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveNonRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1Flags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getApplicant1Flags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveRACodeFlagDetails()));
+        expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveRACodeFlagDetails()));
 
         List<Flags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getNonRACodeFlags(activeFlags);
+        List<Flags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
@@ -232,35 +232,7 @@ public class CaseFlagsHearingsUtilsTest {
         return wrapElements(details1, details2);
     }
 
-    private List<Element<FlagDetail>> getAllActiveNonSMCodeFlagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .build();
-
-        FlagDetail details3 = FlagDetail.builder()
-            .name("Audio/Video evidence")
-            .flagComment("comment")
-            .flagCode("RA001")
-            .hearingRelevant(NO)
-            .status("Active")
-            .build();
-
-        return wrapElements(details1, details3);
-    }
-
-    private List<Element<FlagDetail>> getAllActiveNonRACodeFlagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .build();
-
+    private List<Element<FlagDetail>> getAllActiveSMCodeFlagDetails() {
         FlagDetail details2 = FlagDetail.builder()
             .name("Flight risk")
             .flagComment("comment")
@@ -269,6 +241,18 @@ public class CaseFlagsHearingsUtilsTest {
             .status("Active")
             .build();
 
-        return wrapElements(details1, details2);
+        return wrapElements(details2);
+    }
+
+    private List<Element<FlagDetail>> getAllActiveRACodeFlagDetails() {
+        FlagDetail details3 = FlagDetail.builder()
+            .name("Audio/Video evidence")
+            .flagComment("comment")
+            .flagCode("RA001")
+            .hearingRelevant(NO)
+            .status("Active")
+            .build();
+
+        return wrapElements(details3);
     }
 }
