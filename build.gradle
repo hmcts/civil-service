@@ -262,6 +262,13 @@ task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
 }
 
+task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-noc'
+}
+
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
@@ -291,7 +298,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
