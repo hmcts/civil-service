@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.crd.model.Category;
-import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.util.List;
 
