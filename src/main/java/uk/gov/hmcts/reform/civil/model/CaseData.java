@@ -698,8 +698,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
-    private final Flags caseFlags;
-
     // judge final orders
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
