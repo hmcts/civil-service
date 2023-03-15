@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -806,6 +807,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
-        return Optional.ofNullable(courtLocation).map(LocationRefDataService::buildCaseLocation);
+        return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
 }

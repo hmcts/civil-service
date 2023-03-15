@@ -261,7 +261,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
         DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
                     + "by the Court (together with the appropriate fee) "
@@ -378,7 +379,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
 
         FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
@@ -771,7 +773,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 hearingInPersonLocation,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )
-            .ifPresent(locationRefData -> LocationRefDataService.updateWithLocation(dataBuilder, locationRefData));
+            .ifPresent(locationRefData -> LocationHelper.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {

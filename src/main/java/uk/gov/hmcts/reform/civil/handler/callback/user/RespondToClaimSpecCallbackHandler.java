@@ -24,14 +24,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -1528,13 +1529,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
 
             dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                           .getRespondToCourtLocation().toBuilder()
+                                               .getRespondToCourtLocation().toBuilder()
                                                .reasonForHearingAtSpecificCourt(
                                                    caseData.getRespondent1DQ()
                                                        .getRespondToCourtLocation()
                                                        .getReasonForHearingAtSpecificCourt())
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build());
             dq.respondToCourtLocation(RequestedCourt.builder()
                                           .responseCourtLocations(null)
@@ -1568,7 +1569,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build())
                 .respondToCourtLocation2(RequestedCourt.builder()
                                              .responseCourtLocations(null)

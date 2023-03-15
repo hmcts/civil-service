@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,17 +33,15 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final FeatureToggleService featureToggleService;
     private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
     private final String ccmccEpimsId;
 
     public LocationHelper(
-        FeatureToggleService featureToggleService,
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
         @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
         @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
-        this.featureToggleService = featureToggleService;
+
         this.ccmccAmount = ccmccAmount;
         this.ccmccRegionId = ccmccRegionId;
         this.ccmccEpimsId = ccmccEpimsId;
@@ -189,6 +185,7 @@ public class LocationHelper {
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
     }
+
     /**
      * We say that a locationRefData matches a RequestedCourt if the court code is the same or if
      * (a) the court's case location has region equal to locationRefData.regionId and (b) base location
@@ -220,6 +217,32 @@ public class LocationHelper {
     }
 
     /**
+     * Centralized creation of CaseLocationCivil from LocationRefData to reduce the places it can be done.
+     *
+     * @param location mandatory
+     * @return case location built from location
+     */
+    public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
+        return CaseLocationCivil.builder()
+            .region(location.getRegionId())
+            .baseLocation(location.getEpimmsId())
+            .build();
+    }
+
+    /**
+     * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
+     * about one of those.
+     *
+     * @param builder  (mandatory) to build a case data
+     * @param location (mandatory) what to update with
+     */
+    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
+        builder
+            .caseManagementLocation(buildCaseLocation(location))
+            .locationName(location.getSiteName());
+    }
+
+    /**
      * The caseManagementLocation is given by the requestedCourt's caseLocation field. If there is a matching location,
      * we can also populate the locationName field.
      *
@@ -244,7 +267,7 @@ public class LocationHelper {
         updatedData
             .caseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
-                    matchingLocation.map(LocationRefDataService::buildCaseLocation)
+                    matchingLocation.map(LocationHelper::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)

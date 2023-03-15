@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -28,10 +26,7 @@ public class LocationHelperTest {
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
     private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
-    private final LocationHelper helper = new LocationHelper(
-        featureToggleService,
-        CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
 
     @Test
     public void thereIsAMatchingLocation() {
@@ -327,6 +322,6 @@ public class LocationHelperTest {
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
-                .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
+            .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
     }
 }

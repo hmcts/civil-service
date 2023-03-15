@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
@@ -122,7 +123,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(location)) {
-            caseDataBuilder.caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
+            caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(location));
             caseDataBuilder.locationName(location.getSiteName());
         }
 
@@ -260,7 +261,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
-                                                                        HearingSupportRequirementsDJ data) {
+                                                      HearingSupportRequirementsDJ data) {
         if (Objects.isNull(data.getHearingTemporaryLocation()) || Objects.isNull(locations)) {
             return null;
         }
@@ -268,8 +269,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         var preferredLocation =
             locations
                 .stream()
-                .filter(locationRefData -> checkLocation(locationRefData,
-                                                         locationLabel)).findFirst();
+                .filter(locationRefData -> checkLocation(
+                    locationRefData,
+                    locationLabel
+                )).findFirst();
         return preferredLocation.orElse(null);
     }
 
@@ -284,7 +287,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<DynamicListElement> list = locationList.getListItems()
             .stream()
             .filter(element -> checkLocationItemValue(element, locationList.getValue())).collect(
-            Collectors.toList());
+                Collectors.toList());
         return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
     }
 

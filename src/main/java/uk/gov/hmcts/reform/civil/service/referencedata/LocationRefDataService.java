@@ -13,8 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
@@ -182,19 +180,6 @@ public class LocationRefDataService {
         );
     }
 
-    /**
-     * Centralized creation of CaseLocationCivil from LocationRefData to reduce the places it can be done.
-     *
-     * @param location mandatory
-     * @return case location built from location
-     */
-    public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
-        return CaseLocationCivil.builder()
-            .region(location.getRegionId())
-            .baseLocation(location.getEpimmsId())
-            .build();
-    }
-
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
@@ -227,19 +212,6 @@ public class LocationRefDataService {
             .queryParam("court_status", "Open");
 
         return builder.buildAndExpand(new HashMap<>()).toUri();
-    }
-
-    /**
-     * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
-     * about one of those.
-     *
-     * @param builder  (mandatory) to build a case data
-     * @param location (mandatory) what to update with
-     */
-    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
-        builder
-            .caseManagementLocation(buildCaseLocation(location))
-            .locationName(location.getSiteName());
     }
 
     private LocationRefData filterCourtLocation(List<LocationRefData> locations, String courtCode) {
