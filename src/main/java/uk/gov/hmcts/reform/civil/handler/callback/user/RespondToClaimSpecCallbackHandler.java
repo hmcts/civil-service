@@ -1345,11 +1345,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseRole respondentTwoCaseRoleToCheck;
 
         respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isAccessProfilesEnabled()) {
-            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
-        } else {
-            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWOSPEC;
-        }
 
         if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, respondentTwoCaseRoleToCheck)) {
             updatedData.respondent2ResponseDate(responseDate)
