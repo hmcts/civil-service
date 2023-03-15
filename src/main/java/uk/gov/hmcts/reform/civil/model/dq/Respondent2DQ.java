@@ -91,7 +91,20 @@ public class Respondent2DQ implements DQ {
     @Override
     @JsonProperty("respondent2DQHearing")
     public Hearing getHearing() {
-        return getHearing(respondent2DQHearing);
+        if (respondent2DQHearing != null) {
+            return getHearing(respondent2DQHearing);
+        }
+        DQUtil util = new DQUtil();
+
+        if (respondent2DQHearingFastClaim != null) {
+            return util.buildFastTrackHearing(respondent2DQHearingFastClaim);
+        }
+        if (respondent2DQHearingSmallClaim != null) {
+            SmallClaimHearing small = getSmallClaimHearing();
+            return util.buildSmallClaimHearing(small);
+        }
+
+        return null;
     }
 
     @Override
