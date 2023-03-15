@@ -52,7 +52,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
