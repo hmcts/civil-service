@@ -175,7 +175,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                             .build()
                      )
                      .build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
                     .build();
@@ -245,7 +245,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                             .build()
                     )
                     .build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
                     .build();
@@ -280,7 +280,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                             .build()
                     )
                     .build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
                     .build();
@@ -616,7 +616,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -644,7 +644,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
