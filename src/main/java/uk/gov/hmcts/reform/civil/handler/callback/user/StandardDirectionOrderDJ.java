@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
@@ -283,26 +284,22 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                   .build());
 
         // copy of the above field to update the Hearing time field while not breaking existing cases
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
-                                                                          .builder()
-                                                                          .input("This claim be listed for final "
-                                                                                     + "disposal before a Judge on the "
-                                                                                     + "first available date after")
-                                                                          .date(LocalDate.now().plusWeeks(16))
-                                                                          .build());
-        }
+        caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                      .builder()
+                                                                      .input("This claim be listed for final "
+                                                                                 + "disposal before a Judge on the "
+                                                                                 + "first available date after")
+                                                                      .date(LocalDate.now().plusWeeks(16))
+                                                                      .build());
 
         // copy of the above field to update the Hearing time field while not breaking existing cases
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
-                                                                          .builder()
-                                                                          .input("This claim will be listed for final "
-                                                                                     + "disposal before a Judge on the "
-                                                                                     + "first available date after")
-                                                                          .date(LocalDate.now().plusWeeks(16))
-                                                                          .build());
-        }
+        caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                      .builder()
+                                                                      .input("This claim will be listed for final "
+                                                                                 + "disposal before a Judge on the "
+                                                                                 + "first available date after")
+                                                                      .date(LocalDate.now().plusWeeks(16))
+                                                                      .build());
 
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
@@ -322,19 +319,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
-                                                   .builder().input(String.format(
-                                                            "This order has been made without a hearing. "
-                                                           + "Each party has the right to apply to have this Order "
-                                                           + "set aside or varied. Any such application must "
-                                                           + "be received by the Court "
-                                                           + "(together with the appropriate fee) by 4pm on %s.",
-                                                          deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                                              .format(DateTimeFormatter
-                                                                          .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
-                                                   .build());
-        }
+        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
+                                               .builder().input(String.format(
+                                                        "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
+                                                       + "set aside or varied. Any such application must "
+                                                       + "be received by the Court "
+                                                       + "(together with the appropriate fee) by 4pm on %s.",
+                                                      deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                                          .format(DateTimeFormatter
+                                                                      .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                               .build());
         // populates the trial screen
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
@@ -418,38 +413,34 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .build());
 
         // copy of above method as to not break existing cases
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
-                                               .helpText1(
-                                                   "If either party considers that the time estimate is insufficient, "
-                                                       + "they must inform the court within 7 days of the date of "
-                                                       + "this order.")
-                                               .helpText2(
-                                                   "Not more than seven nor less than three clear days before the "
-                                                       + "trial, the claimant must file at court and serve an indexed "
-                                                       + "and paginated bundle of documents which complies with the "
-                                                       + "requirements of Rule 39.5 Civil Procedure Rules "
-                                                       + "and which complies with requirements of PD32. The parties "
-                                                       + "must endeavour to agree the contents of the bundle before it "
-                                                       + "is filed. The bundle will include a case summary and a "
-                                                       + "chronology.")
-                                               .build());
-        }
+        caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
+                                           .helpText1(
+                                               "If either party considers that the time estimate is insufficient, "
+                                                   + "they must inform the court within 7 days of the date of "
+                                                   + "this order.")
+                                           .helpText2(
+                                               "Not more than seven nor less than three clear days before the "
+                                                   + "trial, the claimant must file at court and serve an indexed "
+                                                   + "and paginated bundle of documents which complies with the "
+                                                   + "requirements of Rule 39.5 Civil Procedure Rules "
+                                                   + "and which complies with requirements of PD32. The parties "
+                                                   + "must endeavour to agree the contents of the bundle before it "
+                                                   + "is filed. The bundle will include a case summary and a "
+                                                   + "chronology.")
+                                           .build());
 
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
-                                               .input(String.format(
-                                                       "This order has been made without a hearing. "
-                                                       + "Each party has the right to apply to have this Order "
-                                                       + "set aside or varied. Any such application must be "
-                                                       + "received by the Court "
-                                                       + "(together with the appropriate fee) by 4pm on %s.",
-                                                   deadlinesCalculator
-                                                       .plusWorkingDays(LocalDate.now(), 5)
-                                                       .format(DateTimeFormatter
-                                                                   .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
-                                               .build());
-        }
+        caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
+                                           .input(String.format(
+                                                   "This order has been made without a hearing. "
+                                                   + "Each party has the right to apply to have this Order "
+                                                   + "set aside or varied. Any such application must be "
+                                                   + "received by the Court "
+                                                   + "(together with the appropriate fee) by 4pm on %s.",
+                                               deadlinesCalculator
+                                                   .plusWorkingDays(LocalDate.now(), 5)
+                                                   .format(DateTimeFormatter
+                                                               .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                           .build());
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
@@ -622,6 +613,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .ifPresent(caseDataBuilder::locationName);
 
         }
+
+        caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

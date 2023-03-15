@@ -87,6 +87,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       free: CopyPagesUpTo10
+      appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -230,6 +231,9 @@ notifications:
   hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
   hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
   hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
+  solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
+  respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
+  respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
@@ -247,6 +251,11 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
+
+bundle:
+  api:
+    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/"
+  config: ${BUNDLE_CONFIG:caseprogression-bundle-config.yaml}
 
 http:
   client:
@@ -361,6 +370,10 @@ rd_professional:
   api:
     url: http://localhost:8765
 
+rd_commondata:
+  api:
+    url: http://localhost:8765
+
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
@@ -446,6 +459,10 @@ rd_professional:
   api:
     url: http://fake-prd-api
 
+rd_commondata:
+  api:
+    url: http://fake-prd-api
+
 sendgrid:
   api-key: fake-key
 ---
@@ -460,4 +477,3 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
-

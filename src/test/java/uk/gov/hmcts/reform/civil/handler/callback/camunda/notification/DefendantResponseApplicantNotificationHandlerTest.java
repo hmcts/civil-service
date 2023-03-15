@@ -37,10 +37,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP1;
@@ -210,7 +210,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                             .build()
                     )
                     .build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
                     .build();
@@ -303,7 +303,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
                     .respondent1DQ(Respondent1DQ.builder().build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                     .build();
@@ -326,7 +326,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             void shouldNotifyRespondentSolicitorSpecDef1_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
                     .respondent1DQ(Respondent1DQ.builder().build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                     .build();
@@ -349,7 +349,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             void shouldNotifyRespondentSolicitorSpecDef1SecondScenerio_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
-                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
                     .respondent2DQ(Respondent2DQ.builder().build())
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                     .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
@@ -563,7 +563,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     void shoulldReturnPartyInformation_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent2DQ(Respondent2DQ.builder().build())
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
@@ -580,7 +580,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     void shoulldReturnPartyInformationSecondScenerio_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent2DQ(Respondent2DQ.builder().build())
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
@@ -597,7 +597,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     void shoulldReturnPartyInformationThirdScenerio_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())

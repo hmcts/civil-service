@@ -77,7 +77,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         properties.put(DEFENDANT_REFERENCE_NUMBER, defRefNumber);
         String emailTemplate = notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
         notificationService.sendMail(recipient, emailTemplate, properties,
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReference())
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
         );
     }
 
@@ -98,7 +98,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
-            time.toString()
+            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
         ));
     }
 }

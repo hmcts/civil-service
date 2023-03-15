@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -24,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @SpringBootTest(classes = {
@@ -42,18 +41,21 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ExitSurveyContentService exitSurveyContentService;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -67,14 +69,15 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -88,14 +91,15 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec_blocked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false);
-
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .doesNotHaveToString("businessProcess");
         }
@@ -106,12 +110,16 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1Represented(NO).build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Claim pending")

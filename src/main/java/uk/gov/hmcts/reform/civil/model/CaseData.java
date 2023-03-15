@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -48,6 +49,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -138,6 +140,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantPartyName;
 
     private final YesOrNo generalAppVaryJudgementType;
+    private final YesOrNo generalAppParentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
@@ -287,6 +290,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
+    private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -442,6 +446,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
+    private final String paymentTypePBA;
+    private final String paymentTypePBASpec;
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
@@ -513,7 +519,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
     //Hearing Scheduled
-    private String hearingReference;
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
@@ -529,6 +534,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String hearingNoticeListOther;
 
     private LocalDateTime caseDismissedHearingFeeDueDate;
+    private YesOrNo trialReadyNotified;
+    private YesOrNo trialReadyChecked;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -588,8 +595,28 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<CaseManagementOrderAdditional> caseManagementOrderAdditional;
     //general application order documents
     private final List<Element<CaseDocument>> generalOrderDocument;
+    private final List<Element<CaseDocument>> generalOrderDocStaff;
+    private final List<Element<CaseDocument>> generalOrderDocClaimant;
+    private final List<Element<CaseDocument>> generalOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
+
     private final List<Element<CaseDocument>> dismissalOrderDocument;
+    private final List<Element<CaseDocument>> dismissalOrderDocStaff;
+    private final List<Element<CaseDocument>> dismissalOrderDocClaimant;
+    private final List<Element<CaseDocument>> dismissalOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> dismissalOrderDocRespondentSolTwo;
+
     private final List<Element<CaseDocument>> directionOrderDocument;
+    private final List<Element<CaseDocument>> directionOrderDocStaff;
+    private final List<Element<CaseDocument>> directionOrderDocClaimant;
+    private final List<Element<CaseDocument>> directionOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> directionOrderDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> hearingNoticeDocument;
+    private final List<Element<CaseDocument>> hearingNoticeDocStaff;
+    private final List<Element<CaseDocument>> hearingNoticeDocClaimant;
+    private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
+    private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
@@ -604,11 +631,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String expertReportFlag;
     private final String expertJointFlag;
     private final String trialAuthorityFlag;
+    private final String trialCostsFlag;
     private final String trialDocumentaryFlag;
+    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
+    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidence;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
+    private final List<EvidenceUploadExpert> expertSelectionEvidence;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
+    private final List<EvidenceUploadTrial> trialSelectionEvidence;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
@@ -661,6 +694,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
+    private final HearingNotes hearingNotes;
+    private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private final Flags caseFlags;
+
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

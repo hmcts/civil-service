@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -63,6 +65,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private InterestCalculator interestCalculator;
+
+    @MockBean
+    private Time time;
 
     @Nested
     class AboutToStartCallback {
@@ -296,6 +301,117 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("currentDefendantName"))
                 .isEqualTo("Steve Rodgers");
+            //
+            assertThat(response.getData().get("registrationTypeRespondentOne")).isNull();
+            assertThat(response.getData().get("registrationTypeRespondentTwo")).isNull();
+        }
+
+        @Test
+        void shouldReturnRegistrationInfo_whenOneVOne() {
+            when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Steve Rodgers")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentOne")
+                .asString()
+                .contains("registrationType=R")
+                .contains("judgmentDateTime=2023-02-20T11:11:11");
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentTwo")
+                .isNull();
+        }
+
+        @Test
+        void shouldReturnRegistrationInfo_whenTwoVOne() {
+            when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .addApplicant2(YesOrNo.YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Steve Rodgers")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentOne")
+                .asString()
+                .contains("registrationType=R")
+                .contains("judgmentDateTime=2023-02-20T11:11:11");
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentTwo")
+                .isNull();
+        }
+
+        @Test
+        void shouldNotReturnRegistrationInfo_whenOneVTwoAndOneDefendantSelected() {
+            when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Steve Rodgers")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentOne")
+                .isNull();
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentTwo")
+                .isNull();
+        }
+
+        @Test
+        void shouldReturnRegistrationInfo_whenOneVTwoAndBothDefendantSelected() {
+            when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .label("Test User2")
+                                                     .label("Both Defendants")
+                                                     .build())
+                                          .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentOne")
+                .asString()
+                .contains("registrationType=R")
+                .contains("judgmentDateTime=2023-02-20T11:11:11");
+            assertThat(response.getData())
+                .extracting("registrationTypeRespondentTwo")
+                .asString()
+                .contains("registrationType=R")
+                .contains("judgmentDateTime=2023-02-20T11:11:11");
         }
     }
 

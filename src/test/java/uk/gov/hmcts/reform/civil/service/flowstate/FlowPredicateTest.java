@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -22,6 +21,7 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
@@ -534,7 +534,7 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                     .respondent1ResponseDate(LocalDateTime.now())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .build();
                 assertTrue(fullDefenceSpec.test(caseData));
             }
@@ -778,7 +778,7 @@ class FlowPredicateTest {
                 void setup() {
                     caseDataBuilder = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .setSuperClaimTypeToSpecClaim();
+                        .setClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1277,7 +1277,7 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
                 .setClaimNotificationDate()
-                .setSuperClaimTypeToSpecClaim().build();
+                .setClaimTypeToSpecClaim().build();
 
             assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
         }
@@ -1502,7 +1502,7 @@ class FlowPredicateTest {
         @BeforeEach
         void setup() {
             caseDataBuilder = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim();
+                .setClaimTypeToSpecClaim();
         }
 
         @Test
@@ -1566,7 +1566,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnTrue_whenSuperClaimTypeIsSpec_Claim() {
+        void shouldReturnTrue_whenClaimTypeIsSpec_Claim() {
             CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertTrue(specClaim.test(caseData));
         }
@@ -1592,7 +1592,7 @@ class FlowPredicateTest {
                 void setup() {
                     caseDataBuilder = CaseDataBuilder.builder()
                         .multiPartyClaimTwoApplicants()
-                        .setSuperClaimTypeToSpecClaim();
+                        .setClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1678,7 +1678,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2DiffSol_Proceed() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateApplicantRespondToDefenceAndProceed()
-                        .setSuperClaimTypeToSpecClaim()
+                        .setClaimTypeToSpecClaim()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                         .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
@@ -1690,7 +1690,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2SameSol_or1v1_Proceed() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateApplicantRespondToDefenceAndProceed()
-                        .setSuperClaimTypeToSpecClaim()
+                        .setClaimTypeToSpecClaim()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .applicant1ProceedWithClaim(YES)
                         .build();
@@ -1701,7 +1701,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenCaseDataAtStateFullDefenceTwo_v_one_Proceed() {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateApplicantRespondToDefenceAndProceed()
-                        .setSuperClaimTypeToSpecClaim()
+                        .setClaimTypeToSpecClaim()
                         .multiPartyClaimTwoApplicants()
                         .applicant1ProceedWithClaimSpec2v1(YES)
                         .build();
@@ -1716,7 +1716,7 @@ class FlowPredicateTest {
                 void setup() {
                     caseDataBuilder = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .setSuperClaimTypeToSpecClaim();
+                        .setClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -1866,7 +1866,7 @@ class FlowPredicateTest {
                 void setup() {
                     caseDataBuilder = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .setSuperClaimTypeToSpecClaim();
+                        .setClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -2009,13 +2009,13 @@ class FlowPredicateTest {
                 void setup() {
                     caseDataBuilder = CaseDataBuilder.builder()
                         .multiPartyClaimTwoApplicants()
-                        .setSuperClaimTypeToSpecClaim();
+                        .setClaimTypeToSpecClaim();
                 }
 
                 @Test
                 void shouldReturnTrue_whenResponsesToBothApplicants() {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
-                        .superClaimType(SuperClaimType.SPEC_CLAIM)
+                        .caseAccessCategory(SPEC_CLAIM)
                         .respondent1ResponseDate(LocalDateTime.now())
                         .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -2142,7 +2142,7 @@ class FlowPredicateTest {
         @Test
         public void whenNotSmall_false() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .build();
             Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
         }
@@ -2150,7 +2150,7 @@ class FlowPredicateTest {
         @Test
         public void when1v1() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .build();
 
@@ -2176,7 +2176,7 @@ class FlowPredicateTest {
         @Test
         public void when1v2ss() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -2204,7 +2204,7 @@ class FlowPredicateTest {
         @Test
         public void when1v2ds() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(NO)
@@ -2237,7 +2237,7 @@ class FlowPredicateTest {
         @Test
         public void when2v1() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .build();
 

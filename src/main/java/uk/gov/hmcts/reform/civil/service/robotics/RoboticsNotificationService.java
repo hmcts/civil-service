@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
-import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.sendgrid.EmailData;
+import uk.gov.hmcts.reform.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
@@ -29,9 +29,9 @@ import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
-import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.sendgrid.EmailAttachment.json;
 
 @Slf4j
 @Service
@@ -54,8 +54,7 @@ public class RoboticsNotificationService {
 
     private boolean canSendEmailSpec() {
         try {
-            return toggleService.isLrSpecEnabled()
-                && toggleService.isSpecRpaContinuousFeedEnabled();
+            return toggleService.isSpecRpaContinuousFeedEnabled();
         } catch (Throwable e) {
             log.error("Exception on launchdarkly check", e);
             return false;
@@ -70,7 +69,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
@@ -85,14 +84,13 @@ public class RoboticsNotificationService {
                 log.info(String.format("triggerEvent %s", triggerEvent));
             }
             return Optional.of(EmailData.builder()
-                                   .message(getMessage(caseData, isMultiParty))
-                                   .subject(getSubject(caseData, triggerEvent, isMultiParty))
-                                   .to(getRoboticsEmailRecipient(
-                                       isMultiParty,
-                                       isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
-                                   ))
-                                   .attachments(of(json(roboticsJsonData, fileName)))
-                                   .build());
+                .message(getMessage(caseData, isMultiParty))
+                .subject(getSubject(caseData, triggerEvent, isMultiParty))
+                .to(getRoboticsEmailRecipient(
+                    isMultiParty,
+                    SPEC_CLAIM.equals(caseData.getCaseAccessCategory())))
+                .attachments(of(json(roboticsJsonData, fileName)))
+                .build());
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
@@ -109,7 +107,7 @@ public class RoboticsNotificationService {
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
-        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                                    caseData.getLegacyCaseReference(),
                                                    caseData.getCcdState(), triggerEvent

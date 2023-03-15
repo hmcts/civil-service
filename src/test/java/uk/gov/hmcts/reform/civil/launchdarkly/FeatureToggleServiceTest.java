@@ -132,30 +132,12 @@ class FeatureToggleServiceTest {
     // }
 
     @Test
-    void shouldCallBoolVariation_whenIsAccessProfilesEnabledInvoked() {
-        var accessProfilesKey = "access-profiles";
-        givenToggle(accessProfilesKey, true);
-
-        assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
-        verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
-    }
-
-    @Test
     void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
         var enableSDOKey = "enableSDO";
         givenToggle(enableSDOKey, true);
 
         assertThat(featureToggleService.isSDOEnabled()).isTrue();
         verifyBoolVariationCalled(enableSDOKey, List.of("timestamp", "environment"));
-    }
-
-    @Test
-    void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
-        var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
-        givenToggle(organisationOnboardedFeatureKey, true);
-
-        assertThat(featureToggleService.isOrganisationOnboarded("someId")).isTrue();
-        verifyBoolVariationCalled(organisationOnboardedFeatureKey, List.of("timestamp", "environment", "orgId"));
     }
 
     @Test
@@ -214,5 +196,14 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
         verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenHmcIsEnabled() {
+        var hmcKey = "hmc";
+        givenToggle(hmcKey, true);
+
+        assertThat(featureToggleService.isHmcEnabled()).isTrue();
+        verifyBoolVariationCalled(hmcKey, List.of("timestamp", "environment"));
     }
 }

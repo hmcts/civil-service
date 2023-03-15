@@ -77,7 +77,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash");
+                                                 "hash", null);
             var documentAndNote = DocumentAndNote.builder().document(testDocument).build();
 
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
@@ -106,7 +106,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash");
+                                                 "hash", null);
             var documentAndNote = DocumentWithName.builder().document(testDocument).build();
 
             List<Element<DocumentWithName>> documentList = new ArrayList<>();

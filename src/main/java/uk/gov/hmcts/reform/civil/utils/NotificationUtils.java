@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -21,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -42,7 +43,7 @@ public class NotificationUtils {
     }
 
     public static Map<String, String> caseOfflineNotificationAddProperties(
-        CaseData caseData, boolean accessProfilesEnabled) {
+        CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
@@ -50,14 +51,14 @@ public class NotificationUtils {
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            String responseTypeToApplicant2 = isSpecCaseCategory(caseData, accessProfilesEnabled)
+            String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                 : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                REASON, isSpecCaseCategory(caseData, accessProfilesEnabled)
-                    ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                        ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                        : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
@@ -69,10 +70,10 @@ public class NotificationUtils {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, isSpecCaseCategory(caseData, accessProfilesEnabled)
+                RESPONDENT_ONE_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, isSpecCaseCategory(caseData, accessProfilesEnabled)
+                RESPONDENT_TWO_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
@@ -94,5 +95,15 @@ public class NotificationUtils {
         } else {
             return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
         }
+    }
+
+    public static boolean shouldSkipEventForRespondent1LiP(CaseData caseData) {
+        return NO.equals(caseData.getRespondent1Represented())
+            && caseData.getRespondentSolicitor1EmailAddress() == null;
+    }
+
+    public static boolean shouldSkipEventForRespondent2LiP(CaseData caseData) {
+        return NO.equals(caseData.getRespondent2Represented())
+            && caseData.getRespondentSolicitor2EmailAddress() == null;
     }
 }

@@ -7,7 +7,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -120,4 +126,89 @@ public class HearingUtilsTest {
     void shouldReturnTimedFormatted_whenGivenAnyTime(String input, String expectedOutput) {
         assertThat(HearingUtils.getHearingTimeFormatted(input)).isEqualTo(expectedOutput);
     }
+
+    @Test
+    void shouldReturnExpectedHearingNotes_whenDisposalHearingHearingNotesAreProvided() {
+        HearingNotes expected = HearingNotes.builder()
+            .notes("test notes")
+            .date(LocalDate.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .disposalHearingHearingNotes("test notes")
+            .build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnExpectedHearingNotes_whenFastTrackHearingNotesAreProvided() {
+        HearingNotes expected = HearingNotes.builder()
+            .notes("test notes")
+            .date(LocalDate.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .fastTrackHearingNotes(FastTrackHearingNotes.builder().input("test notes").build())
+            .build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnExpectedHearingNotes_whenDisposalHearingHearingNotesDJAreProvided() {
+        HearingNotes expected = HearingNotes.builder()
+            .notes("test notes")
+            .date(LocalDate.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .disposalHearingHearingNotesDJ(DisposalHearingHearingNotesDJ.builder().input("test notes").build())
+            .build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnExpectedHearingNotes_whenSdoHearingNotesAreProvided() {
+        HearingNotes expected = HearingNotes.builder()
+            .notes("test notes")
+            .date(LocalDate.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .sdoHearingNotes(SDOHearingNotes.builder().input("test notes").build())
+            .build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnExpectedHearingNotes_whenTrialHearingHearingNotesDJAreProvided() {
+        HearingNotes expected = HearingNotes.builder()
+            .notes("test notes")
+            .date(LocalDate.now())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .trialHearingHearingNotesDJ(TrialHearingHearingNotesDJ.builder().input("test notes").build())
+            .build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnNull_whenNoSupportedNoteFieldsAreProvided() {
+        CaseData caseData = CaseData.builder().build();
+
+        HearingNotes actual = HearingUtils.getHearingNotes(caseData);
+
+        assertThat(actual).isEqualTo(null);
+    }
+
 }

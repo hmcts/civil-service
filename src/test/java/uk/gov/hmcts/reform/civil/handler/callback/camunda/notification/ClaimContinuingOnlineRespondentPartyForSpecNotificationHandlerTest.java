@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -35,8 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -72,8 +69,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private OrganisationService organisationService;
     @MockBean
-    private FeatureToggleService toggleService;
-    @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
     private BulkPrintService bulkPrintService;
@@ -88,13 +83,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
-
-    @Test
-    public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        assertTrue(handler.handledEvents().isEmpty());
-        assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -114,11 +102,14 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
                 "template-id",
@@ -129,20 +120,28 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
+            // Given
             CaseData caseData = getCaseData(null);
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
+
+            // Then
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
+            // Given
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
+
+            // Then
             verify(bulkPrintService)
                 .printLetter(
                     LETTER_CONTENT,

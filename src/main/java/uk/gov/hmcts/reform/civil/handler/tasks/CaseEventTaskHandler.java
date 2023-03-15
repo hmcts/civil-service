@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SETTLED;
@@ -38,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @RequiredArgsConstructor
 @Component
@@ -194,7 +194,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                                               caseData), " and "
                                         ));
                 case FULL_DEFENCE_PROCEED:
-                    return !isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+                    return !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                         ? getDescriptionFullDefenceProceed(caseData) : null;
                 default:
                     break;

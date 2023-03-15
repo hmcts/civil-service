@@ -128,7 +128,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
@@ -531,19 +530,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
-        }
-
-        @Test
-        void shouldNotPopulateOrderMadeWithoutHearingWhenHnlSdoDisabled() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedTrialHearing().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").isNull();
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").isNull();
         }
     }
 
