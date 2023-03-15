@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.referencedata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
-import uk.gov.hmcts.reform.civil.config.referencedata.JRDConfiguration;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.JudgeRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.JudicialRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.JudgeRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 
-@SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
+@SpringBootTest(classes = {RestTemplate.class})
 class JudicialRefDataServiceTest {
 
     @Captor
@@ -63,19 +60,20 @@ class JudicialRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocations() {
         List<JudgeRefData> judgeRefData = Arrays.asList(
-                JudgeRefData.builder().title("Mr").surname("Murphy").emailId("mr.murphy@email.com").build(),
-                JudgeRefData.builder().title("Mr").surname("McGee").emailId("mr.mcgee@email.com").build(),
-                JudgeRefData.builder().title("Mr").surname("Brad").emailId("mr.brad@email.com").build(),
-                JudgeRefData.builder().title("Mrs").surname("Lee").emailId("mrs.lee@email.com").build()
+            JudgeRefData.builder().title("Mr").surname("Murphy").emailId("mr.murphy@email.com").build(),
+            JudgeRefData.builder().title("Mr").surname("McGee").emailId("mr.mcgee@email.com").build(),
+            JudgeRefData.builder().title("Mr").surname("Brad").emailId("mr.brad@email.com").build(),
+            JudgeRefData.builder().title("Mrs").surname("Lee").emailId("mrs.lee@email.com").build()
         );
 
         when(authTokenGenerator.generate()).thenReturn("service_token");
         when(restTemplate.exchange(
-                uriCaptor.capture(),
-                httpMethodCaptor.capture(),
-                httpEntityCaptor.capture(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<JudgeRefData>>>any()))
-                .thenReturn(getJudgeRefDataResponse());
+            uriCaptor.capture(),
+            httpMethodCaptor.capture(),
+            httpEntityCaptor.capture(),
+            ArgumentMatchers.<ParameterizedTypeReference<List<JudgeRefData>>>any()
+        ))
+            .thenReturn(getJudgeRefDataResponse());
 
         List<JudgeRefData> judgeRefDataReturn = refDataService.getJudgeReferenceData("ABC", "user_token");
 
@@ -86,7 +84,7 @@ class JudicialRefDataServiceTest {
         assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.POST);
         assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
         assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
-                .isEqualTo("service_token");
+            .isEqualTo("service_token");
     }
 
     private ResponseEntity<List<JudgeRefData>> getJudgeRefDataResponse() {

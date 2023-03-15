@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.referencedata;
+package uk.gov.hmcts.reform.civil.referencedata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.referencedata.JRDConfiguration;
-import uk.gov.hmcts.reform.civil.model.referencedata.request.JudgeSearchRequest;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.JudgeRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.JudgeRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.JudgeSearchRequest;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -42,7 +41,9 @@ public class JudicialRefDataService {
                 buildURI(),
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<List<JudgeRefData>>() {});
+                new ParameterizedTypeReference<List<JudgeRefData>>() {
+                }
+            );
 
             return responseEntity.getBody();
         } catch (Exception e) {

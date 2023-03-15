@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.referencedata.request;
+package uk.gov.hmcts.reform.civil.referencedata.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
