@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final ObjectMapper objectMapper;
+
     private CaseEvent event;
 
     @Override
@@ -94,6 +97,12 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         log.info("NoC email sent successfully");
+
+        if (NOTIFY_FORMER_SOLICITOR.equals(event)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData).toMap(objectMapper))
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
