@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.notify;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class NotificationServiceTest {
+class NotificationServiceTest {
 
     @InjectMocks
     private NotificationService service;
