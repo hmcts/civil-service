@@ -326,7 +326,8 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
@@ -351,7 +352,8 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
@@ -376,7 +378,8 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
