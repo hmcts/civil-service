@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -77,7 +78,7 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
                 caseData
                     .getRespondent1OrganisationPolicy()
                     .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .organisation(Organisation.builder().build())
                     .build()
             );
         }
@@ -90,7 +91,7 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
                 caseData
                     .getRespondent2OrganisationPolicy()
                     .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .organisation(Organisation.builder().build())
                     .build()
             );
         }
