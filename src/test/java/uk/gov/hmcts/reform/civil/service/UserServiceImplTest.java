@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceImplTest {
 
     private static final String SUB = "user-idam@reform.local";
     private static final String UID = "user-idam-01";
@@ -43,7 +43,7 @@ class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        userService = new UserService(idamClient);
+        userService = new UserServiceImpl(idamClient);
     }
 
     @Test
