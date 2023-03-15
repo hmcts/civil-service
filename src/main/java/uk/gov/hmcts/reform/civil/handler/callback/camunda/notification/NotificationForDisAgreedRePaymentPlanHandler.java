@@ -29,12 +29,12 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_FOR_RESPONDENT1_DISAGREED_REPAYMENT, CaseEvent.NOTIFY_LIP_DEFENDANT_DISAGREED_REPAYMENT);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-%s";
-    public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
+    public static final String TASK_ID_CLAIMANT = "ClaimantDisAgreedRepaymentPlanNotifyApplicant";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantHearing
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantLIP
         );
     }
 
@@ -43,7 +43,7 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
         return TASK_ID_CLAIMANT;
     }
 
-    private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantLIP(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         sendEmail(caseData, recipient);
@@ -52,16 +52,13 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
     }
 
     private void sendEmail(CaseData caseData, String recipient) {
-        String emailTemplate;
-        if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
-            BigDecimal.ZERO) > 0) {
-            emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplate();
-        } else {
-            emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
-        }
+
+        String  emailTemplate = notificationsProperties.getNotifyClaimantLrTemplate();
+        String  emailLipTemplate = notificationsProperties.getNotifyDefendantLipTemplate();
         notificationService.sendMail(recipient, emailTemplate, addProperties(caseData),
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
-        );
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber()));
+        notificationService.sendMail(recipient, emailLipTemplate, addProperties(caseData),
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber()));
     }
 
     @Override
@@ -71,11 +68,7 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String hourMinute = caseData.getHearingTimeHourMinute();
         String reference;
-        int hours = Integer.parseInt(hourMinute.substring(0, 2));
-        int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-        LocalTime time = LocalTime.of(hours, minutes, 0);
         if (caseData.getSolicitorReferences() == null
             || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
             reference = "";
@@ -85,17 +78,7 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
             caseData.getLegacyCaseReference(),
-            HEARING_FEE,
-            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
-            HEARING_DATE,
-            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            HEARING_TIME,
-            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm"),
-            HEARING_DUE_DATE,
-            caseData.getHearingDueDate() == null ? "" :
-                caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             CLAIMANT_REFERENCE_NUMBER, reference
-
         ));
     }
 }
