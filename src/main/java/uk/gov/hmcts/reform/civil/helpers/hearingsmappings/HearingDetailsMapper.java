@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
@@ -95,7 +96,24 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getHearingChannels(CaseData caseData) {
-        return null; //todo civ-6261
+        return hearingMethodIdentifier(caseData) != null ? List.of(hearingMethodIdentifier(caseData).getValue().toString())
+            : null;
+    }
+
+    private static DynamicList hearingMethodIdentifier(CaseData caseData) {
+        if (caseData.getHearingMethodValuesFastTrack() != null) {
+            return caseData.getHearingMethodValuesFastTrack();
+        } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
+            return caseData.getHearingMethodValuesDisposalHearing();
+        } else if (caseData.getHearingMethodValuesDisposalHearingDJ() != null) {
+            return caseData.getHearingMethodValuesDisposalHearingDJ();
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null) {
+            return caseData.getHearingMethodValuesTrialHearingDJ();
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null) {
+            return caseData.getHearingMethodValuesSmallClaims();
+        } else {
+            return null;
+        }
     }
 
 }

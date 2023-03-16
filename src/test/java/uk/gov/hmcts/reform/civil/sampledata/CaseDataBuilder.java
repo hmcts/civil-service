@@ -389,6 +389,10 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent1Experts;
     private List<Element<PartyFlagStructure>> respondent1Witnesses;
 
+    private DynamicList hearingMethodInPerson;
+    private DynamicList hearingMethodVideo;
+    private DynamicList hearingMethodTelephone;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4476,14 +4480,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withRespondent1WitnessFlags() {
         this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
-            .firstName("W first")
-            .lastName("W last")
-            .flags(Flags.builder()
-                       .partyName("W First W Last")
-                       .roleOnCase("Respondent 1 Witness")
-                       .details(flagDetails())
-                       .build())
-            .build());
+                                                     .firstName("W first")
+                                                     .lastName("W last")
+                                                     .flags(Flags.builder()
+                                                                .partyName("W First W Last")
+                                                                .roleOnCase("Respondent 1 Witness")
+                                                                .details(flagDetails())
+                                                                .build())
+                                                     .build());
         return this;
     }
 
@@ -4534,6 +4538,30 @@ public class CaseDataBuilder {
             .build();
 
         return wrapElements(details1, details2, details3, details4);
+    }
+
+    public CaseDataBuilder atHearingMethodValuesFastTrackInPerson() {
+        hearingMethodInPerson = DynamicList.builder().value(
+            DynamicListElement.builder().label("IN_PERSON").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atHearingMethodSmallClaimsInPerson() {
+        hearingMethodInPerson = DynamicList.builder().value(
+            DynamicListElement.builder().label("IN_PERSON").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atHearingMethodValuesFastTrackVideo() {
+        hearingMethodVideo = DynamicList.builder().value(
+            DynamicListElement.builder().label("VIDEO").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atHearingMethodValuesFastTrackTelephone() {
+        hearingMethodTelephone = DynamicList.builder().value(
+            DynamicListElement.builder().label("TELEPHONE").build()).build();
+        return this;
     }
 
     public static CaseDataBuilder builder() {
@@ -4767,6 +4795,7 @@ public class CaseDataBuilder {
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .respondent1Experts(respondent1Experts)
             .respondent1Witnesses(respondent1Witnesses)
+            .hearingMethodValuesFastTrack(hearingMethodInPerson)
             .build();
     }
 

@@ -123,4 +123,16 @@ public class HearingDetailsMapperTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
     }
+
+    @Test
+    void shouldReturnList_whenHearingMethodFastTrackInPerson() {
+        CaseData caseData = CaseDataBuilder.builder().atHearingMethodValuesFastTrackInPerson().build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData).contains("IN_PERSON"));
+    }
+
+    @Test
+    void shouldReturnList_whenHearingMethodSmallClaimsInPerson() {
+        CaseData caseData = CaseDataBuilder.builder().atHearingMethodSmallClaimsInPerson().build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData).contains("IN_PERSON"));
+    }
 }
