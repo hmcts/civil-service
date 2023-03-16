@@ -1,218 +1,154 @@
 package uk.gov.hmcts.reform.civil.launchdarkly;
 
-import com.google.common.collect.ImmutableList;
-import com.launchdarkly.sdk.LDUser;
-import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {
 
-    private static final String FAKE_FEATURE = "fake-feature";
-    private static final String FAKE_ENVIRONMENT = "fake-env";
-
     @Mock
-    private LDClientInterface ldClient;
-
-    @Captor
-    private ArgumentCaptor<LDUser> ldUserArgumentCaptor;
+    private FeatureToggleApi featureToggleApi;
 
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(ldClient, FAKE_ENVIRONMENT);
+        featureToggleService = new FeatureToggleService(featureToggleApi);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectState_whenUserIsProvided(Boolean toggleState) {
-        LDUser ldUSer = new LDUser.Builder("civil-service")
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
-            .custom("environment", FAKE_ENVIRONMENT).build();
-        givenToggle(FAKE_FEATURE, toggleState);
-
-        assertThat(featureToggleService.isFeatureEnabled(FAKE_FEATURE, ldUSer)).isEqualTo(toggleState);
-
-        verify(ldClient).boolVariation(
-            FAKE_FEATURE,
-            ldUSer,
-            false
-        );
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectState_whenDefaultServiceUser(Boolean toggleState) {
-        givenToggle(FAKE_FEATURE, toggleState);
-
-        assertThat(featureToggleService.isFeatureEnabled(FAKE_FEATURE)).isEqualTo(toggleState);
-        verifyBoolVariationCalled(FAKE_FEATURE, List.of("timestamp", "environment"));
-    }
-
-    @Test
-    void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked() {
+    void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
         var multipartyFeatureKey = "rpaContinuousFeed";
-        givenToggle(multipartyFeatureKey, true);
+        givenToggle(multipartyFeatureKey, toggleState);
 
-        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isTrue();
-        verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isEqualTo(toggleState);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
         var noticeOfChangeKey = "notice-of-change";
-        givenToggle(noticeOfChangeKey, true);
+        givenToggle(noticeOfChangeKey, toggleState);
 
-        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isTrue();
-        verifyBoolVariationCalled(noticeOfChangeKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isEqualTo(toggleState);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "hearing-and-listing-sdo";
-        givenToggle(hearingAndListingKey, true);
+        givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isTrue();
-        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsHearingAndListingLegalRepEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "hearing-and-listing-legal-rep";
-        givenToggle(hearingAndListingKey, true);
+        givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isTrue();
-        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
         var courtLocationDynamicListKey = "court-location-dynamic-list";
-        givenToggle(courtLocationDynamicListKey, true);
+        givenToggle(courtLocationDynamicListKey, toggleStat);
 
-        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isTrue();
-        verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsCaseFlagsEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "case-flags";
-        givenToggle(caseFlagsKey, true);
+        givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isTrue();
-        verifyBoolVariationCalled(caseFlagsKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
-        givenToggle(generalApplicationsKey, true);
+        givenToggle(generalApplicationsKey, toggleStat);
 
-        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isTrue();
-        verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
     }
 
-    // @Test
-    // void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
-    // var pinInPostKey = "pin-in-post";
-    // givenToggle(pinInPostKey, true);
-    //
-    // assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
-    // verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
-    // }
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
+        var pinInPostKey = "pin-in-post";
+        givenToggle(pinInPostKey, toggleStat);
 
-    @Test
-    void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
+        assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsSDOEnabledInvoked(Boolean toggleStat) {
         var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, true);
+        givenToggle(enableSDOKey, toggleStat);
 
-        assertThat(featureToggleService.isSDOEnabled()).isTrue();
-        verifyBoolVariationCalled(enableSDOKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsCertificateOfServiceEnabledInvoked() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
         var certificateOfServiceKey = "isCertificateOfServiceEnabled";
-        givenToggle(certificateOfServiceKey, true);
+        givenToggle(certificateOfServiceKey, toggleStat);
 
-        assertThat(featureToggleService.isCertificateOfServiceEnabled()).isTrue();
-        verifyBoolVariationCalled(certificateOfServiceKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isCertificateOfServiceEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void rpaContinuousFeed_LDTagName(Boolean toggleStat) {
+        var rpaContinuousFeed = "specified-rpa-continuous-feed";
+        givenToggle(rpaContinuousFeed, toggleStat);
+        assertThat(featureToggleService.isSpecRpaContinuousFeedEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    public void globalSearch_LDTagName(Boolean toggleStat) {
+        givenToggle("global-search-specified", toggleStat);
+        assertThat(featureToggleService.isGlobalSearchEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
+        var pbaV3Key = "pba-version-3-ways-to-pay";
+        givenToggle(pbaV3Key, toggleStat);
+
+        assertThat(featureToggleService.isPbaV3Enabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenHmcIsEnabled(Boolean toggleStat) {
+        var hmcKey = "hmc";
+        givenToggle(hmcKey, toggleStat);
+
+        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {
-        when(ldClient.boolVariation(eq(feature), any(LDUser.class), anyBoolean()))
+        when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
-    }
-
-    private void verifyBoolVariationCalled(String feature, List<String> customAttributesKeys) {
-        verify(ldClient).boolVariation(
-            eq(feature),
-            ldUserArgumentCaptor.capture(),
-            eq(false)
-        );
-
-        var capturedLdUser = ldUserArgumentCaptor.getValue();
-        assertThat(capturedLdUser.getKey()).isEqualTo("civil-service");
-        assertThat(ImmutableList.copyOf(capturedLdUser.getCustomAttributes())).extracting("name")
-            .containsOnlyOnceElementsOf(customAttributesKeys);
-    }
-
-    @Test
-    public void rpaContinuousFeed_LDTagName() {
-        featureToggleService.isSpecRpaContinuousFeedEnabled();
-
-        Mockito.verify(ldClient).boolVariation(
-            eq("specified-rpa-continuous-feed"),
-            any(LDUser.class),
-            eq(false)
-        );
-    }
-
-    @Test
-    public void globalSearch_LDTagName() {
-        featureToggleService.isGlobalSearchEnabled();
-
-        Mockito.verify(ldClient).boolVariation(
-            eq("global-search-specified"),
-            any(LDUser.class),
-            eq(false)
-        );
-    }
-
-    @Test
-    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
-        var pbaV3Key = "pba-version-3-ways-to-pay";
-        givenToggle(pbaV3Key, true);
-
-        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
-        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
-    }
-
-    @Test
-    void shouldCallBoolVariation_whenHmcIsEnabled() {
-        var hmcKey = "hmc";
-        givenToggle(hmcKey, true);
-
-        assertThat(featureToggleService.isHmcEnabled()).isTrue();
-        verifyBoolVariationCalled(hmcKey, List.of("timestamp", "environment"));
     }
 }

@@ -1,116 +1,74 @@
 package uk.gov.hmcts.reform.civil.launchdarkly;
 
-import com.launchdarkly.sdk.LDUser;
-import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FeatureToggleService {
 
-    private final LDClientInterface internalClient;
-    private final String environment;
-
-    @Autowired
-    public FeatureToggleService(LDClientInterface internalClient, @Value("${launchdarkly.env}") String environment) {
-        this.internalClient = internalClient;
-        this.environment = environment;
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-    }
-
-    public boolean isFeatureEnabled(String feature) {
-        return internalClient.boolVariation(feature, createLDUser().build(), false);
-    }
-
-    public boolean isFeatureEnabled(String feature, LDUser user) {
-        return internalClient.boolVariation(feature, user, false);
-    }
+    private final FeatureToggleApi featureToggleApi;
 
     public boolean isRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
     }
 
     public boolean isSpecRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation(
-            "specified-rpa-continuous-feed",
-            createLDUser().build(),
-            false
-        );
+        return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
     }
 
     public boolean isGlobalSearchEnabled() {
-        return internalClient.boolVariation(
-            "global-search-specified",
-            createLDUser().build(),
-            false
-        );
+        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
     }
 
     public boolean isSdoEnabled() {
-        return isFeatureEnabled("enableSDO");
+        return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
-    }
-
-    public LDUser.Builder createLDUser() {
-        return new LDUser.Builder("civil-service")
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
-            .custom("environment", environment);
+        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
 
     public boolean isHearingAndListingSDOEnabled() {
-        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-sdo");
     }
 
     public boolean isHearingAndListingLegalRepEnabled() {
-        return internalClient.boolVariation("hearing-and-listing-legal-rep", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
 
     public boolean isCaseFlagsEnabled() {
-        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("case-flags");
     }
 
     public boolean isPinInPostEnabled() {
-        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isSDOEnabled() {
-        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isCertificateOfServiceEnabled() {
-        return internalClient.boolVariation("isCertificateOfServiceEnabled",
-                                            createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("isCertificateOfServiceEnabled");
     }
 
     public boolean isHmcEnabled() {
-        return internalClient.boolVariation("hmc", createLDUser().build(), false);
+        return this.featureToggleApi.isFeatureEnabled("hmc");
     }
 
-    private void close() {
-        try {
-            internalClient.close();
-        } catch (IOException e) {
-            log.error("Error in closing the Launchdarkly client::", e);
-        }
-    }
 }
