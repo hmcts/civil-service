@@ -161,6 +161,14 @@ additional information where necessary.
 
   Note that it will also alter other behaviours in GitHub. Hopefully these will also be improvements to you.
 
+*In case of problems*
+
+1. Get in touch with your Technical Lead so that they can get you unblocked
+2. If the rare eventuality that the above is not possible, you can disable enforcement of conventions using the following command
+
+   `git config --local --unset core.hooksPath`
+
+   Still, you shouldn't be doing it so make sure you get in touch with a Technical Lead soon afterwards.
 
 ## License
 
