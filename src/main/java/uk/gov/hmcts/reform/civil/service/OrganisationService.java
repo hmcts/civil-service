@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Optional;
 

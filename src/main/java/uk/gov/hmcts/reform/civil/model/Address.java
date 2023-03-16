@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 
