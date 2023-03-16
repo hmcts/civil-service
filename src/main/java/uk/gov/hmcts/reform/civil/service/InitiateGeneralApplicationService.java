@@ -293,6 +293,10 @@ public class InitiateGeneralApplicationService {
         return true;
     }
 
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
+        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+    }
+
     private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
         String accessToken = userService.getAccessToken(
                 crossAccessUserConfiguration.getUserName(),

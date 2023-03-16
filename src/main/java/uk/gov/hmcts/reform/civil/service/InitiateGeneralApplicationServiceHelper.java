@@ -58,8 +58,7 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
@@ -214,12 +213,9 @@ public class InitiateGeneralApplicationServiceHelper {
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
 
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
 
-        List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles().stream()
-            .filter(CA -> CA.getUserId().equals(userDetails.getId()))
-            .collect(Collectors.toList());
+        List<CaseAssignedUserRole> applicantSolicitor = getApplicantSolicitor(userRoles, userDetails);
 
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
@@ -236,6 +232,18 @@ public class InitiateGeneralApplicationServiceHelper {
         }
 
         return false;
+    }
+
+    public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
+        return caseAccessDataStoreApi.getUserRoles(
+            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+    }
+
+    public List<CaseAssignedUserRole> getApplicantSolicitor(CaseAssignedUserRolesResource userRoles,
+                                                            UserDetails userDetails) {
+        return userRoles.getCaseAssignedUserRoles().stream()
+            .filter(CA -> CA.getUserId().equals(userDetails.getId()))
+            .collect(Collectors.toList());
     }
 
     public String getCaaAccessToken() {

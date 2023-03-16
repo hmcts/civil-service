@@ -829,7 +829,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-        boolean result = helper.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
             .id("org1Sol1").build());
         assertTrue(result);
     }
@@ -847,7 +847,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
 
-        boolean result = helper.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
             .id("org3Sol1").build());
 
         assertFalse(result);
