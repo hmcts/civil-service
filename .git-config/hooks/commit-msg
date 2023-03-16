@@ -4,6 +4,7 @@ REGEX_ISSUE_ID='^CIV-[0-9]+ .*'
 REGEX_GENERIC_TASK='^CIV-TASK .*'
 REGEX_RENOVATE='^Update .*'
 REGEX_RENOVATE_BRANCH='renovate\/.*'
+REGEX_MERGE=`Merge branch .*`
 
 COMMIT_MESSAGE=$(head -n 1 "$1")
 
@@ -26,6 +27,12 @@ if [[ $COMMIT_MESSAGE =~ $REGEX_RENOVATE ]]; then
     exit 0
   fi
 fi
+
+if [[ $COMMIT_MESSAGE =~ $REGEX_MERGE ]]; then
+  # This is a merge done locally. All good.
+  exit 0
+fi
+
 
 # We don't recognize this commit message format, so it's invalid to us. We report an error to the user and exit.
 echo "The provided commit message is invalid. Commit messages must start with CIV-nnnn or CIV-TASK"
