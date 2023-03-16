@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -43,6 +43,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -80,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String DEFENDANT_EMAIL_ID_CONSTANT = "testUser1@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
@@ -144,7 +147,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(weekdayDate);
 
         when(organisationApi.findUserOrganisation(any(), any()))
-            .thenReturn(uk.gov.hmcts.reform.prd.model.Organisation
+            .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
                             .builder().organisationIdentifier("OrgId1").build());
 
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
@@ -811,6 +814,26 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
 
+    }
+
+    @Test
+    void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
+            .email(DEFENDANT_EMAIL_ID_CONSTANT).build());
+        assertFalse(result);
     }
 
     @Test
