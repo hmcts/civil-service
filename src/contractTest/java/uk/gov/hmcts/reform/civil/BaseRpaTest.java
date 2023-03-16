@@ -8,9 +8,9 @@ import au.com.dius.pact.model.RequestResponsePact;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;

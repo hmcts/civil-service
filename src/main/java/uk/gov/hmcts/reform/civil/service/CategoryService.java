@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.crd.client.ListOfValuesApi;
-import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.util.Optional;
 
