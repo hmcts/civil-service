@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.civil.service.search.exceptions;
+package uk.gov.hmcts.reform.civil.exceptions;
 
 public class CaseNotFoundException extends RuntimeException {
 
-    private static final String ERROR_MESSAGE = "Claim not found";
+    private static final String ERROR_MESSAGE = "Case was not found";
 
     public CaseNotFoundException() {
         super(ERROR_MESSAGE);
