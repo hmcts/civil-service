@@ -263,7 +263,6 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
-    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
@@ -280,6 +279,7 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
+
     /**
      * This field is not used.
      *
@@ -361,7 +361,7 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return  this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == YesOrNo.NO;
     }
 
     /**
@@ -380,6 +380,13 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
+
+    @JsonIgnore
+    public boolean isResponseAcceptedByClaimant() {
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
+            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
+            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    }
 
     private final IdamUserDetails claimantUserDetails;
 

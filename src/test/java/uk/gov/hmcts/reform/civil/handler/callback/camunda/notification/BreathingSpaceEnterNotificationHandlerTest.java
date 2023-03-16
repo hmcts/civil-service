@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .name(organisationName)
                                         .build()));
 
@@ -97,7 +97,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .name(organisationName)
                                         .build()));
 
@@ -145,7 +145,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .name(organisationName)
                                         .build()));
 
@@ -195,7 +195,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                         .name(organisationName)
                                         .build()));
 

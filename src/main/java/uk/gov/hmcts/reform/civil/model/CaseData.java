@@ -1,14 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,7 +42,6 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -114,6 +104,16 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
 @SuperBuilder(toBuilder = true)
@@ -141,6 +141,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantPartyName;
 
     private final YesOrNo generalAppVaryJudgementType;
+    private final YesOrNo generalAppParentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
@@ -290,6 +291,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
+    private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -492,7 +494,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo claimStarted;
     private final String currentDefendantName;
 
-    @JsonUnwrapped(suffix = "Breathing")
+    @JsonUnwrapped
     private final BreathingSpaceInfo breathing;
     private final String applicantVRespondentText;
 
@@ -694,7 +696,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
     private final HearingNotes hearingNotes;
+    private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
     private final Flags caseFlags;
+    private final String caseProgAllocatedTrack;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
@@ -734,4 +739,37 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
+
+    @JsonIgnore
+    public boolean respondent1PaidInFull() {
+        return respondent1ClaimResponsePaymentAdmissionForSpec
+            == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT;
+    }
+
+    @JsonIgnore
+    public boolean isPayBySetDate() {
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean isPayByInstallment() {
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+    }
+
+    @JsonIgnore
+    public LocalDate getDateForRepayment() {
+        return Optional.ofNullable(respondToClaimAdmitPartLRspec)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean hasBreathingSpace() {
+        return getBreathing() != null
+            && getBreathing().getEnter() != null
+            && getBreathing().getLift() == null;
+    }
+
 }
