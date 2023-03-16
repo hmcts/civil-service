@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
@@ -42,6 +43,9 @@ class CivilDocumentStitchingServiceTest {
     private BundleRequestExecutor bundleRequestExecutor;
     @MockBean
     private StitchingConfiguration stitchingConfiguration;
+
+    CaseData caseData;
+
     private static final CaseDocument CLAIM_FORM =
         CaseDocument.builder()
             .createdBy("John")
@@ -69,40 +73,43 @@ class CivilDocumentStitchingServiceTest {
         List<IdValue<Bundle>> caseBundles = List.of(new IdValue<>("1", bundle));
         return CaseDataBuilder.builder().caseBundles(caseBundles).build();
     }
+
+    @BeforeEach
+    void sharedSetup() {
+        caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
+        given(stitchingConfiguration.getStitchingUrl()).willReturn("dummy_url");
+    }
+
     @Test
      void whenCaseDataIsNullWithPayloadAndNoCaseBundlesNoStitchingDocument() {
         //Given: Payload details but case data not provided
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
-        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
-        //Then: the case documents is null
+        //When: The document stitching service is called
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                   "Title", "FileName", caseData);
+        //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
     @Test
      void whenCaseDataIsNullWithNoCaseBundles() {
         //Given: Payload details and stitching URL provided
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
-        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
-        //when: bundle Request post is called
-        when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
-        //Then: the case documents is null
+        //When: bundle Request post is called
          CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                          "Title", "FileName", caseData);
+        //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
     @Test
      void whenCaseDataIsNotNullWithCaseBundlesAndNoStitchingDocumentThenCaseDocumentIsNull() {
         //Given: Payload and case data with case bundle details
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
-        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
         CaseData caseData1 = buildCaseData(mock(Bundle.class));
+        given(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).willReturn(caseData1);
         //when: bundle Request post is called and case data is retrieved
-        when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
-        when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
-        //Then: the case documents is null
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                          "Title", "FileName", caseData);
+        //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
     @Test
@@ -111,14 +118,12 @@ class CivilDocumentStitchingServiceTest {
         Optional<Document> stitchedDocument = Optional.of(mock(Document.class));
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
         Bundle bundle = Bundle.builder().stitchedDocument(stitchedDocument).build();
-        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").build();
         CaseData caseData1 = buildCaseData(bundle);
+        given(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).willReturn(caseData1);
         //when: bundle Request post is called and case data is retrieved with stitching document
-        when(stitchingConfiguration.getStitchingUrl()).thenReturn("dummy_url");
-        when(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).thenReturn(caseData1);
-        //Then: Case Document is retrieved
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                          "Title", "FileName", caseData);
+        //Then: Case Document is retrieved
         Assertions.assertNotNull(caseDocument);
     }
 }
