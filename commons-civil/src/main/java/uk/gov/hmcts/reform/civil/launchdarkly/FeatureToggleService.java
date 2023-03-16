@@ -11,6 +11,10 @@ public class FeatureToggleService {
 
     private final FeatureToggleApi featureToggleApi;
 
+    public boolean isFeatureEnabled(String feature) {
+        return this.featureToggleApi.isFeatureEnabled(feature);
+    }
+
     public boolean isRpaContinuousFeedEnabled() {
         return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
     }

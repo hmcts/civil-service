@@ -26,7 +26,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
+    void shouldReturnCorrectValue_whenMyFeatureIsEnabledOrDisabled(Boolean toggleState) {
+        givenToggle("myFeature", toggleState);
+
+        assertThat(featureToggleService.isFeatureEnabled("myFeature")).isEqualTo(toggleState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
         var multipartyFeatureKey = "rpaContinuousFeed";
         givenToggle(multipartyFeatureKey, toggleState);
 
@@ -35,7 +43,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
+    void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
         var noticeOfChangeKey = "notice-of-change";
         givenToggle(noticeOfChangeKey, toggleState);
 
@@ -44,7 +52,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "hearing-and-listing-sdo";
         givenToggle(hearingAndListingKey, toggleStat);
 
@@ -53,7 +61,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "hearing-and-listing-legal-rep";
         givenToggle(hearingAndListingKey, toggleStat);
 
@@ -62,7 +70,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
         var courtLocationDynamicListKey = "court-location-dynamic-list";
         givenToggle(courtLocationDynamicListKey, toggleStat);
 
@@ -71,7 +79,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "case-flags";
         givenToggle(caseFlagsKey, toggleStat);
 
@@ -80,7 +88,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);
 
@@ -89,7 +97,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, toggleStat);
 
@@ -98,7 +106,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsSDOEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
         var enableSDOKey = "enableSDO";
         givenToggle(enableSDOKey, toggleStat);
 
@@ -107,7 +115,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
         var certificateOfServiceKey = "isCertificateOfServiceEnabled";
         givenToggle(certificateOfServiceKey, toggleStat);
 
@@ -131,7 +139,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         givenToggle(pbaV3Key, toggleStat);
 
@@ -140,7 +148,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenHmcIsEnabled(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
         var hmcKey = "hmc";
         givenToggle(hmcKey, toggleStat);
 
