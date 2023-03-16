@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleApiTest {
+
     private static final String FAKE_FEATURE = "fake-feature";
     private static final String FAKE_ENVIRONMENT = "fake-env";
 
