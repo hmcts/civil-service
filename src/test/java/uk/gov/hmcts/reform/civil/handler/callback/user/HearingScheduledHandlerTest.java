@@ -36,10 +36,9 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,8 +67,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     private HearingScheduledHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
-    private HearingReferenceNumberRepository hearingReferenceNumberRepository;
     @MockBean
     private PublicHolidaysCollection publicHolidaysCollection;
 
@@ -401,8 +398,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnHearingNoticeCreated_WhenSubmitted() {
         // Given
-        given(hearingReferenceNumberRepository.getHearingReferenceNumber()).willReturn("000HN001");
-
         String header = "# Hearing notice created\n"
             + "# Your reference number\n" + "# 000HN001";
 
@@ -410,13 +405,11 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             + ", for example, book an interpreter.";
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingReferenceNumber("000HN001")
             .build();
-
-        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
         // When
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
         // Then
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(header)
