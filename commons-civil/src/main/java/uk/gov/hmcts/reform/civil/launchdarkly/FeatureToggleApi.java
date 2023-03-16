@@ -12,6 +12,7 @@ import java.io.IOException;
 @Slf4j
 @Service
 public class FeatureToggleApi {
+
     private final LDClientInterface internalClient;
     private final String environment;
 
