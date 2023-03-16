@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -36,11 +37,23 @@ public class HearingValuesServiceTest {
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
         var caseId = 1L;
         var caseDetails = CaseDetails.builder().id(caseId).build();
-        var caseData = CaseData.builder().ccdCaseReference(caseId).build();
-        var expected = ServiceHearingValuesModel.builder().build();
+        var caseData = CaseData.builder()
+            .ccdCaseReference(caseId)
+            .applicant1(Party.builder()
+                            .individualFirstName("Applicant")
+                            .individualLastName("One")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder()
+                             .individualFirstName("Respondent")
+                             .individualLastName("One")
+                             .type(Party.Type.INDIVIDUAL).build())
+            .build();
+        var expected = ServiceHearingValuesModel.builder()
+            .publicCaseName("'Applicant One' v 'Respondent One'")
+            .build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
         var actual = hearingValuesService.getValues(caseId, "8AB87C89");
 
@@ -49,7 +62,7 @@ public class HearingValuesServiceTest {
 
     @Test
     @SneakyThrows
-    void shouldReturnExpectedHearingValuesWhenCaseDataIs() {
+    void shouldReturnExpectedHearingValuesWhenCaseDateIsNotFound() {
         var caseId = 1L;
 
         doThrow(new NotFoundException("", new RestException("", new Exception())))

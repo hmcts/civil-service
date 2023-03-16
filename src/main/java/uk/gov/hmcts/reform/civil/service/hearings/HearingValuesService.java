@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -23,8 +24,10 @@ public class HearingValuesService {
 
         //ToDo: Use lov refdata model and retrieve data from lov ref data service;
 
-        //ToDo: Utilise hearing mapper;
-        return ServiceHearingValuesModel.builder().build();
+        return ServiceHearingValuesModel.builder()
+            .publicCaseName(ServiceHearingsCaseLevelMapper.getPublicCaseName(caseData))
+
+            .build();
     }
 
     private CaseData retrieveCaseData(long caseId) {

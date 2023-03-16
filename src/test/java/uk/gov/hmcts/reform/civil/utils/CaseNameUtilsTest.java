@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -55,39 +56,48 @@ class CaseNameUtilsTest {
 
     @Nested
     class BuildCaseNamePublic {
+        Party applicant1;
+        Party applicant2;
+        Party respondent1;
+        Party respondent2;
+        LitigationFriend applicant1LitigationFriend;
+        LitigationFriend applicant2LitigationFriend;
 
-        Party applicant1 = Party.builder()
-            .individualFirstName("Applicant")
-            .individualLastName("One")
-            .type(Party.Type.INDIVIDUAL).build();
+        @BeforeEach
+        void setupParties() {
+            applicant1 = Party.builder()
+                .individualFirstName("Applicant")
+                .individualLastName("One")
+                .type(Party.Type.INDIVIDUAL).build();
 
-        LitigationFriend applicant1LitigationFriend = LitigationFriend.builder()
-            .firstName("ApplicantOne")
-            .lastName("LitigationFriend")
-            .build();
+            applicant1LitigationFriend = LitigationFriend.builder()
+                .firstName("ApplicantOne")
+                .lastName("LitigationFriend")
+                .build();
 
-        Party applicant2 = Party.builder()
-            .individualFirstName("Applicant")
-            .individualLastName("Two")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+            applicant2 = Party.builder()
+                .individualFirstName("Applicant")
+                .individualLastName("Two")
+                .type(Party.Type.INDIVIDUAL)
+                .build();
 
-        LitigationFriend applicant2LitigationFriend = LitigationFriend.builder()
-            .firstName("ApplicantTwo")
-            .lastName("LitigationFriend")
-            .build();
+            applicant2LitigationFriend = LitigationFriend.builder()
+                .firstName("ApplicantTwo")
+                .lastName("LitigationFriend")
+                .build();
 
-        Party respondent1 = Party.builder()
-            .individualFirstName("Respondent")
-            .individualLastName("One")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+            respondent1 = Party.builder()
+                .individualFirstName("Respondent")
+                .individualLastName("One")
+                .type(Party.Type.INDIVIDUAL)
+                .build();
 
-        Party respondent2 = Party.builder()
-            .individualFirstName("Respondent")
-            .individualLastName("Two")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+            respondent2 = Party.builder()
+                .individualFirstName("Respondent")
+                .individualLastName("Two")
+                .type(Party.Type.INDIVIDUAL)
+                .build();
+        }
 
         @Test
         void shouldReturnExpectedCaseName_with1v1PartyData() {
