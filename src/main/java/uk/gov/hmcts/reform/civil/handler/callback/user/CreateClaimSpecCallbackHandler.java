@@ -105,7 +105,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
         + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
-        + "when you first notify the Defendant legal representative of the claim.";
+        + "when you first notify the Defendant legal representative of the claim. <br/>[Pay your claim fee](%s)";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
@@ -121,7 +121,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
-        + "confirmed you will receive an email. The email will also include the date that the defendants have to respond.";
+        + "confirmed you will receive an email. The email will also include the date that the defendants have to " +
+        "respond. <br/>[Pay your claim fee](%s)";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When the payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
@@ -523,6 +524,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
+            if (featureToggleService.isPbaV3Enabled()) {
+                return format("# Please now pay your claim fee%n# using the link below");
+            }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
         return format(
@@ -535,22 +539,25 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
-        return format(
-            (areRespondentsRepresentedAndRegistered(caseData)
+        return
+            ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? getConfirmationSummary()
-                : LIP_CONFIRMATION_BODY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                ? getConfirmationSummary(caseData)
+                : format(LIP_CONFIRMATION_BODY, format("/cases/case-details/%s#CaseDocuments",
+                                                       caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
+            formattedServiceDeadline))
+         + exitSurveyContentService.applicantSurvey();
     }
 
-    private String getConfirmationSummary() {
+    private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return CONFIRMATION_SUMMARY_PBA_V3;
+            return format(CONFIRMATION_SUMMARY_PBA_V3, format("/cases/case-details/%s#CaseDocuments",
+                                                              caseData.getCcdCaseReference()),
+                          format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
-            return CONFIRMATION_SUMMARY;
+            return format(CONFIRMATION_SUMMARY,
+                          format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()));
         }
     }
 
@@ -713,6 +720,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private String getSpecHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
             || isPinInPostCaseMatched(caseData)) {
+            if (featureToggleService.isPbaV3Enabled()) {
+                return format("# Please now pay your claim fee%n# using the link below");
+            }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
         return format(
@@ -725,25 +735,28 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
-        return format(
-            (areRespondentsRepresentedAndRegistered(caseData)
+        return
+            ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? getSpecConfirmationSummary()
-                : SPEC_LIP_CONFIRMATION_BODY,
+                ? getSpecConfirmationSummary(caseData)
+                : format(SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             claimIssueConfiguration.getN9aLink(),
             claimIssueConfiguration.getN9bLink(),
             claimIssueConfiguration.getN215Link(),
             formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
+        )) + exitSurveyContentService.applicantSurvey();
     }
 
-    private String getSpecConfirmationSummary() {
+    private String getSpecConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return SPEC_CONFIRMATION_SUMMARY_PBA_V3;
+            return format(SPEC_CONFIRMATION_SUMMARY_PBA_V3, format("/cases/case-details/%s#CaseDocuments",
+                                                              caseData.getCcdCaseReference()),
+                          format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
-            return SPEC_CONFIRMATION_SUMMARY;
+            return format(SPEC_CONFIRMATION_SUMMARY,
+                          format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()));
         }
     }
 

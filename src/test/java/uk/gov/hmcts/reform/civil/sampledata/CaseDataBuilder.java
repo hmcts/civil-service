@@ -1168,6 +1168,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicant2(YesOrNo addApplicant2) {
+        this.addApplicant2 = addApplicant2;
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
         this.respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
         return this;
