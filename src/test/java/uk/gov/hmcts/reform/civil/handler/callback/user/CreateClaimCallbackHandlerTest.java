@@ -51,7 +51,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -411,6 +411,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(getDynamicList(response))
                 .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+        }
+
+        @Test
+        void shouldSetPBAv3FlagOn_whenPBAv3IsActivated() {
+            // Given
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            // Then
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("paymentTypePBA").isEqualTo("PBAv3");
         }
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {

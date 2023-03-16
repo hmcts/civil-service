@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 
 import java.util.List;
 import java.util.Optional;
