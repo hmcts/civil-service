@@ -9,8 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.crd.client.ListOfValuesApi;
-import uk.gov.hmcts.reform.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.util.Map;
 import java.util.Optional;
