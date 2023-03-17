@@ -91,7 +91,6 @@ public class FeatureToggleService {
 
     public boolean isPbaV3Enabled() {
         return true;
-        //internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), true);
     }
 
     public boolean isSDOEnabled() {
