@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.documentmanagement;
+package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,43 +11,41 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
-import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
-import uk.gov.hmcts.reform.ccd.document.am.model.Document;
-import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
-import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi;
+import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Classification;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 
+import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 @Slf4j
 @Service("documentManagementService")
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "true")
-public class SecuredDocumentManagementService implements DocumentManagementService {
+@ConditionalOnProperty(prefix = "document_management", name = "secured", havingValue = "false")
+public class UnsecuredDocumentManagementService implements DocumentManagementService {
 
-    protected static final int DOC_UUID_LENGTH = 36;
     public static final String CREATED_BY = "Civil";
     protected static final String FILES_NAME = "files";
 
+    private final DocumentUploadClientApi documentUploadClientApi;
     private final DocumentDownloadClientApi documentDownloadClientApi;
+    private final DocumentMetadataDownloadClientApi documentMetadataDownloadClient;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
-    private final CaseDocumentClientApi caseDocumentClientApi;
 
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
@@ -56,39 +54,34 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Uploading file {}", originalFileName);
         try {
             MultipartFile file
-                = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes()
-            );
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes());
 
-            DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
-                Classification.RESTRICTED.toString(),
-                "CIVIL",
-                "CIVIL",
-                Collections.singletonList(file)
-            );
-
-            UploadResponse response = caseDocumentClientApi.uploadDocuments(
+            UserInfo userInfo = userService.getUserInfo(authorisation);
+            UploadResponse response = documentUploadClientApi.upload(
                 authorisation,
                 authTokenGenerator.generate(),
-                documentUploadRequest
+                userInfo.getUid(),
+                documentManagementConfiguration.getUserRoles(),
+                Classification.RESTRICTED,
+                singletonList(file)
             );
 
-            Document document = response.getDocuments().stream()
+            Document document = response.getEmbedded().getDocuments().stream()
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
 
             return CaseDocument.builder()
-                .documentLink(uk.gov.hmcts.reform.civil.model.documents.Document.builder()
+                .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
                                   .documentUrl(document.links.self.href)
                                   .documentBinaryUrl(document.links.binary.href)
                                   .documentFileName(originalFileName)
-                                  .documentHash(document.hashToken)
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
                 .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
-                                                                 .toInstant()
-                                                                 .atZone(ZoneId.systemDefault())
-                                                                 .toLocalDateTime()))
+                                                                  .toInstant()
+                                                                  .atZone(ZoneId.systemDefault())
+                                                                  .toLocalDateTime()))
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();
@@ -105,23 +98,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
+            Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
 
-            ResponseEntity<Resource> responseEntity = caseDocumentClientApi.getDocumentBinary(
+            ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
                 authorisation,
                 authTokenGenerator.generate(),
-                UUID.fromString(documentPath.substring(documentPath.lastIndexOf("/") + 1))
+                userRoles,
+                userInfo.getUid(),
+                URI.create(documentMetadata.links.binary.href).getPath()
             );
-
-            if (responseEntity == null) {
-                Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
-                responseEntity = documentDownloadClientApi.downloadBinary(
-                    authorisation,
-                    authTokenGenerator.generate(),
-                    userRoles,
-                    userInfo.getUid(),
-                    URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
-                );
-            }
 
             return Optional.ofNullable(responseEntity.getBody())
                 .map(ByteArrayResource.class::cast)
@@ -137,19 +122,18 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Getting metadata for file {}", documentPath);
 
         try {
-            return caseDocumentClientApi.getMetadataForDocument(
+            UserInfo userInfo = userService.getUserInfo(authorisation);
+            String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
+            return documentMetadataDownloadClient.getDocumentMetadata(
                 authorisation,
                 authTokenGenerator.generate(),
-                getDocumentIdFromSelfHref(documentPath)
+                userRoles,
+                userInfo.getUid(),
+                documentPath
             );
-
         } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
-    }
-
-    private UUID getDocumentIdFromSelfHref(String selfHref) {
-        return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 }

@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.civil.service.documentmanagement;
+package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,10 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -39,10 +40,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.SecuredDocumentManagementService.DOC_UUID_LENGTH;
-import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
+import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService.DOC_UUID_LENGTH;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
@@ -93,7 +93,7 @@ class SecuredDocumentManagementServiceTest {
             PDF document = new PDF("0000-claim.pdf", "test".getBytes(), SEALED_CLAIM);
 
             uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
-                readString("document-management/secured.response.success.json"),
+                ResourceReader.readString("document-management/secured.response.success.json"),
                 uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
             );
 
@@ -102,7 +102,7 @@ class SecuredDocumentManagementServiceTest {
 
             CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
             assertNotNull(caseDocument.getDocumentLink());
-            assertEquals(
+            Assertions.assertEquals(
                 uploadResponse.getDocuments().get(0).links.self.href,
                 caseDocument.getDocumentLink().getDocumentUrl()
             );
@@ -115,7 +115,7 @@ class SecuredDocumentManagementServiceTest {
             PDF document = new PDF("0000-failed-claim.pdf", "failed-test".getBytes(), SEALED_CLAIM);
 
             UploadResponse uploadResponse = mapper.readValue(
-                readString("document-management/secured.response.failure.json"),
+                ResourceReader.readString("document-management/secured.response.failure.json"),
                 UploadResponse.class
             );
 
@@ -143,7 +143,7 @@ class SecuredDocumentManagementServiceTest {
         void shouldDownloadDocumentFromDocumentManagement() throws JsonProcessingException {
 
             Document document = mapper.readValue(
-                readString("document-management/download.success.json"),
+                ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
             String documentPath = URI.create(document.links.self.href).getPath();
@@ -183,7 +183,7 @@ class SecuredDocumentManagementServiceTest {
         void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentClientApi() throws JsonProcessingException {
 
             Document document = mapper.readValue(
-                readString("document-management/download.success.json"),
+                ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
             String documentPath = URI.create(document.links.self.href).getPath();
@@ -210,7 +210,7 @@ class SecuredDocumentManagementServiceTest {
         @Test
         void shouldThrow_whenDocumentDownloadFails() throws JsonProcessingException {
             Document document = mapper.readValue(
-                readString("document-management/download.success.json"),
+                ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
@@ -252,7 +252,7 @@ class SecuredDocumentManagementServiceTest {
                      eq(documentId)
                  )
             ).thenReturn(mapper.readValue(
-                readString("document-management/metadata.success.json"), Document.class)
+                ResourceReader.readString("document-management/metadata.success.json"), Document.class)
             );
 
             when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
@@ -260,8 +260,8 @@ class SecuredDocumentManagementServiceTest {
             uk.gov.hmcts.reform.ccd.document.am.model.Document documentMetaData
                 = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 
-            assertEquals(72552L, documentMetaData.size);
-            assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
+            Assertions.assertEquals(72552L, documentMetaData.size);
+            Assertions.assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }

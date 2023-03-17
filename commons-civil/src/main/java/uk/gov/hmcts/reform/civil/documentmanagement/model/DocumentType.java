@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.documents;
+package uk.gov.hmcts.reform.civil.documentmanagement.model;
 
 public enum DocumentType {
     SEALED_CLAIM,

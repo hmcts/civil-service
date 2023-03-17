@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.documentmanagement;
+package uk.gov.hmcts.reform.civil.documentmanagement;
 
 public class DocumentUploadException extends RuntimeException {
 

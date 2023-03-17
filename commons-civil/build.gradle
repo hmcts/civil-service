@@ -62,6 +62,9 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
 
+  implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
+  implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
+
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.7'
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 

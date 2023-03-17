@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.civil.service.documentmanagement;
+package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,10 +16,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.DocumentManagementConfiguration;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
@@ -42,10 +43,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
-import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
-import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
+import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
 @SpringBootTest(classes = {
     UnsecuredDocumentManagementService.class,
@@ -106,7 +106,7 @@ class UnsecuredDocumentManagementServiceTest {
             ));
 
             UploadResponse uploadResponse = mapper.readValue(
-                readString("document-management/response.success.json"), UploadResponse.class);
+                ResourceReader.readString("document-management/response.success.json"), UploadResponse.class);
 
             when(documentUploadClient.upload(
                      anyString(),
@@ -120,7 +120,7 @@ class UnsecuredDocumentManagementServiceTest {
 
             CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
             assertNotNull(caseDocument.getDocumentLink());
-            assertEquals(
+            Assertions.assertEquals(
                 uploadResponse.getEmbedded().getDocuments().get(0).links.self.href,
                 caseDocument.getDocumentLink().getDocumentUrl()
             );
@@ -149,7 +149,7 @@ class UnsecuredDocumentManagementServiceTest {
                      eq(files)
                  )
             ).thenReturn(mapper.readValue(
-                readString("document-management/response.failure.json"), UploadResponse.class));
+                ResourceReader.readString("document-management/response.failure.json"), UploadResponse.class));
 
             DocumentUploadException documentManagementException = assertThrows(
                 DocumentUploadException.class,
@@ -176,7 +176,7 @@ class UnsecuredDocumentManagementServiceTest {
         void shouldDownloadDocumentFromDocumentManagement() throws JsonProcessingException {
 
             Document document = mapper.readValue(
-                readString("document-management/download.success.json"),
+                ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
             String documentPath = URI.create(document.links.self.href).getPath();
@@ -257,15 +257,15 @@ class UnsecuredDocumentManagementServiceTest {
                      eq(documentPath)
                  )
             ).thenReturn(mapper.readValue(
-                readString("document-management/metadata.success.json"), Document.class)
+                ResourceReader.readString("document-management/metadata.success.json"), Document.class)
             );
 
             when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
 
             Document documentMetaData = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 
-            assertEquals(72552L, documentMetaData.size);
-            assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
+            Assertions.assertEquals(72552L, documentMetaData.size);
+            Assertions.assertEquals("TEST_DOCUMENT_1.pdf", documentMetaData.originalDocumentName);
 
             verify(documentMetadataDownloadClient)
                 .getDocumentMetadata(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentPath));

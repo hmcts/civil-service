@@ -68,8 +68,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
