@@ -10,6 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -33,10 +36,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CreateSDORespondent2NotificationHandler.class,
-    JacksonAutoConfiguration.class
+    CreateSDORespondent1NotificationHandler.class,
+    JacksonAutoConfiguration.class,
+    CreateSDORespondent1LRNotificationSender.class,
+    CreateSDORespondent2LRNotificationSender.class,
+    CreateSDORespondent1LiPNotificationSender.class,
+    CreateSDORespondent2LiPNotificationSender.class
 })
-
 public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
@@ -46,7 +52,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
     @MockBean
     private OrganisationService organisationService;
     @Autowired
-    private CreateSDORespondent2NotificationHandler handler;
+    private CreateSDORespondent1NotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -60,8 +66,22 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("Company 1")
+                                 .partyEmail("company@email.com")
+                                 .build())
+                .respondent2Represented(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.name())
+                             .build())
+                .build();
 
             handler.handle(params);
 
@@ -69,6 +89,38 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
                 "respondentsolicitor2@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
+                "create-sdo-respondent-2-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLiP_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("Company 1")
+                                 .partyEmail("company@email.com")
+                                 .build())
+                .respondent2Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "company@email.com",
+                "template-id",
+                Map.of(
+                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 1"
+                ),
                 "create-sdo-respondent-2-notification-000DC001"
             );
         }

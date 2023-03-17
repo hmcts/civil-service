@@ -1,0 +1,41 @@
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
+@Component
+public class CreateSDORespondent2LRNotificationSender extends AbstractCreateSDORespondentLRNotificationSender {
+
+    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-2-notification-%s";
+
+    public CreateSDORespondent2LRNotificationSender(
+        NotificationService notificationService,
+        NotificationsProperties notificationsProperties,
+        OrganisationService organisationService) {
+        super(notificationService, notificationsProperties, organisationService);
+    }
+
+    @Override
+    protected String getDocReference(CaseData caseData) {
+        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    }
+
+    @Override
+    protected String getRecipientEmail(CaseData caseData) {
+        String r2 = caseData.getRespondentSolicitor2EmailAddress();
+        if (StringUtils.isNotBlank(r2)) {
+            return r2;
+        } else {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        }
+    }
+
+    @Override
+    protected String getLROrganisationId(CaseData caseData) {
+        return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+    }
+}

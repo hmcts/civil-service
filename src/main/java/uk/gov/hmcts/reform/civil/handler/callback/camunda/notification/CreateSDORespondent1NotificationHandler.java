@@ -8,32 +8,31 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED;
 
 @Service
 @RequiredArgsConstructor
-public class CreateSDORespondent1NotificationHandler extends CallbackHandler implements NotificationData {
+public class CreateSDORespondent1NotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED);
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED, NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED
+    );
 
-    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-1-notification-%s";
-    public static final String TASK_ID = "CreateSDONotifyRespondentSolicitor1";
+    public static final String TASK_ID_1 = "CreateSDONotifyRespondentSolicitor1";
+    public static final String TASK_ID_2 = "CreateSDONotifyRespondentSolicitor2";
 
-    private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
+    private final CreateSDORespondent1LiPNotificationSender lip1NotificationSender;
+    private final CreateSDORespondent2LiPNotificationSender lip2NotificationSender;
+    private final CreateSDORespondent1LRNotificationSender lr1NotificationSender;
+    private final CreateSDORespondent2LRNotificationSender lr2NotificationSender;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -44,7 +43,11 @@ public class CreateSDORespondent1NotificationHandler extends CallbackHandler imp
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        if (NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name().equals(callbackParams.getRequest().getEventId())) {
+            return TASK_ID_1;
+        } else {
+            return TASK_ID_2;
+        }
     }
 
     @Override
@@ -55,34 +58,23 @@ public class CreateSDORespondent1NotificationHandler extends CallbackHandler imp
     private CallbackResponse notifyRespondentSolicitor1SDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
-            caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? notificationsProperties.getSdoOrderedSpec()
-                : notificationsProperties.getSdoOrdered(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name().equals(callbackParams.getRequest().getEventId())) {
+            if (caseData.getSpecRespondent1Represented() == YesOrNo.YES
+                || caseData.getRespondent1Represented() == YesOrNo.YES) {
+                lr1NotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            } else {
+                lip1NotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            }
+        } else if (caseData.getRespondent2() != null) {
+            if (caseData.getSpecRespondent2Represented() == YesOrNo.YES
+                || caseData.getRespondent2Represented() == YesOrNo.YES) {
+                lr2NotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            } else {
+                lip2NotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondent1LegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-        );
-    }
-
-    public String getRespondent1LegalOrganizationName(String id) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        String respondentLegalOrganizationName = null;
-        if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
-        }
-        return respondentLegalOrganizationName;
     }
 }
 
