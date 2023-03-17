@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getCaseInterpreterRequiredFlag;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsM
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getNumberOfPhysicalAttendees;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getPanelRequirements;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getPrivateHearingRequiredFlag;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingsPartyMapper.buildPartyObjectForHearingPayload;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ScreenFlowMapper.getScreenFlow;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getAutoListFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getCaseAdditionalSecurityFlag;
@@ -53,6 +55,8 @@ public class HearingValuesService {
     private final CaseCategoriesService caseCategoriesService;
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final OrganisationService organisationService;
+    private final EntityRoleService entityRoleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
         CaseData caseData = retrieveCaseData(caseId);
@@ -64,7 +68,7 @@ public class HearingValuesService {
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
             .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag()) // todo civ-6888
-            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken)) //todo need ref data - doug
+            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
             .caseRestrictedFlag(getCaseRestrictedFlag())
             .externalCaseReference(getExternalCaseReference())
@@ -87,7 +91,7 @@ public class HearingValuesService {
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
             .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(null) //todo civ-7029
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService, entityRoleService, authToken))
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
