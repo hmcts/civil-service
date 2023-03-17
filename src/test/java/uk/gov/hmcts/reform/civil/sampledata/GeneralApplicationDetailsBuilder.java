@@ -93,7 +93,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -162,7 +162,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()

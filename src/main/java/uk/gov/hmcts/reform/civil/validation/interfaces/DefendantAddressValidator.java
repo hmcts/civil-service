@@ -15,7 +15,7 @@ public interface DefendantAddressValidator {
         CallbackParams callbackParams, PostcodeValidator postcodeValidator) {
         CaseData caseData = callbackParams.getCaseData();
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
-            List<String> errors = postcodeValidator.validatePostCodeForDefendant(
+            List<String> errors = postcodeValidator.validate(
                 caseData.getSpecAoSApplicantCorrespondenceAddressdetails().getPostCode());
 
             return AboutToStartOrSubmitCallbackResponse.builder()

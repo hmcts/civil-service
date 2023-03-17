@@ -31,10 +31,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
+import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import static java.lang.String.format;
@@ -63,8 +63,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
-    private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
-
     private final Time time;
 
     @Override
@@ -83,13 +81,14 @@ public class HearingScheduledHandler extends CallbackHandler {
         return format(HEARING_TASKS);
     }
 
-    private String getHeader() {
-        return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
+    private String getHeader(CaseData caseData) {
+        return format(HEARING_CREATED_HEADER, caseData.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
+            .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody())
             .build();
     }
@@ -158,6 +157,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.hearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
@@ -195,7 +195,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                 } else {
                     claimAmount = caseData.getTotalClaimAmount().intValue() * 100;
                 }
-                hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(claimAmount));
+                hearingFee.setCalculatedAmountInPence(HearingUtils.getSmallTrackFee(claimAmount));
                 break;
             case MULTI_CLAIM:
                 hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
