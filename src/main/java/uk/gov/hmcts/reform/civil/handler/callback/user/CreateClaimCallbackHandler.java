@@ -567,7 +567,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     : format(LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()))
-             + exitSurveyContentService.applicantSurvey();
+                + exitSurveyContentService.applicantSurvey();
         } else {
             return
                 (areRespondentsRepresentedAndRegistered(caseData)
@@ -575,7 +575,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     : format(LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()))
-             + exitSurveyContentService.applicantSurvey();
+                + exitSurveyContentService.applicantSurvey();
         }
     }
 

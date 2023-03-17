@@ -547,7 +547,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                        caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline))
-         + exitSurveyContentService.applicantSurvey();
+            + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {

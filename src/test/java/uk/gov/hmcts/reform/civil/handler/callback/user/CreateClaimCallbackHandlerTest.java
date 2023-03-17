@@ -1626,7 +1626,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
                 CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 String body = format(
@@ -1647,6 +1646,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3AndCOSIsOn() {
                 Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                Mockito.when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
