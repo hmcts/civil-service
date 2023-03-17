@@ -155,6 +155,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -543,7 +544,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
-                : format(LIP_CONFIRMATION_BODY, format("/cases/case-details/%s#CaseDocuments",
+                : format(LIP_CONFIRMATION_BODY, format(caseDocLocation,
                                                        caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline))
@@ -552,12 +553,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return format(CONFIRMATION_SUMMARY_PBA_V3, format("/cases/case-details/%s#CaseDocuments",
+            return format(CONFIRMATION_SUMMARY_PBA_V3, format(caseDocLocation,
                                                               caseData.getCcdCaseReference()),
                           format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
             return format(CONFIRMATION_SUMMARY,
-                          format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()));
+                          format(caseDocLocation, caseData.getCcdCaseReference()));
         }
     }
 
@@ -740,7 +741,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
                 : format(SPEC_LIP_CONFIRMATION_BODY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+            format(caseDocLocation, caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             claimIssueConfiguration.getN9aLink(),
             claimIssueConfiguration.getN9bLink(),
@@ -751,12 +752,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private String getSpecConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return format(SPEC_CONFIRMATION_SUMMARY_PBA_V3, format("/cases/case-details/%s#CaseDocuments",
+            return format(SPEC_CONFIRMATION_SUMMARY_PBA_V3, format(caseDocLocation,
                                                               caseData.getCcdCaseReference()),
                           format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
             return format(SPEC_CONFIRMATION_SUMMARY,
-                          format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()));
+                          format(caseDocLocation, caseData.getCcdCaseReference()));
         }
     }
 

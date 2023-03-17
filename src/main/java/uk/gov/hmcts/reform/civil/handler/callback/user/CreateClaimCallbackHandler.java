@@ -141,6 +141,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CourtLocationUtils courtLocationUtils;
 
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -565,7 +566,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 (areRespondentsRepresentedAndRegistered(caseData)
                     ? getConfirmationSummary(caseData)
                     : format(LIP_CONFIRMATION_BODY_COS,
-                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                format(caseDocLocation, caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()))
                 + exitSurveyContentService.applicantSurvey();
         } else {
@@ -573,7 +574,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 (areRespondentsRepresentedAndRegistered(caseData)
                     ? getConfirmationSummary(caseData)
                     : format(LIP_CONFIRMATION_BODY,
-                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                format(caseDocLocation, caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()))
                 + exitSurveyContentService.applicantSurvey();
         }
@@ -581,12 +582,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private String getConfirmationSummary(CaseData caseData) {
         if (toggleService.isPbaV3Enabled()) {
-            return format(CONFIRMATION_SUMMARY_PBA_V3, format("/cases/case-details/%s#CaseDocuments",
+            return format(CONFIRMATION_SUMMARY_PBA_V3, format(caseDocLocation,
                            caseData.getCcdCaseReference()),
                           format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
             return format(CONFIRMATION_SUMMARY,
-                   format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()));
+                   format(caseDocLocation, caseData.getCcdCaseReference()));
         }
     }
 
