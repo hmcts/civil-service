@@ -110,9 +110,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -777,4 +779,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getBreathing().getLift() == null;
     }
 
+    @JsonIgnore
+    public boolean isRejectDefendantPaymentPlanYes() {
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
+        );
+
+        return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isRejectDefendantPaymentPlanNo() {
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
+        );
+
+        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
 }
