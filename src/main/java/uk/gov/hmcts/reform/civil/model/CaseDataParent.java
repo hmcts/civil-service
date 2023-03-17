@@ -142,6 +142,9 @@ public class CaseDataParent implements MappableObject {
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
 
+    @JsonUnwrapped
+    private final Mediation mediation;
+
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
