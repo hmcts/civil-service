@@ -18,12 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isDefendant1;
 
 @Service
@@ -53,25 +51,24 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private CallbackResponse notifyDefendantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient = caseData.getRespondentSolicitor1EmailAddress();
-        if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)
-            || getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+
+        if (isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
             sendEmail(caseData, recipient, true);
         } else {
-            String recipient2 = caseData.getRespondentSolicitor2EmailAddress();
-            sendEmail(caseData, recipient, true);
-            sendEmail(caseData, recipient2, false);
+            if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
+                recipient = caseData.getRespondentSolicitor2EmailAddress();
+            }
+            sendEmail(caseData, recipient, false);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
     private void sendEmail(CaseData caseData, String recipient, boolean isFirst) {
-        String defRefNumber;
+        String defRefNumber = "";
         if (isFirst) {
-            if (caseData.getSolicitorReferences() == null
-                || caseData.getSolicitorReferences().getRespondentSolicitor1Reference() == null) {
-                defRefNumber = "";
-            } else {
+            if (nonNull(caseData.getSolicitorReferences())
+                && nonNull(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())) {
                 defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
             }
         } else {

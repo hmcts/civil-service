@@ -32,12 +32,12 @@ public class NotificationUtils {
         //NO-OP
     }
 
-    public static Boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
+    public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return caseEvent.equals(matchEvent);
     }
 
-    public static Boolean isDefendant1(CallbackParams callbackParams, CaseEvent matchEvent) {
+    public static boolean isDefendant1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return caseEvent.equals(matchEvent);
     }
