@@ -9,7 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.access.ApplicantAccess;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -125,6 +127,9 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @CCD(
+        access = {ApplicantAccess.class}
+    )
     private final Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final CaseState ccdState;
@@ -160,10 +165,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
+    @CCD(
+        access = {ApplicantAccess.class}
+    )
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
+    @JsonUnwrapped
+    @CCD(
+        access = {ApplicantAccess.class}
+    )
+    private PartySpec applicant1Spec;
     private final Party applicant1;
     private final Party applicant2;
     private final CorrectEmail applicantSolicitor1CheckEmail;
@@ -196,6 +209,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     private final StatementOfTruth uiStatementOfTruth;
+    @CCD(
+        access = {ApplicantAccess.class}
+    )
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
