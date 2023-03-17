@@ -252,8 +252,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
-                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
+            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+                dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
             builder.applicant1DQ(dq.build());
@@ -503,7 +504,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>(1);
 
-        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+        if (checkPastDateValidation(
+            caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate())) {
             errors.add("Enter a date that is today or in the future");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
