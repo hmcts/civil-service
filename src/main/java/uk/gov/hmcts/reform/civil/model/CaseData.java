@@ -774,7 +774,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getBreathing().getLift() == null;
     }
 
-
     @JsonIgnore
     public boolean isRejectDefendantPaymentPlanYes() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
