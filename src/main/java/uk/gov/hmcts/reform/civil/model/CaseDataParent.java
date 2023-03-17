@@ -142,6 +142,9 @@ public class CaseDataParent implements MappableObject {
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
 
+    @JsonUnwrapped
+    private final Mediation mediation;
+
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
@@ -331,7 +334,7 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
-    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    private final PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;

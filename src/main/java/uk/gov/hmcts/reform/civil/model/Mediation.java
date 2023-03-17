@@ -14,4 +14,5 @@ import java.time.LocalDate;
 public class Mediation {
 
     private LocalDate mediationSettlementAgreedAt;
+    private String unsuccessfulMediationReason;
 }
