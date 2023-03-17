@@ -57,12 +57,16 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
        CaseData updatedData = getUpdatedCaseData(callbackParams);
 
-       AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder = AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
-       String responseLanguage =  Optional.ofNullable(updatedData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).orElse(null);
+           AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+               AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!Language.BOTH.equals(responseLanguage)) {
-            responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
-        }
+           String responseLanguage =  Optional.ofNullable(updatedData.getCaseDataLiP()
+                                                              .getRespondent1LiPResponse()
+                                                              .getRespondent1ResponseLanguage()).orElse(null);
+
+            if (!Language.BOTH.equals(responseLanguage)) {
+                responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            }
 
         return responseBuilder.build();
     }
