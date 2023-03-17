@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateSDORespondent2NotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
@@ -136,8 +135,11 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED").build()).build())).isEqualTo(TASK_ID);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                 .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED")
+                                                              .build()).build()))
+            .isEqualTo(CreateSDORespondent1NotificationHandler.TASK_ID_2);
     }
 }
 
