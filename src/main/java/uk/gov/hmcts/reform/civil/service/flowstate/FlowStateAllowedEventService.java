@@ -284,7 +284,10 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -310,7 +313,10 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -336,7 +342,10 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 

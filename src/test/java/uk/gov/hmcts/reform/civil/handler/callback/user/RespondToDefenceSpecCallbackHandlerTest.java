@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -857,9 +858,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenPastPaymentDate() {
+            PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
+                .paymentSetDate(LocalDate.now().minusDays(15)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().minusDays(15))
+                .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -868,9 +871,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_whenFuturePaymentDate() {
+            PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
+                .paymentSetDate(LocalDate.now().plusDays(15)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().plusDays(15))
+                .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
