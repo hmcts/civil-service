@@ -149,6 +149,26 @@ To publish your contracts:
 ```
 git config --local core.hooksPath .git-config/hooks
 ```
+Once the above is done, you will be required to follow specific conventions for your commit messages and branch names.
+
+If you violate a convention, the git error message will report clearly the convention you should follow and provide
+additional information where necessary.
+
+*Optional:*
+* Install this plugin in Chrome: https://github.com/refined-github/refined-github
+
+  It will automatically set the title for new PRs according to the first commit message, so you won't have to change it manually.
+
+  Note that it will also alter other behaviours in GitHub. Hopefully these will also be improvements to you.
+
+*In case of problems*
+
+1. Get in touch with your Technical Lead so that they can get you unblocked
+2. If the rare eventuality that the above is not possible, you can disable enforcement of conventions using the following command
+
+   `git config --local --unset core.hooksPath`
+
+   Still, you shouldn't be doing it so make sure you get in touch with a Technical Lead soon afterwards.
 
 ## License
 
