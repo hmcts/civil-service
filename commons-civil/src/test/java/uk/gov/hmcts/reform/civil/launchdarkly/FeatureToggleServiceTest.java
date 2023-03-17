@@ -198,6 +198,7 @@ class FeatureToggleServiceTest {
         );
     }
 
+    @Test
     void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         //givenToggle(pbaV3Key, true);
