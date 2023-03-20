@@ -9,17 +9,17 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 
 import java.io.IOException;
 import java.util.List;

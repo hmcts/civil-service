@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 
@@ -31,10 +32,8 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
         try {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
         } catch (Exception ex) {
-            log.error(
-                "Payment callback is unsuccessful for the CaseID: {}",
-                serviceRequestUpdateDto.getCcdCaseNumber()
-            );
+            log.error("Payment callback is unsuccessful for the CaseID: {}", serviceRequestUpdateDto.getCcdCaseNumber(), ex);
+            throw new InternalServerErrorException(ex);
         }
     }
 

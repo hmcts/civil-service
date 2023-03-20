@@ -72,8 +72,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -109,9 +109,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -699,6 +701,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
     private final Flags caseFlags;
+    private final String caseProgAllocatedTrack;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
@@ -771,4 +774,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getBreathing().getLift() == null;
     }
 
+    @JsonIgnore
+    public boolean isRejectDefendantPaymentPlanYes() {
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
+        );
+
+        return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isRejectDefendantPaymentPlanNo() {
+        Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
+        );
+
+        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
 }

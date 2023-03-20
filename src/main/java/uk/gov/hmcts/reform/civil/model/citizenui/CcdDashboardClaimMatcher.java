@@ -36,7 +36,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasResponseFullAdmit() {
-        return  RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
+        return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean hasResponseDeadlineBeenExtended() {
+    public boolean responseDeadlineHasBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 

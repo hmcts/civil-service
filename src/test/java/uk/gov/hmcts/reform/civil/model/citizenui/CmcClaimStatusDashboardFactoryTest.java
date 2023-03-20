@@ -33,13 +33,13 @@ import static org.mockito.Mockito.mockStatic;
 public class CmcClaimStatusDashboardFactoryTest {
 
     @InjectMocks
-    private DashboardClaimStatusFactory cmcClaimStatusDashboardFactory;
+    private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
         CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10)).build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.NO_RESPONSE);
     }
 
@@ -48,7 +48,7 @@ public class CmcClaimStatusDashboardFactoryTest {
         CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.of(2022, 2, 2))
             .build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
     }
 
@@ -60,7 +60,7 @@ public class CmcClaimStatusDashboardFactoryTest {
             CmcClaim claim = CmcClaim.builder()
                 .responseDeadline(now.toLocalDate())
                 .build();
-            DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+            DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
             assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_DUE_NOW);
         }
     }
@@ -70,28 +70,28 @@ public class CmcClaimStatusDashboardFactoryTest {
         CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
             .moreTimeRequested(true).build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.MORE_TIME_REQUESTED);
     }
 
     @Test
     void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediately() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.IMMEDIATELY);
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY);
     }
 
     @Test
     void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnAdmitPayBySetDate() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.BY_SPECIFIED_DATE);
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE);
     }
 
     @Test
     void given_responseAdmitPayByInstallments_whenGetStatus_thenReturnAdmitPayByInstallments() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.INSTALMENTS);
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS);
     }
 
@@ -103,7 +103,7 @@ public class CmcClaimStatusDashboardFactoryTest {
             .moneyReceivedOn(LocalDate.now())
             .countyCourtJudgmentRequestedAt(LocalDateTime.now())
             .build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID);
     }
 
@@ -115,7 +115,7 @@ public class CmcClaimStatusDashboardFactoryTest {
             .moneyReceivedOn(LocalDate.now())
             .build();
 
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLED);
     }
 
@@ -126,7 +126,7 @@ public class CmcClaimStatusDashboardFactoryTest {
             .response(Response.builder().build())
             .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.ACCEPTATION).build())
             .build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLED);
     }
 
@@ -137,7 +137,7 @@ public class CmcClaimStatusDashboardFactoryTest {
             .response(Response.builder().build())
             .state(ClaimState.TRANSFERRED).build();
 
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.TRANSFERRED);
     }
 
@@ -149,10 +149,9 @@ public class CmcClaimStatusDashboardFactoryTest {
             .claimantResponse(ClaimantResponse.builder().build())
             .countyCourtJudgmentRequestedAt(LocalDateTime.now())
             .build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
-
     @Test
     void given_claimantHasRequestedRedetermination_whenGetStatus_thenReturnRequestCCJByRedetermination() {
         CmcClaim claim = CmcClaim.builder()
