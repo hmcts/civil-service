@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidays;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidaysApi;
