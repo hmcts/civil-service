@@ -56,7 +56,6 @@ public class HearingValuesService {
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final OrganisationService organisationService;
-    private final EntityRoleService entityRoleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
         CaseData caseData = retrieveCaseData(caseId);
@@ -91,7 +90,7 @@ public class HearingValuesService {
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
             .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService, entityRoleService, authToken))
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
