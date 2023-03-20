@@ -240,6 +240,13 @@ task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
 }
 
+task runAllApiTests(type: Exec, description: 'Runs ALL Api tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-all'
+}
+
 task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
@@ -296,9 +303,8 @@ task smoke(description: 'Runs the smoke tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSmokeTests))
 }
 
-task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests))
+task functional(description: 'Runs the API (functional) tests.') {
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runAllApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
