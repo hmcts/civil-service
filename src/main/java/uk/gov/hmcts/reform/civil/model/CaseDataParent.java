@@ -393,7 +393,4 @@ public class CaseDataParent implements MappableObject {
 
     private final IdamUserDetails claimantUserDetails;
 
-    @JsonUnwrapped
-    private final Mediation mediation;
-
 }
