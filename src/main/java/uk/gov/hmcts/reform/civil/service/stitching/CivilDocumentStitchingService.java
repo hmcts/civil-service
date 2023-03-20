@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
@@ -29,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocu
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class CivilDocumentStitchingService implements DocumentStitcher {
 
     private final BundleRequestExecutor bundleRequestExecutor;
@@ -43,7 +41,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String bundleFilename,
         CaseData caseData
     ) {
-        CaseDocument caseDocument = null;
         CaseDetails payload =
             createBundlePayload(
                 documents,
@@ -52,43 +49,46 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 caseData
             );
         log.info("Calling stitching api end point for {}", caseData.getLegacyCaseReference());
-        CaseData caseData1 =
+        CaseData caseDataFromBundlePayload =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
                 stitchingConfiguration.getStitchingUrl(),
                 authorisation
             );
         log.info("Called stitching api end point for {}", caseData.getLegacyCaseReference());
-        if (caseData1 != null) {
-            Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
+        if(caseDataFromBundlePayload == null) {
+            log.info("Case data is null----------");
+            return null;
+        } else {
+            Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
 
             log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(),
                          caseData.getLegacyCaseReference());
-            if (stitchedDocument.isPresent()) {
-                Document document = stitchedDocument.get();
-                String documentUrl = document.getDocumentUrl();
-                String documentBinaryUrl = document.getDocumentBinaryUrl();
-                caseDocument = CaseDocument.builder()
-                    .documentLink(Document.builder()
-                                      .documentUrl(documentUrl)
-                                      .documentBinaryUrl(documentBinaryUrl)
-                                      .documentFileName(document.getDocumentFileName())
-                                      .build())
-                    .documentName("Stitched document")
-                    .documentType(SEALED_CLAIM)
-                    .createdDatetime(LocalDateTime.now())
-                    .createdBy(CREATED_BY)
-                    .build();
-            } else {
-                log.info("stitchedDocument is not present----------");
-            }
-        } else {
-            log.info("Case data is null----------");
+                return retrieveCaseDocument(stitchedDocument);
         }
-
-        return caseDocument;
     }
 
+    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument){
+        if(stitchedDocument.isEmpty()){
+            log.info("stitchedDocument is not present----------");
+            return null;
+        } else {
+            Document document = stitchedDocument.get();
+            String documentUrl = document.getDocumentUrl();
+            String documentBinaryUrl = document.getDocumentBinaryUrl();
+            return CaseDocument.builder()
+                .documentLink(Document.builder()
+                                  .documentUrl(documentUrl)
+                                  .documentBinaryUrl(documentBinaryUrl)
+                                  .documentFileName(document.getDocumentFileName())
+                                  .build())
+                .documentName("Stitched document")
+                .documentType(SEALED_CLAIM)
+                .createdDatetime(LocalDateTime.now())
+                .createdBy(CREATED_BY)
+                .build();
+        }
+    }
     private CaseDetails createBundlePayload(
         List<DocumentMetaData> documents,
         String bundleTitle,
@@ -134,23 +134,9 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             )
         ));
 
-        List<Bundle> bundleList = new ArrayList<>();
-        bundleList.add(
-            new Bundle(
-                "1",
-                bundleTitle,
-                "",
-                "yes",
-                bundleDocuments,
-                bundleFilename
-            )
-        );
         caseDataBuilder.caseBundles(idValueList);
         caseDataBuilder.caseDocuments(caseDocuments);
         caseDataBuilder.caseDocument1Name(bundleFilename);
-
-        Map<String, Object> data = Map.of("case_details", caseDataBuilder.build().toMap(
-            objectMapper));
 
         return CaseDetails.builder().id(caseData.getCcdCaseReference())
             .data(caseDataBuilder.build().toMap(
