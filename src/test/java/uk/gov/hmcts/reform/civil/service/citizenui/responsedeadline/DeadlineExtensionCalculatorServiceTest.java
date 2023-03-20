@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.service.WorkingDayIndicator;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
 

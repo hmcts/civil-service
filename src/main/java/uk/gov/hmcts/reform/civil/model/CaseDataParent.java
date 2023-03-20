@@ -37,8 +37,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -141,6 +141,9 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
+
+    @JsonUnwrapped
+    private final Mediation mediation;
 
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
@@ -263,7 +266,6 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
-    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
@@ -280,6 +282,7 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
+
     /**
      * This field is not used.
      *
@@ -331,7 +334,7 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
-    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    private final PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
@@ -359,7 +362,7 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return  this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == YesOrNo.NO;
     }
 
     /**
@@ -378,6 +381,13 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
+
+    @JsonIgnore
+    public boolean isResponseAcceptedByClaimant() {
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
+            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
+            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    }
 
     private final IdamUserDetails claimantUserDetails;
 
