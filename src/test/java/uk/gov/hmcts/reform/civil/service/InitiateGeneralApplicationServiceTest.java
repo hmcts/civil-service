@@ -330,39 +330,39 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
             assertThat(service.respondentAssigned(caseData)).isFalse();
         }
+    }
 
-        private List<CaseAssignedUserRole> onlyApplicantSolicitorAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE)
-            );
-        }
+    public List<CaseAssignedUserRole> onlyApplicantSolicitorAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent1SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent1SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent2SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent2SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent1Respondent2SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE),
-                    getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent1Respondent2SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE),
+            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+        );
+    }
 
-        private CaseAssignedUserRole getCaseAssignedUserRole(String userId, CaseRole caseRole) {
-            return CaseAssignedUserRole.builder().caseDataId("1").userId(userId)
-                    .caseRole(caseRole.getFormattedName()).build();
-        }
+    public CaseAssignedUserRole getCaseAssignedUserRole(String userId, CaseRole caseRole) {
+        return CaseAssignedUserRole.builder().caseDataId("1").userId(userId)
+            .caseRole(caseRole.getFormattedName()).build();
     }
 
     public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
@@ -820,8 +820,16 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseData(CaseDataBuilder.builder().build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build());
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        builder.applicant1OrganisationPolicy(OrganisationPolicy
+                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+            .id("org1Sol1").build());
         assertTrue(result);
     }
 
@@ -830,8 +838,17 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseData(CaseDataBuilder.builder().build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, UserDetails.builder()
-            .email(DEFENDANT_EMAIL_ID_CONSTANT).build());
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        builder.applicant1OrganisationPolicy(OrganisationPolicy
+                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+            .id("org3Sol1").build());
+
         assertFalse(result);
     }
 
