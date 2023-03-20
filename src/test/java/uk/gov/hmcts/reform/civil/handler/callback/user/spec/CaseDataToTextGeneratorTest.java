@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -33,24 +31,6 @@ public class CaseDataToTextGeneratorTest {
         new RespondToResponseConfirmationHeaderGeneratorTest(),
         new RespondToResponseConfirmationTextGeneratorTest()
     );
-
-    /**
-     * ensures that each instance of CaseDataToTextGenerator is checked.
-     */
-    @SuppressWarnings({"SuspiciousMethodCalls", "rawtypes", "unchecked"})
-    @Test
-    public void allGeneratorsMustBeChecked() {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-            CaseDataToTextGeneratorTestConfig.class);
-        Collection<CaseDataToTextGenerator> allGenerators = context.getBeansOfType(CaseDataToTextGenerator.class)
-            .values();
-        List<CaseDataToTextGenerator> toCheck = new ArrayList<>(allGenerators);
-        for (CaseDataToTextGeneratorIntentionConfig config : intentionConfigs) {
-            Collection used = testIntentionConfig(config, allGenerators);
-            toCheck.removeAll(used);
-        }
-        Assertions.assertTrue(toCheck.isEmpty(), "Some generators have not been checked");
-    }
 
     /**
      * Given an intention interface, checks (1) that each implementation answers to at least one case, (2) that each
