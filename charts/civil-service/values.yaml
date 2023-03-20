@@ -7,6 +7,9 @@ xui-webapp:
 
 camunda-bpm:
   enabled: false
+
+aac-manage-case-assignment:
+  enabled: false
 ccd:
   enabled: false
 java:
