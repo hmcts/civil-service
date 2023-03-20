@@ -4,9 +4,6 @@ import org.camunda.bpm.extension.rest.EnableCamundaRestClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 @SpringBootApplication(
     scanBasePackages = {"uk.gov.hmcts.ccd.sdk", "uk.gov.hmcts.reform.civil.model"}
@@ -29,10 +26,10 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
+    /*@Bean
     public RestTemplate getRestTemplate() {
         return new RestTemplate();
-    }
+    }*
 
     /*@Bean
     public AuthTokenGenerator generator() {
@@ -44,9 +41,9 @@ public class Application {
         };
     }*/
 
-    @Bean
+    /* @Bean
     public AuthTokenGenerator generator() {
         return () -> null;
-    }
+    } */
 
 }
