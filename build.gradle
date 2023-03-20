@@ -15,7 +15,7 @@ plugins {
 
 }
 ccd {
-  configDir = file('build/ccd-definition')
+  configDir = file('build/ccd-definitionIndu')
 }
 
 
