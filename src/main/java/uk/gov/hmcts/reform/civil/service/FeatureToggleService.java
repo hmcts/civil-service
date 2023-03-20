@@ -17,63 +17,63 @@ public class FeatureToggleService {
     }
 
     public boolean isRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
+        return true;
     }
 
     public boolean isSpecRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
+        return true;
     }
 
     public boolean isGlobalSearchEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
+        return true;
     }
 
     public boolean isSdoEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
+        return false;
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
+        return false;
     }
 
     public boolean isHearingAndListingSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-sdo");
+        return false;
     }
 
     public boolean isHearingAndListingLegalRepEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
+        return false;
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return true;
     }
 
     public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return false;
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return false;
     }
 
     public boolean isSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
     }
 
     public boolean isCertificateOfServiceEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("isCertificateOfServiceEnabled");
+        return false;
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
 }
