@@ -11,15 +11,21 @@ plugins {
   id "io.freefair.lombok" version "5.3.3.3"
   id "org.flywaydb.flyway" version "9.0.1"
   id 'net.ltgt.apt' version '0.21'
+  id 'hmcts.ccd.sdk' version '5.2.4'
+
 }
+ccd {
+  configDir = file('build/ccd-definition')
+}
+
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 allprojects {
 
-  sourceCompatibility = '11'
-  targetCompatibility = '11'
+  //sourceCompatibility = '11'
+  //targetCompatibility = '11'
 
   apply plugin: 'java'
   apply plugin: 'jacoco'
