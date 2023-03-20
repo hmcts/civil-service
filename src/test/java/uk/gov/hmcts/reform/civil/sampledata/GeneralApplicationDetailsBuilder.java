@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -58,7 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -103,8 +103,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -164,15 +162,13 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -231,8 +227,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalApplications(wrapElements(getGeneralApplication()))
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -370,8 +364,6 @@ public class GeneralApplicationDetailsBuilder {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalApplications(wrapElements(getGeneralApplication()))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -471,8 +463,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -623,8 +613,6 @@ public class GeneralApplicationDetailsBuilder {
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -720,8 +708,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -820,8 +806,6 @@ public class GeneralApplicationDetailsBuilder {
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                         .id(STRING_CONSTANT)
@@ -917,8 +901,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -1023,8 +1005,6 @@ public class GeneralApplicationDetailsBuilder {
                                           .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                                           .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .id(STRING_CONSTANT)
@@ -1061,8 +1041,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1150,8 +1128,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBA_ACCOUNTS)
-                        .pbaReference(STRING_CONSTANT)
                         .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(10800L))
                                 .version("1").build())
                         .build())
@@ -1331,8 +1307,6 @@ public class GeneralApplicationDetailsBuilder {
                         .hasAgreed(NO)
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
-                        .applicantsPbaAccounts(PBALIST)
-                        .pbaReference(STRING_CONSTANT)
                         .build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)

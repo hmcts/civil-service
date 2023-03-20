@@ -19,7 +19,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -34,14 +35,15 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -50,7 +52,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Slf4j
 @Service
@@ -137,6 +140,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -276,7 +281,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
 
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBA("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
@@ -469,22 +476,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
+
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private String getAllPartyNames(CaseData caseData) {
-        return format("%s%s V %s%s",
-                      caseData.getApplicant1().getPartyName(),
-                      YES.equals(caseData.getAddApplicant2())
-                          ? ", " + caseData.getApplicant2().getPartyName() : "",
-                      caseData.getRespondent1().getPartyName(),
-                      YES.equals(caseData.getAddRespondent2())
-                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -647,7 +645,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                   .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());

@@ -87,6 +87,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       free: CopyPagesUpTo10
+      appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -250,6 +251,11 @@ stitching:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
 
+bundle:
+  api:
+    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/"
+  config: ${BUNDLE_CONFIG:caseprogression-bundle-config.yaml}
+
 http:
   client:
     readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
@@ -363,6 +369,10 @@ rd_professional:
   api:
     url: http://localhost:8765
 
+rd_commondata:
+  api:
+    url: http://localhost:8765
+
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
@@ -448,6 +458,10 @@ rd_professional:
   api:
     url: http://fake-prd-api
 
+rd_commondata:
+  api:
+    url: http://fake-prd-api
+
 sendgrid:
   api-key: fake-key
 ---
@@ -462,4 +476,3 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
-

@@ -24,28 +24,31 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
-import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,11 +72,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -91,6 +96,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
 
     @Override
@@ -175,7 +181,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
-        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
+            caseData));
 
         return updatedCaseData.build();
     }
@@ -246,14 +253,39 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
-                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
+            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+                dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+
+        if (caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant1DQ().getSmallClaimExperts());
+            builder.applicant1DQ(
+                builder.build().getApplicant1DQ().toBuilder()
+                    .applicant1DQExperts(Experts.builder()
+                                             .details(wrapElements(expert))
+                                             .build())
+                    .build());
+        }
+
+        if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ().getSmallClaimExperts() != null) {
+            Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant2DQ().getSmallClaimExperts());
+            builder.applicant2DQ(
+                builder.build().getApplicant2DQ().toBuilder()
+                    .applicant2DQExperts(Experts.builder()
+                                             .details(wrapElements(expert))
+                                             .build())
+                    .build());
+        }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -290,7 +322,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                             .responseCourtLocations(null)
-                            .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                            .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                             .responseCourtCode(courtLocation.getCourtLocationCode()).build()
                     ).build());
             }
@@ -312,7 +344,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 Applicant1DQ.builder().applicant1DQRequestedCourt(
                     RequestedCourt.builder().responseCourtLocations(
                         courtLocationUtils.getLocationsFromList(locations)).build()
-                    ).build());
+                ).build());
         }
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
@@ -473,7 +505,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>(1);
 
-        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+        if (checkPastDateValidation(
+            caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate())) {
             errors.add("Enter a date that is today or in the future");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -553,9 +586,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
-        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(
+            caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal subTotal = claimAmount.add(claimFee).add(caseData.getTotalInterest());
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
         updatedCaseData.ccjJudgmentAmountClaimAmount(claimAmount);
