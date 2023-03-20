@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -55,18 +57,19 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-       CaseData updatedData = getUpdatedCaseData(callbackParams);
+        CaseData updatedData = getUpdatedCaseData(callbackParams);
 
-           AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
                AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-           String responseLanguage =  Optional.ofNullable(updatedData.getCaseDataLiP()
-                                                              .getRespondent1LiPResponse()
-                                                              .getRespondent1ResponseLanguage()).orElse(null);
+        String responseLanguage = Optional.ofNullable(updatedData.getCaseDataLiP())
+                                                     .map(CaseDataLiP::getRespondent1LiPResponse)
+                                                     .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                                                     .orElse(null);
 
-            if (!Language.BOTH.equals(responseLanguage)) {
-                responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
-            }
+        if (responseLanguage != null  && !Language.BOTH.toString().equals(responseLanguage)) {
+            responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
 
         return responseBuilder.build();
     }
