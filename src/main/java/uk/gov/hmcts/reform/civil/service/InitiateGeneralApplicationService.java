@@ -293,7 +293,7 @@ public class InitiateGeneralApplicationService {
     }
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
-        return helper.isGAApplicantSameAsPCClaimant(caseData, userDetails);
+        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
     }
 
     private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
