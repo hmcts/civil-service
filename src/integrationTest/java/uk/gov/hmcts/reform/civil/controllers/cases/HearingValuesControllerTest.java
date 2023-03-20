@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -28,7 +28,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
         ServiceHearingValuesModel expectedHearingValues =
             ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
 
-        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenReturn(expectedHearingValues);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
@@ -41,7 +41,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp400() {
-        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(CaseNotFoundException.class);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();

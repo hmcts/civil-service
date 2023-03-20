@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 public class BundleDocument implements MappableObject {
 

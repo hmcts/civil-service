@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ScreenFlowMappe
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class
 })
+
 public class HearingValuesServiceTest {
 
     @Mock
