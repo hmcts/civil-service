@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -9,6 +10,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -159,5 +162,12 @@ public class CaseFlagUtils {
             updatedData.applicantWitnesses(getTopLevelFieldForWitnessesWithFlagsStructure(applicant1Witnesses, APPLICANT_SOLICITOR_WITNESS));
             updatedData.applicantExperts(getTopLevelFieldForExpertsWithFlagsStructure(applicant1Experts, APPLICANT_SOLICITOR_EXPERT));
         }
+    }
+
+    @SafeVarargs
+    public static List<FlagDetail> filter(List<FlagDetail> flagDetails, Predicate<FlagDetail>... predicates) {
+        return flagDetails.stream()
+            .filter(List.of(predicates).stream().reduce(Predicate::and).orElse(x -> true))
+            .collect(Collectors.toList());
     }
 }
