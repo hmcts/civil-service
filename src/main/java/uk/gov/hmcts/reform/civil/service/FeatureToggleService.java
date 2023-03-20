@@ -72,6 +72,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("isCertificateOfServiceEnabled");
     }
 
+    public boolean isRPAEmailEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+    }
+
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
     }

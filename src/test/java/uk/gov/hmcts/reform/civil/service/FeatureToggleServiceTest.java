@@ -156,6 +156,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
+        var enableRPAEmailsKey = "enable-rpa-emails";
+        givenToggle(enableRPAEmailsKey, toggleStat);
+
+        assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
