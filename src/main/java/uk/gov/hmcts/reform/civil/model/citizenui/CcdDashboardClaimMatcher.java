@@ -59,7 +59,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean hasResponseDeadlineHasBeenExtended() {
+    public boolean hasResponseDeadlineBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 

@@ -28,7 +28,7 @@ public enum DashboardClaimStatus {
         Claim::isEligibleForCCJ
     ),
     MORE_TIME_REQUESTED(
-        Claim::hasResponseDeadlineHasBeenExtended
+        Claim::hasResponseDeadlineBeenExtended
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
