@@ -44,6 +44,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
         CaseData caseData = callbackParams.getCaseData();
         try {
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+                caseData = helperService.updateApplicationLocationDetailsInClaim(caseData);
                 helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
             }
         } catch (Exception e) {
