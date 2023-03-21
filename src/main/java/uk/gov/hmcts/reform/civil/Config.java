@@ -14,9 +14,8 @@ public class Config implements CCDConfig<CaseData, CaseState, UserRole> {
     public void configure(ConfigBuilder<CaseData, CaseState, UserRole> builder) {
         builder.caseType("CIVIL", "Civil", "Civil");
         builder.jurisdiction("CIVIL", "Civil", "Civil Jurisdiction");
-        builder.setCallbackHost(System.getenv().getOrDefault("API_URL", "http://localhost:3333"));
-        // builder.shutterService(UserRole.SOLICITOR);
-        // builder.shutterService(UserRole.SOLICITOR);
+        builder.setCallbackHost(System.getenv().getOrDefault("API_URL", "http://localhost:4013"));
+
     }
 
 }

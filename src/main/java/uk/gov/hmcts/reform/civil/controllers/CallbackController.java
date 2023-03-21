@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 
 @Api
 @Slf4j
-@RestController
+@RestController("CivilController")
 @AllArgsConstructor
 @RequestMapping(
     path = "/cases/callbacks",

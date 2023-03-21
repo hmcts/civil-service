@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 set -ex
-
+echo "hiya"
 dir=$(dirname ${0})
 
-if [[ ($# -ne 3) && ($# -ne 5) ]]; then
-  echo "Usage: ./import-ccd-definition [-e 'UserProfile.json,*-nonprod.json'] - the -e argument is optional, "\
-  "if provided the files matching the provided patterns will be excluded from processing."
-  exit 1
-fi
 
-definition_input_dir=${1}
-definition_output_file=${2}
+echo "111111"
+#definition_input_dir=${1}
+#definition_output_file=${2}
+definition_input_dir='/home/elfasij/workspace/HMCTS-Damages/civil-service/build/ccd-definitionIndu'
+definition_output_file='/home/elfasij/workspace/HMCTS-Damages/civil-service/build/ccd-development-config/ccd-civil-dev.xlsx'
+echo "22222"
 additionalParameters="${@:3}"
+echo "333333"
 
 echo "Definition directory: ${definition_input_dir}"
 echo "Definition spreadsheet ${definition_output_file}"
