@@ -525,28 +525,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
     }
 
-    @Test
-    void shouldReturnsTrueifClaimantIDMatchesWithLogin() {
-
-        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
-
-        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
-        )).isEqualTo(true);
-    }
-
-    @Test
-    void shouldReturnsfalseifClaimantIDMatchesWithLogin() {
-
-        CaseData caseData = getTestCaseData(CaseData.builder().build(), true);
-
-        assertThat(helper.isPCClaimantEmailIDSameAsLoginUser(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getUserDetails(STRING_NUM_CONSTANT, TEST_USER_EMAILID)
-        )).isEqualTo(false);
-    }
-
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
@@ -578,18 +556,18 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .generalApplications(ElementUtils.wrapElements(getGeneralApplication()))
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
                         .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                   .organisation(Organisation.builder()
                                                                      .organisationID(STRING_CONSTANT).build())
                                                    .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
@@ -611,16 +589,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                  .organisation(Organisation.builder()
                                                                     .organisationID(STRING_CONSTANT).build())
                                                   .orgPolicyReference(STRING_CONSTANT).build())
                 .generalApplications(ElementUtils.wrapElements(getGeneralApplication()))
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                   .organisation(Organisation.builder()
                                                                      .organisationID(STRING_CONSTANT).build())
                                                    .orgPolicyReference(STRING_CONSTANT).build())
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                   .organisation(Organisation.builder()
                                                                      .organisationID(STRING_CONSTANT).build())
                                                    .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,9 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChangeOfRepresentationNotificationHandler extends CallbackHandler implements NotificationData {
 
@@ -38,6 +40,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     public static final String TASK_ID_NOTIFY_FORMER_SOLICITOR = "NotifyFormerSolicitor";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_1 = "NotifyOtherSolicitor1";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_2 = "NotifyOtherSolicitor2";
+
+    private static final String LITIGANT_IN_PERSON = "LiP";
 
     private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
@@ -83,11 +87,13 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
+        log.info("Sending NoC notification email");
         notificationService.sendMail(
             getRecipientEmail(caseData),
             getTemplateId(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
+        log.info("NoC email sent successfully");
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -123,19 +129,26 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
-            FORMER_SOL,
-            caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null
-                ? getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()) : "LiP",
+            FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, event.equals(NOTIFY_OTHER_SOLICITOR_2)
-                ? getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData)) :
-                getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)));
+            OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event));
     }
 
     private String getOrganisationName(String orgToName) {
-        return organisationService.findOrganisationById(orgToName).orElseThrow(() -> {
-            throw new CallbackException("Organisation is not valid for: " + orgToName);
-        }).getName();
+        if (orgToName != null) {
+            return organisationService.findOrganisationById(orgToName).orElseThrow(() -> {
+                throw new CallbackException("Organisation is not valid for: " + orgToName);
+            }).getName();
+        }
+        return LITIGANT_IN_PERSON;
+    }
+
+    private String getOtherSolicitorOrganisationName(CaseData caseData, CaseEvent event) {
+        if (event.equals(NOTIFY_OTHER_SOLICITOR_2)) {
+            return getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData));
+        } else {
+            return getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData));
+        }
     }
 
     private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {

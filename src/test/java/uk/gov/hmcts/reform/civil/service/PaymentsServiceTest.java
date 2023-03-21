@@ -10,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -21,8 +20,8 @@ import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -158,7 +158,7 @@ class PaymentsServiceTest {
     }
 
     @Test
-        void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+    void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
         SRPbaDetails hfPbaDetails = SRPbaDetails.builder()
@@ -173,6 +173,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
         caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService

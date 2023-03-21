@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Setter
 @Data
@@ -30,6 +30,7 @@ public class Applicant2DQ implements DQ {
     private HearingSupport applicant2DQHearingSupport;
     private FurtherInformation applicant2DQFurtherInformation;
     private WelshLanguageRequirements applicant2DQLanguage;
+    private WelshLanguageRequirements applicant2DQLanguageLRspec;
     private StatementOfTruth applicant2DQStatementOfTruth;
     private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
 
@@ -115,8 +116,9 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant2DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
-        return applicant2DQLanguage;
+        return applicant2DQLanguageLRspec;
     }
 
     @Override

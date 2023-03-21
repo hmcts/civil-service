@@ -15,10 +15,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
@@ -35,6 +34,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
@@ -623,7 +623,7 @@ class StateFlowEngineTest {
                     .defendant1LIPAtClaimIssued(YES)
                     .build().toBuilder()
                     .takenOfflineDate(null)
-                    .superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                    .caseAccessCategory(SPEC_CLAIM).build();
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -852,7 +852,7 @@ class StateFlowEngineTest {
                     .atStateClaimIssuedUnrepresentedDefendant2()
                     .defendant2LIPAtClaimIssued(YES)
                     .build().toBuilder()
-                    .superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                    .caseAccessCategory(SPEC_CLAIM).build();
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -956,7 +956,7 @@ class StateFlowEngineTest {
             void shouldReturnProceedsWithOfflineJourney_whenRespondentsNotRegisteredSpec() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build()
-                    .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                    .toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4214,7 +4214,7 @@ class StateFlowEngineTest {
         @Test
         void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
             CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .applicant1(Party.builder().build())
                 .respondent1(Party.builder().build())
                 .respondent2(Party.builder().build())
@@ -4297,7 +4297,7 @@ class StateFlowEngineTest {
 
         private CaseData.CaseDataBuilder<?, ?> claim1v1Submitted() {
             return CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .applicant1(Party.builder().build())
                 .respondent1(Party.builder().build())
                 .submittedDate(LocalDateTime.now());
@@ -4341,7 +4341,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseData.builder()
                 // spec claim
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 // claim submitted
                 .submittedDate(LocalDateTime.now())
                 .respondent1Represented(YES)
@@ -4377,7 +4377,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseData.builder()
                 // spec claim
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 // claim submitted
                 .submittedDate(LocalDateTime.now())
                 .respondent1Represented(YES)
@@ -4421,7 +4421,7 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseData.builder()
                 // spec claim
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 // claim submitted
                 .submittedDate(LocalDateTime.now())
                 .respondent1Represented(YES)
@@ -4471,7 +4471,7 @@ class StateFlowEngineTest {
                 .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
                 .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.defaults().build())
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .caseAccessCategory(SPEC_CLAIM).build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

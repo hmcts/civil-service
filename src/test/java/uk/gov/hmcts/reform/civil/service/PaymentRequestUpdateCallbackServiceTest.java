@@ -14,9 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -35,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
@@ -70,9 +69,7 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @BeforeEach
     public void setup() {
-
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
-        when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
     }
 
     @Test
@@ -107,7 +104,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
             .ccdState(PENDING_CASE_ISSUED)
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -171,7 +168,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                           .status(FAILED)
                                           .reference("REFERENCE")
                                           .build())
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .build();
 
         CaseDetails caseDetails = buildCaseDetails(caseData);

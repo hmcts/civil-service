@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,8 +49,6 @@ public class LocationRefSampleDataBuilder {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppEvidenceDocument(wrapElements(Document.builder()
                                                          .documentUrl(STRING_CONSTANT)
@@ -125,8 +123,6 @@ public class LocationRefSampleDataBuilder {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBA_ACCOUNTS)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -225,8 +221,6 @@ public class LocationRefSampleDataBuilder {
                                                .hasAgreed(NO)
                                                .build())
             .generalAppPBADetails(GAPbaDetails.builder()
-                                      .applicantsPbaAccounts(PBALIST)
-                                      .pbaReference(STRING_CONSTANT)
                                       .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)

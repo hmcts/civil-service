@@ -55,7 +55,7 @@ class DefendantPinToPostLRspecServiceTest {
             assertThat(defendantPinToPostLRspec.getExpiryDate())
                 .isEqualTo(getDate180days());
             assertThat(defendantPinToPostLRspec.getRespondentCaseRole())
-                .isEqualTo(CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName());
+                .isEqualTo(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
             assertThat(defendantPinToPostLRspec.getAccessCode())
                 .isNotEmpty();
         }

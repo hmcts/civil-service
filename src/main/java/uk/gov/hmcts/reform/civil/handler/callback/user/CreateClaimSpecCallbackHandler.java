@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -54,7 +55,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,12 +75,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -154,6 +153,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -163,8 +163,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
             .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
@@ -227,7 +226,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
+            errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
@@ -315,7 +314,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
@@ -417,9 +418,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (toggleService.isAccessProfilesEnabled()) {
-            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        }
+        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         //assign case management category to the case and caseNameHMCTSinternal
         if (toggleService.isGlobalSearchEnabled()) {
@@ -440,6 +439,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+
         CaseData temporaryCaseData = dataBuilder.build();
 
         if (temporaryCaseData.getRespondent1OrgRegistered() == YES
@@ -447,7 +448,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
             // Predicate: Def1 registered, Def 2 unregistered.
             // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder.respondent2OrgRegistered(YES);
+            dataBuilder
+                .respondent2OrgRegistered(YES)
+                .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -494,6 +497,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
             }
         }
+
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
@@ -574,7 +578,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validatePostCode(String postCode) {
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
+        List<String> errors = postcodeValidator.validate(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -693,7 +697,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
@@ -754,15 +760,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
-            .build();
-    }
-
-    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.superClaimType(SPEC_CLAIM);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
