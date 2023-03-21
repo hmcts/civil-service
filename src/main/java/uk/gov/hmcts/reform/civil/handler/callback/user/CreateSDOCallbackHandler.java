@@ -22,15 +22,15 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -69,7 +69,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -261,7 +261,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
         DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
                     + "by the Court (together with the appropriate fee) "
@@ -373,7 +374,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
 
         FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
@@ -766,7 +768,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 hearingInPersonLocation,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )
-            .ifPresent(locationRefData -> LocationRefDataService.updateWithLocation(dataBuilder, locationRefData));
+            .ifPresent(locationRefData -> LocationHelper.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
