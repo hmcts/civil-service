@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
 import static java.time.LocalDateTime.of;
 
