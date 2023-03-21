@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
-import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -155,9 +154,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
-
-    @MockBean
-    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToStartCallbackV0 {
@@ -357,7 +353,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA3.5");
         }
 
         @Test
