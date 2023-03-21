@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Setter
 @Data

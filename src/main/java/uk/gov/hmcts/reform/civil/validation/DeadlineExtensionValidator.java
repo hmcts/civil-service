@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.service.WorkingDayIndicator;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
