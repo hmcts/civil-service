@@ -128,15 +128,12 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
             // When
             handler.handle(params);
 
             // Then
-            verifyNoInteractions(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
-                                                                         params.getParams().get(BEARER_TOKEN).toString()
-            );
+            verifyNoInteractions(roboticsNotificationService);
         }
     }
 
