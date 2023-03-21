@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
