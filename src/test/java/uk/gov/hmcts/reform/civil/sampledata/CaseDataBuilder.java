@@ -71,12 +71,13 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
@@ -97,7 +98,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -172,6 +173,7 @@ public class CaseDataBuilder {
     protected Party applicant1;
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
+    protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
@@ -253,6 +255,8 @@ public class CaseDataBuilder {
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
+    protected LitigationFriend applicant1LitigationFriend;
+    protected LitigationFriend applicant2LitigationFriend;
     protected LitigationFriend genericLitigationFriend;
     protected BreathingSpaceInfo breathing;
     protected BreathingSpaceEnterInfo enter;
@@ -2830,6 +2834,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence() {
         atStateRespondentFullDefence();
+        defendantSingleResponseToBothClaimants = NO;
         respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         respondent1ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -3366,6 +3371,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState2v1Applicant1NotProceedApplicant2Proceeds() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
         return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
     }
@@ -3848,9 +3866,37 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicant1LitigationFriend() {
+        this.applicant1LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Applicant Litigation Friend")
+            .firstName("Applicant")
+            .lastName("Litigation Friend")
+            .primaryAddress(AddressBuilder.defaults().build())
+            .hasSameAddressAsLitigant(YES)
+            .certificateOfSuitability(List.of())
+            .build();
+        this.applicant1LitigationFriendRequired = YES;
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2LitigationFriend() {
+        this.applicant2LitigationFriend = LitigationFriend.builder()
+            .fullName("Mr Applicant Litigation Friend")
+            .firstName("Applicant Two")
+            .lastName("Litigation Friend")
+            .primaryAddress(AddressBuilder.defaults().build())
+            .hasSameAddressAsLitigant(YES)
+            .certificateOfSuitability(List.of())
+            .build();
+        this.applicant2LitigationFriendRequired = YES;
+        return this;
+    }
+
     public CaseDataBuilder addRespondent1LitigationFriend() {
         this.respondent1LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
+            .firstName("Litigation")
+            .lastName("Friend")
             .primaryAddress(AddressBuilder.defaults().build())
             .hasSameAddressAsLitigant(YES)
             .certificateOfSuitability(List.of())
@@ -3871,6 +3917,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent2LitigationFriend() {
         this.respondent2LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend")
+            .firstName("Litigation")
+            .lastName("Friend")
             .primaryAddress(AddressBuilder.defaults().build())
             .hasSameAddressAsLitigant(YES)
             .certificateOfSuitability(List.of())
@@ -4441,6 +4489,94 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicant1ExpertsAndWitnesses() {
+        this.applicant1DQ = applicant1DQ.toBuilder()
+            .applicant1DQExperts(Experts.builder()
+                                     .details(wrapElements(
+                                         Expert.builder()
+                                             .firstName("Applicant")
+                                             .lastName("Expert")
+                                             .build()
+                                     ))
+                                     .build())
+            .applicant1DQWitnesses(Witnesses.builder()
+                                       .details(wrapElements(
+                                           Witness.builder()
+                                               .firstName("Applicant")
+                                               .lastName("Witness")
+                                               .build()
+                                       ))
+                                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2ExpertsAndWitnesses() {
+        this.applicant2DQ = applicant2DQ.toBuilder()
+            .applicant2DQExperts(Experts.builder()
+                                     .details(wrapElements(
+                                         Expert.builder()
+                                             .firstName("Applicant Two")
+                                             .lastName("Expert")
+                                             .build()
+                                     ))
+                                     .build())
+            .applicant2DQWitnesses(Witnesses.builder()
+                                       .details(wrapElements(
+                                           Witness.builder()
+                                               .firstName("Applicant Two")
+                                               .lastName("Witness")
+                                               .build()
+                                       ))
+                                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1ExpertsAndWitnesses() {
+        this.respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQExperts(Experts.builder()
+                                      .details(wrapElements(
+                                          Expert.builder()
+                                              .firstName("Respondent")
+                                              .lastName("Expert")
+                                              .build()
+                                      ))
+                                      .build())
+            .respondent1DQWitnesses(Witnesses.builder()
+                                        .details(wrapElements(
+                                            Witness.builder()
+                                                .firstName("Respondent")
+                                                .lastName("Witness")
+                                                .build()
+                                        ))
+                                        .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2ExpertsAndWitnesses() {
+        this.respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQExperts(Experts.builder()
+                                      .details(wrapElements(
+                                          Expert.builder()
+                                              .firstName("Respondent Two")
+                                              .lastName("Expert")
+                                              .build()
+                                      ))
+                                      .build())
+            .respondent2DQWitnesses(Witnesses.builder()
+                                        .details(wrapElements(
+                                            Witness.builder()
+                                                .firstName("Respondent Two")
+                                                .lastName("Witness")
+                                                .build()
+                                        ))
+                                        .build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder withApplicant1Flags() {
         this.applicant1 = applicant1.toBuilder()
             .flags(Flags.builder()
@@ -4629,6 +4765,10 @@ public class CaseDataBuilder {
             .addRespondent2(addRespondent2)
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             .respondent1LitigationFriend(respondent1LitigationFriend)
+            .applicant1LitigationFriend(applicant1LitigationFriend)
+            .applicant1LitigationFriendRequired(applicant1LitigationFriendRequired)
+            .applicant2LitigationFriend(applicant2LitigationFriend)
+            .applicant2LitigationFriendRequired(applicant2LitigationFriendRequired)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
             .respondent1LitigationFriendCreatedDate(respondent1LitigationFriendCreatedDate)
             .respondent2LitigationFriend(respondent2LitigationFriend)

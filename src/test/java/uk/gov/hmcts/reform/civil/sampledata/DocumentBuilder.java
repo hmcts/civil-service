@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 public class DocumentBuilder {
 
