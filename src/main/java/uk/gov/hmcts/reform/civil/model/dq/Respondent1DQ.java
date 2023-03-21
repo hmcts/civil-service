@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +44,11 @@ public class Respondent1DQ implements DQ {
     private List<Element<AccountSimple>> respondent1BankAccountList;
     private HomeDetails respondent1DQHomeDetails;
     private YesOrNo respondent1DQCarerAllowanceCredit;
+    private YesOrNo respondent1DQCarerAllowanceCreditFullAdmission;
     private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
+    private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncomeFA;
     private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
+    private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpensesFA;
     private YesOrNo responseClaimCourtLocationRequired;
     private RequestedCourt respondToCourtLocation;
     private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;

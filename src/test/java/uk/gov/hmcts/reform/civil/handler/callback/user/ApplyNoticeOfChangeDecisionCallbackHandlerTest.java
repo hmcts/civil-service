@@ -19,15 +19,15 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
+import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;

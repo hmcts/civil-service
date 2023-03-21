@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
@@ -19,7 +18,7 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.UUID;
 
@@ -171,7 +170,7 @@ public class PaymentsService {
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
 
-        if (caseData.getHearingDate() == null) {
+        if (caseData.getHearingDueDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
             feeResponse = caseData.getClaimFee().toFeeDto();
         } else {

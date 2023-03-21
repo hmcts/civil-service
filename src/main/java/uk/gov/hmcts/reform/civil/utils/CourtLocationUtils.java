@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 import java.util.Objects;

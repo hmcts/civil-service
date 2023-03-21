@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -54,16 +55,10 @@ public abstract class BaseIntegrationTest {
         + "k02vLJDY9fLCsFYy5iWGCjb8lD1aX1NTv7jz2ttNNv7-smqp6L3LSSD_LCZMpf0h_3n5RXiv-N3vNpWe4ZC9u0AWQdHEE9QlKTZlsqwKSog"
         + "3yJWhyxAamdMepgW7Z8jQ";
 
-    private static final UserInfo USER_INFO = UserInfo.builder()
+    protected static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
         .roles(of("caseworker-civil-solicitor"))
         .build();
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @Autowired
-    protected MockMvc mockMvc;
 
     @MockBean
     protected UserService userService;
@@ -74,8 +69,15 @@ public abstract class BaseIntegrationTest {
     @MockBean
     protected JwtDecoder jwtDecoder;
 
+    @Autowired
+    protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected MockMvc mockMvc;
+
     @BeforeEach
     public void setUpBase() {
+        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(userService.getUserInfo(anyString())).thenReturn(USER_INFO);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
