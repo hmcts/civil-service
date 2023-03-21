@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +39,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
     private CallbackResponse triggerGaEvent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         try {

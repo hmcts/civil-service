@@ -294,6 +294,8 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("344489")
+                                                   .region("4").build());
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -327,6 +329,52 @@ public class GeneralApplicationDetailsBuilder {
         if (withGADetailsResp2) {
             caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
                                                                        .toArray(new GADetailsRespondentSol[0])));
+        }
+        return caseDataBuilder.build();
+    }
+
+    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+                                               boolean withGADetails,
+                                               boolean withGADetailsResp,
+                                               boolean withGADetailsResp2, boolean withGADetailsMaster,
+                                               Map<String, String> applicationIdStatus) {
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
+                                                   .region("2").build());
+        caseDataBuilder.ccdCaseReference(1L);
+        if (!Collections.isEmpty(applicationIdStatus)) {
+            List<GeneralApplication> genApps = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
+            caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
+        }
+
+        if (withGADetails) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.claimantGaAppDetails(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        if (withGADetailsMaster) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.gaDetailsMasterCollection(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
+        applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
+        if (withGADetailsResp) {
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
+
+        if (withGADetailsResp2) {
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
+                                                                          .toArray(new GADetailsRespondentSol[0])));
         }
         return caseDataBuilder.build();
     }
@@ -1108,6 +1156,11 @@ public class GeneralApplicationDetailsBuilder {
         return builder.generalAppType(GAApplicationType.builder()
                         .types(singletonList(SUMMARY_JUDGEMENT))
                         .build())
+                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication
+                                            .CaseLocationCivil.builder()
+                                            .baseLocation("34567")
+                                            .region("4").build())
+                .isCcmccLocation(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())

@@ -37,13 +37,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
     TriggerGenAppLocationUpdateCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
+
 public class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     TriggerGenAppLocationUpdateCallbackHandler handler;
 
     @MockBean
     private GenAppStateHelperService helperService;
-
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -59,7 +60,7 @@ public class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallback
                                         true, true,
                                         getOriginalStatusOfGeneralApplication()
             );
-        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData) ;
+        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -92,7 +93,7 @@ public class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallback
             );
         String expectedErrorMessage = "Could not trigger event to update location on application under case: "
             + caseData.getCcdCaseReference();
-        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData) ;
+        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
         when(helperService.triggerEvent(any(CaseData.class), eq(TRIGGER_LOCATION_UPDATE)))
             .thenThrow(new RuntimeException());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
