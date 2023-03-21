@@ -9,11 +9,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseProgression.JudgeFinalOrderGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -82,7 +82,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument document = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.freeFormOrderDocument(document.getDocumentLink());
+
+        if (caseData.getFinalOrderSelection() == FinalOrderSelection.FREE_FORM_ORDER) {
+            caseDataBuilder.freeFormOrderDocument(document.getDocumentLink());
+        } else {
+            caseDataBuilder.assistedOrderDocument(document.getDocumentLink());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

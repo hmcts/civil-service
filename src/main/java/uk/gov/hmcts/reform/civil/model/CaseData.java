@@ -710,6 +710,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final OrderOnCourtsList orderOnCourtsList;
 
     private Document freeFormOrderDocument;
+    private Document assistedOrderDocument;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

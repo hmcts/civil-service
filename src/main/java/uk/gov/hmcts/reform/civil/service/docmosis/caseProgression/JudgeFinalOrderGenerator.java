@@ -17,24 +17,22 @@ import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
 @Service
 @RequiredArgsConstructor
 public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
-
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
-        DocmosisTemplates docmosisTemplate;
+        DocmosisTemplates docmosisTemplate = null;
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER))
             docmosisTemplate = FREE_FORM_ORDER_PDF;
-        else docmosisTemplate = DJ_SDO_TRIAL;
-        System.out.println("template is    " + docmosisTemplate);
-        System.out.println("template data is  "+ templateData);
+        // ASSISTED_ORDER will be added as part of civ-7569
+        //else docmosisTemplate = ASSISTED_ORDER_PDF;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
         return documentManagementService.uploadDocument(
@@ -84,6 +82,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return freeFormOrderBuilder.build();
     }
 
+    // will be added part of civ-7569
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData) {
         return null;
     }
