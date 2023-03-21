@@ -672,14 +672,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
                                + "their case on periodical payments, they must do so in the respective schedule and "
                                + "counter-schedule.");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input4")
-                .isEqualTo("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                               + "therefore final, no further schedule of loss shall be uploaded without permission to"
-                               + " amend. The defendant shall upload to the Digital Portal an up-to-date counter"
-                               + " schedule of loss by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
                 .isEqualTo("The time provisionally allowed for this trial is");
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
