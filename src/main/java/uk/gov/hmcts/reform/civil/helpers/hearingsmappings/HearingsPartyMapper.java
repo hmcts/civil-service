@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.hearing.PartyRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
@@ -79,14 +79,15 @@ public class HearingsPartyMapper {
                 || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)))
                 && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
                 // respondent 2 expert
-                if (caseData.getRespondent2DQ().getExperts() != null
-                    && caseData.getRespondent2DQ().getExperts().getDetails() != null) {
-                    parties.addAll(getDetailsForExperts(caseData.getRespondent2DQ().getExperts().getDetails()));
+                if (caseData.getRespondent2Experts() != null
+                    && !caseData.getRespondent2Experts().isEmpty()) {
+                    parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getRespondent2Experts()));
                 }
+
                 // respondent 2 witness
-                if (caseData.getRespondent2DQ().getWitnesses() != null
-                    && caseData.getRespondent2DQ().getWitnesses().getDetails() != null) {
-                    parties.addAll(getDetailsForWitnesses(caseData.getRespondent2DQ().getWitnesses().getDetails()));
+                if (caseData.getRespondent2Witnesses() != null
+                    && !caseData.getRespondent2Witnesses().isEmpty()) {
+                    parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getRespondent2Witnesses()));
                 }
             }
             // respondent 2 lit friend
@@ -106,18 +107,18 @@ public class HearingsPartyMapper {
                 organisationService
             ));
         }
-        if (caseData.getRespondent1DQ() != null) {
-            // respondent 1 expert
-            if (caseData.getRespondent1DQ().getExperts() != null
-                && caseData.getRespondent1DQ().getExperts().getDetails() != null) {
-                parties.addAll(getDetailsForExperts(caseData.getRespondent1DQ().getExperts().getDetails()));
-            }
-            // respondent 1 witness
-            if (caseData.getRespondent1DQ().getWitnesses() != null
-                && caseData.getRespondent1DQ().getWitnesses().getDetails() != null) {
-                parties.addAll(getDetailsForWitnesses(caseData.getRespondent1DQ().getWitnesses().getDetails()));
-            }
+        // respondent 1 expert
+        if (caseData.getRespondent1Experts() != null
+            && !caseData.getRespondent1Experts().isEmpty()) {
+            parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getRespondent1Experts()));
         }
+
+        // respondent 1 witness
+        if (caseData.getRespondent1Witnesses() != null
+            && !caseData.getRespondent1Witnesses().isEmpty()) {
+            parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getRespondent1Witnesses()));
+        }
+
         // respondent 1 lit friend
         if (caseData.getRespondent1LitigationFriend() != null) {
             parties.add(getDetailsForLitigationFriendObject(caseData.getRespondent1LitigationFriend()));
@@ -132,15 +133,15 @@ public class HearingsPartyMapper {
             if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
                 && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
                 if (caseData.getApplicant2DQ() != null) {
-                    // applicant 2 witness
-                    if (caseData.getApplicant2DQ().getExperts() != null
-                        && caseData.getApplicant2DQ().getExperts().getDetails() != null) {
-                        parties.addAll(getDetailsForExperts(caseData.getApplicant2DQ().getExperts().getDetails()));
-                    }
                     // applicant 2 expert
-                    if (caseData.getApplicant2DQ().getWitnesses() != null
-                        && caseData.getApplicant2DQ().getWitnesses().getDetails() != null) {
-                        parties.addAll(getDetailsForWitnesses(caseData.getApplicant2DQ().getWitnesses().getDetails()));
+                    if (caseData.getApplicantExperts() != null
+                        && !caseData.getApplicantExperts().isEmpty()) {
+                        parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
+                    }
+                    // applicant 2 witness
+                    if (caseData.getApplicantWitnesses() != null
+                        && !caseData.getApplicantWitnesses().isEmpty()) {
+                        parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
                     }
                 }
             }
@@ -161,17 +162,19 @@ public class HearingsPartyMapper {
         ));
 
         if (caseData.getApplicant1DQ() != null) {
-            // applicant 1 witness
-            if (caseData.getApplicant1DQ().getExperts() != null
-                && caseData.getApplicant1DQ().getExperts().getDetails() != null) {
-                parties.addAll(getDetailsForExperts(caseData.getApplicant1DQ().getExperts().getDetails()));
-            }
             // applicant 1 expert
-            if (caseData.getApplicant1DQ().getWitnesses() != null
-                && caseData.getApplicant1DQ().getWitnesses().getDetails() != null) {
-                parties.addAll(getDetailsForWitnesses(caseData.getApplicant1DQ().getWitnesses().getDetails()));
+            if (caseData.getApplicantExperts() != null
+                && !caseData.getApplicantExperts().isEmpty()) {
+                parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
+            }
+
+            // applicant 1 witness
+            if (caseData.getApplicantWitnesses() != null
+                && !caseData.getApplicantWitnesses().isEmpty()) {
+                parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
             }
         }
+
         // applicant 1 lit friend
         if (caseData.getApplicant1LitigationFriend() != null) {
             parties.add(getDetailsForLitigationFriendObject(caseData.getApplicant1LitigationFriend()));
@@ -207,34 +210,23 @@ public class HearingsPartyMapper {
                                           litigationFriend.getPhoneNumber());
     }
 
-    private static List<PartyDetailsModel> getDetailsForExperts(List<Element<Expert>> expertDetails) {
-        ArrayList<PartyDetailsModel> expertPartyDetails = new ArrayList<>();
-        List<Expert> experts = unwrapElements(expertDetails);
-        for (Expert expert : experts) {
-            expertPartyDetails.add(buildIndividualPartyObject(
-                expert.getFirstName(),
-                expert.getLastName(),
-                String.format(FULL_NAME, expert.getFirstName(), expert.getLastName()),
-                EXPERT_ROLE.getPartyRoleValue(),
-                expert.getEmailAddress(),
-                expert.getPhoneNumber()));
+    private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
+        List<PartyDetailsModel> partyDetails = new ArrayList<>();
+        List<PartyFlagStructure> filteredList = unwrapElements(experts);
+        if (!filteredList.isEmpty()) {
+            for (PartyFlagStructure partyFlagStructure : filteredList) {
+                partyDetails.add(buildIndividualPartyObject(
+                    partyFlagStructure.getFirstName(),
+                    partyFlagStructure.getLastName(),
+                    String.format(FULL_NAME, partyFlagStructure.getFirstName(),
+                                  partyFlagStructure.getLastName()),
+                    partyRole.getPartyRoleValue(),
+                    null, //todo add email here
+                    null //todo add phone number here
+                ));
+            }
         }
-        return expertPartyDetails;
-    }
-
-    private static List<PartyDetailsModel> getDetailsForWitnesses(List<Element<Witness>> witnessDetails) {
-        ArrayList<PartyDetailsModel> expertPartyDetails = new ArrayList<>();
-        List<Witness> witnesses = unwrapElements(witnessDetails);
-        for (Witness witness : witnesses) {
-            expertPartyDetails.add(buildIndividualPartyObject(
-                witness.getFirstName(),
-                witness.getLastName(),
-                String.format(FULL_NAME, witness.getFirstName(), witness.getLastName()),
-                WITNESS_ROLE.getPartyRoleValue(),
-                witness.getEmailAddress(),
-                witness.getPhoneNumber()));
-        }
-        return expertPartyDetails;
+        return partyDetails;
     }
 
     private static PartyDetailsModel getDetailsForSolicitorOrganisation(OrganisationPolicy organisationPolicy,

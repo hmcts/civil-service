@@ -390,8 +390,12 @@ public class CaseDataBuilder {
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
+    private List<Element<PartyFlagStructure>> applicantExperts;
+    private List<Element<PartyFlagStructure>> applicantWitnesses;
     private List<Element<PartyFlagStructure>> respondent1Experts;
     private List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private List<Element<PartyFlagStructure>> respondent2Experts;
+    private List<Element<PartyFlagStructure>> respondent2Witnesses;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4508,6 +4512,14 @@ public class CaseDataBuilder {
                                        ))
                                        .build())
             .build();
+        this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("Applicant")
+                                                   .lastName("Expert")
+                                                   .build());
+        this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("Applicant")
+                                                   .lastName("Witness")
+                                                   .build());
         return this;
     }
 
@@ -4530,6 +4542,14 @@ public class CaseDataBuilder {
                                        ))
                                        .build())
             .build();
+        this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                 .firstName("Applicant Two")
+                                                 .lastName("Expert")
+                                                 .build());
+        this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("Applicant Two")
+                                                   .lastName("Witness")
+                                                   .build());
         return this;
     }
 
@@ -4552,6 +4572,14 @@ public class CaseDataBuilder {
                                         ))
                                         .build())
             .build();
+        this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
+                                                 .firstName("Respondent")
+                                                 .lastName("Expert")
+                                                 .build());
+        this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("Respondent")
+                                                   .lastName("Witness")
+                                                   .build());
         return this;
     }
 
@@ -4574,6 +4602,14 @@ public class CaseDataBuilder {
                                         ))
                                         .build())
             .build();
+        this.respondent2Experts = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("Respondent Two")
+                                                   .lastName("Expert")
+                                                   .build());
+        this.respondent2Witnesses = wrapElements(PartyFlagStructure.builder()
+                                                     .firstName("Respondent Two")
+                                                     .lastName("Witness")
+                                                     .build());
         return this;
     }
 
@@ -4905,8 +4941,12 @@ public class CaseDataBuilder {
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
+            .applicantExperts(applicantExperts)
+            .applicantWitnesses(applicantWitnesses)
             .respondent1Experts(respondent1Experts)
             .respondent1Witnesses(respondent1Witnesses)
+            .respondent2Experts(respondent2Experts)
+            .respondent2Witnesses(respondent2Witnesses)
             .build();
     }
 
