@@ -1,16 +1,27 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrationTest {
@@ -21,6 +32,26 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
 
+    @MockBean
+    CoreCaseDataApi coreCaseDataApi;
+
+    @MockBean
+    AuthTokenGenerator authTokenGenerator;
+
+    @BeforeEach
+    void bareMinimumToMakeAPositiveRequest() {
+        CaseData
+            caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        caseDetails.setData(caseData.toMap(objectMapper));
+        StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
+
+        given(authTokenGenerator.generate()).willReturn("some arbitrary token");
+        given(coreCaseDataApi.getCase(any(), any(), any())).willReturn(caseDetails);
+        given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willReturn(startEventResponse);
+        given(coreCaseDataApi.submitEventForCaseWorker(any(), any(), any(), any(), any(), any(), anyBoolean(), any())).willReturn(caseDetails);
+    }
+
     @Test
     public void whenInvalidTypeOfRequestMade_ReturnMethodNotAllowed() throws Exception {
 
@@ -29,10 +60,21 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
-    public void whenServiceRequestUpdateRequest() throws Exception {
+    public void whenServiceRequestUpdateRequestAndEverythingIsOk_thenHttp2xx() throws Exception {
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
+        // Given: a CCD call will throw an exception
+        given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willThrow(RuntimeException.class);
+
+        // When: I call the /service-request-update URL
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            // Then: the result status must be an HTTP-5xx
+            .andExpect(status().is5xxServerError());
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
