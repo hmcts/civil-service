@@ -66,7 +66,7 @@ public class HearingValuesService {
             .hmctsServiceID(getHmctsServiceID(caseData, paymentsConfiguration))
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
-            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag()) // todo civ-6888
+            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
             .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
             .caseRestrictedFlag(getCaseRestrictedFlag())

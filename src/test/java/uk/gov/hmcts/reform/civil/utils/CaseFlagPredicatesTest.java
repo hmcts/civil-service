@@ -10,16 +10,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class CaseFlagPredicatesTest {
     @Test
-    void isActive_shouldReturnTrueForActiveFlagDetails() {
+    void isActive_shouldReturnExpectedActiveFlagDetails() {
         FlagDetail inactiveFlagDetail = FlagDetail.builder().status("INACTIVE").build();
-        FlagDetail activeFlagDetail = FlagDetail.builder().status("ACTIVE").build();
+        FlagDetail activeFlagDetail = FlagDetail.builder().status("Active").build();
 
         assertFalse(CaseFlagPredicates.isActive().test(inactiveFlagDetail));
         assertTrue(CaseFlagPredicates.isActive().test(activeFlagDetail));
     }
 
     @Test
-    void isHearingRelevant_shouldReturnTrueForHearingRelevantFlagDetails() {
+    void isHearingRelevant_shouldReturnExpectedHearingRelevantFlagDetails() {
         FlagDetail nonHearingRelevantFlagDetail = FlagDetail.builder().hearingRelevant(NO).build();
         FlagDetail hearingRelevantFlagDetail = FlagDetail.builder().hearingRelevant(YES).build();
 
@@ -28,7 +28,7 @@ public class CaseFlagPredicatesTest {
     }
 
     @Test
-    void hasVulnerableFlag_shouldReturnTrueForVulnerableFlagDetails() {
+    void hasVulnerableFlag_shouldReturnExpectedVulnerableFlagDetails() {
         FlagDetail nonVulnerableFlagDetail = FlagDetail.builder().flagCode("PF0007").build();
         FlagDetail vulnerableFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
 
@@ -37,7 +37,7 @@ public class CaseFlagPredicatesTest {
     }
 
     @Test
-    void hasAdditionalSecurityFlag_shouldReturnTrueForAdditionalSecurityFlagDetails() {
+    void hasAdditionalSecurityFlag_shouldReturnExpectedAdditionalSecurityFlagDetails() {
         FlagDetail nonAdditionalSecurityFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
         FlagDetail additionalSecurityFlagDetail = FlagDetail.builder().flagCode("PF0007").build();
 
@@ -46,7 +46,7 @@ public class CaseFlagPredicatesTest {
     }
 
     @Test
-    void hasLanguageInterpreterFlag_shouldReturnTrueForLanguageInterpreterFlagDetails() {
+    void hasLanguageInterpreterFlag_shouldReturnExpectedLanguageInterpreterFlagDetails() {
         FlagDetail nonLanguageInterpreterFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
         FlagDetail languageInterpreterFlagDetail = FlagDetail.builder().flagCode("PF0015").build();
 
@@ -55,18 +55,7 @@ public class CaseFlagPredicatesTest {
     }
 
     @Test
-    void getReasonableAdjustmentFlagCodes_shouldReturnTrueForReasonableAdjustmentFlagDetails() {
-        FlagDetail nonReasonableAdjustmentFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
-        FlagDetail reasonableAdjustmentFlagDetail = FlagDetail.builder().flagCode("RA0033").build();
-        FlagDetail reasonableAdjustmentFlagDetail2 = FlagDetail.builder().flagCode("SM0033").build();
-
-        assertFalse(CaseFlagPredicates.getReasonableAdjustmentFlagCodes().test(nonReasonableAdjustmentFlagDetail));
-        assertTrue(CaseFlagPredicates.getReasonableAdjustmentFlagCodes().test(reasonableAdjustmentFlagDetail));
-        assertTrue(CaseFlagPredicates.getReasonableAdjustmentFlagCodes().test(reasonableAdjustmentFlagDetail2));
-    }
-
-    @Test
-    void isDetainedIndividual_shouldReturnTrueForDetainedIndividualFlagDetails() {
+    void isDetainedIndividual_shouldReturnExpectedDetainedIndividualFlagDetails() {
         FlagDetail nonDetainedIndividualFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
         FlagDetail detainedIndividualFlagDetail = FlagDetail.builder().flagCode("PF0019").build();
 

@@ -12,12 +12,11 @@ public class CaseFlagPredicates {
     private static final List<String> VULNERABLE_FLAGS = List.of("PF0002", "RA0033", "RA0026");
     private static final List<String> ADDITIONAL_SECURITY_FLAGS = List.of("PF0007");
     private static final List<String> LANGUAGE_INTERPRETER_FLAGS = List.of("PF0015");
-    private static final List<String> REASONABLE_ADJUSTMENT_FLAGS = List.of("RA", "SM");
     private static final List<String> DETAINED_INDIVIDUAL_FLAGS = List.of("PF0019");
 
 
     public static Predicate<FlagDetail> isActive() {
-        return flagDetail -> flagDetail.getStatus().equals("ACTIVE");
+        return flagDetail -> flagDetail.getStatus().equals("Active");
     }
 
     public static Predicate<FlagDetail> isHearingRelevant() {
@@ -34,10 +33,6 @@ public class CaseFlagPredicates {
 
     public static Predicate<FlagDetail> hasLanguageInterpreterFlag() {
         return flagDetail -> LANGUAGE_INTERPRETER_FLAGS.contains(flagDetail.getFlagCode());
-    }
-
-    public static Predicate<FlagDetail> getReasonableAdjustmentFlagCodes() {
-        return flagDetail -> REASONABLE_ADJUSTMENT_FLAGS.stream().anyMatch(flagDetail.getFlagCode()::startsWith);
     }
 
     public static Predicate<FlagDetail> isDetainedIndividual() {

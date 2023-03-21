@@ -15,12 +15,12 @@ public class CaseFlagsToHearingValueMapperTest {
     @Test
     public void testHasVulnerableFlag() {
         FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("PF0002")
             .build();
 
         FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("RA0033")
             .build();
 
@@ -37,12 +37,12 @@ public class CaseFlagsToHearingValueMapperTest {
     @Test
     public void testHasAdditionalSecurityFlag() {
         FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("PF0007")
             .build();
 
         FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("PF0007")
             .build();
 
@@ -53,68 +53,38 @@ public class CaseFlagsToHearingValueMapperTest {
 
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
-        assertEquals(true, hasAdditionalSecurityFlag(flagDetails));
+        assertEquals(true, getAdditionalSecurity(flagDetails));
     }
 
     @Test
     public void testHasLanguageMisinterpretationFlag() {
         FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .hearingRelevant(YES)
             .flagCode("PF0015")
-            .name("Name1")
+            .subTypeKey("english")
             .build();
 
         FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("ACTIVE")
-            .hearingRelevant(NO)
-            .flagCode("PF0015")
-            .name("Name2")
-            .build();
-
-        FlagDetail flagDetail3 = FlagDetail.builder()
             .status("INACTIVE")
             .hearingRelevant(YES)
             .flagCode("PF0015")
-            .name("Name3")
             .build();
 
-        List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+        List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2);
 
-        assertEquals("Name1", hasLanguageMisinterpretationFlag(flagDetails));
-    }
-
-    @Test
-    public void testGetReasonableAdjustmentFlagCodes() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("ACTIVE")
-            .flagCode("RA")
-            .build();
-
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("ACTIVE")
-            .flagCode("SM")
-            .build();
-
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("INACTIVE")
-            .flagCode("RA")
-            .build();
-
-        List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
-
-        assertEquals(List.of("RA", "SM"), getReasonableAdjustmentFlagCodes(flagDetails));
+        assertEquals("english", hasLanguageMisinterpretationFlag(flagDetails));
     }
 
     @Test
     public void testGetCustodyStatus() {
         FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("PF0019")
             .build();
 
         FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("ACTIVE")
+            .status("Active")
             .flagCode("PF0019")
             .build();
 
