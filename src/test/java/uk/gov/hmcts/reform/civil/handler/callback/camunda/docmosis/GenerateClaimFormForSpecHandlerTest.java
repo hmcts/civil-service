@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,10 +15,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -44,8 +43,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
@@ -82,13 +81,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
     private FeatureToggleService toggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-
-    @Test
-    public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     private static final CaseDocument CLAIM_FORM =
         CaseDocument.builder()
@@ -165,15 +157,18 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build().toBuilder()
                 .specRespondent1Represented(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            // Then
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
 
@@ -209,12 +204,12 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
                 .specClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
 
                 .specClaimDetailsDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

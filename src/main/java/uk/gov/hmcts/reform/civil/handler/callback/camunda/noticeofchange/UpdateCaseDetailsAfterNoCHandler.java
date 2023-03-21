@@ -183,10 +183,9 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .respondentSolicitor1ServiceAddressRequired(NO)
                 .respondent1OrganisationIDCopy(addedOrganisation);
         } else {
-            caseDataBuilder.specApplicantCorrespondenceAddressRequired(NO)
-                .specRespondentCorrespondenceAddressdetails(null)
+            caseDataBuilder.specRespondentCorrespondenceAddressdetails(null)
                 .specAoSRespondentCorrespondenceAddressdetails(null)
-                .specAoSRespondentCorrespondenceAddressRequired(NO)
+                .specAoSRespondentCorrespondenceAddressRequired(null)
                 .specRespondent1Represented(YES);
         }
 
@@ -211,9 +210,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         } else {
             caseDataBuilder
                 .specApplicantCorrespondenceAddressdetails(null)
-                .specApplicantCorrespondenceAddressRequired(NO)
-                .specAoSApplicantCorrespondenceAddressRequired(NO)
-                .specAoSApplicantCorrespondenceAddressdetails(null);
+                .specApplicantCorrespondenceAddressRequired(NO);
         }
 
         if (addedSolicitorDetails != null) {

@@ -12,15 +12,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -38,8 +37,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -104,7 +104,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent1DQ() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentResponseIsSame(YesOrNo.NO)
@@ -130,7 +130,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentResponseIsSame(YesOrNo.NO)
@@ -178,7 +178,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentAdmitPartOfClaimFastTrack()
             .multiPartyClaimTwoDefendantSolicitors()
-            .setSuperClaimTypeToSpecClaim()
+            .setClaimTypeToSpecClaim()
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentResponseIsSame(YesOrNo.YES)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -230,7 +230,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                                                                   RespondentResponseTypeSpec.PART_ADMISSION)) {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent1DQ(Respondent1DQ.builder().build())
                 .respondent1ClaimResponseTypeForSpec(responseType)
@@ -258,7 +258,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
                                                                   RespondentResponseTypeSpec.PART_ADMISSION)) {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(SPEC_CLAIM)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2ClaimResponseTypeForSpec(responseType)
@@ -284,7 +284,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolBothRespondents() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .respondent1DQ(Respondent1DQ.builder().build())

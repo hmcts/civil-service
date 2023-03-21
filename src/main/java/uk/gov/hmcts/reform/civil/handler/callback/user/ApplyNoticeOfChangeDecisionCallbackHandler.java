@@ -13,14 +13,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
+import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +89,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
             .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
             .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
-            .timestamp(corFieldBeforeNoC.getRequestTimestamp());
+            .timestamp(corFieldBeforeNoC.getRequestTimestamp())
+            .formerRepresentationEmailAddress(
+                getFormerEmail(corFieldBeforeNoC.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeNoC.getOrganisationToRemove() != null) {
             builder.organisationToRemoveID(corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
@@ -185,6 +187,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
                     return respondent2OrganisationIDCopy;
                 }
             }
+        }
+        return null;
+    }
+
+    private String getFormerEmail(String caseRole, CaseData caseData) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            return caseData.getRespondentSolicitor2EmailAddress();
         }
         return null;
     }

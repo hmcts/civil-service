@@ -20,15 +20,18 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -39,7 +42,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
@@ -73,12 +76,20 @@ class SealedClaimFormGeneratorTest {
     private SealedClaimFormGenerator sealedClaimFormGenerator;
     @MockBean
     private RepresentativeService representativeService;
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @BeforeEach
     void setup() {
         when(representativeService.getRespondent1Representative(any())).thenReturn(representative1);
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
     }
 
     @Test
@@ -131,7 +142,6 @@ class SealedClaimFormGeneratorTest {
 
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
-
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
@@ -256,10 +266,6 @@ class SealedClaimFormGeneratorTest {
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
                 ),
                 () -> assertEquals(templateData.getClaimDetails(), caseData.getDetailsOfClaim()),
-                () -> assertEquals(
-                    templateData.getHearingCourtLocation(),
-                    caseData.getCourtLocation().getApplicantPreferredCourt()
-                ),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(templateData.getSubmittedOn(), caseData.getSubmittedDate().toLocalDate()),
@@ -291,10 +297,6 @@ class SealedClaimFormGeneratorTest {
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
                 ),
                 () -> assertEquals(templateData.getClaimDetails(), caseData.getDetailsOfClaim()),
-                () -> assertEquals(
-                    templateData.getHearingCourtLocation(),
-                    caseData.getCourtLocation().getApplicantPreferredCourt()
-                ),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(templateData.getSubmittedOn(), caseData.getSubmittedDate().toLocalDate()),
@@ -327,10 +329,6 @@ class SealedClaimFormGeneratorTest {
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
                 ),
                 () -> assertEquals(templateData.getClaimDetails(), caseData.getDetailsOfClaim()),
-                () -> assertEquals(
-                    templateData.getHearingCourtLocation(),
-                    caseData.getCourtLocation().getApplicantPreferredCourt()
-                ),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(templateData.getSubmittedOn(), caseData.getSubmittedDate().toLocalDate()),
@@ -366,10 +364,6 @@ class SealedClaimFormGeneratorTest {
                     caseData.getApplicantSolicitor1ClaimStatementOfTruth()
                 ),
                 () -> assertEquals(templateData.getClaimDetails(), caseData.getDetailsOfClaim()),
-                () -> assertEquals(
-                    templateData.getHearingCourtLocation(),
-                    caseData.getCourtLocation().getApplicantPreferredCourt()
-                ),
                 () -> assertEquals(templateData.getReferenceNumber(), caseData.getLegacyCaseReference()),
                 () -> assertEquals(templateData.getIssueDate(), caseData.getIssueDate()),
                 () -> assertEquals(templateData.getSubmittedOn(), caseData.getSubmittedDate().toLocalDate()),

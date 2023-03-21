@@ -3,10 +3,13 @@
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.GithubAPI
 
 def type = "java"
 def product = "civil"
 def component = "service"
+def ccdBranch = "master"
+def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -55,13 +58,19 @@ def publishRpaContract() {
   sh """ ./gradlew pactPublish """
 }
 
+def checkForEnableHelmLabel(branch_name) {
+    return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+}
+
 withPipeline(type, product, component) {
 
   onPR {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
-    enableCleanupOfHelmReleaseOnSuccess()
+    if (!checkForEnableHelmLabel(env.BRANCH_NAME)) {
+      enableCleanupOfHelmReleaseAlways();
+    }
   }
   onMaster {
     loadVaultSecrets(secrets)
@@ -94,18 +103,22 @@ withPipeline(type, product, component) {
     sh """
       eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/add-roles.sh
-      ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
-      ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,*CUI-nonprod.json"
-      ./bin/import-bpmn-diagram.sh .
+      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,*CUI-nonprod.json,*CUI.json"
     """
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
 
-  afterSuccess('smoketest:preview') {
+  afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
+    if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
+      sh """
+        exit 1
+      """
+    }
   }
 
   before('functionalTest:preview') {
@@ -114,9 +127,10 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
 
-  afterSuccess('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
@@ -125,16 +139,16 @@ withPipeline(type, product, component) {
     sh """
       eval \$(./bin/variables/load-staging-environment-variables.sh)
       ./bin/add-roles.sh
-      ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
-      ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *GAspec.json,*DJspec.json,*-nonprod.json,*DJ.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json"
+      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+      ./bin/import-ccd-definition.sh "-e *GAspec.json,*-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json,*CUI.json"
       ./bin/import-bpmn-diagram.sh .
     """
     env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
   }
 
-  afterSuccess('smoketest:aat') {
+  afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
@@ -145,9 +159,10 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
+    env.AAC_API_URL="https://manage-case-assignment-civil-service-staging.preview.platform.hmcts.net"
   }
 
-  afterSuccess('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 

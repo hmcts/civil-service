@@ -1,17 +1,17 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RoboticsDataMapperForSpecTest {
 
     @InjectMocks
@@ -75,10 +75,10 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
-        Assert.assertTrue(mapped.getLitigiousParties().stream()
+        Assertions.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
+        Assertions.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
-        Assert.assertTrue(mapped.getLitigiousParties().stream()
+        Assertions.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
     }
 
@@ -134,7 +134,69 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
+            List.of(
+                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+            ),
+            roboticsCaseData.getNoticeOfChange()
+        );
+    }
+
+    @Test
+    public void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
+        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now().minusDays(14))
+            .totalInterest(BigDecimal.ZERO)
+            .totalClaimAmount(BigDecimal.valueOf(15000_00))
+            .applicant1(Party.builder()
+                            .type(Party.Type.COMPANY)
+                            .companyName("company 1")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("company 2")
+                             .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .breathing(BreathingSpaceInfo.builder()
+                           .enter(BreathingSpaceEnterInfo.builder()
+                                      .type(BreathingSpaceType.STANDARD)
+                                      .build())
+                           .lift(BreathingSpaceLiftInfo.builder()
+                                     .expectedEnd(LocalDate.now())
+                                     .build())
+                           .build())
+            .ccdState(CaseState.CASE_DISMISSED)
+            .build();
+
+        caseData = caseData.toBuilder()
+            .applicant1OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                    .build())
+            .respondent1OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                    .build())
+            .respondent2OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                    .build())
+            .build();
+
+        Mockito.when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+
+        Assertions.assertEquals(
             List.of(
                 NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
                 NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
@@ -175,7 +237,7 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertNull(roboticsCaseData.getNoticeOfChange());
+        Assertions.assertNull(roboticsCaseData.getNoticeOfChange());
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {

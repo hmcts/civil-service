@@ -18,12 +18,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
-import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.referencedata.LRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataException;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
 class LocationRefDataServiceTest {
@@ -427,6 +428,37 @@ class LocationRefDataServiceTest {
 
             assertThat(courtLocations.getRegionId()).isNull();
             assertThat(courtLocations.getEpimmsId()).isNull();
+        }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsId() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CCMCC").courtLocationCode("121").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(mockedResponse);
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+            String prefferedCourtCode = result.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+
+            verify(lrdConfiguration, times(1)).getUrl();
+            verify(lrdConfiguration, times(1)).getEndpoint();
+            assertThat(uriCaptor.getValue().toString()).isEqualTo(
+                "dummy_url/fees-register/fees/lookup?epimms_id=192280");
+            assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
+                .isEqualTo("service_token");
+            assertThat(prefferedCourtCode).isEqualTo("121");
         }
 
     }

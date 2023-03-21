@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -45,7 +46,7 @@ public class HearingUtils {
         return result;
     }
 
-    public static BigDecimal getFastTrackFee(int claimFee) {
+    public static BigDecimal getSmallTrackFee(int claimFee) {
         if (claimFee == 0) {
             return new BigDecimal(0);
         } else if (claimFee < 300_00) {
@@ -117,5 +118,25 @@ public class HearingUtils {
         StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
         hearingTimeBuilder.insert(2, ':');
         return hearingTimeBuilder.toString();
+    }
+
+    public static HearingNotes formatHearingNote(String hearingNotes) {
+        return HearingNotes.builder().date(LocalDate.now()).notes(hearingNotes).build();
+    }
+
+    public static HearingNotes getHearingNotes(CaseData caseData) {
+        if (caseData.getDisposalHearingHearingNotes() != null) {
+            return formatHearingNote(caseData.getDisposalHearingHearingNotes());
+        } else if (caseData.getFastTrackHearingNotes() != null) {
+            return formatHearingNote(caseData.getFastTrackHearingNotes().getInput());
+        } else if (caseData.getDisposalHearingHearingNotesDJ() != null) {
+            return formatHearingNote(caseData.getDisposalHearingHearingNotesDJ().getInput());
+        } else if (caseData.getSdoHearingNotes() != null) {
+            return formatHearingNote(caseData.getSdoHearingNotes().getInput());
+        } else if (caseData.getTrialHearingHearingNotesDJ() != null) {
+            return formatHearingNote(caseData.getTrialHearingHearingNotesDJ().getInput());
+        } else {
+            return null;
+        }
     }
 }

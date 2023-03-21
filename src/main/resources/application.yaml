@@ -49,6 +49,20 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+
+serviceRequest:
+  api:
+    callback-url : ${SERVICE_REQUEST_UPDATE:}
+    site_id : AAA7
+    service : CIVIL
+
+serviceRequestClaimIssued:
+  api:
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
+    site_id: AAA7
+    service: CIVIL
+
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
@@ -73,6 +87,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       free: CopyPagesUpTo10
+      appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -95,6 +110,7 @@ payments:
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
+    url: http://localhost:8765
 
 idam:
   s2s-auth:
@@ -113,6 +129,9 @@ nonworking-days:
 
 civil:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
+  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
+  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
+  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -164,11 +183,13 @@ notifications:
   claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
   claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
   claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
+  claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
   claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
   solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
   solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
+  claimantClaimContinuingOnlineForSpec: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
@@ -203,12 +224,19 @@ notifications:
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
-  solicitorHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
+  applicantHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
+  respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
   hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
   hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
+  solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
+  respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
+  respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
+  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
+  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
+  evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -222,6 +250,11 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
+
+bundle:
+  api:
+    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/"
+  config: ${BUNDLE_CONFIG:caseprogression-bundle-config.yaml}
 
 http:
   client:
@@ -290,6 +323,18 @@ payments:
   api:
     url: http://localhost:8765
 
+serviceRequest:
+  api:
+    callback-url : http://localhost:4000/service-request-update
+    site_id : AAA7
+    service : CIVIL
+
+serviceRequestClaimIssued:
+  api:
+    callback-url: http://localhost:4000/service-request-update-claim-issued
+    site_id: AAA7
+    service: CIVIL
+
 idam:
   web:
     url: http://localhost:9002
@@ -321,6 +366,10 @@ testing:
     enabled: true
 
 rd_professional:
+  api:
+    url: http://localhost:8765
+
+rd_commondata:
   api:
     url: http://localhost:8765
 
@@ -409,6 +458,10 @@ rd_professional:
   api:
     url: http://fake-prd-api
 
+rd_commondata:
+  api:
+    url: http://fake-prd-api
+
 sendgrid:
   api-key: fake-key
 ---
@@ -423,4 +476,3 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
-

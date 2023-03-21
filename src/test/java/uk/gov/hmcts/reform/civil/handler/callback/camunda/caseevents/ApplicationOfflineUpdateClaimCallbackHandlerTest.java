@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,11 +34,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ApplicationOfflineUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class
 })
-class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHandlerTest {
+class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ApplicationOfflineUpdateClaimCallbackHandler handler;
@@ -55,7 +55,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
 
     @Test
@@ -66,37 +66,41 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
     @Test
     public void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        true,
-                        true, true,
-                        getOriginalStatusOfGeneralApplication_test1());
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        true,
+                                        true,
+                                        true, true,
+                                        getOriginalStatusOfGeneralApplication_test1()
+            );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(
-                any(),
-                eq(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION),
-                eq(GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE)))
-                .thenReturn(caseData);
+            any(),
+            eq(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION),
+            eq(GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE)
+        ))
+            .thenReturn(caseData);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
         verify(helperService, ONCE).updateApplicationDetailsInClaim(
-                caseData,
-                APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
-                GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
+            caseData,
+            APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
+            GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE
+        );
         verifyNoMoreInteractions(helperService);
     }
 
     @Test
     public void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        false,
-                        false,
-                        false, false,
-                        Map.of());
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        false,
+                                        false,
+                                        false, false,
+                                        Map.of()
+            );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -109,25 +113,27 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
     @Test
     public void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        true,
-                        true, true,
-                        getOriginalStatusOfGeneralApplication_test1());
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        true,
+                                        true,
+                                        true, true,
+                                        getOriginalStatusOfGeneralApplication_test1()
+            );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))
-                .thenThrow(new RuntimeException("Some Error"));
+            .thenThrow(new RuntimeException("Some Error"));
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
         assertThat(response.getErrors())
-                .contains("Error occurred while updating claim with application status: " + "Some Error");
+            .contains("Error occurred while updating claim with application status: " + "Some Error");
         verify(helperService, ONCE).updateApplicationDetailsInClaim(
-                caseData,
-                APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
-                GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
+            caseData,
+            APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
+            GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE
+        );
         verifyNoMoreInteractions(helperService);
     }
 

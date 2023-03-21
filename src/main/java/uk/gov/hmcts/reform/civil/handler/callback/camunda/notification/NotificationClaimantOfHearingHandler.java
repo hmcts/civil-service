@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -60,7 +60,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         }
         notificationService.sendMail(recipient, emailTemplate, addProperties(caseData),
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReference())
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
         );
     }
 
@@ -90,7 +90,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
-            time.toString(),
+            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm"),
             HEARING_DUE_DATE,
             caseData.getHearingDueDate() == null ? "" :
                 caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),

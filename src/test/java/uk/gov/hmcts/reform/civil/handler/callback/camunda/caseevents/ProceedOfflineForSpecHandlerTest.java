@@ -1,30 +1,37 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {
     ProceedOfflineForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-class ProceedOfflineForSpecHandlerTest {
+class ProceedOfflineForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ProceedOfflineForSpecCallbackHandler handler;
 
-    @MockBean
-    private FeatureToggleService toggleService;
-
     @Test
-    void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+    void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
     }
 }

@@ -15,11 +15,12 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -47,6 +49,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     },
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
     private FeatureToggleService toggleService;
@@ -95,6 +100,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
+            given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
         }
 
         @Test
@@ -104,7 +110,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            System.out.println(response.getData());
             assertThat(response.getData())
+                .containsEntry("issueDate", submittedDate.format(DateTimeFormatter.ISO_DATE))
+                .containsEntry("respondent1ResponseDeadline", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 

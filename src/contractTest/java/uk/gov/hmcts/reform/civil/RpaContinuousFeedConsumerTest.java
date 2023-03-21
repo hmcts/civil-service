@@ -13,7 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -25,12 +25,13 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
 
@@ -69,8 +70,10 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
+    LocationRefDataService locationRefDataService;
+    @MockBean
     private Time time;
-
+    private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
     @BeforeEach
@@ -90,7 +93,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .legacyCaseReference("100DC001")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -107,7 +110,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimIssuedMaximumData()
                 .legacyCaseReference("100DC002")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -124,7 +127,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimIssuedWithMinimalData()
                 .legacyCaseReference("100DC003")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -145,7 +148,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.CLAIM_NOTIFIED)
                 .legacyCaseReference("100DC004")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -162,7 +165,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimNotifiedWithMaximumData()
                 .legacyCaseReference("100DC005")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -179,7 +182,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimNotifiedWithMinimumData()
                 .legacyCaseReference("100DC006")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -200,7 +203,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.CLAIM_NOTIFIED)
                 .legacyCaseReference("100DC007")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -217,7 +220,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimDetailsNotifiedWithMaximumData()
                 .legacyCaseReference("100DC008")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -234,7 +237,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimDetailsNotifiedWithMinimumData()
                 .legacyCaseReference("100DC009")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -255,7 +258,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.NOTIFICATION_ACKNOWLEDGED)
                 .legacyCaseReference("100DC010")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -272,7 +275,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateNotificationAcknowledgedWithMaximumData()
                 .legacyCaseReference("100DC011")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -289,7 +292,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateClaimDetailsNotifiedWithMinimumData()
                 .legacyCaseReference("100DC012")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -310,7 +313,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .legacyCaseReference("100DC013")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -327,7 +330,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateRespondentFullDefenceMaximumData()
                 .legacyCaseReference("100DC014")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -344,7 +347,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateRespondentFullDefenceMinimumData()
                 .legacyCaseReference("100DC015")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -365,7 +368,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                 .legacyCaseReference("100DC016")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -382,7 +385,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateNotificationAcknowledgedTimeExtensionMaximumData()
                 .legacyCaseReference("100DC017")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -399,7 +402,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateNotificationAcknowledgedTimeExtensionMinimalData()
                 .legacyCaseReference("100DC018")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -421,7 +424,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .addRespondent1LitigationFriend()
                 .legacyCaseReference("100DC019")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -438,7 +441,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateNotificationAcknowledgedTimeExtensionMaximumData()
                 .legacyCaseReference("100DC017")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -455,7 +458,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                 .atStateNotificationAcknowledgedTimeExtensionMinimalData()
                 .legacyCaseReference("100DC018")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -481,7 +484,7 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
                                .note("my note")
                                .build())
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 

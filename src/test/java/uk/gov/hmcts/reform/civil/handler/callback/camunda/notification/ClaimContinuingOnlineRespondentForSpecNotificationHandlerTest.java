@@ -1,30 +1,27 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ClaimContinuingOnlineRespondentForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class,
@@ -59,18 +56,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
     private OrganisationService organisationService;
     @MockBean
     private Time time;
-    @MockBean
-    private FeatureToggleService toggleService;
 
     @Autowired
     private ClaimContinuingOnlineRespondentForSpecNotificationHandler handler;
-
-    @org.junit.Test
-    public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -85,6 +73,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -98,8 +87,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "template-id",
@@ -110,6 +101,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -123,8 +115,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-id",

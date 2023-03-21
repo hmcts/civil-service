@@ -65,6 +65,7 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/assignment/reference/caseReference_POST": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/access-profiles_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/service-request-update_PUT": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/service-request-update-claim-issued_PUT": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/fees/claim/1.2_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/fees/hearing/1.2_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/locations/courtLocations_GET": "ignore",
@@ -73,5 +74,9 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/isCertificateOfServiceEnabled_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/eventHistory_POST": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/flowstate_POST": "ignore",
-  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/rpaJson_POST": "ignore"
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/rpaJson_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/trigger-case-dismissal-scheduler_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/assignment/case/caseId/caseRole_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/serviceHearingValues_POST": "ignore",
+  "90022_Application Error Disclosure_http://civil-service-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore"
 }

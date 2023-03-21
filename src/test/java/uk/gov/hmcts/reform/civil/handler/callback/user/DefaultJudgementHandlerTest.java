@@ -21,11 +21,11 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -338,7 +338,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     .addRespondent2(NO)
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                     .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingTemporaryLocation(
-                        DynamicList.builder().build()).build())
+                        DynamicList.builder().value(DynamicListElement.builder().label("loc1").code("loc1").build())
+                            .listItems(List.of(DynamicListElement.builder().label("loc1").code("loc1").build()))
+                            .build()).build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

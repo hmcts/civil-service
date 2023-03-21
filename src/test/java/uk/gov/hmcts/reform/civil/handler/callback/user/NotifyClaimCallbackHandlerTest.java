@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -36,7 +36,7 @@ import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -274,8 +274,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
-                                                .build())
+                                              .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
+                                              .build())
                 .build();
             when(time.now()).thenReturn(LocalDateTime.now());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -316,8 +316,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                .build())
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -335,8 +335,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                .build())
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -919,8 +919,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                           .cosDateOfServiceForDefendant(LocalDate.now())
-                                                           .build())
+                                              .cosDateOfServiceForDefendant(LocalDate.now())
+                                              .build())
                 .build();
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

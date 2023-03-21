@@ -17,32 +17,33 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
@@ -116,16 +117,35 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
-            caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES);
+
+        List<String> errors = new ArrayList<>();
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
+            .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+        if (generalAppTypes.size() > 1
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            errors.add("It is not possible to select an additional application type when applying to vary judgment");
+        }
+
+        if (generalAppTypes.size() == 1
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES)
+                    .generalAppInformOtherParty(
+                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
 
+        caseDataBuilder
+            .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
@@ -142,12 +162,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
-    }
-
-    private List<String> getPbaAccounts(String authToken) {
-        return organisationService.findOrganisation(authToken)
-            .map(Organisation::getPaymentAccount)
-            .orElse(emptyList());
     }
 
     private CallbackResponse gaValidateUrgencyDate(CallbackParams callbackParams) {
@@ -176,12 +190,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData = setWithNoticeByType(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
         Fee feeForGA = feesService.getFeeForGA(caseData);
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .applicantsPbaAccounts(fromList(pbaNumbers))
                 .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
                 .fee(feeForGA)
                 .build());
@@ -199,7 +211,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        caseData = setWithNoticeByType(caseData);
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
@@ -222,12 +234,18 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             first.ifPresent(dynamicLocationList::setValue);
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
                 .hearingPreferredLocation(dynamicLocationList).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppHearingDetails(generalAppHearingDetails)
+                .generalAppParentClaimantIsApplicant(null)
+                .build();
             caseData = updatedCaseData;
         } else {
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
                 .hearingPreferredLocation(DynamicList.builder().build()).build();
-            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            CaseData updatedCaseData = caseData.toBuilder()
+                .generalAppHearingDetails(generalAppHearingDetails)
+                .generalAppParentClaimantIsApplicant(null)
+                .build();
             caseData = updatedCaseData;
         }
 
@@ -246,5 +264,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
      */
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
+    }
+
+    private CaseData setWithNoticeByType(CaseData caseData) {
+        if (Objects.nonNull(caseData.getGeneralAppType())
+                && caseData.getGeneralAppType().getTypes().size() == 1
+                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            caseData = caseData.toBuilder()
+                    .generalAppInformOtherParty(
+                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
+        }
+        return caseData;
     }
 }

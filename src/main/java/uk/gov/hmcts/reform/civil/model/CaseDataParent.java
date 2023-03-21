@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -10,6 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -31,11 +33,12 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHeari
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -138,6 +141,9 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
+
+    @JsonUnwrapped
+    private final Mediation mediation;
 
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
@@ -260,7 +266,6 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
-    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
@@ -277,6 +282,7 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
+
     /**
      * This field is not used.
      *
@@ -299,6 +305,8 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
@@ -326,12 +334,37 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
+    private final PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final String currentDateboxDefendantSpec;
+    private final YesOrNo ccjPaymentPaidSomeOption;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountClaimAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountClaimFee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentTotalStillOwed;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountInterestToDate;
 
+    @JsonUnwrapped
+    private final CaseDataLiP caseDataLiP;
+
+    private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return  this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == YesOrNo.NO;
     }
 
     /**
@@ -343,5 +376,21 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo defendant2LIPAtClaimIssued;
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
+
+    private final List<Element<PartyFlagStructure>> applicantExperts;
+    private final List<Element<PartyFlagStructure>> respondent1Experts;
+    private final List<Element<PartyFlagStructure>> respondent2Experts;
+    private final List<Element<PartyFlagStructure>> applicantWitnesses;
+    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
+
+    @JsonIgnore
+    public boolean isResponseAcceptedByClaimant() {
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
+            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
+            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    }
+
+    private final IdamUserDetails claimantUserDetails;
 
 }

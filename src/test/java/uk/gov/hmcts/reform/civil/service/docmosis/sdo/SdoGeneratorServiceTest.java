@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +10,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,13 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_HNL_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_HNL_FAST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_HNL;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -77,39 +73,8 @@ public class SdoGeneratorServiceTest {
     @Autowired
     private SdoGeneratorService generator;
 
-    @BeforeEach
-    void setUp() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-    }
-
     @Test
     public void sdoSmall() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_HNL)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_SMALL);
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER));
-    }
-
-    @Test
-    public void sdoSmall_whenHNLFlagIsFalse() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
             .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
@@ -134,36 +99,9 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void sdoFast() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+    public void shouldGenerateSdoFastTrackDocument() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST)))
             .thenReturn(new DocmosisDocument(SDO_FAST.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
-    }
-
-    @Test
-    public void shouldGenerateSdoFastTrackDocument_whenHnlToggleIsEnabled() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_HNL_FAST)))
-            .thenReturn(new DocmosisDocument(SDO_HNL_FAST.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
         when(idamClient.getUserDetails(any()))
@@ -187,38 +125,9 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void sdoDisposal() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+    public void shouldGenerateSdoDisposalDocument() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_DISPOSAL);
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-            .orderType(OrderType.DISPOSAL)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
-    }
-
-    @Test
-    public void shouldGenerateSdoDisposalDocument_whenHnlToggleIsEnabled() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_HNL_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_HNL_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
         when(idamClient.getUserDetails(any()))

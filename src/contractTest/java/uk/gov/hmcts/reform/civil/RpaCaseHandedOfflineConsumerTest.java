@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
@@ -25,12 +25,13 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,7 +71,11 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
+    LocationRefDataService locationRefDataService;
+    @MockBean
     private Time time;
+
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     LocalDateTime localDateTime;
 
@@ -89,7 +94,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .legacyCaseReference("100DC001")
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);
@@ -103,7 +108,28 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
 
     @Test
     @SneakyThrows
-    void shouldGeneratePact_whenNoticerOfChangeAndCaseTakenOffline() {
+    void shouldGeneratePact_whenCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
+            .legacyCaseReference("100DC001")
+            .build();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+
+        System.out.println("PAYLOAD");
+        System.out.println(payload);
+
+        assertThat(payload, validateJson());
+
+        PactVerificationResult result = getPactVerificationResult(payload);
+
+        assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGeneratePact_whenNoticeOfChangeAndCaseTakenOffline() {
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -121,7 +147,39 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
                                 .build()).build()))
                     .build())
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+
+        System.out.println("PAYLOAD");
+        System.out.println(payload);
+
+        assertThat(payload, validateJson());
+
+        PactVerificationResult result = getPactVerificationResult(payload);
+
+        assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGeneratePact_whenNoticeOfChangeAndCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
+            .legacyCaseReference("100DC001")
+            .applicant1OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .organisation(Organisation.builder().organisationID("QWERTY R").build())
+                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                    .previousOrganisations(List.of(
+                        PreviousOrganisationCollectionItem.builder().value(
+                            PreviousOrganisation.builder()
+                                .organisationName("app 1 org")
+                                .toTimestamp(LocalDateTime.parse("2022-02-01T12:00:00.000550439"))
+                                .build()).build()))
+                    .build())
+            .build();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);

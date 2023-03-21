@@ -13,13 +13,12 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
@@ -33,10 +32,10 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,6 +49,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -61,7 +61,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -143,7 +142,7 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseType = CaseCategory.SPEC_CLAIM;
         } else {
             caseType = CaseCategory.UNSPEC_CLAIM;
@@ -167,7 +166,7 @@ public class InitiateGeneralApplicationService {
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
-        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
@@ -293,6 +292,10 @@ public class InitiateGeneralApplicationService {
         return true;
     }
 
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
+        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+    }
+
     private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
         String accessToken = userService.getAccessToken(
                 crossAccessUserConfiguration.getUserName(),
@@ -315,7 +318,7 @@ public class InitiateGeneralApplicationService {
         return respondentCaseRoles;
     }
 
-    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+    private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
             if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
                 if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
@@ -337,7 +340,7 @@ public class InitiateGeneralApplicationService {
             }
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-            CaseLocation courtLocation = CaseLocation.builder()
+            CaseLocationCivil courtLocation = CaseLocationCivil.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
@@ -350,16 +353,16 @@ public class InitiateGeneralApplicationService {
         return !statesBeforeSDO.contains(state);
     }
 
-    private CaseLocation getClaimant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getClaimant1PreferredLocation(CaseData caseData) {
         if (caseData.getApplicant1DQ() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getCourtLocation().getCaseLocation().getRegion())
                 .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
                 .build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
@@ -373,13 +376,13 @@ public class InitiateGeneralApplicationService {
                 && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
     }
 
-    private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendant1PreferredLocation(CaseData caseData) {
         if (caseData.getRespondent1DQ() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
-        return CaseLocation.builder()
+        return CaseLocationCivil.builder()
             .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -387,11 +390,11 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private CaseLocation getDefendantPreferredLocation(CaseData caseData) {
+    private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
         if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
 
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
@@ -399,14 +402,14 @@ public class InitiateGeneralApplicationService {
                 .build();
         } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
             || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
-            return CaseLocation.builder()
+            return CaseLocationCivil.builder()
                 .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                   .getCaseLocation().getBaseLocation())
                 .build();
         } else {
-            return CaseLocation.builder().build();
+            return CaseLocationCivil.builder().build();
         }
     }
 }

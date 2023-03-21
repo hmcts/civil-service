@@ -6,13 +6,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -23,15 +24,23 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToUserHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
+    private static final List<CaseEvent> EVENTS = List.of(
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
+    public static final String TASK_ID_SPEC = "CaseAssignmentToApplicantSolicitor1ForSpec";
+
+    private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -43,13 +52,23 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::assignSolicitorCaseRole
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+
+        switch (caseEvent) {
+            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1:
+                return TASK_ID;
+            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC:
+                return TASK_ID_SPEC;
+            default:
+                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
+        }
     }
 
     @Override
@@ -66,19 +85,21 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
-        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7
+        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
         if (toggleService.isGlobalSearchEnabled()) {
-            setSupplementaryData(caseData.getCcdCaseReference());
+            CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+            String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
+                ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
+            setSupplementaryData(caseData.getCcdCaseReference(), siteId);
         }
 
         return SubmittedCallbackResponse.builder().build();
     }
 
-    private void setSupplementaryData(Long caseId) {
+    private void setSupplementaryData(Long caseId, String siteId) {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put("supplementary_data_updates",
-                                   singletonMap("$set", singletonMap("HMCTSServiceId",
-                                                                     paymentsConfiguration.getSiteId())));
+                                   singletonMap("$set", singletonMap("HMCTSServiceId", siteId)));
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
 
     }

@@ -14,8 +14,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
@@ -25,14 +26,17 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,9 +79,13 @@ class RpaConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     FeatureToggleService featureToggleService;
+
+    @MockBean
+    LocationRefDataService locationRefDataService;
     @MockBean
     private Time time;
 
+    private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
     @BeforeEach
@@ -85,6 +93,12 @@ class RpaConsumerTest extends BaseRpaTest {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(ORGANISATION);
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
     }
 
     @Nested
@@ -97,7 +111,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
                 .legacyCaseReference("000DC001")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -114,7 +128,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateProceedsOfflineUnrepresentedDefendantMaximumData()
                 .legacyCaseReference("000DC002")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -131,7 +145,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateProceedsOfflineUnrepresentedDefendantMinimumData()
                 .legacyCaseReference("000DC003")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -152,7 +166,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
                 .legacyCaseReference("000DC004")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -169,7 +183,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateProceedsOfflineUnrepresentedDefendantWithMinimalData()
                 .legacyCaseReference("000DC005")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -186,7 +200,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateProceedsOfflineUnregisteredDefendantMaximumData()
                 .legacyCaseReference("000DC006")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -211,7 +225,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
                 .legacyCaseReference("000DC038")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -234,7 +248,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .respondent2OrganisationPolicy(null)
                     .legacyCaseReference("000DC047")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -257,7 +271,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC007")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -275,7 +289,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC008")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -293,7 +307,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC009")
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -314,7 +328,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .legacyCaseReference("000DC010")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -331,7 +345,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateRespondentRespondToClaimWithMinimalData(FULL_ADMISSION)
                 .legacyCaseReference("000DC011")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -348,7 +362,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateRespondentRespondToClaimWithMaximalData(FULL_ADMISSION)
                 .legacyCaseReference("000DC012")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -370,7 +384,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC013")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -388,7 +402,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC014")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -406,7 +420,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .legacyCaseReference("000DC015")
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -429,7 +443,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                     .legacyCaseReference("000DC016")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -446,7 +460,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndNotProceedMinimumData()
                     .legacyCaseReference("000DC017")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -463,7 +477,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndNotProceedMaximumData()
                     .legacyCaseReference("000DC018")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -484,7 +498,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
                     .legacyCaseReference("000DC045")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -507,7 +521,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndNotProceed_2v1()
                     .legacyCaseReference("000DC046")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -532,9 +546,10 @@ class RpaConsumerTest extends BaseRpaTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                     .legacyCaseReference("000DC019")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -551,7 +566,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndProceed()
                     .legacyCaseReference("000DC020")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -569,7 +584,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndProceed()
                     .legacyCaseReference("000DC036")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -592,7 +607,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                     .legacyCaseReference("000DC039")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -611,7 +626,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                     .legacyCaseReference("000DC040")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -630,7 +645,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                     .legacyCaseReference("000DC041")
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -653,9 +668,9 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC042")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -673,9 +688,10 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant1RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC043")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -693,9 +709,10 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC044")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
-                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
 
@@ -717,7 +734,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff()
                 .legacyCaseReference("000DC021")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -733,7 +750,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimNotified()
                 .legacyCaseReference("000DC022")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -749,7 +766,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified()
                 .legacyCaseReference("000DC023")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -766,7 +783,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
                 .legacyCaseReference("000DC024")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -783,7 +800,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledged()
                 .legacyCaseReference("000DC025")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -800,7 +817,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
                 .legacyCaseReference("000DC026")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -817,7 +834,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateTakenOfflineByStaffAfterDefendantResponse()
                 .legacyCaseReference("000DC027")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -837,7 +854,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissed()
                 .legacyCaseReference("000DC028")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -854,7 +871,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .claimDismissedDate(LocalDateTime.now())
                 .legacyCaseReference("000DC029")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -871,7 +888,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .claimDismissedDate(LocalDateTime.now())
                 .legacyCaseReference("000DC030")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -888,7 +905,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .claimDismissedDate(LocalDateTime.now())
                 .legacyCaseReference("000DC031")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -910,7 +927,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .legacyCaseReference("000DC032")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -936,7 +953,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .legacyCaseReference("000DC033")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -953,7 +970,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateClaimIssuedMaximumData()
                 .legacyCaseReference("000DC034")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 
@@ -970,7 +987,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 .atStateClaimIssuedWithMinimalData()
                 .legacyCaseReference("000DC035")
                 .build();
-            String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+            String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
             assertThat(payload, validateJson());
 

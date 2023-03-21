@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -10,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -43,29 +41,40 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -101,6 +110,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -110,11 +120,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 })
 class FlowStateAllowedEventServiceTest {
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @MockBean
+    private FeatureToggleService toggleService;
 
     static class GetFlowStateArguments implements ArgumentsProvider {
 
@@ -201,7 +211,9 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        migrateCase
+                        migrateCase,
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT
                     }
                 ),
                 of(
@@ -223,8 +235,13 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         EVIDENCE_UPLOAD_JUDGE,
-                        EVIDENCE_UPLOAD,
-                        migrateCase
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        migrateCase,
+                        MEDIATION_UNSUCCESSFUL,
+                        EVIDENCE_UPLOAD_RESPONDENT
+
                     }
                 ),
                 of(
@@ -247,8 +264,9 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         EVIDENCE_UPLOAD_JUDGE,
-                        EVIDENCE_UPLOAD,
-                        migrateCase
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        migrateCase,
+                        EVIDENCE_UPLOAD_RESPONDENT
                     }
                 ),
                 of(
@@ -275,9 +293,17 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        TRIAL_READY_NOTIFICATION,
+                        TRIAL_READY_CHECK,
+                        MOVE_TO_DECISION_OUTCOME,
+                        SERVICE_REQUEST_RECEIVED,
                         HEARING_SCHEDULED,
-                        EVIDENCE_UPLOAD,
-                        migrateCase
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        migrateCase,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS
                     }
                 ),
                 of(
@@ -299,9 +325,13 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
-                        migrateCase
-
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -324,7 +354,12 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -347,7 +382,12 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -490,9 +530,19 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         HEARING_SCHEDULED,
                         HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        SERVICE_REQUEST_RECEIVED,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
@@ -536,6 +586,12 @@ class FlowStateAllowedEventServiceTest {
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[]{
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
@@ -776,7 +832,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        TAKEN_OFFLINE_AFTER_SDO.fullName()
                     }
                 )
             );
@@ -796,9 +853,6 @@ class FlowStateAllowedEventServiceTest {
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
         void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
-            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
-                .isEmpty();
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
@@ -898,11 +952,6 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class IsEventAllowedOnCaseDetails {
 
-        @BeforeEach
-        void enableSpec() {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        }
-
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
         void shouldReturnValidStates_whenCaseEventIsGiven(
@@ -911,8 +960,8 @@ class FlowStateAllowedEventServiceTest {
             CaseEvent caseEvent
         ) {
             //work around starts: to force SPEC CLAIM tests to pass to not impact Damages.
-            if ((caseDetails.getData().get("superClaimType") != null
-                && caseDetails.getData().get("superClaimType").equals(SPEC_CLAIM))
+            if ((caseDetails.getData().get("CaseAccessCategory") != null
+                && caseDetails.getData().get("CaseAccessCategory").equals(SPEC_CLAIM))
                 || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
                 expected = false;
             }
@@ -929,8 +978,6 @@ class FlowStateAllowedEventServiceTest {
             CaseDetails caseDetails,
             CaseEvent caseEvent
         ) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }

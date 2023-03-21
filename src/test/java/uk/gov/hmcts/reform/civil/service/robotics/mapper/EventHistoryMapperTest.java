@@ -7,20 +7,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -29,14 +35,17 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -44,7 +53,9 @@ import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -62,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -78,6 +90,9 @@ class EventHistoryMapperTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
     @Autowired
     EventHistoryMapper mapper;
 
@@ -86,10 +101,18 @@ class EventHistoryMapperTest {
 
     LocalDateTime localDateTime;
 
+    List<LocationRefData> courtLocations;
+
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
+        courtLocations = new ArrayList<>();
+        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
     }
 
     @Nested
@@ -1575,7 +1598,7 @@ class EventHistoryMapperTest {
 
             if (!featureToggleService.isSDOEnabled()) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                     .atState(FlowState.Main.FULL_DEFENCE)
                     .atStateRespondent1v1FullDefenceSpec()
@@ -1668,7 +1691,7 @@ class EventHistoryMapperTest {
 
             if (featureToggleService.isSDOEnabled()) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
                     .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                     .atStateRespondent1v1FullDefenceSpec()
@@ -1747,7 +1770,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v1AllPaid() {
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .atStateRespondent1v1FullDefenceSpec()
@@ -1826,7 +1849,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when1v1ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
                 .atStateRespondent1v1FullAdmissionSpec()
                 .build();
@@ -1875,7 +1898,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1FullAdmission()
                 .build();
@@ -1924,7 +1947,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when1v2ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec1v2ClaimSubmitted()
                 .atStateRespondent1v2FullAdmission()
                 .build();
@@ -1980,7 +2003,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentPartAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1PartAdmission()
                 .build();
@@ -2033,7 +2056,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentCounterClaimToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1CounterClaim()
                 .build();
@@ -2875,14 +2898,14 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID("003")
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
-                        caseData.getRespondent2DQ(),
+                        caseData.getRespondent1DQ(),
                         caseData,
                         true,
                         caseData.getRespondent2()
                     ))
                     .eventDetails(EventDetails.builder()
-                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
-                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
                                       .preferredCourtName("")
                                       .build())
                     .build()
@@ -3022,7 +3045,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1PartAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondent1v2FullDefence_AdmitPart()
@@ -3088,7 +3111,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondent1v2FullDefence_AdmitFull()
@@ -3497,7 +3520,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2ssR1FullAdmissionR2FullDefenceNoOptionalEventsSpec() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
@@ -4065,12 +4088,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedReplyToDefence = Event.builder()
@@ -4157,12 +4188,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedReplyToDefence = Event.builder()
@@ -4260,12 +4299,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedReplyToDefence = Event.builder()
@@ -4480,12 +4527,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -4614,12 +4669,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5211,12 +5274,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedApplicant2DQ = Event.builder()
@@ -5226,12 +5297,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("004")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5335,12 +5414,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedApplicant2DQ = Event.builder()
@@ -5350,12 +5437,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("004")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      CIVIL_COURT_TYPE_ID))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5576,12 +5671,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  CIVIL_COURT_TYPE_ID))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.isEmpty() ? "" : courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                CIVIL_COURT_TYPE_ID))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
 
@@ -5691,12 +5794,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  CIVIL_COURT_TYPE_ID))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.isEmpty() ? "" : courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                CIVIL_COURT_TYPE_ID))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
 
@@ -5807,12 +5918,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  CIVIL_COURT_TYPE_ID))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant2DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.isEmpty() ? "" : courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                CIVIL_COURT_TYPE_ID))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
                 List<Event> expectedMiscEvents = List.of(
@@ -5895,12 +6014,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  CIVIL_COURT_TYPE_ID))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant2DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.isEmpty() ? "" : courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                CIVIL_COURT_TYPE_ID))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
                 List<Event> expectedMiscEvents = List.of(
@@ -7003,7 +7130,7 @@ class EventHistoryMapperTest {
             .defendant1LIPAtClaimIssued(NO)
             .defendant2LIPAtClaimIssued(null)
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
@@ -7058,7 +7185,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
@@ -7125,7 +7252,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("Company Name")
@@ -7198,7 +7325,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7218,7 +7345,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7239,7 +7366,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpace()
@@ -7259,7 +7386,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addLiftMentalBreathingSpace()
@@ -7279,7 +7406,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceOptionalDataNull() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithoutOptionalData()
@@ -7299,7 +7426,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7320,7 +7447,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpaceNoOptionalData()
@@ -7340,7 +7467,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addLiftMentalBreathingSpace()
@@ -7360,7 +7487,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceWithOnlyReferenceInfo() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithOnlyReferenceInfo()
@@ -7387,7 +7514,7 @@ class EventHistoryMapperTest {
             LocalDateTime datetime = LocalDateTime.now();
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
@@ -7405,4 +7532,126 @@ class EventHistoryMapperTest {
         }
     }
 
+    @Nested
+    class InterlocutoryJudgment {
+
+        @Test
+        public void shouldgenerateRPAfeedfor_IJNoDivergent() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.JUDICIAL_REFERRAL)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetails(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Both")
+                                                 .build())
+                                      .build())
+                .build();
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("interlocutoryJudgment").asList()
+                .extracting("eventCode").asString().contains("[252, 252]");
+        }
+
+        @Test
+        public void shouldgenerateRPAfeedfor_IJWithDivergent() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.JUDICIAL_REFERRAL)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetails(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("Test User")
+                                                 .build())
+                                      .build())
+                .build();
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+        }
+
+    }
+
+    @Nested
+    class DefaultJudgment {
+
+        @Test
+        public void shouldgenerateRPAfeedfor_DJNoDivergent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.JUDICIAL_REFERRAL)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+        }
+
+        @Test
+        public void shouldgenerateRPAfeedfor_DJWithDivergent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.JUDICIAL_REFERRAL)
+                .totalClaimAmount(new BigDecimal(1000))
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .build())
+                                          .build())
+                .build();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+
+        }
+
+    }
 }

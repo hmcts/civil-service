@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -77,7 +77,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash");
+                                                 "hash", null);
             var documentAndNote = DocumentAndNote.builder().document(testDocument).build();
 
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
@@ -106,7 +106,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
                                                  "A Fancy Name",
-                                                 "hash");
+                                                 "hash", null);
             var documentAndNote = DocumentWithName.builder().document(testDocument).build();
 
             List<Element<DocumentWithName>> documentList = new ArrayList<>();

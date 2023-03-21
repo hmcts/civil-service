@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -13,11 +13,11 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseF
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 
 import java.time.LocalDateTime;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class SealedClaimResponseFormGeneratorForSpecTest {
 
     @InjectMocks
@@ -56,12 +56,18 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
             caseData);
 
-        Assert.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
-        Assert.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
-                            templateData.getWhyDisputeTheClaim());
-        Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName(),
-                            templateData.getStatementOfTruth().getName());
-        Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
-                            templateData.getStatementOfTruth().getRole());
+        Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
+        Assertions.assertEquals(
+            caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
+            templateData.getWhyDisputeTheClaim()
+        );
+        Assertions.assertEquals(
+            caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName(),
+            templateData.getStatementOfTruth().getName()
+        );
+        Assertions.assertEquals(
+            caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
+            templateData.getStatementOfTruth().getRole()
+        );
     }
 }

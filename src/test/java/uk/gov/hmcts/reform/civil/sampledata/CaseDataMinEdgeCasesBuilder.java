@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,6 +63,12 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
     public CaseDataMinEdgeCasesBuilder atStateClaimDraftWithMinimalData() {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocationCivil.builder()
+                              .region("4")
+                              .baseLocation("000000")
+                              .build())
             .build();
         applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;

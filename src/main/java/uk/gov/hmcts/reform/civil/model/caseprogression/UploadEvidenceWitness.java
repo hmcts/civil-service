@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder(toBuilder = true)
@@ -14,17 +15,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UploadEvidenceWitness {
 
-    private String witnessOption1Name;
-    private LocalDate witnessOption1UploadDate;
-    private Document witnessOption1;
-
-    private String witnessOption2Name;
-    private Document witnessOption2;
-
-    private String witnessOption3Name;
-    private LocalDate witnessOption3UploadDate;
-    private Document witnessOption3;
-
-    private Document witnessOption4;
-
+    private String witnessOptionName;
+    private LocalDate witnessOptionUploadDate;
+    private Document witnessOptionDocument;
+    @Builder.Default
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }

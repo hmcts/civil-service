@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -56,12 +56,10 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if ("CREATE_CLAIM_SPEC".equals(callbackParams.getRequest().getEventId())
-            || isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-            if (toggleService.isLrSpecEnabled()) {
-                caseData = caseData.toBuilder()
-                    .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
-                    .build();
-            }
+            || SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            caseData = caseData.toBuilder()
+                .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
+                .build();
         } else {
             caseData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM))

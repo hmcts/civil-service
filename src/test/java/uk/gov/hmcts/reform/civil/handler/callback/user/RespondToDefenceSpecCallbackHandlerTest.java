@@ -27,9 +27,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -43,17 +46,20 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -117,6 +123,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
 
+    @MockBean
+    private CaseFlagsInitialiser caseFlagsInitialiser;
+
     @Nested
     class AboutToStart {
 
@@ -153,7 +162,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_START
             );
 
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("respondent1Copy")
@@ -386,7 +394,57 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("applicant1ProceedWithClaim"))
                 .isEqualTo(null);
         }
+    }
 
+    @Nested
+    class MidEventCallbackSetApplicantRoutesFlag {
+
+        private static final String PAGE_ID = "set-applicant-route-flags";
+
+        @Test
+        void shouldSetApplicantRouteFlag_whenClaimantRejectPartPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetApplicantRouteFlag_whenItsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ProceedWithClaim(YES)
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotSetApplicantRouteFlag_whenClaimantAcceptPartPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
+                .isEqualTo("No");
+        }
     }
 
     @Nested
@@ -742,6 +800,32 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(null)
+                    .whenWasThisAmountPaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
         void shouldSetUpPaymentDateForResponseDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
@@ -763,6 +847,149 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+
+    }
+
+    @Nested
+    class PaymentDateValidationCallback {
+
+        private static final String PAGE_ID = "validate-respondent-payment-date";
+
+        @Test
+        void shouldReturnError_whenPastPaymentDate() {
+            PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
+                .paymentSetDate(LocalDate.now().minusDays(15)).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Enter a date that is today or in the future");
+        }
+
+        @Test
+        void shouldNotReturnError_whenFuturePaymentDate() {
+            PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
+                .paymentSetDate(LocalDate.now().plusDays(15)).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class SetUpPaymentAmountField {
+
+        @Test
+        void shouldConvertPartAdmitPaidValueFromPenniesToPounds() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(BigDecimal.valueOf(1050))
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            BigDecimal result = getCaseData(response).getPartAdmitPaidValuePounds();
+
+            assertThat(result).isEqualTo(new BigDecimal("10.50"));
+        }
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class MidEventCallbackValidateAmountPaidFlag {
+
+        private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(new BigDecimal(150000))
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
+        }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceed() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
+
+            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
+        }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceedWhenPartPaymentAccepted() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimAmount = getCaseData(response).getCcjJudgmentAmountClaimAmount();
+            assertThat(claimAmount).isEqualTo(BigDecimal.valueOf(500));
+
+            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
+
+            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
     }
 }

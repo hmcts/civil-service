@@ -2,24 +2,29 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,18 +46,12 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-
-            if (toggleService.isHearingAndListingSDOEnabled()) {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
-            }
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
-                ? DocmosisTemplates.SDO_HNL_FAST : DocmosisTemplates.SDO_FAST;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
-            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
-                ? DocmosisTemplates.SDO_HNL_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
@@ -63,9 +62,10 @@ public class SdoGeneratorService {
 
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(docmosisTemplate, caseData),
-                    docmosisDocument.getBytes(),
-                    DocumentType.SDO_ORDER
+            new PDF(
+                getFileName(docmosisTemplate, caseData),
+                docmosisDocument.getBytes(),
+                DocumentType.SDO_ORDER
             )
         );
     }
@@ -149,12 +149,13 @@ public class SdoGeneratorService {
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
             );
 
-        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
-            sdoDocumentBuilder
-                .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-                .disposalHearingTime(caseData.getDisposalHearingHearingTime())
-                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel());
-        }
+        sdoDocumentBuilder
+            .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
+        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
 
         return sdoDocumentBuilder.build();
     }
@@ -254,13 +255,13 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
             );
 
-        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
-            sdoDocumentFormBuilder
-                .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .fastTrackHearingTime(caseData.getFastTrackHearingTime())
-                .fastTrackHearingTimeEstimate(
-                    caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
-        }
+        sdoDocumentFormBuilder
+            .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
+            .fastTrackHearingTime(caseData.getFastTrackHearingTime());
+        Optional.ofNullable(caseData.getFastTrackHearingTime())
+            .map(FastTrackHearingTime::getHearingDuration)
+            .map(FastTrackHearingTimeEstimate::getLabel)
+            .ifPresent(sdoDocumentFormBuilder::fastTrackHearingTimeEstimate);
 
         return sdoDocumentFormBuilder.build();
     }

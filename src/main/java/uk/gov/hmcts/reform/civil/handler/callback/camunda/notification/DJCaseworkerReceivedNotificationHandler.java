@@ -11,11 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -57,14 +57,21 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     }
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
-        log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
-                                     notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
-                                             addProperties(caseData),
-                                             String.format(REFERENCE_TEMPLATE_CASEWORKER,
-                                                           caseData.getLegacyCaseReference()));
-
+        if (caseData.getRespondent2() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both")) {
+            log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
+            notificationService.sendMail(
+                defaultJudgmentSpecEmailConfiguration.getReceiver(),
+                notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
+                addProperties(caseData),
+                String.format(
+                    REFERENCE_TEMPLATE_CASEWORKER,
+                    caseData.getLegacyCaseReference()
+                )
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -85,6 +92,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             PAYMENT_TYPE, getPaymentTypeField(caseData, total),
             AMOUNT_CLAIMED, amountClaimed.toString(),
+            RESPONDENT, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             AMOUNT_OF_COSTS, amountOfCosts.toString(),
             AMOUNT_PAID, partialPayment.toString(),
             AMOUNT_OF_JUDGMENT, total.toString()
