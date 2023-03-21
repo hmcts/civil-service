@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -61,13 +62,13 @@ public class CreateSDORespondent1NotificationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name().equals(callbackParams.getRequest().getEventId())) {
-            if (caseData.isRespondent1Represented()) {
+            if (caseData.getRespondent1Represented() == YesOrNo.YES) {
                 lr1NotificationSender.notifyRespondentPartySDOTriggered(caseData);
             } else {
                 lip1NotificationSender.notifyRespondentPartySDOTriggered(caseData);
             }
         } else if (caseData.getRespondent2() != null) {
-            if (caseData.isRespondent2Represented()) {
+            if (caseData.getRespondent2Represented() == YesOrNo.YES) {
                 lr2NotificationSender.notifyRespondentPartySDOTriggered(caseData);
             } else {
                 lip2NotificationSender.notifyRespondentPartySDOTriggered(caseData);

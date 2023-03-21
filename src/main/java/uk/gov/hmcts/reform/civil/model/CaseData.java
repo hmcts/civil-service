@@ -733,11 +733,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .findFirst().orElse(null);
     }
 
-    @JsonIgnore
-    public boolean isRespondent1Represented() {
-        return YesOrNo.YES == getRespondent1Represented();
-    }
-
     public YesOrNo getRespondent2Represented() {
         return Stream.of(
                 respondent2Represented,
@@ -745,11 +740,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
-    }
-
-    @JsonIgnore
-    public boolean isRespondent2Represented() {
-        return YesOrNo.YES == getRespondent2Represented();
     }
 
     @JsonIgnore
