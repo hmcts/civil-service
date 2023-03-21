@@ -516,6 +516,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
+    private final DynamicList hearingMethodValuesDisposalHearingDJ;
+    private final DynamicList hearingMethodValuesTrialHearingDJ;
     private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
