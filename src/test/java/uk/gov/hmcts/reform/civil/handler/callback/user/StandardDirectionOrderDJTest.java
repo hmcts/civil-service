@@ -13,7 +13,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -36,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,6 +78,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CategoryService categoryService;
 
     @Nested
     class AboutToStartCallback {
@@ -143,6 +149,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
                               .epimmsId("123").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearing().build();

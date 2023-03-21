@@ -13,9 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -51,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -84,6 +88,9 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
+    private static final String HEARING_CHANNEL = "HearingChannel";
+    private static final String SPEC_SERVICE_ID = "AAA6";
+    private static final String UNSPEC_SERVICE_ID = "AAA7";
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
@@ -96,6 +103,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
+    private final CategoryService categoryService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -189,6 +197,15 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         DynamicList locationsList = getLocationsFromList(locations);
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
+
+        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+            authToken, HEARING_CHANNEL, serviceId
+        );
+        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+        caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
+        caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
