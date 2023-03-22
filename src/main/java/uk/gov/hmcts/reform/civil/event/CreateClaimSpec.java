@@ -55,7 +55,7 @@ public class CreateClaimSpec implements CCDConfig<CaseData, State, UserRole> {
             )
             .done()
 
-            .page("Claimant", this::midEvent)
+            .page("Claimant")
             .label("claimantsDetails", "## Claimant's details")
             .complex(CaseData::getApplicant1Spec)
             .mandatoryWithLabel(Party::getType, "Claimant type")
@@ -70,7 +70,7 @@ public class CreateClaimSpec implements CCDConfig<CaseData, State, UserRole> {
             .done();
     }
 
-    public AboutToStartOrSubmitResponse<CaseData, State> midEvent(CaseDetails<CaseData, State> details,
+   /* public AboutToStartOrSubmitResponse<CaseData, State> midEvent(CaseDetails<CaseData, State> details,
                                                                   CaseDetails<CaseData, State> detailsBefore) {
         final CaseData caseData = details.getData();
         List<String> errors = new ArrayList<>();
@@ -83,7 +83,7 @@ public class CreateClaimSpec implements CCDConfig<CaseData, State, UserRole> {
             .errors(errors)
             .data(caseData)
             .build();
-    }
+    }*/
 
     public AboutToStartOrSubmitResponse<CaseData, State> aboutToSubmit(
         CaseDetails<CaseData, State> details, CaseDetails<CaseData, State> beforeDetails) {
