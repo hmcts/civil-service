@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.documents;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;

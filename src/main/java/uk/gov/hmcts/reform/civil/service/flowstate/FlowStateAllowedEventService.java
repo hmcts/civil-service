@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
@@ -53,6 +53,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
@@ -192,6 +194,7 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
+                MEDIATION_UNSUCCESSFUL,
                 EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
@@ -275,12 +278,17 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -302,9 +310,14 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -326,9 +339,14 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -742,6 +760,7 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
+                MEDIATION_SUCCESSFUL,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
@@ -773,6 +792,7 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
+                MEDIATION_SUCCESSFUL,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,

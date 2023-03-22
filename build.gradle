@@ -127,6 +127,8 @@ allprojects {
       ) {
         entry 'groovy-all'
       }
+
+      // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     }
     imports {
@@ -260,6 +262,13 @@ task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
 }
 
+task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-noc'
+}
+
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
@@ -289,7 +298,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -303,7 +312,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/CivilDocumentStitchingService.java, **/CountriesAllowed.java, **/FeesService.java, **/UnavailableDateValidator.java, **/AcknowledgeOfServiceCallbackHandler.java, **/FlowPredicate.java, **/CreateClaimCallbackHandler.java, **/CaseProceedsInCasemanRespondentNotificationHandler.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java, **/*Spec*.java"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/CivilDocumentStitchingService.java, **/CountriesAllowed.java, **/FeesService.java, **/UnavailableDateValidator.java, **/AcknowledgeOfServiceCallbackHandler.java, **/FlowPredicate.java, **/CreateClaimCallbackHandler.java, **/CaseProceedsInCasemanRespondentNotificationHandler.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java, **/ResendNotifyRPA*.java, **/*Spec*.java, **/model/hearingvalues/**, **/enums/hearing/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -358,7 +367,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation project(':sendgrid-client')
+  implementation project(':commons-civil')
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -423,7 +432,6 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.19.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.73'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.7'
