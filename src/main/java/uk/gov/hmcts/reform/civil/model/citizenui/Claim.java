@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 public interface Claim {
-
     boolean hasResponsePending();
 
     boolean hasResponsePendingOverdue();
