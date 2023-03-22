@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
     JacksonAutoConfiguration.class
 })
 
-public class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
+ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     TriggerGenAppLocationUpdateCallbackHandler handler;

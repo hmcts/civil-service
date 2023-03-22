@@ -392,7 +392,7 @@ class GenAppStateHelperServiceTest {
         }
 
         @Test
-        public void updateApplicationLocationDetailsLists() {
+         void updateApplicationLocationDetailsLists() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                                             true,
@@ -417,7 +417,7 @@ class GenAppStateHelperServiceTest {
         }
 
         @Test
-        public void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
+         void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
