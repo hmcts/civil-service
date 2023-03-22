@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -124,8 +123,6 @@ public class HearingValuesServiceTest {
                                                        .locationType(COURT)
                                                        .build());
 
-        PanelRequirementsModel expectedPanelReqs = PanelRequirementsModel.builder().build();
-
         JudiciaryModel expectedJudiciary = JudiciaryModel.builder().build();
 
         ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
@@ -152,7 +149,7 @@ public class HearingValuesServiceTest {
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
-            .panelRequirements(expectedPanelReqs)
+            .panelRequirements(null)
             .leadJudgeContractType("")
             .judiciary(expectedJudiciary)
             .hearingIsLinkedFlag(false)
