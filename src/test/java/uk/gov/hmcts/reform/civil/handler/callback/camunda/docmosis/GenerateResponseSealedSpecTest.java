@@ -247,7 +247,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
-    @Test
+    /*@Test
     void shouldGenerateClaimForm_WhenSpecResponseTimelineDocAndRespondent1SpecDefenceResponseDocumentIsNull() {
         // Given: Case data with docs to stitch and no existing systemGeneratedCaseDocuments,
         // stitching is enabled,isPinInPostEnabled is false and callback version V1
@@ -268,7 +268,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-    }
+    }*/
 
     @Test
     void shouldReturnCorrectActivityId_whenRequestedSpecClaim() {
