@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -101,6 +102,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
+    private final RespondentMediationService respondentMediationService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -202,60 +204,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        DefendantResponseShowTag mediationFlag = setMediationRequired(caseData);
+        DefendantResponseShowTag mediationFlag = respondentMediationService.setMediationRequired(caseData);
         if (mediationFlag != null) {
             Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
             showConditionFlags.add(mediationFlag);
             updatedCaseData.showConditionFlags(showConditionFlags);
         }
-    }
-
-    private DefendantResponseShowTag setMediationRequired(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-            if (multiPartyScenario.equals(ONE_V_ONE)) {
-                switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                    case FULL_DEFENCE:
-                        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
-                            && YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
-                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                        }
-                        break;
-                    case PART_ADMISSION:
-                        if (YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
-                            if (caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() != null
-                                && NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())) {
-                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                            } else if (caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec() != null
-                                && NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
-                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                            } else if (caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null
-                                && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())) {
-                                return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                            }
-                        }
-                        break;
-                    case FULL_ADMISSION:
-                        if (YES.equals(caseData.getApplicant1ProceedWithClaim())
-                            && !YES.equals(caseData.getDefendantSingleResponseToBothClaimants())) {
-                            return DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE;
-                        }
-                        break;
-                    default:
-                        return null;
-                }
-            } else if (multiPartyScenario.equals(TWO_V_ONE)
-                && YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
-                && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
-                return DefendantResponseShowTag.CLAIMANT_MEDIATION_TWO_V_ONE;
-            } else {
-                if (!YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
-                    && YES.equals(caseData.getApplicant1ProceedWithClaim())) {
-                    return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO;
-                }
-            }
-        }
-        return null;
     }
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
