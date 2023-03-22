@@ -1,33 +1,53 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.reform.civil.access.ApplicantAccess;
 
-@SuperBuilder(toBuilder = true)
-@Jacksonized
+import static uk.gov.hmcts.ccd.sdk.type.FieldType.Label;
+import static uk.gov.hmcts.ccd.sdk.type.FieldType.TextArea;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class CaseData {
 
-    /*@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //Civil Service Case Data
     @CCD(
         access = {ApplicantAccess.class}
     )
-    private final Long ccdCaseReference; */
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String legacyCaseReference;
 
     @CCD(
-        access = {ApplicantAccess.class}
+        typeOverride = Label,
+        access = {ApplicantAccess.class},
+        label = "## Legal representatives: Test Label"
     )
-    private final SolicitorReferences solicitorReferences;
+    private String specCheckList;
+
+    @CCD(
+        typeOverride = TextArea,
+        access = {ApplicantAccess.class},
+        label = "Test checklist text"
+    )
+    private String checkListText;
 
     @JsonUnwrapped
     @CCD(
         access = {ApplicantAccess.class}
     )
-    private PartySpec applicant1Spec;
+    private SolicitorReferences solicitorReferences;
+
+    @JsonUnwrapped
+    @CCD(
+        access = {ApplicantAccess.class}
+    )
+    private Party applicant1Spec;
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CaseDetails {
 
-    private Long id;
+    //private Long id;
 
     private String jurisdictionId;
 

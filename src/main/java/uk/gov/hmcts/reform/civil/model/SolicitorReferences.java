@@ -14,23 +14,19 @@ import uk.gov.hmcts.reform.civil.access.CaseworkerCaaAccess;
 import static uk.gov.hmcts.ccd.sdk.type.FieldType.TextArea;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class SolicitorReferences {
 
     @CCD(typeOverride = TextArea,
-        label = "Applicant solictor reference",
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
     private String applicantSolicitor1Reference;
+
     @CCD(typeOverride = TextArea,
-        label = "Respondent solicitor 1 reference",
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
     private String respondentSolicitor1Reference;
+
     @CCD(typeOverride = TextArea,
-        label = "Respondent solicitor 2 reference",
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
     private String respondentSolicitor2Reference;
 }

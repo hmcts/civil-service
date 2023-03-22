@@ -4,7 +4,7 @@ import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.reform.civil.access.ApplicantAccess;
 import uk.gov.hmcts.reform.civil.access.CaseworkerCaaAccess;
 
-public enum CaseState {
+public enum State {
     @CCD(
         label = "Pending case issued",
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class}

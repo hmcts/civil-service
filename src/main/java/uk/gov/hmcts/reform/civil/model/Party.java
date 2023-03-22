@@ -8,7 +8,7 @@ import lombok.Data;
 import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.reform.civil.access.ApplicantAccess;
 import uk.gov.hmcts.reform.civil.access.CaseworkerCaaAccess;
-import uk.gov.hmcts.reform.civil.enums.PartyTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.PartyType;
 
 import java.time.LocalDate;
 
@@ -18,37 +18,40 @@ import static uk.gov.hmcts.ccd.sdk.type.FieldType.TextArea;
 @Data
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
-public class PartySpec {
+public class Party {
 
     @CCD(label = "Claimant type",
         typeOverride = FixedRadioList,
         typeParameterOverride = "PartyType",
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class}
     )
-    private PartyTypeSpec typeSpec;
+    private PartyType type;
 
     @CCD(typeOverride = TextArea,
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
-    private String individualTitleSpec;
+    private String individualTitle;
 
     @CCD(typeOverride = TextArea,
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
-    private String individualFirstNameSpec;
+    private String individualFirstName;
 
     @CCD(typeOverride = TextArea,
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
-    private String individualLastNameSpec;
+    private String individualLastName;
 
     @CCD(access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
     @JsonFormat(pattern = "dd-MM-yyyy")
-    private LocalDate individualDateOfBirthSpec;
+    private LocalDate individualDateOfBirth;
 
     @CCD(typeOverride = TextArea,
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
-    private String companyNameSpec;
+    private String companyName;
 
     @CCD(typeOverride = TextArea,
         access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
-    private String organisationNameSpec;
+    private String organisationName;
 
+    @CCD(typeOverride = TextArea,
+        access = {ApplicantAccess.class, CaseworkerCaaAccess.class})
+    private String soleTraderName;
 }
