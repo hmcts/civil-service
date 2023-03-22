@@ -97,10 +97,10 @@ allprojects {
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4.2'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
 
-      // solves CVE-2022-25857 and CVE-2022-1471
+      // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '2.0'
+        version: '1.33'
       ) {
         entry 'snakeyaml'
       }
