@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -55,7 +55,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -226,7 +226,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
+            errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
@@ -314,7 +314,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.claimFee(feesService
@@ -577,7 +579,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validatePostCode(String postCode) {
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
+        List<String> errors = postcodeValidator.validate(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -696,7 +698,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
-
+        if (toggleService.isPbaV3Enabled()) {
+            caseDataBuilder.paymentTypePBASpec("PBAv3");
+        }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
