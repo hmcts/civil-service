@@ -22,15 +22,12 @@ public class RespondentLiPResponse {
 
     @JsonIgnore
     public boolean isRespondentResponseBilingual(CaseData caseData) {
-        String responseLanguage = Optional.ofNullable(caseData.getCaseDataLiP())
+        boolean responseLanguage = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .orElse(null);
+            .filter(respondent1ResponseLanguage -> Language.BOTH.toString().equals(respondent1ResponseLanguage))
+            .isPresent();
 
-        if (responseLanguage != null && Language.BOTH.toString().equals(responseLanguage)) {
-            return true;
-        }
-
-        return false;
+        return responseLanguage;
     }
 }

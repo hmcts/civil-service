@@ -61,11 +61,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (responseLanguageIsBilingual) {
-            return responseBuilder.build();
+        if (!responseLanguageIsBilingual) {
+            responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
-        responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         return responseBuilder.build();
     }
 
