@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.documents;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import static java.util.Objects.requireNonNull;
 
