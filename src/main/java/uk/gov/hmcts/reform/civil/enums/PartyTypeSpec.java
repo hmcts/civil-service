@@ -23,3 +23,4 @@ public enum PartyTypeSpec implements HasLabel {
 
     private final String label;
 }
+
