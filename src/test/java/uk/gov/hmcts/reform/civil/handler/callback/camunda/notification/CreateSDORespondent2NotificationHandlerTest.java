@@ -12,15 +12,15 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -35,11 +35,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
-    CreateSDORespondent1NotificationHandler.class,
+    CreateSDORespondent2NotificationHandler.class,
     JacksonAutoConfiguration.class,
-    CreateSDORespondent1LRNotificationSender.class,
     CreateSDORespondent2LRNotificationSender.class,
-    CreateSDORespondent1LiPNotificationSender.class,
     CreateSDORespondent2LiPNotificationSender.class
 })
 public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -51,7 +49,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
     @MockBean
     private OrganisationService organisationService;
     @Autowired
-    private CreateSDORespondent1NotificationHandler handler;
+    private CreateSDORespondent2NotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -98,7 +96,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
                 .toBuilder()
                 .respondent2(Party.builder()
                                  .type(Party.Type.COMPANY)
-                                 .companyName("Company 1")
+                                 .companyName("Company 2")
                                  .partyEmail("company@email.com")
                                  .build())
                 .respondent2Represented(YesOrNo.NO)
@@ -118,7 +116,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
                 "template-id",
                 Map.of(
                     CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 1"
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "Company 2"
                 ),
                 "create-sdo-respondent-2-notification-000DC001"
             );
@@ -139,7 +137,7 @@ public class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHan
                                                  .request(CallbackRequest.builder().eventId(
                                                          "NOTIFY_RESPONDENT_SOLICITOR2_SDO_TRIGGERED")
                                                               .build()).build()))
-            .isEqualTo(CreateSDORespondent1NotificationHandler.TASK_ID_2);
+            .isEqualTo("CreateSDONotifyRespondentSolicitor2");
     }
 }
 
