@@ -39,8 +39,6 @@ public class HearingsPartyMapperTest {
     private static final String EXPERT_ROLE = "EXPR";
     private static final String WITNESS_ROLE = "WITN";
 
-    private static final String FULL_NAME = "%s %s";
-
     private static final String APPLICANT_ORG_ID = "QWERTY A";
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String RESPONDENT_TWO_ORG_ID = "QWERTY R2";

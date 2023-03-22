@@ -79,7 +79,7 @@ public class HearingDetailsMapper {
     }
 
     public static PanelRequirementsModel getPanelRequirements() {
-        return PanelRequirementsModel.builder().build();
+        return null;
     }
 
     public static String getLeadJudgeContractType() {
