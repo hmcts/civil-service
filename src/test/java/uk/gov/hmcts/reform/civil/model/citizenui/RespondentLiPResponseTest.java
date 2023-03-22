@@ -25,7 +25,7 @@ public class RespondentLiPResponseTest {
                              .build())
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(caseData);
+        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
         assertThat(isBilingualResponse).isEqualTo(true);
     }
 
@@ -38,7 +38,7 @@ public class RespondentLiPResponseTest {
                              .build())
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(caseData);
+        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
         assertThat(isBilingualResponse).isEqualTo(false);
     }
 
@@ -48,7 +48,7 @@ public class RespondentLiPResponseTest {
             .caseDataLip(null)
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(caseData);
+        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
         assertThat(isBilingualResponse).isEqualTo(false);
     }
 }

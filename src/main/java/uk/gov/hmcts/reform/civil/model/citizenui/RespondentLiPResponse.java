@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -19,7 +20,8 @@ public class RespondentLiPResponse {
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private String respondent1ResponseLanguage;
 
-    public boolean doesRespondentResponseLanguageIsBilingual(CaseData caseData) {
+    @JsonIgnore
+    public boolean isRespondentResponseBilingual(CaseData caseData) {
         String responseLanguage = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)

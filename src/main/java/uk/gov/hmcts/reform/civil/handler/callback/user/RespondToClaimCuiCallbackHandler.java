@@ -57,7 +57,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData updatedData = getUpdatedCaseData(callbackParams);
 
-        boolean responseLanguageIsBilingual = respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(updatedData);
+        boolean responseLanguageIsBilingual = respondentLiPResponse.isRespondentResponseBilingual(updatedData);
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 

@@ -83,7 +83,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssued()
                 .build();
 
-            given(respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(any())).willReturn(false);
+            given(respondentLiPResponse.isRespondentResponseBilingual(any())).willReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -103,7 +103,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
-            given(respondentLiPResponse.doesRespondentResponseLanguageIsBilingual(any())).willReturn(true);
+            given(respondentLiPResponse.isRespondentResponseBilingual(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
