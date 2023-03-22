@@ -21,7 +21,6 @@ public class CreateSDORespondent1NotificationHandler extends AbstractCreateSDORe
               Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED));
     }
 
-
     @Override
     protected boolean isRespondentLiP(CaseData caseData) {
         return caseData.isRespondent1LiP();

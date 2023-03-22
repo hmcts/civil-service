@@ -23,7 +23,6 @@ public class CreateSDORespondent2NotificationHandler extends AbstractCreateSDORe
         );
     }
 
-
     @Override
     protected boolean isRespondentLiP(CaseData caseData) {
         return caseData.isRespondent2LiP();
