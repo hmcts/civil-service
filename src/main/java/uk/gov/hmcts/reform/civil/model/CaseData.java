@@ -90,6 +90,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -562,6 +565,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
+
+    /* Final Orders */
+
+    private final YesOrNo finalOrderMadeSelection;
+    private final OrderMade finalOrderDateHeardComplex;
+    private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
+    private FinalOrderRepresentation finalOrderRepresentation;
     /**
      * RTJ = Refer To Judge.
      */
