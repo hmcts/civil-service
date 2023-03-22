@@ -294,8 +294,8 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("344489")
-                                                   .region("4").build());
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000")
+                                                   .region("2").build());
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();

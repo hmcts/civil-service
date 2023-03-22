@@ -1,26 +1,28 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Collections;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Slf4j
 @Service
@@ -29,7 +31,8 @@ public class GenAppStateHelperService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final InitiateGeneralApplicationService genAppService;
+
+    private final ObjectMapper objectMapper;
 
     @Getter
     @RequiredArgsConstructor
@@ -68,12 +71,18 @@ public class GenAppStateHelperService {
     public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData) {
 
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {
-            Pair<CaseLocationCivil, Boolean> caseLocation = genAppService.getWorkAllocationLocation(caseData, null);
+            List<GeneralApplication> genApps = new ArrayList<>();
+            CaseData finalCaseData = caseData;
             caseData.getGeneralApplications().forEach(generalApplicationElement -> {
-                generalApplicationElement.getValue().getCaseManagementLocation().setBaseLocation(caseLocation.getLeft().getBaseLocation());
-                generalApplicationElement.getValue().getCaseManagementLocation().setRegion(caseLocation.getLeft().getRegion());
-
+                GeneralApplication generalApplication = generalApplicationElement.getValue();
+                generalApplication.getCaseManagementLocation().setBaseLocation(finalCaseData.getCaseManagementLocation().getBaseLocation());
+                generalApplication.getCaseManagementLocation().setRegion(finalCaseData.getCaseManagementLocation().getRegion());
+                Map<String, Object> genAppMap = generalApplication.toMap(objectMapper);
+                genAppMap.put("isCcmccLocation", YesOrNo.NO);
+                generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
+                genApps.add((generalApplication));
             });
+            caseData = caseData.toBuilder().generalApplications(wrapElements(genApps)).build();
         }
         return caseData;
     }

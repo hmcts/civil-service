@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -52,9 +53,6 @@ class GenAppStateHelperServiceTest {
 
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
-    private InitiateGeneralApplicationService genAppHelperService;
 
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";
     private static final String APPLICATION_OFFLINE_TEXT = "Proceeds In Heritage";
@@ -405,15 +403,17 @@ class GenAppStateHelperServiceTest {
 
             Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
                                                          .region("2")
-                                                         .baseLocation("000000")
+                                                         .baseLocation("00000")
                                                          .build(), false);
-            when(genAppHelperService.getWorkAllocationLocation(caseData, null)).thenReturn(caseLocation);
             CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
             assertThat(updatedData.getGeneralApplications().get(1).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(1).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
             assertThat(updatedData.getGeneralApplications().get(2).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(2).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
