@@ -31,7 +31,7 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantLIP
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyBothParties
         );
     }
 
@@ -40,7 +40,7 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
         return TASK_ID_CLAIMANT;
     }
 
-    private CallbackResponse notifyClaimantLIP(CallbackParams callbackParams) {
+    private CallbackResponse notifyBothParties(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         sendEmail(caseData, recipient);
@@ -65,17 +65,10 @@ public class NotificationForDisAgreedRePaymentPlanHandler extends CallbackHandle
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String reference;
-        if (caseData.getSolicitorReferences() == null
-            || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
-            reference = "";
-        } else {
-            reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
-        }
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
-            CLAIMANT_REFERENCE_NUMBER, reference
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
     }
 }
