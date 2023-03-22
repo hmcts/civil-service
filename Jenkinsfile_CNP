@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "feat/CIV-5171"
+def ccdBranch = "task/CIV-6647"
 def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 
