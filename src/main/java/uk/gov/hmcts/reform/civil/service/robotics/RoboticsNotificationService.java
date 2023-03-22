@@ -7,14 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
-import uk.gov.hmcts.reform.sendgrid.EmailData;
-import uk.gov.hmcts.reform.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
+import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
@@ -31,7 +31,7 @@ import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
-import static uk.gov.hmcts.reform.sendgrid.EmailAttachment.json;
+import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Slf4j
 @Service
