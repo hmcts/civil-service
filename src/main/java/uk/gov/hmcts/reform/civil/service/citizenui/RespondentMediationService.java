@@ -31,17 +31,17 @@ public class RespondentMediationService {
     private DefendantResponseShowTag getDefendantResponseShowTagFor1v1(CaseData caseData) {
         switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
             case FULL_DEFENCE:
-                if (caseData.isFullDefence() && caseData.isDefendantHasAcceptedMediation()) {
+                if (caseData.isFullDefence() && caseData.isMediationAcceptedByDefendant()) {
                     return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
                 }
                 break;
             case PART_ADMISSION:
-                if (caseData.isDefendantHasAcceptedMediation()) {
-                    if (caseData.isDefendantHasNotPaidTheClaimant()) {
+                if (caseData.isMediationAcceptedByDefendant()) {
+                    if (caseData.hasDefendantNotPaid()) {
                         return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                    } else if (caseData.isClaimantNotAgreeToSettleTheClaim()) {
+                    } else if (caseData.isSettlementDeclinedByClaimant()) {
                         return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
-                    } else if (caseData.isClaimantRejectClaimAmount()) {
+                    } else if (caseData.isClaimantRejectsClaimAmount()) {
                         return DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE;
                     }
                 }

@@ -802,17 +802,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isDefendantHasNotPaidTheClaimant() {
+    public boolean hasDefendantNotPaid() {
         return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 
     @JsonIgnore
-    public boolean isClaimantNotAgreeToSettleTheClaim() {
+    public boolean isSettlementDeclinedByClaimant() {
         return NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
     }
 
     @JsonIgnore
-    public boolean isClaimantRejectClaimAmount() {
+    public boolean isClaimantRejectsClaimAmount() {
         return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
@@ -822,7 +822,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isDefendantHasAcceptedMediation() {
+    public boolean isMediationAcceptedByDefendant() {
         return YES.equals(getResponseClaimMediationSpecRequired());
     }
 
