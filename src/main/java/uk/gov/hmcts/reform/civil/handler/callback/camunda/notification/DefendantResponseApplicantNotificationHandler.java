@@ -55,7 +55,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
+    private final NotificationsProperties notificationsProperties123;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService123;
 
@@ -129,7 +129,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
         notificationService.sendMail(
             recipient,
-            notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence(),
+            notificationsProperties123.getClaimantSolicitorDefendantResponseFullDefence(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -144,9 +144,9 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                     || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
                         caseData.getRespondent2ClaimResponseTypeForSpec()))
             ) {
-                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+                emailTemplate = notificationsProperties123.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
-                emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+                emailTemplate = notificationsProperties123.getClaimantSolicitorDefendantResponseForSpec();
             }
 
             notificationService.sendMail(
@@ -156,7 +156,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            emailTemplate = notificationsProperties123.getRespondentSolicitorDefendantResponseForSpec();
             if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
                 .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 notificationService.sendMail(
@@ -168,7 +168,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             }
 
         } else {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            emailTemplate = notificationsProperties123.getRespondentSolicitorDefendantResponseForSpec();
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
