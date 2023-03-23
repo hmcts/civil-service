@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
 import static uk.gov.hmcts.reform.civil.callback.UserType.CAMUNDA;
 import static uk.gov.hmcts.reform.civil.callback.UserType.TESTING_SUPPORT;
@@ -72,6 +74,9 @@ public enum CaseEvent {
     EVIDENCE_UPLOAD_CHECK(USER),
     CREATE_BUNDLE(USER),
     EXTEND_RESPONSE_DEADLINE(USER),
+    APPLICANT_TRIAL_READY_NOTIFY_OTHERS(USER),
+    RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS(USER),
+    RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS(USER),
     NOTIFY_FORMER_SOLICITOR(CAMUNDA),
     NOTIFY_OTHER_SOLICITOR_1(CAMUNDA),
     NOTIFY_OTHER_SOLICITOR_2(CAMUNDA),
