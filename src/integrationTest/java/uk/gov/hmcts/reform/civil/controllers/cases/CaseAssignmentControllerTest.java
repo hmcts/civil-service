@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +46,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnUnauthorized() {
         when(caseByLegacyReferenceSearchService
-                 .getCaseDataByLegacyReference(any())).thenThrow(new CaseNotFoundException());
+                 .getCaseDataByLegacyReference(any())).thenThrow(new SearchServiceCaseNotFoundException());
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
             .andExpect(status().isUnauthorized());

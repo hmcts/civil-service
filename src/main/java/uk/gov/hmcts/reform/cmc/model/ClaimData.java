@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cmc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class ClaimData {
     private Amount amount;
     private List<CmcParty> claimants;
     private List<CmcParty> defendants;
+    private BreathingSpace breathingSpace;
 
     public String getClaimantName() {
         return getPartyName(claimants);
@@ -26,6 +28,11 @@ public class ClaimData {
 
     public String getDefendantName() {
         return getPartyName(defendants);
+    }
+
+    @JsonIgnore
+    public boolean hasBreathingSpace() {
+        return breathingSpace != null && breathingSpace.applies();
     }
 
     private String getPartyName(List<CmcParty> parties) {
