@@ -509,7 +509,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS
             )
         ),
 
@@ -966,7 +967,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS
             )
         ),
 
