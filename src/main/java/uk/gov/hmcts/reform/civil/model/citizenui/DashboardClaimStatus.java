@@ -9,11 +9,20 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
     ),
+    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
+        Claim::hasClaimantAcceptedPartialAdmissionAmount
+    ),
+    SETTLEMENT_SIGNED(
+        Claim::haveBothPartiesSignedSettlementAgreement
+    ),
     SETTLED(
         Claim::isSettled
     ),
     TRANSFERRED(
         Claim::isSentToCourt
+    ),
+    REQUESTED_CCJ_BY_REDETERMINATION(
+        Claim::hasCCJByRedetermination
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
@@ -39,6 +48,9 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
+    ),
     NO_RESPONSE(
         Claim::hasResponsePending
     ),
@@ -62,12 +74,6 @@ public enum DashboardClaimStatus {
     ),
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
-    ),
-    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
-        Claim::hasClaimantAcceptedPartialAdmissionAmount
-    ),
-    SETTLEMENT_SIGNED(
-        Claim::haveBothPartiesSignedSettlementAgreement
     ),
     NO_STATUS(c -> false);
 
