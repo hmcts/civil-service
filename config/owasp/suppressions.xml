@@ -32,4 +32,12 @@
     <cve>CVE-2022-34305</cve>
     <cve>CVE-2022-42252</cve>
   </suppress>
+  <suppress until="2023-06-22">
+    <notes>Updating the dependency set did not have effect on error: launchdarkly-java-server-sdk-5.10.7.jar/META-INF/maven/org.yaml/snakeyaml/pom.xml (pkg:maven/org.yaml/snakeyaml@1.32, cpe:2.3:a:snakeyaml_project:snakeyaml:1.32:*:*:*:*:*:*:*) : CVE-2022-1471.</notes>
+    <cve>CVE-2022-1471</cve>
+  </suppress>
+  <suppress until="2023-06-22">
+    <notes>Creating a dependency set to bump to 4.1.86.Final created a failure in functional tests.</notes>
+    <cve>CVE-2022-41881</cve>
+  </suppress>
 </suppressions>
