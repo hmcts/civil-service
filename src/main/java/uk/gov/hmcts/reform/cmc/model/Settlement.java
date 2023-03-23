@@ -30,7 +30,6 @@ public class Settlement {
         return isAcceptedByClaimant && isNotRejectedByDefendant;
     }
 
-
     @JsonIgnore
     public boolean isSettled() {
         Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();

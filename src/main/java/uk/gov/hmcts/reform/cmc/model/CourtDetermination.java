@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cmc.model;
 
-
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +12,9 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class CourtDetermination {
+
     private PaymentIntention courtDecision;
-
     private PaymentIntention courtPaymentIntention;
-
-    private  String rejectionReason;
-
+    private String rejectionReason;
     private BigDecimal disposableIncome;
 }

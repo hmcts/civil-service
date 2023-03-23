@@ -21,7 +21,6 @@ public class Response {
     private PaymentDeclaration paymentDeclaration;
     private ResponseMethod responseMethod;
 
-
     @JsonIgnore
     public boolean isFullAdmit() {
         return RespondentResponseType.FULL_ADMISSION == responseType;
