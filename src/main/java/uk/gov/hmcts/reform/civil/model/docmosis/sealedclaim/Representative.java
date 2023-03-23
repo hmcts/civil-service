@@ -4,8 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 

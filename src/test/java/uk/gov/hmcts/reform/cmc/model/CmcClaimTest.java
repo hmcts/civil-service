@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.cmc.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CmcClaimTest {
 
@@ -48,5 +51,40 @@ public class CmcClaimTest {
             .build();
         String defendantName = cmcClaim.getDefendantName();
         assert (defendantName).equals("");
+    }
+
+    @Test
+    void shouldReturnPayedByDateWhenItExists() {
+        //Given
+        LocalDate now = LocalDate.now();
+        CmcClaim cmcClaim = CmcClaim.builder()
+            .response(Response.builder().paymentIntention(PaymentIntention.builder()
+                                                              .paymentDate(now).build())
+                          .build()).build();
+        //When
+        LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
+        //Then
+        assertThat(paymentDate).isEqualTo(now);
+    }
+
+    @Test
+    void shouldReturnNullWhenNoResponseExists() {
+        //Given
+        CmcClaim cmcClaim = CmcClaim.builder().build();
+        //When
+        LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
+        //Then
+        assertThat(paymentDate).isNull();
+    }
+
+    @Test
+    void shouldReturnNullWhenNoPaymentIntentionExists() {
+        //Given
+        CmcClaim cmcClaim = CmcClaim.builder()
+            .response(Response.builder().build()).build();
+        //When
+        LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
+        //Then
+        assertThat(paymentDate).isNull();
     }
 }
