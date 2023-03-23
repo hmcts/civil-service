@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORM
 @Data
 @Builder
 public class Offer {
+
     private PaymentIntention paymentIntention;
     private String content;
 
@@ -29,7 +30,7 @@ public class Offer {
     private LocalDate completionDate;
 
     @JsonIgnore
-    public boolean hasPaymentIntention(){
+    public boolean hasPaymentIntention() {
         return paymentIntention != null;
     }
 
