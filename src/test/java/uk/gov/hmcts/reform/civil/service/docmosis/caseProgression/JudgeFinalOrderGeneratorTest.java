@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentMan
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -86,7 +87,7 @@ public class JudgeFinalOrderGeneratorTest {
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-        assertThat(caseDocument).isNotNull();
+        assertNotNull(caseDocument);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
@@ -105,7 +106,7 @@ public class JudgeFinalOrderGeneratorTest {
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-        assertThat(caseDocument).isNotNull();
+        assertNotNull(caseDocument);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
