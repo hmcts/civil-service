@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
+import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
+import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -50,7 +52,7 @@ public class TestingSupportController {
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
-
+    private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
@@ -173,6 +175,19 @@ public class TestingSupportController {
         var event = new HearingFeePaidEvent(caseId);
         try {
             hearingFeePaidHandler.moveCaseToPrepareForHearing(event);
+        } catch (Exception e) {
+            responseMsg = "failed";
+        }
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/{caseId}/trigger-hearing-fee-unpaid")
+    public ResponseEntity<String> getHearingFeeUnpaidEvent(@PathVariable("caseId") Long caseId) {
+
+        String responseMsg = "success";
+        var event = new HearingFeeUnpaidEvent(caseId);
+        try {
+            hearingFeeUnpaidHandler.moveCaseToStruckOut(event);
         } catch (Exception e) {
             responseMsg = "failed";
         }
