@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
-import uk.gov.hmcts.reform.civil.handler.tasks.HearingFeeDueHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
