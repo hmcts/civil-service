@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -92,14 +92,6 @@ public class TestingSupportController {
     @ApiOperation("Check if court location dynamic list feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkCourtLocationsDynamicListEnabled() {
         boolean featureEnabled = featureToggleService.isCourtLocationDynamicListEnabled();
-        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
-        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
-    }
-
-    @GetMapping("/testing-support/feature-toggle/access-profiles")
-    @ApiOperation("Check if access profiles feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkAccessProfilesEnabled() {
-        boolean featureEnabled = featureToggleService.isAccessProfilesEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }

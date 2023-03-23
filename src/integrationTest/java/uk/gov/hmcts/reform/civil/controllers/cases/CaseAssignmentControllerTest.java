@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,11 +22,15 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/assignment";
     private static final String VALIDATE_PIN_URL = CASES_URL + "/reference/{caseReference}";
+    private static final String ASSIGN_CASE = CASES_URL + "/case/{caseId}/{caseRole}";
 
     @MockBean
     private CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     @MockBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+
+    @MockBean
+    private AssignCaseService assignCaseService;
 
     @Test
     @SneakyThrows
@@ -41,7 +46,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnUnauthorized() {
         when(caseByLegacyReferenceSearchService
-                 .getCaseDataByLegacyReference(any())).thenThrow(new CaseNotFoundException());
+                 .getCaseDataByLegacyReference(any())).thenThrow(new SearchServiceCaseNotFoundException());
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
             .andExpect(status().isUnauthorized());
@@ -58,6 +63,13 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void givenCorrectParams_whenAssignClaim_shouldReturnStatusOk() {
+        doPost("authorization", "", ASSIGN_CASE, "123", "RESPONDENTSOLICITORONE")
+            .andExpect(status().isOk());
     }
 
     private CaseDetails givenCaseIsFound() {

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
@@ -19,13 +18,13 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +57,7 @@ public class PaymentsService {
                 .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory()))  {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                     .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                     .amount(claimFee.getCalculatedAmount())
@@ -71,7 +70,7 @@ public class PaymentsService {
                     .siteId(paymentsConfiguration.getSiteId())
                     .fees(new FeeDto[]{claimFee})
                     .build();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                     .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                     .amount(claimFee.getCalculatedAmount())
@@ -162,16 +161,16 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         String siteId = null;
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSiteId();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
 
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
 
-        if (caseData.getHearingDate() == null) {
+        if (caseData.getHearingDueDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
             feeResponse = caseData.getClaimFee().toFeeDto();
         } else {

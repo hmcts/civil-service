@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,9 +45,8 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         String legacyCaseReference = caseData.getLegacyCaseReference();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
-
             log.info(String.format("Start notify robotics for %s", legacyCaseReference));
-            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                 errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
             } else {

@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -69,8 +68,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -95,7 +94,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -117,6 +116,8 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -135,8 +136,6 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
@@ -241,7 +240,6 @@ public class CaseDataBuilder {
     protected OrganisationPolicy respondent1OrganisationPolicy;
     protected OrganisationPolicy respondent2OrganisationPolicy;
     protected YesOrNo addApplicant2;
-    protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
     protected CaseCategory caseAccessCategory;
 
@@ -376,6 +374,13 @@ public class CaseDataBuilder {
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
     private BigDecimal ccjPaymentPaidSomeAmount;
+    private YesOrNo ccjPaymentPaidSomeOption;
+    private BigDecimal totalInterest;
+    private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+
+    private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+
+    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1865,8 +1870,7 @@ public class CaseDataBuilder {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = SUBMITTED_DATE_TIME;
-        caseAccessCategory = CaseCategory.SPEC_CLAIM;
-        superClaimType = SPEC_CLAIM;
+        caseAccessCategory = SPEC_CLAIM;
         claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
         return this;
     }
@@ -2203,7 +2207,7 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
         respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()).build();
+            .organisation(Organisation.builder().build()).build();
         return this;
     }
 
@@ -3050,7 +3054,7 @@ public class CaseDataBuilder {
         respondent2Responds(respondent2Response);
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondentResponseIsSame(NO);
-        if (superClaimType != SPEC_CLAIM) {
+        if (caseAccessCategory != SPEC_CLAIM) {
             // at least in spec claims, respondent2 response date is null by front-end
             respondent2ResponseDate = respondent1ResponseDate;
         } else {
@@ -3330,6 +3334,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePastClaimDismissedDeadline() {
         atStateClaimDetailsNotified();
         claimDismissedDeadline = LocalDateTime.now().minusDays(5);
+        return this;
+    }
+
+    public CaseDataBuilder atStateHearingDateScheduled() {
+        atStateHearingFeeDuePaid();
+        hearingDate = LocalDate.now().plusWeeks(3).plusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
+        ccdState = HEARING_READINESS;
         return this;
     }
 
@@ -3785,7 +3797,7 @@ public class CaseDataBuilder {
         respondent1MediationRequired = YES;
         respondent2MediationRequired = YES;
         responseClaimTrack = SMALL_CLAIM.name();
-        superClaimType = SPEC_CLAIM;
+        caseAccessCategory = SPEC_CLAIM;
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
 
@@ -3948,18 +3960,18 @@ public class CaseDataBuilder {
         return cases;
     }
 
-    public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
-        this.superClaimType = SPEC_CLAIM;
+    public CaseDataBuilder setClaimTypeToSpecClaim() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimTypeToUnspecClaim() {
+        this.caseAccessCategory = UNSPEC_CLAIM;
         return this;
     }
 
     public CaseDataBuilder setClaimNotificationDate() {
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
-        return this;
-    }
-
-    public CaseDataBuilder setSuperClaimTypeToUnspecClaim() {
-        this.superClaimType = UNSPEC_CLAIM;
         return this;
     }
 
@@ -4151,14 +4163,15 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
-                        .fee(
+                    .fee(
                         Fee.builder()
                             .code("FE203")
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
@@ -4169,8 +4182,75 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithoutServiceRequestReference() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimIssuedPBADetails(
+                SRPbaDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build()).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimIssuedPBADetails(
+                SRPbaDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
+            .build();
+    }
+
     public CaseData buildClaimIssuedPaymentCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -4192,7 +4272,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildPaymentFailureCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -4219,7 +4299,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildPaymentSuccessfulCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -4263,7 +4343,6 @@ public class CaseDataBuilder {
                 this.solicitorReferences.getRespondentSolicitor1Reference();
         }
         return this;
-
     }
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
@@ -4302,6 +4381,41 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
         this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
+        return this;
+    }
+
+    public CaseDataBuilder specRespondent1Represented(YesOrNo specRespondent1Represented) {
+        this.specRespondent1Represented = specRespondent1Represented;
+        return this;
+    }
+
+    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption) {
+        this.ccjPaymentPaidSomeOption = paymentOption;
+        return this;
+    }
+
+    public CaseDataBuilder claimFee(Fee fee) {
+        this.claimFee = fee;
+        return this;
+    }
+
+    public CaseDataBuilder totalInterest(BigDecimal interest) {
+        this.totalInterest = interest;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1AcceptAdmitAmountPaidSpec(YesOrNo isPaymemtAccepted) {
+        this.applicant1AcceptAdmitAmountPaidSpec = isPaymemtAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo isPartPaymentAccepted) {
+        this.applicant1AcceptPartAdmitPaymentPlanSpec = isPartPaymentAccepted;
+        return this;
+    }
+
+    public CaseDataBuilder respondToAdmittedClaimOwingAmountPounds(BigDecimal admitedCliaimAmount) {
+        this.respondToAdmittedClaimOwingAmountPounds = admitedCliaimAmount;
         return this;
     }
 
@@ -4442,14 +4556,13 @@ public class CaseDataBuilder {
             .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
-            .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
+            .caseAccessCategory(caseAccessCategory == null ? UNSPEC_CLAIM : caseAccessCategory)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
             //spec route
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
-            .caseAccessCategory(caseAccessCategory)
             //case progression
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
             //workaround fields
@@ -4510,6 +4623,7 @@ public class CaseDataBuilder {
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
             .caseManagementLocation(caseManagementLocation)
             .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
+            .hearingDate(hearingDate)
             .cosNotifyClaimDefendant1(cosNotifyClaimDefendant1)
             .cosNotifyClaimDefendant2(cosNotifyClaimDefendant2)
             .defendant1LIPAtClaimIssued(defendant1LIPAtClaimIssued)
@@ -4527,8 +4641,12 @@ public class CaseDataBuilder {
                 //Certificate of Service
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
-            .caseAccessCategory(caseAccessCategory)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
+            .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
+            .totalInterest(totalInterest)
+            .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
+            .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
             .build();
     }
 

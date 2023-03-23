@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
@@ -71,9 +72,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -109,6 +111,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -237,6 +240,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
+                        MEDIATION_UNSUCCESSFUL,
                         EVIDENCE_UPLOAD_RESPONDENT
 
                     }
@@ -299,7 +303,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        GENERATE_DIRECTIONS_ORDER
+                        GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS
                     }
                 ),
                 of(
@@ -321,9 +326,13 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
+                        STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
-                        migrateCase
-
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -346,7 +355,12 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -369,7 +383,12 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        migrateCase
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        migrateCase,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -521,6 +540,7 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
+                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE
@@ -813,7 +833,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        TAKEN_OFFLINE_AFTER_SDO.fullName()
                     }
                 )
             );
@@ -940,8 +961,8 @@ class FlowStateAllowedEventServiceTest {
             CaseEvent caseEvent
         ) {
             //work around starts: to force SPEC CLAIM tests to pass to not impact Damages.
-            if ((caseDetails.getData().get("superClaimType") != null
-                && caseDetails.getData().get("superClaimType").equals(SPEC_CLAIM))
+            if ((caseDetails.getData().get("CaseAccessCategory") != null
+                && caseDetails.getData().get("CaseAccessCategory").equals(SPEC_CLAIM))
                 || caseEvent.toString().equals("CREATE_CLAIM_SPEC")) {
                 expected = false;
             }

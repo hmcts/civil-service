@@ -18,12 +18,12 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
-import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.referencedata.LRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataException;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.net.URI;
 import java.util.ArrayList;

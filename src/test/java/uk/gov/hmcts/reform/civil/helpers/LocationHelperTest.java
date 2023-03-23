@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -14,22 +11,22 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+
 public class LocationHelperTest {
 
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
     private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
-    private final LocationHelper helper = new LocationHelper(
-        featureToggleService,
-        CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
 
     @Test
     public void thereIsAMatchingLocation() {
@@ -55,7 +52,7 @@ public class LocationHelperTest {
     @Test
     public void whenSpecDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -88,7 +85,7 @@ public class LocationHelperTest {
     @Test
     public void whenSpecDefendantIsPersonAndDefendant2_courtIsDefendant2() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -130,7 +127,7 @@ public class LocationHelperTest {
     @Test
     public void whenLessThan1000_locationIsCcmcc() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                             .build())
@@ -168,7 +165,7 @@ public class LocationHelperTest {
     @Test
     public void whenLessThan1000_locationIsCcmccEvenUndef() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -190,7 +187,7 @@ public class LocationHelperTest {
     @Test
     public void whenDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
                             .build())
@@ -221,7 +218,7 @@ public class LocationHelperTest {
     @Test
     public void whenSpecDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -255,7 +252,7 @@ public class LocationHelperTest {
     @Test
     public void whenDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
                             .build())
@@ -287,7 +284,7 @@ public class LocationHelperTest {
     @Test
     public void when1v2AnyIndividual_thenCourtIsIndividualDefendant() {
         CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
                             .build())
@@ -325,6 +322,6 @@ public class LocationHelperTest {
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
-                .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
+            .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
     }
 }

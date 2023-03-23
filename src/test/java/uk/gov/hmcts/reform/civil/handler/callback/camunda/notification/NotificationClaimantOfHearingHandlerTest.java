@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -206,7 +206,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "15:30", "hearingDueDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022"
         );
     }
 
@@ -215,7 +215,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30", "hearingDueDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "23-11-2022"
         );
     }
 

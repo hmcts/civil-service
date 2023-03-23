@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -41,7 +41,8 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -50,7 +51,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -148,13 +149,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CourtLocationUtils courtLocationUtility;
 
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
+
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
 
     @Nested
     class AboutToStartCallbackV0 {
-
-        private static final String SUPER_CLAIM_KEY = "superClaimType";
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
@@ -167,19 +169,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
-        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
@@ -422,6 +411,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(getDynamicList(response))
                 .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+        }
+
+        @Test
+        void shouldSetPBAv3FlagOn_whenPBAv3IsActivated() {
+            // Given
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            // Then
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("paymentTypePBA").isEqualTo("PBAv3");
         }
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
@@ -951,7 +954,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
                                                                      + " for example john.smith@example.com");
             }
-
         }
     }
 
@@ -977,17 +979,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-        }
-
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
-        @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
     }
 
@@ -1073,11 +1065,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ABOUT_TO_SUBMIT
                 ));
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+            var respondentSolicitor2EmailAddress = response.getData().get("respondentSolicitor2EmailAddress");
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+            assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
         }
 
         @Test
@@ -1104,6 +1098,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("respondent2OrgRegistered", "Yes");
+            assertThat(response.getData())
+                .containsEntry("respondentSolicitor2EmailAddress", "respondentsolicitor@example.com");
         }
 
         //TO DO remove V_1 when CIV-3278 is released
@@ -1183,6 +1179,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldSetCaseCategoryToUnspec_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
 
         @Nested
