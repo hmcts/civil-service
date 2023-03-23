@@ -336,11 +336,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
                         + "counter-schedule.")
-            .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                        + "therefore final, no further schedule of loss shall be uploaded without permission to amend. "
-                        + "The defendant shall upload to the Digital Portal an up-to-date counter schedule of loss by "
-                        + "4pm on")
-            .date3(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
