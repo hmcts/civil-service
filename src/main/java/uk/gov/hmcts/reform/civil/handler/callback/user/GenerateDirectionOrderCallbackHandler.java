@@ -83,7 +83,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseDocument document = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        if (caseData.getFinalOrderSelection() == FinalOrderSelection.FREE_FORM_ORDER) {
+        if (caseData.getFinalOrderSelection().equals(FinalOrderSelection.FREE_FORM_ORDER)) {
             caseDataBuilder.freeFormOrderDocument(document.getDocumentLink());
         } else {
             caseDataBuilder.assistedOrderDocument(document.getDocumentLink());
