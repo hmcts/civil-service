@@ -58,7 +58,7 @@ public class Response {
 
     @JsonIgnore
     public boolean isPaymentDateOnTime() {
-        return paymentIntention != null && paymentIntention.isPaymentDateOnTime();
+        return paymentIntention != null && paymentIntention.hasAlreadyPaid();
     }
 
     @JsonIgnore

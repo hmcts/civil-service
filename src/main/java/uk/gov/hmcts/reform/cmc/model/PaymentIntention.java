@@ -43,7 +43,7 @@ public class PaymentIntention {
         return paymentOption == PaymentOption.INSTALMENTS;
     }
 
-    public boolean isPaymentDateOnTime() {
+    public boolean hasAlreadyPaid() {
         return paymentDate != null && paymentDate.isBefore(LocalDate.now());
     }
 
