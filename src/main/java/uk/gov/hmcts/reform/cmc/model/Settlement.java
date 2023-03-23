@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 @Builder
 @Data
 public class Settlement {
+
     private List<PartyStatement> partyStatements;
 
     @JsonIgnore

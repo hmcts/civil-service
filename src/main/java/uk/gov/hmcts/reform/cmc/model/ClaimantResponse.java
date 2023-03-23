@@ -16,9 +16,9 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClaimantResponse {
 
-    private  ClaimantResponseType type;
+    private ClaimantResponseType type;
     private BigDecimal amountPaid;
-    private  String paymentReceived;
+    private String paymentReceived;
     private String settleForAmount;
     private CourtDetermination courtDetermination;
 
@@ -26,6 +26,4 @@ public class ClaimantResponse {
     public boolean hasCourtDetermination() {
         return courtDetermination != null;
     }
-
-
 }

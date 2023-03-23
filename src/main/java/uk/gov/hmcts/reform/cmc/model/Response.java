@@ -28,8 +28,8 @@ public class Response {
     }
 
     @JsonIgnore
-    public boolean isFullDefence(){
-       return RespondentResponseType.FULL_DEFENCE == responseType;
+    public boolean isFullDefence() {
+        return RespondentResponseType.FULL_DEFENCE == responseType;
     }
 
     @JsonIgnore
@@ -54,16 +54,16 @@ public class Response {
 
     @JsonIgnore
     public boolean isPartAdmitPayImmediately() {
-        return isPartAdmit() && paymentIntention !=null && paymentIntention.isPayImmediately();
+        return isPartAdmit() && paymentIntention != null && paymentIntention.isPayImmediately();
     }
 
     @JsonIgnore
-    public boolean isPaymentDateOnTime(){
+    public boolean isPaymentDateOnTime() {
         return paymentIntention != null && paymentIntention.isPaymentDateOnTime();
     }
 
     @JsonIgnore
-    public boolean hasPaymentDeclaration(){
+    public boolean hasPaymentDeclaration() {
         return paymentDeclaration != null;
     }
 

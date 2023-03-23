@@ -12,43 +12,43 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PartyStatement {
 
-    private  StatementType type;
-    private  MadeBy madeBy;
-    private  Offer offer;
+    private StatementType type;
+    private MadeBy madeBy;
+    private Offer offer;
 
     @JsonIgnore
-    public boolean isAccepted(){
-       return StatementType.ACCEPTATION == type;
+    public boolean isAccepted() {
+        return StatementType.ACCEPTATION == type;
     }
 
     @JsonIgnore
-    public boolean isRejected(){
+    public boolean isRejected() {
         return StatementType.REJECTION == type;
     }
 
     @JsonIgnore
-    public boolean isCounterSigned(){
+    public boolean isCounterSigned() {
         return StatementType.COUNTERSIGNATURE == type;
     }
 
     @JsonIgnore
-    public boolean hasOffer(){
+    public boolean hasOffer() {
         return StatementType.OFFER == type;
     }
 
     @JsonIgnore
-    public boolean isMadeByDefendant(){
+    public boolean isMadeByDefendant() {
         return MadeBy.DEFENDANT == madeBy;
     }
 
     @JsonIgnore
-    public boolean isMadeByClaimant(){
+    public boolean isMadeByClaimant() {
         return MadeBy.CLAIMANT == madeBy;
     }
 
     @JsonIgnore
     public boolean hasPaymentIntention() {
-        return offer != null  && offer.hasPaymentIntention();
+        return offer != null && offer.hasPaymentIntention();
     }
 
 }
