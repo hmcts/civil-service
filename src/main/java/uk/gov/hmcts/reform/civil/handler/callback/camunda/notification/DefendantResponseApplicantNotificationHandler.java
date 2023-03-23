@@ -54,8 +54,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     public static final String TASK_ID_CC_RESP2 = "DefendantResponseFullDefenceNotifyRespondentSolicitor2CC";
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
-    private final NotificationService notificationService;
-    private final NotificationsPropertie notificationsProperties;
+    private final NotificationServic notificationService;
+    private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
