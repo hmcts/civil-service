@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cmc.model;
 
-
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
