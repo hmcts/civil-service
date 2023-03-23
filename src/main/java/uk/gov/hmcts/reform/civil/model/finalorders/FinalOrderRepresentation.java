@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FinalOrderRepresentation {
+
     private FinalOrderRepresentationList typeRepresentationList;
     private ClaimantAndDefendantHeard typeRepresentationComplex;
     private ClaimantAndDefendantHeard typeRepresentationOtherComplex;

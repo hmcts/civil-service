@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderMadeOnDetails {
+
     private String ownInitiativeText;
     private LocalDate ownInitiativeDate;
 

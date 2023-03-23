@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssistedOrderCostDetails {
+
     private String detailsRepresentationText;
     private String claimantCostStandardText;
     private LocalDate claimantCostStandardDate;

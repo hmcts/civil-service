@@ -56,7 +56,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         );
     }
 
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;

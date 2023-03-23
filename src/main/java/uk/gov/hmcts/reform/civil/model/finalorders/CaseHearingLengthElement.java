@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseHearingLengthElement {
+
     private BigDecimal lengthListOtherDays;
     private BigDecimal lengthListOtherHours;
     private BigDecimal lengthListOtherMinutes;

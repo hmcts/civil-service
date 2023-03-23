@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderMadeOnDetailsOrderWithoutNotice {
+
     private String withOutNoticeText;
     private LocalDate withOutNoticeDate;
 }

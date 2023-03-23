@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.finalorders;
+package uk.gov.hmcts.reform.civil.enums.finalorders;
 
 public enum HearingMethodFinalOrderList {
     VIDEO,
