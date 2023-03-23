@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -56,7 +55,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
+    private final NotificationsPropertie notificationsProperties;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
