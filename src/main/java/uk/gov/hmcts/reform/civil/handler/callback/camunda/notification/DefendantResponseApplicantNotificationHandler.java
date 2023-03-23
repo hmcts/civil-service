@@ -55,7 +55,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationService notificationService;
-    private final NotificationsPropertie notificationsProperties;
+    private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
