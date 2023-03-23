@@ -452,14 +452,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 .respondent2OrgRegistered(YES)
                 .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-            if (references.isPresent()) {
+            references.ifPresent(ref -> {
                 SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                        .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
-                        .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
-                        .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
-                    .build();
+                        .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                        .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
-            }
+            });
             dataBuilder
                 .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
@@ -470,14 +470,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     .respondent2OrgRegistered(NO)
                     .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
-            if (references.isPresent()) {
+            references.ifPresent(ref -> {
                 SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
                         .applicantSolicitor1Reference(references.get().getApplicantSolicitor1Reference())
                         .respondentSolicitor1Reference(references.get().getRespondentSolicitor1Reference())
                         .respondentSolicitor2Reference(references.get().getRespondentSolicitor1Reference())
                         .build();
                 dataBuilder.solicitorReferences(updatedSolicitorReferences);
-            }
+            });
             dataBuilder
                   .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
