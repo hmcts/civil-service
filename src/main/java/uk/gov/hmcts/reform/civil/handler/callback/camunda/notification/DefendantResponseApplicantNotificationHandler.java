@@ -57,7 +57,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private final FeatureToggleService featureToggleService;
+    private final FeatureToggleService featureToggleService123;
 
     @Override
     protected Map<String, Callback> callbacks() {
