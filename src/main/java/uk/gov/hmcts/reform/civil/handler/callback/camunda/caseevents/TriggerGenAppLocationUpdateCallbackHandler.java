@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
     private static final List<CaseEvent> EVENTS = List.of(TRIGGER_UPDATE_GA_LOCATION);
 
     private final GenAppStateHelperService helperService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -53,6 +55,9 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             log.error(errorMessage, e);
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
-        return emptyCallbackResponse(callbackParams);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .build();
     }
+
 }
