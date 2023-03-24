@@ -34,13 +34,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     private final ObjectMapper objectMapper;
     private final StitchingConfiguration stitchingConfiguration;
 
-    public CaseDocument bundle(
-        List<DocumentMetaData> documents,
-        String authorisation,
-        String bundleTitle,
-        String bundleFilename,
-        CaseData caseData
-    ) {
+    public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle,
+                               String bundleFilename, CaseData caseData) {
         CaseDetails payload =
             createBundlePayload(
                 documents,
@@ -59,43 +54,37 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         if(caseDataFromBundlePayload == null) {
             log.info("Case data is null----------");
             return null;
-        } else {
-            Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
-
-            log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(),
-                         caseData.getLegacyCaseReference());
-                return retrieveCaseDocument(stitchedDocument);
         }
+        Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
+
+        log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(),
+                 caseData.getLegacyCaseReference());
+        return retrieveCaseDocument(stitchedDocument);
+
     }
 
     private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument){
         if(stitchedDocument.isEmpty()){
             log.info("stitchedDocument is not present----------");
             return null;
-        } else {
-            Document document = stitchedDocument.get();
-            String documentUrl = document.getDocumentUrl();
-            String documentBinaryUrl = document.getDocumentBinaryUrl();
-            return CaseDocument.builder()
-                .documentLink(Document.builder()
-                                  .documentUrl(documentUrl)
-                                  .documentBinaryUrl(documentBinaryUrl)
-                                  .documentFileName(document.getDocumentFileName())
-                                  .build())
-                .documentName("Stitched document")
-                .documentType(SEALED_CLAIM)
-                .createdDatetime(LocalDateTime.now())
-                .createdBy(CREATED_BY)
-                .build();
         }
+        Document document = stitchedDocument.get();
+        String documentUrl = document.getDocumentUrl();
+        String documentBinaryUrl = document.getDocumentBinaryUrl();
+        return CaseDocument.builder()
+            .documentLink(Document.builder()
+                              .documentUrl(documentUrl)
+                              .documentBinaryUrl(documentBinaryUrl)
+                              .documentFileName(document.getDocumentFileName())
+                              .build())
+            .documentName("Stitched document")
+            .documentType(SEALED_CLAIM)
+            .createdDatetime(LocalDateTime.now())
+            .createdBy(CREATED_BY)
+            .build();
     }
-    private CaseDetails createBundlePayload(
-        List<DocumentMetaData> documents,
-        String bundleTitle,
-        String bundleFilename,
-        CaseData caseData
-    ) {
-
+    private CaseDetails createBundlePayload(List<DocumentMetaData> documents, String bundleTitle, String bundleFilename,
+        CaseData caseData) {
         List<IdValue<BundleDocument>> bundleDocuments = new ArrayList<>();
         List<Value<Document>> caseDocuments = new ArrayList<>();
 
