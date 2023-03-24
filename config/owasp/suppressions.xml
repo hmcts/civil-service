@@ -33,8 +33,4 @@
     <cve>CVE-2022-34305</cve>
     <cve>CVE-2022-42252</cve>
   </suppress>
-  <suppress until="2023-06-22">
-    <notes>Creating a dependency set to bump to 4.1.86.Final created a failure in functional tests.</notes>
-    <cve>CVE-2022-41881</cve>
-  </suppress>
 </suppressions>
