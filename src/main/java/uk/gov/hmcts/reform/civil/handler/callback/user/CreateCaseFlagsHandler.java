@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 
-
 @Service
 @RequiredArgsConstructor
 public class CreateCaseFlagsHandler extends CallbackHandler {
+    
     private static final List<CaseEvent> EVENTS =  List.of(CREATE_CASE_FLAGS);
     private final ObjectMapper objectMapper;
 
@@ -50,7 +50,6 @@ public class CreateCaseFlagsHandler extends CallbackHandler {
                 && details.getValue().getStatus().equals("Active"))).collect(Collectors.toList());
 
         updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
