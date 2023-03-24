@@ -821,27 +821,29 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Party applicant2 = caseData.getApplicant2();
         Party respondent2 = caseData.getRespondent2();
 
+        String initialBody = format(
+            CONFIRMATION_SUMMARY_1v1,
+            applicant1Name,
+            respondent1Name
+        );
+
         if (applicant2 != null) {
-            return format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_2v1,
                 applicant1Name,
                 applicant2.getPartyName(),
                 respondent1Name
             );
         } else if (respondent2 != null) {
-            return format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_1v2,
                 applicant1Name,
                 respondent1Name,
                 respondent2.getPartyName()
             );
-        } else {
-            return format(
-                CONFIRMATION_SUMMARY_1v1,
-                applicant1Name,
-                respondent1Name
-            );
         }
+        String body = initialBody + format("<p><strong>Feedback </strong>Please provide judicial feedback <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>");
+        return body;
     }
 
     private void setCheckList(
