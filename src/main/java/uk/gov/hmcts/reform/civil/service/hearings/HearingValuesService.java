@@ -78,7 +78,7 @@ public class HearingValuesService {
             .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
             .hearingInWelshFlag(getHearingInWelshFlag())
             .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData)) // todo civ-6888
+            .facilitiesRequired(getFacilitiesRequired(caseData))
             .listingComments(getListingComments(caseData)) // todo CIV-6855
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())

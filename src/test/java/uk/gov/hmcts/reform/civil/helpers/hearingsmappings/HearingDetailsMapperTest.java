@@ -123,4 +123,10 @@ public class HearingDetailsMapperTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
     }
+
+    @Test
+    void shouldReturnNull_whenGet() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
+    }
 }

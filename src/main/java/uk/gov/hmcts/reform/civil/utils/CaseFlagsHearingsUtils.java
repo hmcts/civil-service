@@ -18,6 +18,7 @@ public class CaseFlagsHearingsUtils {
 
     private static final String SPECIAL_MEASURES_FLAG_CODE = "SM";
     private static final String REASONABLE_ADJUSTMENTS_FLAG_CODE = "RA";
+    private static final String DETAINED_INDIVIDUAL_FLAG_CODE = "PF0019";
 
     public static List<Flags> getAllActiveFlags(CaseData caseData) {
         List<Flags> nonEmptyFlags = new ArrayList<>();
@@ -126,6 +127,15 @@ public class CaseFlagsHearingsUtils {
         if (flags != null && !flags.isEmpty()) {
             flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getFlagCode().contains(
                 REASONABLE_ADJUSTMENTS_FLAG_CODE)));
+        }
+        return flags;
+    }
+
+    public static List<Flags> getDetainedIndividualCodeFlags(CaseData caseData) {
+        List<Flags> flags = getAllActiveFlags(caseData);
+        if (flags != null && !flags.isEmpty()) {
+            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue( ).getFlagCode().equals(
+                DETAINED_INDIVIDUAL_FLAG_CODE)));
         }
         return flags;
     }

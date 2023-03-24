@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
@@ -119,6 +121,105 @@ public class CaseFlagsHearingsUtilsTest {
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
+
+    @Nested
+    class DetainedIndividualFlags {
+        List<Element<FlagDetail>> flags;
+
+        @BeforeEach
+        void setup() {
+            FlagDetail details = FlagDetail.builder()
+                .name("Detained individual")
+                .flagComment("comment")
+                .flagCode("PF0019")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            flags = wrapElements(details);
+        }
+
+        @Test
+        void shouldReturnAllCaseFlags_withDetainedIndividualCodeFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags(flags)
+                .withApplicant1Flags(flags)
+                .withRespondent1LitigationFriendFlags(flags)
+                .withRespondent1WitnessFlags(flags)
+                .withRespondent1ExpertFlags(flags)
+                .build();
+
+            List<Flags> expectedFlags = new ArrayList<>();
+
+            expectedFlags.add(getRespondent1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+            expectedFlags.add(getApplicant1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+            expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+            expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+            expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+
+            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
+
+            System.out.println(expectedFlags);
+            assertThat(actualFlags).isEqualTo(expectedFlags);
+        }
+
+        @Test
+        void shouldReturnAllCaseFlags_withDetainedIndividualCodeFlags_WhenChosenForRespondent1Only() {
+
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags(flags)
+                .withApplicant1Flags()
+                .withRespondent1LitigationFriendFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1ExpertFlags()
+                .build();
+
+            List<Flags> expectedFlags = new ArrayList<>();
+
+            expectedFlags.add(getRespondent1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
+            expectedFlags.add(getApplicant1Flags(caseData, List.of()));
+            expectedFlags.add(getRespondent1LitFriendFlags(caseData, List.of()));
+            expectedFlags.add(getRespondent1ExpertsFlags(caseData, List.of()));
+            expectedFlags.add(getRespondent1WitnessFlags(caseData, List.of()));
+
+            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
+
+            System.out.println(expectedFlags);
+            assertThat(actualFlags).isEqualTo(expectedFlags);
+        }
+
+        @Test
+        void shouldAllCaseFlags_withDetainedIndividualCodeFlags_WhenNoneChosen() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags()
+                .withApplicant1Flags()
+                .withRespondent1LitigationFriendFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1ExpertFlags()
+                .build();
+
+            List<Flags> expectedFlags = new ArrayList<>();
+
+            expectedFlags.add(getRespondent1Flags(caseData, List.of()));
+            expectedFlags.add(getApplicant1Flags(caseData, List.of()));
+            expectedFlags.add(getRespondent1LitFriendFlags(caseData, List.of()));
+            expectedFlags.add(getRespondent1ExpertsFlags(caseData, List.of()));
+            expectedFlags.add(getRespondent1WitnessFlags(caseData, List.of()));
+
+            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
+
+            assertThat(actualFlags).isEqualTo(expectedFlags);
+        }
+    }
+
+
 
     private Flags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details);
@@ -254,5 +355,17 @@ public class CaseFlagsHearingsUtilsTest {
             .build();
 
         return wrapElements(details3);
+    }
+
+    private List<Element<FlagDetail>> getAllActiveDetainedIndividualCodeFlagDetails() {
+        FlagDetail details = FlagDetail.builder()
+            .name("Detained individual")
+            .flagComment("comment")
+            .flagCode("PF0019")
+            .hearingRelevant(YES)
+            .status("Active")
+            .build();
+
+        return wrapElements(details);
     }
 }
