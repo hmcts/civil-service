@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -654,7 +656,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = mapHearingMethodFields(callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
@@ -670,6 +672,34 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData mapHearingMethodFields(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (caseData.getHearingMethodValuesDisposalHearingDJ() != null
+            && caseData.getHearingMethodValuesDisposalHearingDJ().getValue() != null) {
+            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearingDJ().getValue().getLabel();
+            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null
+            && caseData.getHearingMethodValuesTrialHearingDJ().getValue() != null) {
+            String trialHearingMethodLabel = caseData.getHearingMethodValuesTrialHearingDJ().getValue().getLabel();
+            if (trialHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            } else if (trialHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            } else if (trialHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            }
+        }
+
+        return updatedData.build();
     }
 
     private CaseData fillDisposalToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
