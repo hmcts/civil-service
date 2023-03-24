@@ -2204,20 +2204,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
-        Category category = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
-        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
-        Category category = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
-        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
