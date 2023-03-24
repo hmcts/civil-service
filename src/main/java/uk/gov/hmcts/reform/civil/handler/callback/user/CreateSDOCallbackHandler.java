@@ -731,7 +731,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = mapHearingMethodFields(callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         CaseDocument document = sdoGeneratorService.generate(
@@ -746,6 +746,44 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData mapHearingMethodFields(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (caseData.getHearingMethodValuesDisposalHearing() != null
+            && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
+            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearing().getValue().getLabel();
+            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesFastTrack() != null
+            && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
+            String fastTrackHearingMethodLabel = caseData.getHearingMethodValuesFastTrack().getValue().getLabel();
+            if (fastTrackHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
+            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null
+            && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
+            String smallClaimsHearingMethodLabel = caseData.getHearingMethodValuesSmallClaims().getValue().getLabel();
+            if (smallClaimsHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
+            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+            }
+        }
+
+        return updatedData.build();
     }
 
     private String getHearingInPersonSmall(CaseData caseData) {
