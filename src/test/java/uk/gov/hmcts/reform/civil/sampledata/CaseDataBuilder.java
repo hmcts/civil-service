@@ -4759,6 +4759,9 @@ public class CaseDataBuilder {
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
+            .hearingMethodValuesDisposalHearing(hearingMethodValuesDisposalHearing)
+            .hearingMethodValuesFastTrack(hearingMethodValuesFastTrack)
+            .hearingMethodValuesSmallClaims(hearingMethodValuesSmallClaims)
             .build();
     }
 
