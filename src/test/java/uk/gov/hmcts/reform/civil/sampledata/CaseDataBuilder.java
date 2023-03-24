@@ -2203,6 +2203,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
