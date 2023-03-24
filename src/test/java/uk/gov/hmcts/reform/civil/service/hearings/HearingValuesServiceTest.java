@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -88,9 +89,6 @@ public class HearingValuesServiceTest {
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 
         HearingWindowModel expectedHearingWindow = HearingWindowModel.builder()
-            .dateRangeEnd("")
-            .dateRangeStart("")
-            .firstDateTimeMustBe("")
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
@@ -108,7 +106,7 @@ public class HearingValuesServiceTest {
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
-            .externalCaseReference("")
+            .externalCaseReference(null)
             .caseManagementLocationCode("1234")
             .caseSLAStartDate("")
             .autoListFlag(false)
@@ -116,7 +114,7 @@ public class HearingValuesServiceTest {
             .hearingWindow(expectedHearingWindow)
             .duration(0)
             .hearingPriorityType("Standard")
-            .numberOfPhysicalAttendees(null)
+            .numberOfPhysicalAttendees(0)
             .hearingInWelshFlag(false)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
@@ -124,7 +122,7 @@ public class HearingValuesServiceTest {
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
-            .panelRequirements(null)
+            .panelRequirements(PanelRequirementsModel.builder().build())
             .leadJudgeContractType("")
             .judiciary(expectedJudiciary)
             .hearingIsLinkedFlag(false)
