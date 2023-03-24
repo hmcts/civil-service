@@ -2153,15 +2153,25 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
+    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearingNew() {
         DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
         return this;
     }
 
-    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
+    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearingNew() {
         DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
