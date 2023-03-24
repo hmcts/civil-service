@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
@@ -920,8 +921,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(150000))
+                .build();
+
             CaseData caseData = CaseDataBuilder.builder()
-                .ccjPaymentPaidSomeAmount(new BigDecimal(150000))
+                .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -930,14 +936,24 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
         }
+    }
+
+    @Nested
+    class MidEventCallbackSetUpCcjSummaryPage {
+
+        private static final String PAGE_ID = "set-up-ccj-amount-summary";
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceed() {
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
-            BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder()
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .claimFee(fee)
                 .totalInterest(interestAmount)
@@ -946,27 +962,31 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
 
-            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
-            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+            BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                 .add(caseData.getTotalInterest())
                 .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
             assertThat(subTotal).isEqualTo(expectedSubTotal);
 
-            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedWhenPartPaymentAccepted() {
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .build();
+
             BigDecimal interestAmount = BigDecimal.valueOf(100);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
                 .claimFee(fee)
@@ -976,19 +996,56 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            BigDecimal claimAmount = getCaseData(response).getCcjJudgmentAmountClaimAmount();
+            BigDecimal claimAmount = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount();
             assertThat(claimAmount).isEqualTo(BigDecimal.valueOf(500));
 
-            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
 
-            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
-            BigDecimal expectedSubTotal = getCaseData(response).getCcjJudgmentAmountClaimAmount()
+            BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                 .add(caseData.getTotalInterest())
                 .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
             assertThat(subTotal).isEqualTo(expectedSubTotal);
 
-            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
+        }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceedWithFixedCost() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentFixedCostOption(YES)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount())
+                .add(BigDecimal.valueOf(40));
+            BigDecimal fixedCost = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentFixedCostAmount();
+            BigDecimal expectedFixedCost = BigDecimal.valueOf(40);
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
+            assertThat(fixedCost).isEqualTo(expectedFixedCost);
+
+            BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
     }
