@@ -856,6 +856,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasApplicantProceededWithClaim(){
+        return getApplicant1ProceedWithClaim() == YES
+            || getApplicant1ProceedWithClaimSpec2v1() == YES;
+    }
+
+    @JsonIgnore
     private ResponseOneVOneShowTag getResponseOneVOneTagForFullAdmit(){
         if (YES.equals(getSpecDefenceFullAdmittedRequired())) {
             return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
