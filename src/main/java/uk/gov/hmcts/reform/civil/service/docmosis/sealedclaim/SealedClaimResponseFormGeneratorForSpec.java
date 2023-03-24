@@ -34,6 +34,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
+
 @Service
 @RequiredArgsConstructor
 public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimResponseFormForSpec> {
@@ -92,6 +94,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
 
         if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+            log.info("Respondent Spec Doc: " + caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
             builder.respondent1SpecDefenceResponseDocument(
                 caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
         }
