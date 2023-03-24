@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -1198,7 +1199,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CONFIRMATION_SUMMARY_1v1,
                 "Mr. John Rambo",
                 "Mr. Sole Trader"
-            );
+            ) + format(FEEDBACK_LINK);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1226,7 +1227,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Sole Trader",
                 "Mr. John Rambo"
-            );
+            ) + format(FEEDBACK_LINK);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1254,7 +1255,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Jason Rambo",
                 "Mr. Sole Trader"
-            );
+            ) + format(FEEDBACK_LINK);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

@@ -124,6 +124,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
 
+    public static final String FEEDBACK_LINK = "<p><strong>Feedback </strong>Please provide judicial feedback"
+        + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
+
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
     @Autowired
@@ -842,7 +845,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 respondent2.getPartyName()
             );
         }
-        String body = initialBody + format("<p><strong>Feedback </strong>Please provide judicial feedback <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>");
+        String body = initialBody + format(FEEDBACK_LINK);
         return body;
     }
 
