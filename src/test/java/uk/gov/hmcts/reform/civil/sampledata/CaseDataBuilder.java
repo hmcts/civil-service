@@ -5147,6 +5147,9 @@ public class CaseDataBuilder {
             .respondent2Witnesses(respondent2Witnesses)
             .respondentSolicitor1ServiceAddressRequired(respondentSolicitor1ServiceAddressRequired)
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
+            .hearingMethodValuesDisposalHearing(hearingMethodValuesDisposalHearing)
+            .hearingMethodValuesFastTrack(hearingMethodValuesFastTrack)
+            .hearingMethodValuesSmallClaims(hearingMethodValuesSmallClaims)
             .build();
     }
 
