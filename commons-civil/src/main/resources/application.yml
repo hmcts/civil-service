@@ -32,6 +32,9 @@ fees:
     channel: default
     event: issue
     hearingEvent: hearing
+    endpoint: /fees-register/fees/lookup
+    keywords:
+      fastTrackHrg: FastTrackHrg
 
 pin-in-post:
   cui-respond-to-claim:
