@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -338,6 +339,8 @@ public class CaseDataBuilder {
     private LocalDateTime addLegalRepDeadline;
     private DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
+    private DynamicList hearingMethodValuesDisposalHearingDJ;
+    private DynamicList hearingMethodValuesTrialHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
@@ -2074,7 +2077,29 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
         trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
@@ -2166,7 +2191,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOInPerson() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOTelephoneCall() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCall() {
+        Category category = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
+        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
         disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
@@ -4605,6 +4652,8 @@ public class CaseDataBuilder {
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
+            .hearingMethodValuesDisposalHearingDJ(hearingMethodValuesDisposalHearingDJ)
+            .hearingMethodValuesTrialHearingDJ(hearingMethodValuesTrialHearingDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
             .disposalHearingBundleDJ(disposalHearingBundleDJ)
