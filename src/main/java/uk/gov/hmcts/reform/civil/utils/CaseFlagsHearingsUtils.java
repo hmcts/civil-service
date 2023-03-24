@@ -131,12 +131,10 @@ public class CaseFlagsHearingsUtils {
         return flags;
     }
 
-    public static List<Flags> getDetainedIndividualCodeFlags(CaseData caseData) {
+    public static boolean detainedIndividualFlagExist(CaseData caseData) {
         List<Flags> flags = getAllActiveFlags(caseData);
-        if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue( ).getFlagCode().equals(
-                DETAINED_INDIVIDUAL_FLAG_CODE)));
-        }
-        return flags;
+        return flags.stream()
+            .flatMap(flag -> flag.getDetails().stream())
+            .anyMatch(detail -> detail.getValue().getFlagCode().equals(DETAINED_INDIVIDUAL_FLAG_CODE));
     }
 }

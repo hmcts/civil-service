@@ -140,7 +140,7 @@ public class CaseFlagsHearingsUtilsTest {
         }
 
         @Test
-        void shouldReturnAllCaseFlags_withDetainedIndividualCodeFlags() {
+        void shouldReturnTrue_whenDetainedIndividualFlagExistsInAllUsers() {
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .atStateRespondentFullDefence()
@@ -151,50 +151,26 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1ExpertFlags(flags)
                 .build();
 
-            List<Flags> expectedFlags = new ArrayList<>();
-
-            expectedFlags.add(getRespondent1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-            expectedFlags.add(getApplicant1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-            expectedFlags.add(getRespondent1LitFriendFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-            expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-            expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-
-            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
-
-            System.out.println(expectedFlags);
-            assertThat(actualFlags).isEqualTo(expectedFlags);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(true);
         }
 
         @Test
-        void shouldReturnAllCaseFlags_withDetainedIndividualCodeFlags_WhenChosenForRespondent1Only() {
-
-
+        void shouldReturnTrue_whenDetainedIndividualFlagExists() {
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .atStateRespondentFullDefence()
-                .withRespondent1Flags(flags)
+                .withRespondent1Flags()
                 .withApplicant1Flags()
-                .withRespondent1LitigationFriendFlags()
+                .withRespondent1LitigationFriendFlags(flags)
                 .withRespondent1WitnessFlags()
                 .withRespondent1ExpertFlags()
                 .build();
 
-            List<Flags> expectedFlags = new ArrayList<>();
-
-            expectedFlags.add(getRespondent1Flags(caseData, getAllActiveDetainedIndividualCodeFlagDetails()));
-            expectedFlags.add(getApplicant1Flags(caseData, List.of()));
-            expectedFlags.add(getRespondent1LitFriendFlags(caseData, List.of()));
-            expectedFlags.add(getRespondent1ExpertsFlags(caseData, List.of()));
-            expectedFlags.add(getRespondent1WitnessFlags(caseData, List.of()));
-
-            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
-
-            System.out.println(expectedFlags);
-            assertThat(actualFlags).isEqualTo(expectedFlags);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(true);
         }
 
         @Test
-        void shouldAllCaseFlags_withDetainedIndividualCodeFlags_WhenNoneChosen() {
+        void shouldReturnFalse_whenDetainedIndividualFlagDoesNotExists() {
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .atStateRespondentFullDefence()
@@ -205,21 +181,9 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1ExpertFlags()
                 .build();
 
-            List<Flags> expectedFlags = new ArrayList<>();
-
-            expectedFlags.add(getRespondent1Flags(caseData, List.of()));
-            expectedFlags.add(getApplicant1Flags(caseData, List.of()));
-            expectedFlags.add(getRespondent1LitFriendFlags(caseData, List.of()));
-            expectedFlags.add(getRespondent1ExpertsFlags(caseData, List.of()));
-            expectedFlags.add(getRespondent1WitnessFlags(caseData, List.of()));
-
-            List<Flags> actualFlags = CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags(caseData);
-
-            assertThat(actualFlags).isEqualTo(expectedFlags);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(false);
         }
     }
-
-
 
     private Flags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details);
@@ -355,17 +319,5 @@ public class CaseFlagsHearingsUtilsTest {
             .build();
 
         return wrapElements(details3);
-    }
-
-    private List<Element<FlagDetail>> getAllActiveDetainedIndividualCodeFlagDetails() {
-        FlagDetail details = FlagDetail.builder()
-            .name("Detained individual")
-            .flagComment("comment")
-            .flagCode("PF0019")
-            .hearingRelevant(YES)
-            .status("Active")
-            .build();
-
-        return wrapElements(details);
     }
 }

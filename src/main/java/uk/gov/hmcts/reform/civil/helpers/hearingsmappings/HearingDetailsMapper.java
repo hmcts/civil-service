@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
-
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getDetainedIndividualCodeFlags;
 
 public class HearingDetailsMapper {
 
@@ -58,8 +56,9 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
-        List<Flags> flags = getDetainedIndividualCodeFlags(caseData);
-
+        if (CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)) {
+            return List.of("11");
+        }
         return null;
     }
 
