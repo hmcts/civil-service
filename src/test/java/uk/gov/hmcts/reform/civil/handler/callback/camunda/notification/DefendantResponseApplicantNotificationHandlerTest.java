@@ -634,7 +634,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "28 MARCH 2023");
+            .containsEntry("payImmediately", "29 MARCH 2023");
 
     }
 
@@ -662,7 +662,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "28 MARCH 2023");;
+            .containsEntry("payImmediately", "29 MARCH 2023");;
 
     }
 }
