@@ -188,4 +188,11 @@ public class NocNotificationUtils {
 
         return String.format("%s v %s", applicants, defendants);
     }
+
+    public static CaseData getCaseDataWithoutFormerSolicitorEmail(CaseData caseData) {
+        return caseData.toBuilder().changeOfRepresentation(
+            caseData.getChangeOfRepresentation().toBuilder()
+                .formerRepresentationEmailAddress(null)
+                .build()).build();
+    }
 }

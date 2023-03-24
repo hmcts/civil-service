@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -224,6 +225,7 @@ class FlowStateAllowedEventServiceTest {
                         NOTIFY_DEFENDANT_OF_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
+                        UPLOAD_TRANSLATED_DOCUMENT,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
@@ -328,7 +330,10 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         CHANGE_SOLICITOR_EMAIL,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -353,7 +358,10 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -378,7 +386,10 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_SCHEDULED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
