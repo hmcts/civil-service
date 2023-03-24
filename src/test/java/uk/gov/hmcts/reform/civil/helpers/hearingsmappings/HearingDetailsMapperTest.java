@@ -139,11 +139,11 @@ public class HearingDetailsMapperTest {
             .withRespondent1Flags(wrapElements(
                 FlagDetail.builder()
                     .name("Detained individual")
-                  .flagComment("comment")
-                  .flagCode("PF0019")
-                  .hearingRelevant(YES)
-                  .status("Active")
-                  .build()))
+                    .flagComment("comment")
+                    .flagCode("PF0019")
+                    .hearingRelevant(YES)
+                    .status("Active")
+                    .build()))
             .build();
         assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(List.of("11"));
     }

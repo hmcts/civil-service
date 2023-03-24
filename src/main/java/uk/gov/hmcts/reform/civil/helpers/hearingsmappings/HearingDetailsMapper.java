@@ -64,7 +64,7 @@ public class HearingDetailsMapper {
 
     public static String getListingComments(CaseData caseData) {
         return EMPTY_STRING;
-        //todo CIV-6855git
+        //todo CIV-6855
     }
 
     public static String getHearingRequester() {
