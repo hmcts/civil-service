@@ -36,7 +36,7 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static String getExternalCaseReference() {
-        return EMPTY_STRING;
+        return null;
     }
 
     public static boolean getAutoListFlag() {

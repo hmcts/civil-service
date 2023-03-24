@@ -23,11 +23,7 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnEmptyObject_whenHearingWindowInvoked() {
-        HearingWindowModel expected = HearingWindowModel.builder()
-            .dateRangeEnd("")
-            .dateRangeStart("")
-            .firstDateTimeMustBe("")
-            .build();
+        HearingWindowModel expected = HearingWindowModel.builder().build();
         assertThat(HearingDetailsMapper.getHearingWindow()).isEqualTo(expected);
     }
 
@@ -42,8 +38,8 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnNull_whenNumberOfPhysicalAttendeesInvoked() {
-        assertThat(HearingDetailsMapper.getNumberOfPhysicalAttendees()).isNull();
+    void shouldReturn0_whenNumberOfPhysicalAttendeesInvoked() {
+        assertThat(HearingDetailsMapper.getNumberOfPhysicalAttendees()).isEqualTo(0);
     }
 
     @Test

@@ -114,17 +114,12 @@ public class HearingValuesServiceTest {
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 
         HearingWindowModel expectedHearingWindow = HearingWindowModel.builder()
-            .dateRangeEnd("")
-            .dateRangeStart("")
-            .firstDateTimeMustBe("")
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
                                                        .locationId("1234")
                                                        .locationType(COURT)
                                                        .build());
-
-        PanelRequirementsModel expectedPanelReqs = PanelRequirementsModel.builder().build();
 
         JudiciaryModel expectedJudiciary = JudiciaryModel.builder().build();
 
@@ -136,7 +131,7 @@ public class HearingValuesServiceTest {
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
-            .externalCaseReference("")
+            .externalCaseReference(null)
             .caseManagementLocationCode("1234")
             .caseSLAStartDate("")
             .autoListFlag(false)
@@ -144,7 +139,7 @@ public class HearingValuesServiceTest {
             .hearingWindow(expectedHearingWindow)
             .duration(0)
             .hearingPriorityType("Standard")
-            .numberOfPhysicalAttendees(null)
+            .numberOfPhysicalAttendees(0)
             .hearingInWelshFlag(false)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
@@ -152,7 +147,7 @@ public class HearingValuesServiceTest {
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
-            .panelRequirements(expectedPanelReqs)
+            .panelRequirements(PanelRequirementsModel.builder().build())
             .leadJudgeContractType("")
             .judiciary(expectedJudiciary)
             .hearingIsLinkedFlag(false)
