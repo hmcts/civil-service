@@ -199,9 +199,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("locationName")
                 .isEqualTo(matching.getSiteName());
-            assertThat(response.getData())
-                .extracting("locationName")
-                .isEqualTo(matching.getSiteName());
         }
 
         @Test
