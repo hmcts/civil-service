@@ -62,7 +62,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     private DefaultJudgmentOrderFormGenerator generator;
 
     @Test
-    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndInPersonHearing() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -84,7 +84,49 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     }
 
     @Test
-    void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndTelephoneHearing() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOTelephoneHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndVidoeHearing() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOVideoHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggledAndSDOVideoCall() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
                                                                eq(DJ_SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
@@ -96,6 +138,52 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedDisposalHearing()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateClaimIssuedDisposalSDOVideoCall()
+            .atStateClaimIssuedDisposalHearingInPersonDJ()
+            .atStateDisposalHearingOrderMadeWithoutHearing()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggledAndSDOTelephoneCall() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
+                                                               eq(DJ_SDO_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_DISPOSAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedDisposalHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedDisposalSDOTelephoneCall()
+            .atStateClaimIssuedDisposalHearingInPersonDJ()
+            .atStateDisposalHearingOrderMadeWithoutHearing()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggledAndSDOTelephoneCallAndSDOInPerson() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
+                                                               eq(DJ_SDO_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_DISPOSAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedDisposalHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedDisposalSDOInPerson()
             .atStateClaimIssuedDisposalHearingInPersonDJ()
             .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
