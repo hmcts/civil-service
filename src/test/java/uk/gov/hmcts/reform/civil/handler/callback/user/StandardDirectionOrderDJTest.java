@@ -547,12 +547,83 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "create-order";
 
         @Test
-        void shouldCreateAndSaveSDOOrder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
-                Document.builder().documentUrl("url").build())
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOTelephoneHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOTelephoneHearing().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOVideoHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOVideoHearing().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOInPerson() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOInPerson().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOTelephoneCall() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOTelephoneCall().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOVideoCall() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOVideoCall().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
                 .build();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
