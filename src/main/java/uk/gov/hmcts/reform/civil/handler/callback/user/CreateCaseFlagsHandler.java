@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 @Service
 @RequiredArgsConstructor
 public class CreateCaseFlagsHandler extends CallbackHandler {
-    
+
     private static final List<CaseEvent> EVENTS =  List.of(CREATE_CASE_FLAGS);
     private final ObjectMapper objectMapper;
 
