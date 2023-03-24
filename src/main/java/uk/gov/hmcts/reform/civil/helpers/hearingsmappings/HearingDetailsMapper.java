@@ -14,6 +14,7 @@ public class HearingDetailsMapper {
 
     private static String EMPTY_STRING = "";
     public static String STANDARD_PRIORITY = "Standard";
+    public static String SECURE_DOCK_KEY = "11";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -57,7 +58,7 @@ public class HearingDetailsMapper {
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
         if (CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)) {
-            return List.of("11");
+            return List.of(SECURE_DOCK_KEY);
         }
         return null;
     }
