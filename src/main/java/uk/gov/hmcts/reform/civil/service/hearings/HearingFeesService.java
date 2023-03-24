@@ -38,7 +38,7 @@ public class HearingFeesService {
         String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam(CHANNEL, feesConfiguration.getChannel())
-            .queryParam(EVENT, feesConfiguration.getEvent())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
             .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
             .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
             .queryParam(SERVICE, feesConfiguration.getService())
@@ -51,9 +51,9 @@ public class HearingFeesService {
         String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam(CHANNEL, feesConfiguration.getChannel())
-            .queryParam(EVENT, feesConfiguration.getEvent())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
             .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
-            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
+            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2Hearing())
             .queryParam(SERVICE, feesConfiguration.getService())
             .queryParam(KEYWORD, feesConfiguration.getFastTrackHrgKey())
             .queryParam(AMOUNT, amount);

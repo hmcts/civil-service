@@ -46,9 +46,10 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getEndpoint()).thenReturn("/fees-register/fees/lookup");
         when(feesConfiguration.getService()).thenReturn("civil money claims");
         when(feesConfiguration.getChannel()).thenReturn("default");
-        when(feesConfiguration.getEvent()).thenReturn("hearing");
+        when(feesConfiguration.getHearingEvent()).thenReturn("hearing");
         when(feesConfiguration.getJurisdiction1()).thenReturn("civil");
-        when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
+        when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
+        when(feesConfiguration.getJurisdiction2Hearing()).thenReturn("civil");
         when(feesConfiguration.getFastTrackHrgKey()).thenReturn("FastTrackHrgKey");
     }
 
@@ -75,7 +76,7 @@ class HearingFeesServiceTest {
         assertThat(feeDto).isEqualTo(expectedFeeDto);
         assertThat(queryCaptor.getValue().toString())
             .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=hearing&jurisdiction1"
-                           + "=civil&jurisdiction2=civil&service=civil%20money%20claims&amount_or_volume=125");
+                           + "=civil&jurisdiction2=county%20court&service=civil%20money%20claims&amount_or_volume=125");
     }
 
     @Test

@@ -13,6 +13,7 @@ public class HearingFeeConfiguration {
     private final String service;
     private final String jurisdiction1;
     private final String jurisdiction2;
+    private final String jurisdiction2Hearing;
     private final String channel;
     private final String event;
     private final String hearingEvent;
@@ -23,6 +24,7 @@ public class HearingFeeConfiguration {
                                    @Value("${fees.api.service}") String service,
                                    @Value("${fees.api.jurisdiction1}") String jurisdiction1,
                                    @Value("${fees.api.jurisdiction2}") String jurisdiction2,
+                                   @Value("${fees.api.jurisdiction2Hearing}") String jurisdiction2Hearing,
                                    @Value("${fees.api.channel}") String channel,
                                    @Value("${fees.api.event}") String event,
                                    @Value("${fees.api.hearingEvent}") String hearingEvent,
@@ -32,6 +34,7 @@ public class HearingFeeConfiguration {
         this.service = service;
         this.jurisdiction1 = jurisdiction1;
         this.jurisdiction2 = jurisdiction2;
+        this.jurisdiction2Hearing = jurisdiction2Hearing;
         this.channel = channel;
         this.event = event;
         this.hearingEvent = hearingEvent;

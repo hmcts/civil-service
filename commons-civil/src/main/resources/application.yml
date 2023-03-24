@@ -33,6 +33,7 @@ fees:
     event: issue
     hearingEvent: hearing
     endpoint: /fees-register/fees/lookup
+    jurisdiction2Hearing: civil
     keywords:
       fastTrackHrg: FastTrackHrg
 
