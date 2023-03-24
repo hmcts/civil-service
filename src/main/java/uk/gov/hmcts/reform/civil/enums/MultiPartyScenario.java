@@ -38,4 +38,8 @@ public enum MultiPartyScenario {
     public static boolean isMultiPartyScenario(CaseData caseData) {
         return caseData.getApplicant2() != null || caseData.getRespondent2() != null;
     }
+
+    public static boolean isOneVOne(CaseData caseData) {
+        return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
 }

@@ -14,8 +14,7 @@ public class RejectWithMediationConfHeader implements RespondToResponseConfirmat
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.getApplicant1ClaimMediationSpecRequired() == null
-            || !YesOrNo.YES.equals(caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation())) {
+        if (caseData.isClaimantRejectsClaimAmount()) {
             return Optional.empty();
         }
 

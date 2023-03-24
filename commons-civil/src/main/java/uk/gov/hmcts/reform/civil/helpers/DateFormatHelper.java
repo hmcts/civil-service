@@ -9,6 +9,7 @@ public class DateFormatHelper {
 
     public static final String DATE_TIME_AT = "h:mma 'on' d MMMM yyyy";
     public static final String DATE = "d MMMM yyyy";
+    public static final String DATE_WITH_TWO_DAY_DIGIT = "dd MMMM yyyy";
 
     private DateFormatHelper() {
         //NO-OP

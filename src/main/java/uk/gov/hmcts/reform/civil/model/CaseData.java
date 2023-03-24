@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -72,8 +75,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -108,15 +109,20 @@ import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_WITH_TWO_DAY_DIGIT;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -796,5 +802,90 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantRejectsClaimAmount() {
+        return YesOrNo.NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isMediationAcceptedByDefendant() {
+        return YesOrNo.YES.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public ResponseOneVOneShowTag getResponseOneVOneShowTag() {
+        if(isOneVOne(this)){
+            if (getRespondent1ClaimResponseTypeForSpec() == null) {
+                return null;
+            }
+            switch (getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_DEFENCE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
+                case FULL_ADMISSION:
+                    return getResponseOneVOneTagForFullAdmit();
+                case PART_ADMISSION:
+                    return getResponseOneVOneTagForPartAdmit();
+                case COUNTER_CLAIM:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public String getPayDateAsString(){
+        if (getRespondToClaimAdmitPartLRspec() != null
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
+            return getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
+        }
+        if (getRespondToAdmittedClaim() != null
+            && getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
+            return getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
+                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
+        }
+        if (getRespondent1ResponseDate() != null) {
+            return getRespondent1ResponseDate().plusDays(5)
+                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    private ResponseOneVOneShowTag getResponseOneVOneTagForFullAdmit(){
+        if (YES.equals(getSpecDefenceFullAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+        }
+        switch (getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+        }
+    }
+
+    @JsonIgnore
+    private ResponseOneVOneShowTag getResponseOneVOneTagForPartAdmit(){
+        if (YES.equals(getSpecDefenceAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+        }
+        switch (getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+        }
     }
 }
