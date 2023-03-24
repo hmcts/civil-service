@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -34,8 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimResponseFormForSpec> {
