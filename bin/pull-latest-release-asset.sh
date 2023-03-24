@@ -8,7 +8,7 @@ token=$(az keyvault secret show --vault-name infra-vault-nonprod --name hmcts-gi
  --query value -o tsv)
 
 latestAssetId=$(curl -H "Authorization: token ${token}" \
-  https://api.github.com/repos/hmcts/${repoName}/releases/latest \
+  https://api.github.com/repos/hmcts/${repoName}/releases/CIV-5708-Yarn-Test \
   | docker run --rm --interactive stedolan/jq ".assets[] | select(.name==\"${assetName}\") | .id")
 
 curl -L \
