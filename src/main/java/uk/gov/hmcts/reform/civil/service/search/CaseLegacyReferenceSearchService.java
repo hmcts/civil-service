@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class CaseLegacyReferenceSearchService {
         SearchResult searchResult = coreCaseDataService.searchCases(query);
         if (searchResult == null || searchResult.getCases().size() < 1) {
             log.error("no case found for {}", legacyReference);
-            throw new CaseNotFoundException();
+            throw new SearchServiceCaseNotFoundException();
         }
         return searchResult.getCases().get(0);
     }
