@@ -80,8 +80,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         List<IdValue<Bundle>> idValueList = new ArrayList<>();
         idValueList.add(new IdValue<>(
             "1",
-            Bundle.builder().id("1").description(bundleTitle).eligibleForStitching("yes").documents(bundleDocuments).filename(bundleFilename).build())
-        );
+            Bundle.builder().id("1").description(bundleTitle).eligibleForStitching("yes").documents(bundleDocuments).filename(bundleFilename).build()
+        ));
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseBundles(idValueList);
