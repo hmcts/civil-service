@@ -87,7 +87,6 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().isRespondent1(isRespondent1).build().toMap(objectMapper))
             .build();
