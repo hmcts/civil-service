@@ -68,7 +68,7 @@ public class ServiceHearingsCaseLevelMapperTest {
     @Test
     void shouldReturnEmptyString_whenExternalCaseReferenceInvoked() {
         assertThat(ServiceHearingsCaseLevelMapper.getExternalCaseReference())
-            .isEqualTo("");
+            .isEqualTo(null);
     }
 
     @Test

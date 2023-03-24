@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
@@ -22,11 +23,7 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnEmptyObject_whenHearingWindowInvoked() {
-        HearingWindowModel expected = HearingWindowModel.builder()
-            .dateRangeEnd("")
-            .dateRangeStart("")
-            .firstDateTimeMustBe("")
-            .build();
+        HearingWindowModel expected = HearingWindowModel.builder().build();
         assertThat(HearingDetailsMapper.getHearingWindow()).isEqualTo(expected);
     }
 
@@ -41,8 +38,8 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnNull_whenNumberOfPhysicalAttendeesInvoked() {
-        assertThat(HearingDetailsMapper.getNumberOfPhysicalAttendees()).isNull();
+    void shouldReturn0_whenNumberOfPhysicalAttendeesInvoked() {
+        assertThat(HearingDetailsMapper.getNumberOfPhysicalAttendees()).isEqualTo(0);
     }
 
     @Test
@@ -97,7 +94,8 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnPanelRequirements_whenInvoked() {
-        assertThat(HearingDetailsMapper.getPanelRequirements()).isEqualTo(null);
+        PanelRequirementsModel expected = PanelRequirementsModel.builder().build();
+        assertThat(HearingDetailsMapper.getPanelRequirements()).isEqualTo(expected);
     }
 
     @Test
