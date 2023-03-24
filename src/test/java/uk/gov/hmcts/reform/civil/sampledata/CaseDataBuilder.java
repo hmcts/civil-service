@@ -5150,12 +5150,6 @@ public class CaseDataBuilder {
             .hearingMethodValuesDisposalHearing(hearingMethodValuesDisposalHearing)
             .hearingMethodValuesFastTrack(hearingMethodValuesFastTrack)
             .hearingMethodValuesSmallClaims(hearingMethodValuesSmallClaims)
-            .applicantExperts(applicantExperts)
-            .applicantWitnesses(applicantWitnesses)
-            .respondent1Experts(respondent1Experts)
-            .respondent1Witnesses(respondent1Witnesses)
-            .respondent2Experts(respondent2Experts)
-            .respondent2Witnesses(respondent2Witnesses)
             .build();
     }
 
