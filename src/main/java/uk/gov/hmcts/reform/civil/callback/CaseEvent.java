@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
 import static uk.gov.hmcts.reform.civil.callback.UserType.CAMUNDA;
 import static uk.gov.hmcts.reform.civil.callback.UserType.TESTING_SUPPORT;
