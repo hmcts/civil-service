@@ -99,11 +99,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
-    private static final BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
-    private static final BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-    private static final BigDecimal lowCostAmount = ZERO;
-    private static final BigDecimal midCostAmount = BigDecimal.valueOf(40);
-    private static final BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -571,7 +566,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        if (isPaidSomeAmountMoreThanClaimAmount(caseData)) {
+        if (caseData.isPaidSomeAmountMoreThanClaimAmount(caseData)) {
             errors.add("The amount paid must be less than the full claim amount.");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -594,7 +589,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal fixedCost = setUpFixedCostAmount(claimAmount, caseData);
+        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
@@ -613,24 +608,5 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
-    }
-
-    private BigDecimal setUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
-        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
-            return ZERO;
-        }
-        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
-            return lowCostAmount;
-        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
-            return midCostAmount;
-        } else {
-            return highCostAmount;
-        }
-    }
-
-    private boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
-        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
-            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
-            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
     }
 }
