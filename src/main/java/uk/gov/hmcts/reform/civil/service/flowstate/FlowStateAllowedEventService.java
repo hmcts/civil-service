@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -180,6 +181,7 @@ public class FlowStateAllowedEventService {
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
