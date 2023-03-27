@@ -11,21 +11,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -50,6 +50,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -613,7 +615,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     @Test
     void shoulldReturnPartyInformationScenerio1_whenCaseEventIsInvoked() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-
+        String formattedDate = formatLocalDate(whenWillPay, DATE);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -634,14 +636,14 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "29 MARCH 2023");
+            .containsEntry("payImmediately", formattedDate.toUpperCase());
 
     }
 
     @Test
     void shoulldReturnPartyInformationScenerio2_whenCaseEventIsInvoked() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-
+        String formattedDate = formatLocalDate(whenWillPay, DATE);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
@@ -662,7 +664,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "29 MARCH 2023");;
+            .containsEntry("payImmediately", formattedDate.toUpperCase());;
 
     }
 }
