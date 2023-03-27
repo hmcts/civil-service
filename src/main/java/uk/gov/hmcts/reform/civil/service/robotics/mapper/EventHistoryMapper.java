@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -35,8 +34,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -86,7 +85,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENC
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -109,7 +107,7 @@ public class EventHistoryMapper {
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
     private final Time time;
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
@@ -1118,10 +1116,10 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
-            List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsId(
-                    CallbackParams.Params.BEARER_TOKEN.toString(),
-                    caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+            String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
+                    caseData,
+                    CallbackParams.Params.BEARER_TOKEN.toString(), true
+            );
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1131,21 +1129,12 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode(courtLocations.isEmpty()
-                                                                            ? "" : courtLocations.stream()
-                                                        .filter(id -> id.getCourtTypeId().equals(
-                                                            CIVIL_COURT_TYPE_ID))
-                                                        .collect(Collectors.toList()).get(0)
-                                                        .getCourtLocationCode())
+                                                    .preferredCourtCode(preferredCourtCode)
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      courtLocations.isEmpty() ? "" : courtLocations.stream()
-                                          .filter(id -> id.getCourtTypeId().equals(
-                                              CIVIL_COURT_TYPE_ID))
-                                          .collect(Collectors.toList()).get(0)
-                                          .getCourtLocationCode()
+                                          preferredCourtCode
                                   ))
                                   .build())
                 .collect(Collectors.toList());

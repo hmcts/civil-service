@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
 
@@ -71,6 +72,8 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
     @MockBean
     private Time time;
     private static final String BEARER_TOKEN = "Bearer Token";
