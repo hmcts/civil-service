@@ -87,7 +87,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
                 recipient = caseData.getRespondent1().getPartyEmail();
                 template = notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip();
                 properties = addProperties(caseData);
-            }else{
+            } else {
                 template = isCcNotification(callbackParams)
                     ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
                     : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
