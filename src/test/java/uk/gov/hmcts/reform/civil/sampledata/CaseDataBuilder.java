@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
@@ -87,7 +89,6 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -374,8 +375,6 @@ public class CaseDataBuilder {
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
-    private BigDecimal ccjPaymentPaidSomeAmount;
-    private YesOrNo ccjPaymentPaidSomeOption;
     private BigDecimal totalInterest;
     private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
 
@@ -383,6 +382,8 @@ public class CaseDataBuilder {
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
     private CaseDataLiP caseDataLiP;
+
+    private CCJPaymentDetails ccjPaymentDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4381,18 +4382,13 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
-        this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
+    public CaseDataBuilder ccjPaymentDetails(CCJPaymentDetails ccjPaymentDetails) {
+        this.ccjPaymentDetails = ccjPaymentDetails;
         return this;
     }
 
     public CaseDataBuilder specRespondent1Represented(YesOrNo specRespondent1Represented) {
         this.specRespondent1Represented = specRespondent1Represented;
-        return this;
-    }
-
-    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption) {
-        this.ccjPaymentPaidSomeOption = paymentOption;
         return this;
     }
 
@@ -4648,8 +4644,7 @@ public class CaseDataBuilder {
                 //Certificate of Service
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
-            .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
-            .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
+            .ccjPaymentDetails(ccjPaymentDetails)
             .totalInterest(totalInterest)
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
