@@ -195,4 +195,3 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     }
 
 }
-
