@@ -26,7 +26,6 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final PinInPostConfiguration pipInPostConfiguration;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_FOR_RESPONDENT1_REJECT_REPAYMENT);
     private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimantDisAgreeRepaymentPlanNotifyApplicant";
@@ -72,7 +71,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addEmail(CaseData caseData) {
-        return caseData.getApplicant1().getPartyEmail();
+        return caseData.getApplicantSolicitor1UserDetails().getEmail();
         //String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }
