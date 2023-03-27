@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -22,10 +21,7 @@ public class JudgmentSubmittedConfText implements RespondToResponseConfirmationT
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if ((YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || null == caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            && !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+        if (caseData.isRejectDefendantPaymentPlanNo()) {
             return Optional.empty();
         }
         return Optional.of(format(
