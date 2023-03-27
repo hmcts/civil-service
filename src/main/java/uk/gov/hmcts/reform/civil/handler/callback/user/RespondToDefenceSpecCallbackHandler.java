@@ -196,7 +196,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
 
-        // TODO add a V_something flag here
         if ((updatedCaseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && updatedCaseData.getApplicant1ProceedWithClaim() == YES)
             || updatedCaseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
