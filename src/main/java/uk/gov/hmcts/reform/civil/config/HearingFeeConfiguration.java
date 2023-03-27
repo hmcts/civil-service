@@ -28,7 +28,7 @@ public class HearingFeeConfiguration {
                                    @Value("${fees.api.channel}") String channel,
                                    @Value("${fees.api.event}") String event,
                                    @Value("${fees.api.hearingEvent}") String hearingEvent,
-                                   @Value("${fees.api.keywords.fastTrackHrg") String fastTrackHrgKey) {
+                                   @Value("${fees.api.keywords.fastTrackHrg}") String fastTrackHrgKey) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
