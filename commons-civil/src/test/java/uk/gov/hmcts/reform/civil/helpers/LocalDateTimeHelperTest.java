@@ -13,7 +13,7 @@ class LocalDateTimeHelperTest {
     @Test
     void fromUTC_shouldReturnTimeInLocalZoneWinterTime() {
         // Given
-        LocalDateTime farAwayLocalDateTime = LocalDateTime.of(2022,12,30,12,30,5)
+        LocalDateTime farAwayLocalDateTime = LocalDateTime.of(2022, 12, 30, 12, 30, 5)
             .atZone(ZoneId.of("America/New_York")).toLocalDateTime();
 
         // when
@@ -27,7 +27,7 @@ class LocalDateTimeHelperTest {
     @Test
     void fromUTC_shouldReturnTimeInLocalZoneSummerTime() {
         // Given
-        LocalDateTime farAwayLocalDateTime = LocalDateTime.of(2022,6,30,12,30,5)
+        LocalDateTime farAwayLocalDateTime = LocalDateTime.of(2022, 6, 30, 12, 30, 5)
             .atZone(ZoneId.of("America/New_York")).toLocalDateTime();
 
         // when
@@ -35,6 +35,9 @@ class LocalDateTimeHelperTest {
 
         // then
         assertThat(farAwayLocalDateTime.atZone(LocalDateTimeHelper.UTC_ZONE).toLocalDateTime())
-            .isEqualTo(expectedDateTime.atZone(LocalDateTimeHelper.UTC_ZONE).minus(1, ChronoUnit.HOURS).toLocalDateTime());
+            .isEqualTo(expectedDateTime.atZone(LocalDateTimeHelper.UTC_ZONE).minus(
+                1,
+                ChronoUnit.HOURS
+            ).toLocalDateTime());
     }
 }
