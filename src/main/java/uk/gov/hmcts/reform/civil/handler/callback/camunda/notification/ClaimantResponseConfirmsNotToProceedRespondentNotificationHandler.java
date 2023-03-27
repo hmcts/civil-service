@@ -22,6 +22,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
@@ -35,11 +36,13 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC);
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_CC,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP);
 
     public static final String TASK_ID = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor1";
     public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsNotToProceedNotifyApplicantSolicitor1CC";
+    public static final String TASK_ID_LIP = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor1Lip";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -59,6 +62,9 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
         if (isRespondentSolicitor2Notification(callbackParams)) {
             return Task_ID_RESPONDENT_SOL2;
         }
+        if (isRespondentSolicitor1Lip(callbackParams)) {
+            return TASK_ID_LIP;
+        }
         return isCcNotification(callbackParams) ? TASK_ID_CC : TASK_ID;
     }
 
@@ -68,6 +74,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     }
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsNotToProceed(CallbackParams callbackParams) {
+        Map<String, String> properties;
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String template = null;
@@ -76,11 +83,19 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
             : caseData.getRespondentSolicitor1EmailAddress();
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            template = isCcNotification(callbackParams)
-                ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
-                : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
+            if (isRespondentSolicitor1Lip(callbackParams)) {
+                recipient = caseData.getRespondent1().getPartyEmail();
+                template = notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip();
+                properties = addProperties(caseData);
+            }else{
+                template = isCcNotification(callbackParams)
+                    ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
+                    : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
+                properties = addPropertiesSpec(caseData, caseEvent);
+            }
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
+            properties = addProperties(caseData);
         }
         if (isRespondentSolicitor2Notification(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
@@ -89,9 +104,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
         notificationService.sendMail(
             recipient,
             template,
-            SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? addPropertiesSpec(caseData, caseEvent)
-                : addProperties(caseData),
+            properties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -121,6 +134,11 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED.name());
+    }
+
+    private boolean isRespondentSolicitor1Lip(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP.name());
     }
 
     //finding legal org name
