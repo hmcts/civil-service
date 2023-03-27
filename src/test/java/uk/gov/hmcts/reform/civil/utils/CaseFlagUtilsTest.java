@@ -330,7 +330,7 @@ class CaseFlagUtilsTest {
 
             Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
             Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().firstName("Third").lastName("experto").build();
+            Expert expert3 = Expert.builder().firstName("Third").lastName("expert").build();
 
             CaseData updatedCaseData = caseData.toBuilder()
                 .applicant1DQ(Applicant1DQ.builder()
