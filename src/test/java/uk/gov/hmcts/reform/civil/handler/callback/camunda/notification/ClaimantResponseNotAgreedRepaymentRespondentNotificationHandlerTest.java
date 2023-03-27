@@ -28,10 +28,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @SpringBootTest(classes = {
-    NotificationForDisAgreedRePaymentPlanHandler.class,
+    ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class NotificationForDisAgreedRePaymentPlanHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -39,7 +39,7 @@ class NotificationForDisAgreedRePaymentPlanHandlerTest extends BaseCallbackHandl
     private NotificationsProperties notificationsProperties;
 
     @Autowired
-    private NotificationForDisAgreedRePaymentPlanHandler handler;
+    private ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
