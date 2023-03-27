@@ -365,7 +365,7 @@ class CaseFlagUtilsTest {
                 .details(List.of()).build();
 
             Flags expectedExpert3Flags = Flags.builder().roleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                .partyName("Third experto")
+                .partyName("Third expert")
                 .details(List.of()).build();
 
             assertThat(applicantExperts).isNotNull();
