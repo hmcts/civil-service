@@ -196,12 +196,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
 
-        if ((caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-            && caseData.getApplicant1ProceedWithClaim() == YES)
-            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
-            Set<DefendantResponseShowTag> showConditionFlags = caseData.getShowConditionFlags();
+        // TODO add a V_something flag here
+        if ((updatedCaseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            && updatedCaseData.getApplicant1ProceedWithClaim() == YES)
+            || updatedCaseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
+            Set<DefendantResponseShowTag> showConditionFlags = updatedCaseData.getShowConditionFlags();
             showConditionFlags.add(DefendantResponseShowTag.VULNERABILITY);
-            updatedCaseData.toBuilder().showConditionFlags(showConditionFlags);
+            updatedCaseData = updatedCaseData.toBuilder().showConditionFlags(showConditionFlags).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
