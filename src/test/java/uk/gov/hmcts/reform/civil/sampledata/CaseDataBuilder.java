@@ -396,6 +396,8 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent1Witnesses;
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
+    private List<Element<PartyFlagStructure>> applicant2Witnesses;
+    private List<Element<PartyFlagStructure>> applicant2Experts;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4624,6 +4626,91 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withApplicant1WitnessFlags() {
+        this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                     .firstName("W first")
+                                                     .lastName("W last")
+                                                     .flags(Flags.builder()
+                                                                .partyName("W First W Last")
+                                                                .roleOnCase("Applicant 1 Witness")
+                                                                .details(flagDetails())
+                                                                .build())
+                                                     .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1ExpertFlags() {
+        this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("E first")
+                                                   .lastName("E last")
+                                                   .flags(Flags.builder()
+                                                              .partyName("E First E Last")
+                                                              .roleOnCase("Applicant 1 Expert")
+                                                              .details(flagDetails())
+                                                              .build())
+                                                   .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant1LitigationFriendFlags() {
+        this.applicant1LitigationFriend = applicant1LitigationFriend.toBuilder()
+            .flags(Flags.builder()
+                       .partyName(applicant1LitigationFriend.getFullName())
+                       .roleOnCase("Applicant 1 Litigation Friend")
+                       .details(flagDetails())
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2Flags() {
+        this.applicant2 = applicant2.toBuilder()
+            .flags(Flags.builder()
+                       .partyName(applicant2.getPartyName())
+                       .roleOnCase("Applicant 2")
+                       .details(flagDetails())
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2WitnessFlags() {
+        this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                    .firstName("W first")
+                                                    .lastName("W last")
+                                                    .flags(Flags.builder()
+                                                               .partyName("W First W Last")
+                                                               .roleOnCase("Applicant 2 Witness")
+                                                               .details(flagDetails())
+                                                               .build())
+                                                    .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2ExpertFlags() {
+        this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                  .firstName("E first")
+                                                  .lastName("E last")
+                                                  .flags(Flags.builder()
+                                                             .partyName("E First E Last")
+                                                             .roleOnCase("Applicant 2 Expert")
+                                                             .details(flagDetails())
+                                                             .build())
+                                                  .build());
+        return this;
+    }
+
+    public CaseDataBuilder withApplicant2LitigationFriendFlags() {
+        this.applicant2LitigationFriend = applicant2LitigationFriend.toBuilder()
+            .flags(Flags.builder()
+                       .partyName(applicant2LitigationFriend.getFullName())
+                       .roleOnCase("Applicant 2 Litigation Friend")
+                       .details(flagDetails())
+                       .build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder withRespondent1LitigationFriendFlags() {
         this.respondent1LitigationFriend = respondent1LitigationFriend.toBuilder()
             .flags(Flags.builder()
@@ -4669,6 +4756,54 @@ public class CaseDataBuilder {
                                                          .details(flagDetails())
                                                          .build())
                                               .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2Flags() {
+        this.respondent2 = respondent2.toBuilder()
+            .flags(Flags.builder()
+                       .partyName(respondent2.getPartyName())
+                       .roleOnCase("Respondent 2")
+                       .details(flagDetails())
+                       .build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2ExpertFlags() {
+        this.respondent2Experts = wrapElements(PartyFlagStructure.builder()
+                                                   .firstName("E first")
+                                                   .lastName("E last")
+                                                   .flags(Flags.builder()
+                                                              .partyName("E First E Last")
+                                                              .roleOnCase("Respondent 2 Expert")
+                                                              .details(flagDetails())
+                                                              .build())
+                                                   .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2WitnessFlags() {
+        this.respondent2Witnesses = wrapElements(PartyFlagStructure.builder()
+                                                     .firstName("W first")
+                                                     .lastName("W last")
+                                                     .flags(Flags.builder()
+                                                                .partyName("W First W Last")
+                                                                .roleOnCase("Respondent 2 Witness")
+                                                                .details(flagDetails())
+                                                                .build())
+                                                     .build());
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent2LitigationFriendFlags() {
+        this.respondent2LitigationFriend = respondent2LitigationFriend.toBuilder()
+            .flags(Flags.builder()
+                       .partyName(respondent2LitigationFriend.getFullName())
+                       .roleOnCase("Respondent 2 Litigation Friend")
+                       .details(flagDetails())
+                       .build())
+            .build();
         return this;
     }
 

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -20,11 +21,14 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_EXPERT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_WITNESS;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR_ONE_EXPERT;
@@ -33,10 +37,9 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR_TWO_WITNESS;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.filter;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.getAllCaseFlags;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CaseFlagUtilsTest {
 
@@ -148,7 +151,8 @@ class CaseFlagUtilsTest {
 
             addRespondentDQPartiesFlagStructure(
                 caseDataBuilderToUpdateWithFlags,
-                updatedCaseData);
+                updatedCaseData
+            );
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
             List<Element<PartyFlagStructure>> respondent1ExpertsWithFlags = caseDataWithFlags.getRespondent1Experts();
@@ -215,7 +219,8 @@ class CaseFlagUtilsTest {
 
             addRespondentDQPartiesFlagStructure(
                 caseDataBuilderToUpdateWithFlags,
-                updatedCaseData);
+                updatedCaseData
+            );
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
             List<Element<PartyFlagStructure>> respondent1WitnessWithFlags = caseDataWithFlags.getRespondent1Witnesses();
@@ -282,7 +287,8 @@ class CaseFlagUtilsTest {
 
             addApplicantExpertAndWitnessFlagsStructure(
                 caseDataBuilderToUpdateWithFlags,
-                updatedCaseData);
+                updatedCaseData
+            );
 
             CaseData caseDataWithFlags = caseDataBuilderToUpdateWithFlags.build();
             List<Element<PartyFlagStructure>> applicantWitnesses = caseDataWithFlags.getApplicantWitnesses();
@@ -375,8 +381,259 @@ class CaseFlagUtilsTest {
 
             assertThat(applicantExperts.get(2).getValue().getFlags()).isEqualTo(expectedExpert3Flags);
             assertThat(applicantExperts.get(2).getValue().getFirstName()).isEqualTo("Third");
-            assertThat(applicantExperts.get(2).getValue().getLastName()).isEqualTo("experto");
+            assertThat(applicantExperts.get(2).getValue().getLastName()).isEqualTo("expert");
+        }
+
+        @Test
+        public void getAllCaseFlagsThatAreNotEmpty_1v1() {
+            List<FlagDetail> expectedApplicant1Flags = flagDetails();
+            List<FlagDetail> expectedApplicant1WitnessFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1ExpertFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1Flags = flagDetails();
+            List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+
+            List<FlagDetail> expected = new ArrayList<>();
+            expected.addAll(expectedApplicant1Flags);
+            expected.addAll(expectedApplicant1WitnessFlags);
+            expected.addAll(expectedApplicant1ExpertFlags);
+            expected.addAll(expectedApplicant1LitigationFriendFlags);
+            expected.addAll(expectedRespondent1Flags);
+            expected.addAll(expectedRespondent1WitnessFlags);
+            expected.addAll(expectedRespondent1ExpertFlags);
+            expected.addAll(expectedRespondent1LitigationFriendFlags);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .addApplicant1ExpertsAndWitnesses()
+                .addApplicant1LitigationFriend()
+                .addRespondent1ExpertsAndWitnesses()
+                .addRespondent1LitigationFriend()
+                .withApplicant1Flags()
+                .withApplicant1WitnessFlags()
+                .withApplicant1ExpertFlags()
+                .withApplicant1LitigationFriendFlags()
+                .withRespondent1Flags()
+                .withRespondent1ExpertFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1LitigationFriendFlags()
+                .build();
+
+            assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        public void getAllCaseFlagsThatAreNotEmpty_2v1_App2Proceeds() {
+            List<FlagDetail> expectedApplicant2Flags = flagDetails();
+            List<FlagDetail> expectedApplicant2WitnessFlags = flagDetails();
+            List<FlagDetail> expectedApplicant2ExpertFlags = flagDetails();
+            List<FlagDetail> expectedApplicant2LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1Flags = flagDetails();
+            List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+
+            List<FlagDetail> expected = new ArrayList<>();
+            expected.addAll(expectedApplicant2Flags); // add other parties
+            expected.addAll(expectedApplicant2WitnessFlags);
+            expected.addAll(expectedApplicant2ExpertFlags);
+            expected.addAll(expectedApplicant2LitigationFriendFlags);
+            expected.addAll(expectedRespondent1Flags);
+            expected.addAll(expectedRespondent1WitnessFlags);
+            expected.addAll(expectedRespondent1ExpertFlags);
+            expected.addAll(expectedRespondent1LitigationFriendFlags);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicant2RespondToDefenceAndProceed_2v1()
+                .multiPartyClaimTwoApplicants()
+                .addApplicant2ExpertsAndWitnesses()
+                .addApplicant2LitigationFriend()
+                .addRespondent1ExpertsAndWitnesses()
+                .addRespondent1LitigationFriend()
+                .withApplicant2Flags()
+                .withApplicant2WitnessFlags()
+                .withApplicant2ExpertFlags()
+                .withApplicant2LitigationFriendFlags()
+                .withRespondent1Flags()
+                .withRespondent1ExpertFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1LitigationFriendFlags()
+                .build();
+
+            assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        public void getAllCaseFlagsThatAreNotEmpty_1v2DS() {
+            List<FlagDetail> expectedRespondent1Flags = flagDetails();
+            List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2Flags = flagDetails();
+            List<FlagDetail> expectedRespondent2ExpertFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2WitnessFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2LitigationFriendFlags = flagDetails();
+
+            List<FlagDetail> expected = new ArrayList<>();
+
+            expected.addAll(expectedRespondent1Flags);
+            expected.addAll(expectedRespondent1WitnessFlags);
+            expected.addAll(expectedRespondent1ExpertFlags);
+            expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedRespondent2Flags);
+            expected.addAll(expectedRespondent2ExpertFlags);
+            expected.addAll(expectedRespondent2WitnessFlags);
+            expected.addAll(expectedRespondent2LitigationFriendFlags);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .addRespondent1ExpertsAndWitnesses()
+                .addRespondent1LitigationFriend()
+                .addRespondent2ExpertsAndWitnesses()
+                .addRespondent2LitigationFriend()
+                .withRespondent1Flags()
+                .withRespondent1ExpertFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1LitigationFriendFlags()
+                .withRespondent2Flags()
+                .withRespondent2ExpertFlags()
+                .withRespondent2WitnessFlags()
+                .withRespondent2LitigationFriendFlags()
+                .build();
+
+            assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        public void filterCaseFlagsByActive() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .withApplicant1Flags()
+                .withRespondent1Flags()
+                .build();
+
+            List<FlagDetail> expectedApplicant1Flags = activeFlagDetails();
+            List<FlagDetail> expectedRespondent1Flags = activeFlagDetails();
+
+            List<FlagDetail> expected = new ArrayList<>();
+            expected.addAll(expectedApplicant1Flags);
+            expected.addAll(expectedRespondent1Flags);
+
+            assertThat(filter(getAllCaseFlags(caseData), CaseFlagPredicates.isActive())).isEqualTo(expected);
+        }
+
+        @Test
+        public void filterCaseFlagsByHearingRelevant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .withApplicant1Flags()
+                .withRespondent1Flags()
+                .build();
+
+            List<FlagDetail> expectedApplicant1Flags = hearingRelevantFlagDetails();
+            List<FlagDetail> expectedRespondent1Flags = hearingRelevantFlagDetails();
+
+            List<FlagDetail> expected = new ArrayList<>();
+            expected.addAll(expectedApplicant1Flags);
+            expected.addAll(expectedRespondent1Flags);
+
+            assertThat(filter(getAllCaseFlags(caseData), CaseFlagPredicates.isHearingRelevant())).isEqualTo(expected);
+        }
+
+        private List<FlagDetail> flagDetails() {
+            FlagDetail details1 = FlagDetail.builder()
+                .name("Vulnerable user")
+                .flagComment("comment")
+                .flagCode("AB001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details2 = FlagDetail.builder()
+                .name("Flight risk")
+                .flagComment("comment")
+                .flagCode("SM001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details3 = FlagDetail.builder()
+                .name("Audio/Video evidence")
+                .flagComment("comment")
+                .flagCode("RA001")
+                .hearingRelevant(NO)
+                .status("Active")
+                .build();
+
+            FlagDetail details4 = FlagDetail.builder()
+                .name("Other")
+                .flagComment("comment")
+                .flagCode("AB001")
+                .hearingRelevant(YES)
+                .status("Inactive")
+                .build();
+
+            return List.of(details1, details2, details3, details4);
+        }
+
+        private List<FlagDetail> activeFlagDetails() {
+            FlagDetail details1 = FlagDetail.builder()
+                .name("Vulnerable user")
+                .flagComment("comment")
+                .flagCode("AB001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details2 = FlagDetail.builder()
+                .name("Flight risk")
+                .flagComment("comment")
+                .flagCode("SM001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details3 = FlagDetail.builder()
+                .name("Audio/Video evidence")
+                .flagComment("comment")
+                .flagCode("RA001")
+                .hearingRelevant(NO)
+                .status("Active")
+                .build();
+
+            return List.of(details1, details2, details3);
+
+        }
+
+        private List<FlagDetail> hearingRelevantFlagDetails() {
+            FlagDetail details1 = FlagDetail.builder()
+                .name("Vulnerable user")
+                .flagComment("comment")
+                .flagCode("AB001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details2 = FlagDetail.builder()
+                .name("Flight risk")
+                .flagComment("comment")
+                .flagCode("SM001")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            FlagDetail details3 = FlagDetail.builder()
+                .name("Other")
+                .flagComment("comment")
+                .flagCode("AB001")
+                .hearingRelevant(YES)
+                .status("Inactive")
+                .build();
+
+            return List.of(details1, details2, details3);
         }
     }
-
 }

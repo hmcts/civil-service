@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.getCustodyStatus;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.hasLanguageMisinterpretationFlag;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 
 public class HearingsPartyMapper {
@@ -252,22 +252,22 @@ public class HearingsPartyMapper {
                                                                String partyName, String partyRole,
                                                                String email, String phone, Flags flags) {
 
-        List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null ?
-            flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
+        List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
 
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .interpreterLanguage(null) //todo civ-6888
-            .reasonableAdjustments(null)//todo civ-6888
-            .vulnerableFlag(false)//todo civ-6888
-            .vulnerabilityDetails(null) //todo civ-6888
+            .interpreterLanguage(null)
+            .reasonableAdjustments(null)
+            .vulnerableFlag(false)
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
-            .interpreterLanguage(hasLanguageMisinterpretationFlag(flagDetails))
+            .interpreterLanguage(getInterpreterLanguage(flagDetails))
             .reasonableAdjustments(null)
             .vulnerableFlag(hasVulnerableFlag(flagDetails))
             .custodyStatus(getCustodyStatus(flagDetails))

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -177,7 +178,7 @@ public class CaseFlagUtils {
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2LitigationFriend()));
         flagCollection.addAll(getFlagDetails(caseData.getApplicantExperts()));
         flagCollection.addAll(getFlagDetails(caseData.getApplicantWitnesses()));
-        flagCollection.addAll( getFlagDetails(caseData.getRespondent1Experts()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
@@ -185,28 +186,28 @@ public class CaseFlagUtils {
     }
 
     public static List<FlagDetail> getFlagDetails(Flags flags) {
-        return flags != null && flags.getDetails() != null ?
-            flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : null;
+        return flags != null && flags.getDetails() != null
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     public static List<FlagDetail> getFlagDetails(Party party) {
-        return party != null ? getFlagDetails(party.getFlags()) : null;
+        return party != null ? getFlagDetails(party.getFlags()) : Collections.emptyList();
     }
 
     public static List<FlagDetail> getFlagDetails(LitigationFriend litigationFriend) {
-        return litigationFriend != null ? getFlagDetails(litigationFriend.getFlags()) : null;
+        return litigationFriend != null ? getFlagDetails(litigationFriend.getFlags()) : Collections.emptyList();
     }
 
     public static List<FlagDetail> getFlagDetails(PartyFlagStructure partyStructure) {
-        return partyStructure != null ? getFlagDetails(partyStructure.getFlags()) : null;
+        return partyStructure != null ? getFlagDetails(partyStructure.getFlags()) : Collections.emptyList();
     }
 
     public static List<FlagDetail> getFlagDetails(List<Element<PartyFlagStructure>> partyStructures) {
-        return partyStructures != null ?
-            partyStructures.stream()
-                .map(party-> getFlagDetails(party.getValue().getFlags()))
+        return partyStructures != null
+            ? partyStructures.stream()
+                .map(party -> getFlagDetails(party.getValue().getFlags()))
                 .flatMap(List::stream)
-                .collect(Collectors.toList()) : null;
+                .collect(Collectors.toList()) : Collections.emptyList();
     }
 
     @SafeVarargs

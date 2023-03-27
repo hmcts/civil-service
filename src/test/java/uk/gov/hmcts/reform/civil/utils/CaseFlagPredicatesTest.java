@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class CaseFlagPredicatesTest {
+
     @Test
     void isActive_shouldReturnExpectedActiveFlagDetails() {
         FlagDetail inactiveFlagDetail = FlagDetail.builder().status("INACTIVE").build();
@@ -52,6 +53,17 @@ public class CaseFlagPredicatesTest {
 
         assertFalse(CaseFlagPredicates.hasLanguageInterpreterFlag().test(nonLanguageInterpreterFlagDetail));
         assertTrue(CaseFlagPredicates.hasLanguageInterpreterFlag().test(languageInterpreterFlagDetail));
+    }
+
+    @Test
+    void hasCaseInterpreterRequiredFlag_shouldReturnExpectedCaseInterpreterFlagDetails() {
+        FlagDetail nonLanguageInterpreterFlagDetail = FlagDetail.builder().flagCode("PF0002").build();
+        FlagDetail languageInterpreterFlagDetail = FlagDetail.builder().flagCode("PF0015").build();
+        FlagDetail signLanguageInterpreterFlagDetail = FlagDetail.builder().flagCode("RA0042").build();
+
+        assertFalse(CaseFlagPredicates.hasCaseInterpreterRequiredFlag().test(nonLanguageInterpreterFlagDetail));
+        assertTrue(CaseFlagPredicates.hasCaseInterpreterRequiredFlag().test(languageInterpreterFlagDetail));
+        assertTrue(CaseFlagPredicates.hasCaseInterpreterRequiredFlag().test(signLanguageInterpreterFlagDetail));
     }
 
     @Test

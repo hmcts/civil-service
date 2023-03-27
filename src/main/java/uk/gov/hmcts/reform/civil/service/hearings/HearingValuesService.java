@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
-import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getDuration;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getFacilitiesRequired;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getHearingChannels;
@@ -43,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearings
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getHmctsInternalCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getPublicCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMapper.getVocabulary;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
 
 @Slf4j
@@ -85,7 +85,7 @@ public class HearingValuesService {
             .listingComments(getListingComments(caseData)) // todo CIV-6855
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
-            .caseInterpreterRequiredFlag(getCaseInterpreterRequiredFlag()) // todo civ-6888
+            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
             .panelRequirements(getPanelRequirements())
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())

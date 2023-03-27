@@ -56,7 +56,7 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
-        // todo civ-6888
+        // todo civ-6387
         return null;
     }
 
@@ -71,11 +71,6 @@ public class HearingDetailsMapper {
 
     public static boolean getPrivateHearingRequiredFlag() {
         return false;
-    }
-
-    public static boolean getCaseInterpreterRequiredFlag() {
-        return false;
-        // todo civ-6888
     }
 
     public static PanelRequirementsModel getPanelRequirements() {
