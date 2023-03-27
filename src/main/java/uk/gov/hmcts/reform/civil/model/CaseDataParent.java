@@ -84,6 +84,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -92,6 +93,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.math.BigDecimal.ZERO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
 @SuperBuilder(toBuilder = true)
@@ -340,21 +344,8 @@ public class CaseDataParent implements MappableObject {
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
-    private final YesOrNo ccjPaymentPaidSomeOption;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimFee;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentTotalStillOwed;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountInterestToDate;
+    @JsonUnwrapped
+    private final CCJPaymentDetails ccjPaymentDetails;
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
@@ -392,6 +383,32 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
-
     private final ClaimProceedsInCaseman claimProceedsInCasemanLR;
+
+    @JsonIgnore
+    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
+        BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
+        BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
+        BigDecimal lowCostAmount = ZERO;
+        BigDecimal midCostAmount = BigDecimal.valueOf(40);
+        BigDecimal highCostAmount = BigDecimal.valueOf(55);
+
+        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+            return ZERO;
+        }
+        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
+            return lowCostAmount;
+        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+            return midCostAmount;
+        } else {
+            return highCostAmount;
+        }
+    }
+
+    @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
+        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
+    }
 }
