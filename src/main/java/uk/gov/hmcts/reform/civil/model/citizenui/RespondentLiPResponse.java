@@ -16,4 +16,6 @@ public class RespondentLiPResponse {
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private String respondent1LiPContactPerson;
     private Address respondent1LiPCorrespondenceAddress;
+    private DQExtraDetailsLip respondent1DQExtraDetails;
+    private HearingSupportLip respondent1DQHearingSupportLip;
 }
