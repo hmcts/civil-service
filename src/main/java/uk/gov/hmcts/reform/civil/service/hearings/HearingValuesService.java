@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 @RequiredArgsConstructor
 public class HearingValuesService {
 
-    //Todo: Introduce lov ref data service
+    //Todo: Introduce lov ref data service and hearing data mapper service
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -26,6 +26,7 @@ public class HearingValuesService {
 
         //ToDo: Use lov refdata model and retrieve data from lov ref data service;
 
+        //ToDo: Utilise hearing mapper;
         return ServiceHearingValuesModel.builder()
             .caseSLAStartDate(ServiceHearingsCaseLevelMapper.getCaseSLAStartDate(
                 deadlinesCalculator.getSlaStartDate(caseData)))

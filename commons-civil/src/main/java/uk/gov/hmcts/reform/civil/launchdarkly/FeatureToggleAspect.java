@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FeatureToggleAspect {
 
-    private final FeatureToggleService featureToggleService;
+    private final FeatureToggleApi featureToggleApi;
 
     @Around("execution(* *(*)) && @annotation(featureToggle)")
     public void checkFeatureEnabled(ProceedingJoinPoint joinPoint, FeatureToggle featureToggle) throws Throwable {
 
-        if (featureToggle.value() && featureToggleService.isFeatureEnabled(featureToggle.feature())) {
+        if (featureToggle.value() && featureToggleApi.isFeatureEnabled(featureToggle.feature())) {
             joinPoint.proceed();
-        } else if (!featureToggle.value() && !featureToggleService.isFeatureEnabled(featureToggle.feature())) {
+        } else if (!featureToggle.value() && !featureToggleApi.isFeatureEnabled(featureToggle.feature())) {
             joinPoint.proceed();
         } else {
             log.warn(
