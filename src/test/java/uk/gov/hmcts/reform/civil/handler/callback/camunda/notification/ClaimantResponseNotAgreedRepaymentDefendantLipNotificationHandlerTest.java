@@ -23,15 +23,13 @@ import java.util.Map;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @SpringBootTest(classes = {
     ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -39,18 +37,18 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
     private NotificationsProperties notificationsProperties;
 
     @Autowired
-    private ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler handler;
+    private ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         private final String emailTemplate = "emailTemplate";
-        private final String defendantEmail = "Rosy@hsbcbank.co.uk";
-        private final String legacyReference = "000MC001";
+        private final String defendantEmail = "Jessica@hsbcbank.co.uk";
+        private final String legacyReference = "000MC009";
 
         @BeforeEach
         void setUp() {
-            given(notificationsProperties.getNotifyClaimantLrTemplate()).willReturn(emailTemplate);
+            given(notificationsProperties.getNotifyDefendantLipTemplate()).willReturn(emailTemplate);
         }
 
         @Test
@@ -63,13 +61,13 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
                 .respondent1(Party
                                  .builder().type(Party.Type.INDIVIDUAL)
                                  .individualTitle("Mr")
-                                 .individualFirstName("James")
-                                 .individualLastName("Cock")
+                                 .individualFirstName("John")
+                                 .individualLastName("Wincent")
                                  .partyEmail(defendantEmail)
                                  .build())
                 .applicant1(Party.builder()
                                 .type(Party.Type.COMPANY)
-                                .companyName("ABC Company ltd")
+                                .companyName("XYZ Company ltd")
                                 .build())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
