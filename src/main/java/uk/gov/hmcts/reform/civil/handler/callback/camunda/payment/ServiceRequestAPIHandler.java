@@ -61,12 +61,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             if (isHearingFeeServiceRequest(caseData)) {
-                log.debug("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
+                log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
                 caseData = caseData.toBuilder().hearingFeePBADetails(paymentDetails.build()).build();
             } else if (isClaimFeeServiceRequest(caseData)) {
-                log.debug("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
+                log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getClaimFee());
                 caseData = caseData.toBuilder().claimIssuedPBADetails(paymentDetails.build()).build();
