@@ -24,5 +24,4 @@ public class LocalDateTimeHelper {
     public static LocalDateTime nowInUTC() {
         return LocalDateTime.now(UTC_ZONE);
     }
-
 }
