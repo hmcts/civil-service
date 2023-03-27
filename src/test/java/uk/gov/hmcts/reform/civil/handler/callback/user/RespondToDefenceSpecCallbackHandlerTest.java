@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -394,6 +395,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("applicant1ProceedWithClaim"))
                 .isEqualTo(null);
+        }
+
+        @Test
+        void shouldSetVulnerability_whenRejectAllAndProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullDefenceSpec()
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
+                                                     "set-applicant-route-flags");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                    .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
+
+        @Test
+        void shouldSetVulnerability_whenNotAgreeOwedAmount() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
+                                                     "set-applicant-route-flags");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
         }
     }
 

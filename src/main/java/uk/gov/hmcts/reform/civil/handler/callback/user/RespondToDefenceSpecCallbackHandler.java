@@ -117,6 +117,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
             .put(callbackKey(V_1, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
+            .put(callbackKey(V_2, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
             .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
             .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
             .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
@@ -176,7 +177,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
         if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
             && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             return YES;
@@ -196,9 +197,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(caseData));
 
-        if ((updatedCaseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-            && updatedCaseData.getApplicant1ProceedWithClaim() == YES)
-            || updatedCaseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO) {
+        if (V_2.equals(callbackParams.getVersion()) && shouldVulnerabilityAppear(updatedCaseData)) {
             Set<DefendantResponseShowTag> showConditionFlags = updatedCaseData.getShowConditionFlags();
             showConditionFlags.add(DefendantResponseShowTag.VULNERABILITY);
             updatedCaseData = updatedCaseData.toBuilder().showConditionFlags(showConditionFlags).build();
@@ -207,6 +206,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
+    }
+
+    /**
+     * Checks if the vulnerability flag should be added to case data
+     * @param caseData current case data
+     * @return true if and only if either of the following conditions are satisfied: (a) applicant does not
+     * accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
+     * wants to proceed with the claim
+     */
+    private boolean shouldVulnerabilityAppear(CaseData caseData) {
+        return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            && caseData.getApplicant1ProceedWithClaim() == YES)
+            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
