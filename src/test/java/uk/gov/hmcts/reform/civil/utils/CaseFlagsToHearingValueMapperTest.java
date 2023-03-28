@@ -11,11 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.getCustodyStatus;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
-import static uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseFlagsToHearingValueMapperTest {

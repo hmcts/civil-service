@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.civil.utils;
+package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagPredicates;
 
 import java.util.List;
 

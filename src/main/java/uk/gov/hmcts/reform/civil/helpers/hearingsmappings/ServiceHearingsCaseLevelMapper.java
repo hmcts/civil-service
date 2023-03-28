@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagUtils;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsToHearingValueMapper;
 
 import java.util.ArrayList;
 import java.util.List;
