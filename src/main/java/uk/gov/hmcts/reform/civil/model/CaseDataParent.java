@@ -330,9 +330,7 @@ public class CaseDataParent implements MappableObject {
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
-    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
-    private final YesOrNo applicant1RejectFullAdmitPaymentPlanSpec;
-    private final YesOrNo applicant1RejectPartAdmitPaymentPlanSpec;
+    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
