@@ -171,15 +171,15 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isNotNull();
         }
 
-        // TODO my test
-        @Test
-        void shouldPopulateCourtLocations() {
+        @ParameterizedTest
+        @EnumSource
+        void shouldPopulateCourtLocations(CallbackVersion version) {
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             when(courtLocationUtils.getLocationsFromList(any()))
                 .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(version, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

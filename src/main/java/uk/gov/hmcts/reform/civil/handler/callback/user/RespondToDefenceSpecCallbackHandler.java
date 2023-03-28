@@ -340,7 +340,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if ((V_1.equals(callbackParams.getVersion()) || V_2.equals(callbackParams.getVersion()))
+            && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             updatedCaseData.applicant1DQ(
                 Applicant1DQ.builder().applicant1DQRequestedCourt(
