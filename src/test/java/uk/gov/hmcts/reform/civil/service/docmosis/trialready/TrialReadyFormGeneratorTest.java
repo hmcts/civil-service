@@ -58,7 +58,7 @@ public class TrialReadyFormGeneratorTest {
     private TrialReadyFormGenerator generator;
 
     @Test
-    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided() {
+    void shouldTrialReadyFormGeneratorOneForm_whenValidDataIsProvided() {
         // Given
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(TRIAL_READY)))
             .thenReturn(new DocmosisDocument(TRIAL_READY.getDocumentTitle(), bytes));
@@ -66,13 +66,13 @@ public class TrialReadyFormGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder().isApplicant1(YesOrNo.YES).trialReadyApplicant(YesOrNo.YES)
+            .build().toBuilder().trialReadyApplicant(YesOrNo.YES)
             .applicantRevisedHearingRequirements(
                 RevisedHearingRequirements.builder()
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant");
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -81,7 +81,7 @@ public class TrialReadyFormGeneratorTest {
     }
 
     @Test
-    void shouldHearingFormGeneratorOneForm_whenRespondent1GenerateDocs() {
+    void shouldTrialReadyFormGeneratorOneForm_whenRespondent1GenerateDocs() {
         // Given
         String fileName = String.format(
             TRIAL_READY.getDocumentTitle(), "Trader", formatLocalDate(LocalDate.now(), DATE));
@@ -91,13 +91,13 @@ public class TrialReadyFormGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT)))
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder().isRespondent1(YesOrNo.YES).trialReadyRespondent1(YesOrNo.YES)
+            .build().toBuilder().trialReadyRespondent1(YesOrNo.YES)
             .respondent1RevisedHearingRequirements(
                 RevisedHearingRequirements.builder()
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1");
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -106,7 +106,7 @@ public class TrialReadyFormGeneratorTest {
     }
 
     @Test
-    void shouldHearingFormGeneratorOneForm_whenRespondent2GenerateDocs() {
+    void shouldTrialReadyFormGeneratorOneForm_whenRespondent2GenerateDocs() {
         // Given
         String fileName = String.format(
             TRIAL_READY.getDocumentTitle(), "Company", formatLocalDate(LocalDate.now(), DATE));
@@ -117,13 +117,13 @@ public class TrialReadyFormGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Company").build())
-            .build().toBuilder().isRespondent2(YesOrNo.YES).trialReadyRespondent2(YesOrNo.YES)
+            .build().toBuilder().trialReadyRespondent2(YesOrNo.NO)
             .respondent2RevisedHearingRequirements(
                 RevisedHearingRequirements.builder()
                     .revisedHearingRequirements(YesOrNo.YES)
-                    .revisedHearingComments("Revised Hearing Comments").build()).build();;
+                    .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -132,7 +132,7 @@ public class TrialReadyFormGeneratorTest {
     }
 
     @Test
-    void shouldHearingFormGeneratorOneForm_whenRespondent2OrganisationGenerateDocs() {
+    void shouldTrialReadyFormGeneratorOneForm_whenRespondent2OrganisationGenerateDocs() {
         // Given
         String fileName = String.format(
             TRIAL_READY.getDocumentTitle(), "Organisation", formatLocalDate(LocalDate.now(), DATE));
@@ -143,13 +143,13 @@ public class TrialReadyFormGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .respondent2(Party.builder().type(Party.Type.ORGANISATION).organisationName("Organisation").build())
-            .build().toBuilder().isRespondent2(YesOrNo.YES).trialReadyRespondent2(YesOrNo.NO)
+            .build().toBuilder().trialReadyRespondent2(YesOrNo.YES)
             .respondent2RevisedHearingRequirements(
                 RevisedHearingRequirements.builder()
                     .revisedHearingRequirements(YesOrNo.NO)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
         // Then
         assertThat(caseDocument).isNotNull();
 

@@ -555,6 +555,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingOtherComments respondent1HearingOtherComments;
     private HearingOtherComments respondent2HearingOtherComments;
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;

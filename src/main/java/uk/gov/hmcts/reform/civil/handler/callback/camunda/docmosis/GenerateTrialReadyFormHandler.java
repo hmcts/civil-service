@@ -18,16 +18,24 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT2;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
 @Service
 @RequiredArgsConstructor
 public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        CaseEvent.GENERATE_TRIAL_READY_FORM
+        GENERATE_TRIAL_READY_FORM_APPLICANT,
+        GENERATE_TRIAL_READY_FORM_RESPONDENT1,
+        GENERATE_TRIAL_READY_FORM_RESPONDENT2
     );
-    private static final String TASK_ID = "GenerateTrialReadyForm";
+    private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
+    private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
+    private static final String TASK_ID_RESPONDENT2 = "GenerateTrialReadyFormRespondent2";
 
     private final TrialReadyFormGenerator trialReadyFormGenerator;
 
@@ -45,7 +53,13 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        if (isApplicant(callbackParams, GENERATE_TRIAL_READY_FORM_APPLICANT)) {
+            return TASK_ID_APPLICANT;
+        } else if (isRespondent1(callbackParams, GENERATE_TRIAL_READY_FORM_RESPONDENT1)) {
+            return TASK_ID_RESPONDENT1;
+        } else {
+            return TASK_ID_RESPONDENT2;
+        }
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
@@ -63,11 +77,17 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
                                CaseData caseData) {
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            camundaActivityId(callbackParams)
         );
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
+    }
+
+    private boolean isApplicant(CallbackParams callbackParams, CaseEvent matchEvent) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        return caseEvent.equals(matchEvent);
     }
 
 }

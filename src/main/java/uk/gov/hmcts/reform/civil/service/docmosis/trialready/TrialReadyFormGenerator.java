@@ -32,22 +32,25 @@ public class TrialReadyFormGenerator {
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public CaseDocument generate(CaseData caseData, String authorisation) {
-        TrialReadyForm templateData = getTemplateData(caseData);
+    private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
+    private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
+
+    public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity) {
+        TrialReadyForm templateData = getTemplateData(caseData, camundaActivity);
 
         DocmosisTemplates template = TRIAL_READY;
         DocmosisDocument document = documentGeneratorService.generateDocmosisDocument(templateData, template);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(caseData, template),
+                getFileName(caseData, template, camundaActivity),
                 document.getBytes(),
                 DocumentType.TRIAL_READY_DOCUMENT
             )
         );
     }
 
-    private TrialReadyForm getTemplateData(CaseData caseData) {
+    private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
         var trialReadyForm = TrialReadyForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
             .date(formatLocalDate(LocalDate.now(), DATE))
@@ -66,21 +69,21 @@ public class TrialReadyFormGenerator {
             .defendant2RefNumber(checkReference(caseData)
                                      ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference() : null);
 
-        return completeTrialReadyFormWithOptionalFields(caseData, trialReadyForm).build();
+        return completeTrialReadyFormWithOptionalFields(caseData, trialReadyForm, camundaActivity).build();
     }
 
-    private String getFileName(CaseData caseData, DocmosisTemplates template) {
+    private String getFileName(CaseData caseData, DocmosisTemplates template, String camundaActivity) {
         return String.format(
             template.getDocumentTitle(),
-            getUserLastName(caseData),
+            getUserLastName(caseData, camundaActivity),
             formatLocalDate(LocalDate.now(), DATE));
     }
 
-    private String getUserLastName(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getIsApplicant1())) {
+    private String getUserLastName(CaseData caseData, String camundaActivity) {
+        if (TASK_ID_APPLICANT.equals(camundaActivity)) {
             log.info("Generating document for Applicant");
             return getTypeUserLastName(caseData.getApplicant1());
-        } else if (YesOrNo.YES.equals(caseData.getIsRespondent1())) {
+        } else if (TASK_ID_RESPONDENT1.equals(camundaActivity)) {
             log.info("Generating document for Respondent 1");
             return getTypeUserLastName(caseData.getRespondent1());
         } else {
@@ -103,12 +106,12 @@ public class TrialReadyFormGenerator {
     }
 
     private TrialReadyForm.TrialReadyFormBuilder completeTrialReadyFormWithOptionalFields(
-        CaseData caseData, TrialReadyForm.TrialReadyFormBuilder trialReadyForm) {
-        if (YesOrNo.YES.equals(caseData.getIsApplicant1())) {
+        CaseData caseData, TrialReadyForm.TrialReadyFormBuilder trialReadyForm, String camundaActivity) {
+        if (TASK_ID_APPLICANT.equals(camundaActivity)) {
             return addUserFields(caseData.getTrialReadyApplicant(),
                                  caseData.getApplicantRevisedHearingRequirements(),
                                  caseData.getApplicantHearingOtherComments(), trialReadyForm);
-        } else if (YesOrNo.YES.equals(caseData.getIsRespondent1())) {
+        } else if (TASK_ID_RESPONDENT1.equals(camundaActivity)) {
             return addUserFields(caseData.getTrialReadyRespondent1(),
                                  caseData.getRespondent1RevisedHearingRequirements(),
                                  caseData.getRespondent1HearingOtherComments(), trialReadyForm);
