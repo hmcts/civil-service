@@ -108,7 +108,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -119,7 +118,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
         finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("finalOrders"));
-
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
