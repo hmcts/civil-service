@@ -104,6 +104,9 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+manage-case-ui:
+  baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
+
 payments:
   api:
     site_id: AAA7
