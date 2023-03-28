@@ -1,16 +1,13 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.caseProgression;
+package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
-import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Builder
@@ -30,6 +27,5 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final LocalDate onInitiativeSelectionDate;
     private final String withoutNoticeSelectionText;
     private final LocalDate withoutNoticeSelectionDate;
-
 
 }
