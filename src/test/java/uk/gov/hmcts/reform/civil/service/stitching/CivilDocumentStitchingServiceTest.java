@@ -13,7 +13,10 @@ import uk.gov.hmcts.reform.civil.config.StitchingConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BundleRequest;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -37,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
     CaseDetailsConverter.class
 })
 class CivilDocumentStitchingServiceTest {
+
     @Autowired
     private CivilDocumentStitchingService civilDocumentStitchingService;
     @MockBean
@@ -59,6 +63,7 @@ class CivilDocumentStitchingServiceTest {
                               .documentBinaryUrl("binary-url")
                               .build())
             .build();
+
     private List<DocumentMetaData> buildDocumentMetaDataList() {
         return List.of(
             new DocumentMetaData(
@@ -69,7 +74,7 @@ class CivilDocumentStitchingServiceTest {
         );
     }
 
-    private CaseData buildCaseData(Bundle bundle){
+    private CaseData buildCaseData(Bundle bundle) {
         List<IdValue<Bundle>> caseBundles = List.of(new IdValue<>("1", bundle));
         return CaseDataBuilder.builder().caseBundles(caseBundles).build();
     }
@@ -90,16 +95,18 @@ class CivilDocumentStitchingServiceTest {
         //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
+
     @Test
-     void whenCaseDataIsNullWithNoCaseBundles() {
+    void whenCaseDataIsNullWithNoCaseBundles() {
         //Given: Payload details and stitching URL provided
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
         //When: bundle Request post is called
-         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
+        CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
                                                                          "Title", "FileName", caseData);
         //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
+
     @Test
      void whenCaseDataIsNotNullWithCaseBundlesAndNoStitchingDocumentThenCaseDocumentIsNull() {
         //Given: Payload and case data with case bundle details
@@ -112,6 +119,7 @@ class CivilDocumentStitchingServiceTest {
         //Then: the case documents is null
         Assertions.assertNull(caseDocument);
     }
+
     @Test
     void whenStitchingDocumentIsPresentAndCaseDataNotNullThenCaseDocumentNotNull() {
         //Given: Payload,case data with case bundle details and stitching document
