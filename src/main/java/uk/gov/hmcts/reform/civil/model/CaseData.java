@@ -537,8 +537,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingDuration hearingDuration;
     private String information;
     private String hearingNoticeListOther;
-
     private LocalDateTime caseDismissedHearingFeeDueDate;
+
+    //Trial Readiness
     private YesOrNo trialReadyNotified;
     private YesOrNo trialReadyChecked;
 
@@ -719,9 +720,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
