@@ -37,8 +37,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -84,6 +84,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -92,6 +93,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.math.BigDecimal.ZERO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
 @SuperBuilder(toBuilder = true)
@@ -144,6 +148,9 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
+
+    @JsonUnwrapped
+    private final Mediation mediation;
 
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
@@ -266,7 +273,6 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
-    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
@@ -283,6 +289,7 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
+
     /**
      * This field is not used.
      *
@@ -334,27 +341,14 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
-    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    private final PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
-    private final YesOrNo ccjPaymentPaidSomeOption;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountClaimFee;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentTotalStillOwed;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal ccjJudgmentAmountInterestToDate;
+    @JsonUnwrapped
+    private final CCJPaymentDetails ccjPaymentDetails;
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
@@ -364,7 +358,7 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return  this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == YesOrNo.NO;
     }
 
     /**
@@ -384,6 +378,40 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
 
+    @JsonIgnore
+    public boolean isResponseAcceptedByClaimant() {
+        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
+            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
+            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    }
+
     private final IdamUserDetails claimantUserDetails;
+
+    @JsonIgnore
+    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
+        BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
+        BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
+        BigDecimal lowCostAmount = ZERO;
+        BigDecimal midCostAmount = BigDecimal.valueOf(40);
+        BigDecimal highCostAmount = BigDecimal.valueOf(55);
+
+        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+            return ZERO;
+        }
+        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
+            return lowCostAmount;
+        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+            return midCostAmount;
+        } else {
+            return highCostAmount;
+        }
+    }
+
+    @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
+        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
+    }
 
 }

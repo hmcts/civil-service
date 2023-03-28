@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
@@ -22,18 +21,17 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -46,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
@@ -62,7 +59,7 @@ public class RoboticsDataMapper {
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
 
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
         requireNonNull(caseData);
@@ -101,22 +98,9 @@ public class RoboticsDataMapper {
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
-            .preferredCourtCode(getPreferredCourtCode(caseData, authToken))
+            .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
-    }
-
-    public String getPreferredCourtCode(CaseData caseData, String authToken) {
-        List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-            authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
-        if (!courtLocations.isEmpty()) {
-            return courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList()).get(0).getCourtLocationCode();
-        } else {
-            log.info("Court location not found");
-            return "";
-        }
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
@@ -174,7 +158,7 @@ public class RoboticsDataMapper {
         return solicitorBuilder.build();
     }
 
-    private Consumer<uk.gov.hmcts.reform.prd.model.Organisation> buildOrganisation(
+    private Consumer<uk.gov.hmcts.reform.civil.prd.model.Organisation> buildOrganisation(
         Solicitor.SolicitorBuilder solicitorBuilder, Address providedServiceAddress
     ) {
         return organisation -> {

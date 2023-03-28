@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -7,16 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +71,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
     @Autowired
     private ChangeOfRepresentationNotificationHandler handler;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Nested
     class AboutToSubmitCallback {
 
@@ -115,6 +121,25 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     expectedProperties,
                     REFERENCE
                 );
+            }
+
+            @Test
+            void shouldRemoveFormerSolicitorEmail_whenInvoked() {
+                CaseData caseData =
+                    CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
+
+                var expected = objectMapper.convertValue(caseData.getChangeOfRepresentation().toBuilder()
+                                                             .formerRepresentationEmailAddress(null).build(), new TypeReference<>() {});
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                assertThat(response.getData())
+                    .extracting("changeOfRepresentation")
+                    .isEqualTo(expected);
             }
         }
 
