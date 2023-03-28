@@ -7,13 +7,13 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.util.HashMap;
 
 import static java.util.Objects.isNull;
 
@@ -77,17 +77,16 @@ public class HearingFeesService {
 
     private Fee getRespond(UriComponentsBuilder builder) {
         FeeLookupResponseDto feeLookupResponseDto;
-        URI uri;
+        URI uri = builder.build().toUri();
         try {
-            uri = builder.buildAndExpand(new HashMap<>()).toUri();
             feeLookupResponseDto = restTemplate.getForObject(uri, FeeLookupResponseDto.class);
-        } catch (Exception e) {
-            log.error("Fee Service Lookup Failed - " + e.getMessage(), e);
-            throw new RestClientException("Fee Service Lookup Failed");
+        } catch (RestClientException e) {
+            log.error("Fee Service Lookup Failed for [{}]", uri);
+            throw e;
         }
         if (isNull(feeLookupResponseDto) || isNull(feeLookupResponseDto.getFeeAmount())) {
             log.error("No Fees returned for [{}].", uri);
-            throw new RestClientException("No Fees returned by fee-service while creating hearing fee");
+            throw new InternalServerErrorException("No Fees returned by fee-service while creating hearing fee");
         }
         return buildFeeDto(feeLookupResponseDto);
     }

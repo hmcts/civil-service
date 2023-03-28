@@ -192,15 +192,14 @@ public class HearingScheduledHandler extends CallbackHandler {
         BigDecimal claimAmount;
         if (nonNull(caseData.getClaimValue())) {
             claimAmount = caseData.getClaimValue().toPounds();
+        } else if (nonNull(caseData.getTotalInterest())) {
+            claimAmount = caseData.getTotalClaimAmount()
+                .add(caseData.getTotalInterest())
+                .setScale(2, RoundingMode.UNNECESSARY);
         } else {
-            if (nonNull(caseData.getTotalInterest())) {
-                claimAmount = caseData.getTotalClaimAmount()
-                    .add(caseData.getTotalInterest())
-                    .setScale(2, RoundingMode.UNNECESSARY);
-            } else {
-                claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
-            }
+            claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
         }
+
         if (SMALL_CLAIM.equals(allocatedTrack)) {
             return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
         } else if (FAST_CLAIM.equals(allocatedTrack)) {

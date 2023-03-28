@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
@@ -157,7 +158,7 @@ class HearingFeesServiceTest {
         BigDecimal claimAmount = new BigDecimal(125);
 
         Exception exception = assertThrows(
-            RestClientException.class, () -> feesService.getFeeForHearingSmallClaims(claimAmount));
+            InternalServerErrorException.class, () -> feesService.getFeeForHearingSmallClaims(claimAmount));
         // Then
         assertThat(exception.getMessage())
             .isEqualTo("No Fees returned by fee-service while creating hearing fee");
@@ -175,7 +176,7 @@ class HearingFeesServiceTest {
         BigDecimal claimAmount = new BigDecimal(125);
         // When
         Exception exception = assertThrows(
-            RestClientException.class, () -> feesService.getFeeForHearingSmallClaims(claimAmount));
+            InternalServerErrorException.class, () -> feesService.getFeeForHearingSmallClaims(claimAmount));
         // Then
         assertThat(exception.getMessage())
             .isEqualTo("No Fees returned by fee-service while creating hearing fee");
