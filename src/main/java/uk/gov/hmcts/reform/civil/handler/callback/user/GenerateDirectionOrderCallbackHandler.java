@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+
 import uk.gov.hmcts.reform.civil.service.docmosis.caseProgression.JudgeFinalOrderGenerator;
 
 import java.time.LocalDate;
@@ -52,7 +53,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "\n ### Defendant 2 \n %s";
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
-    private static  CaseDocument finalDocument;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -118,8 +118,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
+        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("finalOrders"));
 
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+        // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
+        //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
+        // showing, we remove.
+        caseDataBuilder.freeFormOrderDocument(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,6 +59,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @MockBean
     private JudgeFinalOrderGenerator judgeFinalOrderGenerator;
 
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
+
     private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
@@ -77,7 +81,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
-
 
     @Nested
     class AboutToStartCallback {
@@ -155,8 +158,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getCategoryID().equals("finalOrders"));
         }
     }
 
