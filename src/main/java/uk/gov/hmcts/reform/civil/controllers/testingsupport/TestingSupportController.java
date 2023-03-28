@@ -111,7 +111,7 @@ public class TestingSupportController {
 
     @GetMapping("/testing-support/feature-toggle/pba-version-3-ways-to-pay")
     @ApiOperation("Check if a feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkFeatureToggle() {
+    public ResponseEntity<FeatureToggleInfo> checkPBAv3Enabled() {
         boolean featureEnabled = featureToggleService.isPbaV3Enabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
