@@ -216,7 +216,6 @@ public enum CaseEvent {
     NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED(CAMUNDA),
     NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED(CAMUNDA);
 
-
     private final UserType userType;
 
     public boolean isCamundaEvent() {
