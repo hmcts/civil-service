@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 
-import uk.gov.hmcts.reform.civil.service.docmosis.caseProgression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -151,8 +151,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if ((caseData.getApplicant2() != null)) {
             return format(BODY_2v1, caseData.getApplicant1().getPartyName(), caseData.getApplicant2().getPartyName(),
                           caseData.getRespondent1().getPartyName());
-        }
-        else {
+        } else {
             return format(BODY_1v1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
         }
     }

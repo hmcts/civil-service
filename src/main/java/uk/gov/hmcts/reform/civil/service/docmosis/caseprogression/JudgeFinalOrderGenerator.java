@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.caseProgression;
+package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
         DocmosisTemplates docmosisTemplate = null;
-        if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER))
+        if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             docmosisTemplate = FREE_FORM_ORDER_PDF;
+        }
         // ASSISTED_ORDER will be added as part of civ-7569
         //else docmosisTemplate = ASSISTED_ORDER_PDF;
         DocmosisDocument docmosisDocument =

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.caseProgression;
+package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
