@@ -105,11 +105,20 @@ public class DeadlinesCalculator {
         if (caseIssueDate == null) {
             throw new IllegalArgumentException("Case issue data cannot be null");
         }
-        if (caseData.getAllocatedTrack() == null) {
+        var allocatedTrackName = caseData.getAllocatedTrack() != null
+            ? caseData.getAllocatedTrack().name()
+            : caseData.getResponseClaimTrack();
+
+        AllocatedTrack allocatedTrack;
+        try {
+            allocatedTrack = AllocatedTrack.valueOf(allocatedTrackName);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("The allocated track provided was not of type AllocatedTrack");
+        } catch (NullPointerException ex) {
             throw new IllegalArgumentException("Allocated track cannot be null");
         }
 
-        switch (caseData.getAllocatedTrack()) {
+        switch (allocatedTrack) {
             case FAST_CLAIM: {
                 return caseIssueDate.plusWeeks(50);
             }
@@ -120,7 +129,7 @@ public class DeadlinesCalculator {
                 return caseIssueDate.plusWeeks(80);
             }
             default: {
-                throw new IllegalArgumentException("Invalid allocated track provided");
+                throw new IllegalArgumentException("Unexpected allocated track provided");
             }
         }
     }

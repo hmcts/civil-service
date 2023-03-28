@@ -21,8 +21,6 @@ import uk.gov.hmcts.reform.civil.bankholidays.BankHolidays;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidaysApi;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.io.IOException;
@@ -432,7 +430,7 @@ public class DeadlinesCalculatorTest {
     @Nested
     class GetSLAStartDate {
         @Test
-        void shouldReturnADate30WeeksAfterClaimIssueData_whenSmallClaimTrack() {
+        void shouldReturnADate30WeeksAfterClaimIssueData_whenAllocatedTrackIsSmallClaim() {
             var caseData = CaseData.builder()
                 .allocatedTrack(SMALL_CLAIM)
                 .issueDate(LocalDate.of(2023, 01, 01))
@@ -444,7 +442,7 @@ public class DeadlinesCalculatorTest {
         }
 
         @Test
-        void shouldReturnADate50WeeksAfterClaimIssueData_whenFastClaimTrack() {
+        void shouldReturnADate50WeeksAfterClaimIssueData_whenAllocatedTrackFastClaimTrack() {
             var caseData = CaseData.builder()
                 .allocatedTrack(FAST_CLAIM)
                 .issueDate(LocalDate.of(2023, 01, 01))
@@ -456,7 +454,7 @@ public class DeadlinesCalculatorTest {
         }
 
         @Test
-        void shouldReturnADate80WeeksAfterClaimIssueData_whenMultiTrack() {
+        void shouldReturnADate80WeeksAfterClaimIssueData_whenAllocatedTrackMultiTrack() {
             var caseData = CaseData.builder()
                 .allocatedTrack(MULTI_CLAIM)
                 .issueDate(LocalDate.of(2023, 01, 01))
@@ -468,7 +466,43 @@ public class DeadlinesCalculatorTest {
         }
 
         @Test
-        void shouldThrowIllegalArgumentException_whenAllocatedTrackIsNull() {
+        void shouldReturnADate30WeeksAfterClaimIssueDate_whenResponseClaimTrackIsSmallClaim() {
+            var caseData = CaseData.builder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2023, 07, 30);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void shouldReturnADate50WeeksAfterClaimIssueDate_whenResponseClaimTrackIsFastClaimTrack() {
+            var caseData = CaseData.builder()
+                .responseClaimTrack(FAST_CLAIM.name())
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2023, 12, 17);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void shouldReturnADate80WeeksAfterClaimIssueDate_whenResponseClaimTrackIsMultiTrack() {
+            var caseData = CaseData.builder()
+                .responseClaimTrack(MULTI_CLAIM.name())
+                .issueDate(LocalDate.of(2023, 01, 01))
+                .build();
+
+            var expectedDate = LocalDate.of(2024, 07, 14);
+
+            Assertions.assertEquals(expectedDate, calculator.getSlaStartDate(caseData));
+        }
+
+        @Test
+        void  shouldThrowIllegalArgumentException_whenAllocatedTrackIsNull() {
             var caseData = CaseData.builder()
                 .issueDate(LocalDate.of(2024, 07, 14))
                 .build();
@@ -478,6 +512,20 @@ public class DeadlinesCalculatorTest {
                 () -> calculator.getSlaStartDate(caseData)
             );
             assertEquals(exception.getMessage(), "Allocated track cannot be null");
+        }
+
+        @Test
+        void  shouldThrowIllegalArgumentException_whenResponseClaimTrackIsNotValidAllocatedTrack() {
+            var caseData = CaseData.builder()
+                .responseClaimTrack("invalid")
+                .issueDate(LocalDate.of(2024, 07, 14))
+                .build();
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.getSlaStartDate(caseData)
+            );
+            assertEquals(exception.getMessage(), "The allocated track provided was not of type AllocatedTrack");
         }
 
         @Test
