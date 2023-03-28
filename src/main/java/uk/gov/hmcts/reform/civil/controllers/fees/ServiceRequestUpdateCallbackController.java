@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 
@@ -26,15 +27,15 @@ public class ServiceRequestUpdateCallbackController {
     @ApiOperation(value = "Ways to pay will call this API and send the status of payment with other details")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Callback processed.", response = CallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request")})
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
         } catch (Exception ex) {
-            log.error(
-                "Payment callback is unsuccessful for the CaseID: {} {}",
-                serviceRequestUpdateDto.getCcdCaseNumber(), ex.toString()
-            );
+            log.error("Payment callback is unsuccessful for the CaseID: {}", serviceRequestUpdateDto.getCcdCaseNumber(), ex);
+            throw new InternalServerErrorException(ex);
         }
     }
 }

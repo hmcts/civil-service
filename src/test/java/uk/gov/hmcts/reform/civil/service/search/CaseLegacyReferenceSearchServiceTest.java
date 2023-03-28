@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,7 +67,7 @@ class CaseLegacyReferenceSearchServiceTest {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
 
         assertThrows(
-            CaseNotFoundException.class, () ->
+            SearchServiceCaseNotFoundException.class, () ->
                 caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE));
     }
 

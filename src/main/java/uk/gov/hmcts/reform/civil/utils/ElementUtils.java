@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -30,6 +30,13 @@ public class ElementUtils {
             .collect(toList());
     }
 
+    public static <T> List<Element<T>> wrapElements(List<T> elements) {
+        return nullSafeCollection(elements).stream()
+            .filter(Objects::nonNull)
+            .map(element -> Element.<T>builder().value(element).build())
+            .collect(toList());
+    }
+
     public static <T> List<T> unwrapElements(List<Element<T>> elements) {
         return nullSafeCollection(elements)
             .stream()
@@ -47,7 +54,7 @@ public class ElementUtils {
 
     public static Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
                                                         LocalDateTime createdAt, DocumentType type) {
-        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
+        return ElementUtils.element(CaseDocument.builder()
                                         .documentLink(document)
                                         .documentName(document.getDocumentFileName())
                                         .documentType(type)
