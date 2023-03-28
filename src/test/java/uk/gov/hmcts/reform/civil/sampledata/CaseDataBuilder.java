@@ -2203,18 +2203,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
