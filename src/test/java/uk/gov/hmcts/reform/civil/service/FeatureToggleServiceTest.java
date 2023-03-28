@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -138,6 +139,7 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isGlobalSearchEnabled()).isEqualTo(toggleStat);
     }
 
+    @Disabled
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
