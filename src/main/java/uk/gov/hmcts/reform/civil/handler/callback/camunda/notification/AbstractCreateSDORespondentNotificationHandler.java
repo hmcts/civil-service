@@ -24,11 +24,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 public abstract class AbstractCreateSDORespondentNotificationHandler extends CallbackHandler {
 
     /**
-     * to be used when defendant is not represented
+     * to be used when defendant is not represented.
      */
     private final AbstractCreateSDORespondentNotificationSender lipNotificationSender;
     /**
-     * to be used when defendant is represented
+     * to be used when defendant is represented.
      */
     private final AbstractCreateSDORespondentNotificationSender lrNotificationSender;
     private final String taskId;
