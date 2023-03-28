@@ -5,6 +5,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+/**
+ * When an SDO is created it is notified to applicants and defendants.
+ * This class sends the email to an unrepresented second defendant.
+ */
 @Component
 public class CreateSDORespondent2LiPNotificationSender extends AbstractCreateSDORespondentNotificationSender {
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -9,7 +10,12 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
+/**
+ * When an SDO is created it is notified to applicants and defendants.
+ * This class holds common code for the actual sending of the email.
+ */
 @RequiredArgsConstructor
+@Slf4j
 public abstract class AbstractCreateSDORespondentNotificationSender implements NotificationData {
 
     private final NotificationService notificationService;
@@ -30,9 +36,19 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                 addProperties(caseData),
                 getDocReference(caseData)
             );
+        } else {
+            log.info("Party " + getRespondentLegalName(caseData)
+                         + " has no email address for claim "
+                         + caseData.getLegacyCaseReference());
         }
     }
 
+    /**
+     * Depending on the defendant being represented or otherwise, the legal name is different.
+     *
+     * @param caseData case data
+     * @return email to use for the defendant
+     */
     protected abstract String getRespondentLegalName(CaseData caseData);
 
     @Override

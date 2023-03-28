@@ -6,6 +6,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+/**
+ * When an SDO is created it is notified to applicants and defendants.
+ * This class sends the email to a represented first defendant.
+ */
 @Component
 public class CreateSDORespondent1LRNotificationSender extends AbstractCreateSDORespondentLRNotificationSender {
 

@@ -7,6 +7,10 @@ import java.util.Collections;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED;
 
+/**
+ * When an SDO is created it is notified to applicants and defendants.
+ * This handler notifies the first defendant.
+ */
 @Service
 public class CreateSDORespondent1NotificationHandler extends AbstractCreateSDORespondentNotificationHandler {
 

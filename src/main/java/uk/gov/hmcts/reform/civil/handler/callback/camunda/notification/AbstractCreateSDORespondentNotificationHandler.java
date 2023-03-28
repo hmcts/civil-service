@@ -15,11 +15,21 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+/**
+ * When an SDO is created it is notified to applicants and defendants.
+ * This class holds common code for the defendant handlers
+ */
 @Service
 @RequiredArgsConstructor
 public abstract class AbstractCreateSDORespondentNotificationHandler extends CallbackHandler {
 
+    /**
+     * to be used when defendant is not represented
+     */
     private final AbstractCreateSDORespondentNotificationSender lipNotificationSender;
+    /**
+     * to be used when defendant is represented
+     */
     private final AbstractCreateSDORespondentNotificationSender lrNotificationSender;
     private final String taskId;
     private final List<CaseEvent> events;
@@ -43,7 +53,7 @@ public abstract class AbstractCreateSDORespondentNotificationHandler extends Cal
 
     protected abstract boolean isRespondentLiP(CaseData caseData);
 
-    private CallbackResponse notifyRespondentSolicitorSDOTriggered(CallbackParams callbackParams) {
+    protected CallbackResponse notifyRespondentSolicitorSDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isRespondentLiP(caseData)) {
             lipNotificationSender.notifyRespondentPartySDOTriggered(caseData);
