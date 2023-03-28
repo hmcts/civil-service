@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.trialready;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL_READY;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrialReadyFormGenerator {
@@ -76,10 +78,13 @@ public class TrialReadyFormGenerator {
 
     private String getUserLastName(CaseData caseData) {
         if (YesOrNo.YES.equals(caseData.getIsApplicant1())) {
+            log.info("Generating document for Applicant");
             return getTypeUserLastName(caseData.getApplicant1());
         } else if (YesOrNo.YES.equals(caseData.getIsRespondent1())) {
+            log.info("Generating document for Respondent 1");
             return getTypeUserLastName(caseData.getRespondent1());
         } else {
+            log.info("Generating document for Respondent 2");
             return getTypeUserLastName(caseData.getRespondent2());
         }
     }
