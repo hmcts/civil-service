@@ -36,6 +36,7 @@ fees:
     jurisdiction2Hearing: civil
     keywords:
       fastTrackHrg: FastTrackHrg
+      multiTrackHrg: MultiTrackHrg
 
 pin-in-post:
   cui-respond-to-claim:

@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -202,8 +203,10 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
         if (SMALL_CLAIM.equals(allocatedTrack)) {
             return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
-        } else {
+        } else if (FAST_CLAIM.equals(allocatedTrack)) {
             return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
+        } else {
+            return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
         }
     }
 

@@ -387,6 +387,30 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .totalClaimAmount(new BigDecimal(123000))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(117500)).code("FEE0440").version("2").build();
+        given(feesService.getFeeForHearingMultiClaims(any())).willReturn(expectedFee);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
+    }
+
+    @Test
     void shouldReturnHearingNoticeCreated_WhenSubmitted() {
         // Given
         String header = "# Hearing notice created\n"

@@ -51,6 +51,7 @@ class HearingFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("county court");
         when(feesConfiguration.getJurisdiction2Hearing()).thenReturn("civil");
         when(feesConfiguration.getFastTrackHrgKey()).thenReturn("FastTrackHrgKey");
+        when(feesConfiguration.getMultiClaimKey()).thenReturn("MultiTrackHrg");
     }
 
     @Test
@@ -104,6 +105,33 @@ class HearingFeesServiceTest {
             .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=hearing&jurisdiction1"
                            + "=civil&jurisdiction2=civil&service=civil%20money%20claims"
                            + "&keyword=FastTrackHrgKey&amount_or_volume=125");
+    }
+
+    @Test
+    void shouldReturnFeeData_whenMultiClaim() {
+        // Given
+        given(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
+            .willReturn(FeeLookupResponseDto.builder()
+                            .feeAmount(TEST_FEE_AMOUNT_POUNDS_14)
+                            .code("test_fee_code")
+                            .version(2)
+                            .build());
+
+        BigDecimal claimAmount = new BigDecimal(125);
+
+        Fee expectedFeeDto = Fee.builder()
+            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
+            .code("test_fee_code")
+            .version("2")
+            .build();
+        // When
+        Fee feeDto = feesService.getFeeForHearingMultiClaims(claimAmount);
+        // Then
+        assertThat(feeDto).isEqualTo(expectedFeeDto);
+        assertThat(queryCaptor.getValue().toString())
+            .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=hearing&jurisdiction1"
+                           + "=civil&jurisdiction2=civil&service=civil%20money%20claims"
+                           + "&keyword=MultiTrackHrg&amount_or_volume=125");
     }
 
     @Test

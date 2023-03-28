@@ -61,6 +61,20 @@ public class HearingFeesService {
         return getRespond(builder);
     }
 
+    public Fee getFeeForHearingMultiClaims(BigDecimal amount) {
+        String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam(CHANNEL, feesConfiguration.getChannel())
+            .queryParam(EVENT, feesConfiguration.getHearingEvent())
+            .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
+            .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2Hearing())
+            .queryParam(SERVICE, feesConfiguration.getService())
+            .queryParam(KEYWORD, feesConfiguration.getMultiClaimKey())
+            .queryParam(AMOUNT, amount);
+
+        return getRespond(builder);
+    }
+
     private Fee getRespond(UriComponentsBuilder builder) {
         FeeLookupResponseDto feeLookupResponseDto;
         URI uri;
