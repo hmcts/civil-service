@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,9 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -325,6 +328,13 @@ class GenAppStateHelperServiceTest {
             return first.map(Element::getValue).orElse(null);
         }
 
+        private GeneralApplicationsDetails getGALocationDetailsFromUpdatedCaseData(CaseData caseData,
+                                                                           String gaCaseRef) {
+            Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
+                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
+            return first.map(Element::getValue).orElse(null);
+        }
+
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
             Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
@@ -380,11 +390,55 @@ class GenAppStateHelperServiceTest {
 
             return builder.build();
         }
+
+        @Test
+         void updateApplicationLocationDetailsLists() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication_applicationClosed()
+                );
+
+            Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
+                                                         .region("2")
+                                                         .baseLocation("00000")
+                                                         .build(), false);
+            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData);
+
+            assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
+            assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+            assertThat(updatedData.getGeneralApplications().get(1).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(1).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+            assertThat(updatedData.getGeneralApplications().get(2).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
+            assertThat(updatedData.getGeneralApplications().get(2).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
+        }
+
+        @Test
+         void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
+            setupForApplicationOffline();
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            false,
+                                            false,
+                                            false, false,
+                                            Map.of()
+                );
+
+            CaseData response = service.updateApplicationLocationDetailsInClaim(
+                caseData);
+
+            CaseData updatedData = mapper.convertValue(response, CaseData.class);
+
+            assertThat(updatedData.getGeneralApplications()).isEmpty();
+            verifyNoMoreInteractions(coreCaseDataService);
+        }
     }
 
     @Nested
     class TriggerGenAppEvents {
-
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -418,5 +472,4 @@ class GenAppStateHelperServiceTest {
             return latestStatus;
         }
     }
-
 }
