@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -395,6 +396,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("applicant1ProceedWithClaim"))
                 .isEqualTo(null);
         }
+
+        @Test
+        void shouldSetVulnerability_whenRejectAllAndProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullDefenceSpec()
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
+                                                     "set-applicant-route-flags");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                    .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
+
+        @Test
+        void shouldSetVulnerability_whenNotAgreeOwedAmount() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
+                                                     "set-applicant-route-flags");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
     }
 
     @Nested
@@ -651,6 +686,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -660,6 +696,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -669,6 +706,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .specDefenceAdmittedRequired(YES)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -678,6 +716,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -688,6 +727,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .specDefenceAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -697,6 +737,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -706,6 +747,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YES)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -714,6 +756,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -724,6 +767,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .specDefenceFullAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -732,6 +776,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -740,6 +785,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -749,6 +795,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -757,6 +804,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent2(PartyBuilder.builder().company().build())
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -766,6 +814,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
             assertThat(result).isNull();
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -788,6 +837,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -798,6 +848,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(result).isEqualTo(whenWillPay
                                              .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -814,6 +865,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondToAdmittedClaim(respondToAdmittedClaim)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -824,6 +876,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(result).isEqualTo(whenWillPay
                                              .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         @Test
@@ -834,6 +887,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -844,6 +898,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(result).isEqualTo(whenWillPay
                                              .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -898,6 +953,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondToAdmittedClaim(respondToAdmittedClaim)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
@@ -907,6 +963,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal result = getCaseData(response).getPartAdmitPaidValuePounds();
 
             assertThat(result).isEqualTo(new BigDecimal("10.50"));
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
     }
 
