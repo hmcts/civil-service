@@ -65,7 +65,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "hmcts.civil@gmail.com",
+                "applicantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
                 "other-party-trial-ready-notification-000DC001"
