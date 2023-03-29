@@ -21,5 +21,4 @@ public abstract class ResponseToDefenceSpecStrategy {
         return updatedCaseData.build();
     }
 
-    abstract public CallbackResponse populateCaseData(CallbackParams callbackParams, ObjectMapper objectMapper);
 }
