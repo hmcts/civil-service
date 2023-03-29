@@ -28,7 +28,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
         ServiceHearingValuesModel expectedHearingValues =
             ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
 
-        when(hearingValuesService.getValues(anyLong(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
             .thenReturn(expectedHearingValues);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
@@ -41,7 +41,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp400() {
-        when(hearingValuesService.getValues(anyLong(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
             .thenThrow(CaseNotFoundException.class);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
