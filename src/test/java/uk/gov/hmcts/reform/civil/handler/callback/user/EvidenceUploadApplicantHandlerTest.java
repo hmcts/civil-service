@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentTyp
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -292,7 +292,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
-        + " date entered must not be in the future (5).",
+            + " date entered must not be in the future (5).",
         "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (6).",
         "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "

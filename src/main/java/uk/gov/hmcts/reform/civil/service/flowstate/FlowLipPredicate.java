@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 public class FlowLipPredicate {
 
-    private FlowLipPredicate(){
+    private FlowLipPredicate() {
 
     }
 

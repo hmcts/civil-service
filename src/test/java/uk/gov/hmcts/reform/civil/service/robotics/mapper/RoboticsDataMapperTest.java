@@ -15,11 +15,10 @@ import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -28,20 +27,21 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -90,6 +90,8 @@ class RoboticsDataMapperTest {
     private Time time;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
     private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
@@ -362,12 +364,7 @@ class RoboticsDataMapperTest {
     @Test
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10").courtLocationCode("121")
-                               .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
@@ -377,11 +374,7 @@ class RoboticsDataMapperTest {
     @Test
     void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10")
-                               .epimmsId("9088").build());
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);

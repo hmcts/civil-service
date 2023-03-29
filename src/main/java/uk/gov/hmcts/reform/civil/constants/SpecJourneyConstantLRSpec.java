@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.constants;
 
 public final class SpecJourneyConstantLRSpec {
 
-    private SpecJourneyConstantLRSpec(){
+    private SpecJourneyConstantLRSpec() {
         //To satisfy sonarQube
     }
 
