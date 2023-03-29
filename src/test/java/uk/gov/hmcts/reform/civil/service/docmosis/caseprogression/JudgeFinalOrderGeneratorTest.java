@@ -68,7 +68,7 @@ public class JudgeFinalOrderGeneratorTest {
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
-        assertThat(caseDocument).isNotNull();
+        assertNotNull(caseDocument);
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
