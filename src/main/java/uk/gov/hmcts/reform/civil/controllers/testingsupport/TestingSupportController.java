@@ -200,6 +200,7 @@ public class TestingSupportController {
             responseMsg = "failed";
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
 
     @GetMapping("/testing-support/case/{caseId}")
     public ResponseEntity<CaseData> getCaseData(@PathVariable("caseId") Long caseId) {
