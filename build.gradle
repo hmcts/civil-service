@@ -213,7 +213,7 @@ task contract(type: Test) {
 }
 
 task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine './bin/pull-latest-release-asset.sh', 'civil-ccd-definition', 'civil-e2e.zip'
+  commandLine './bin/pull-latest-ccd-files.sh', 'master'
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
@@ -296,11 +296,11 @@ def inStrictOrder(Task... tasks) {
 }
 
 task smoke(description: 'Runs the smoke tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSmokeTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, runSmokeTests))
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
+  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity,
     runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests))
 }
 
