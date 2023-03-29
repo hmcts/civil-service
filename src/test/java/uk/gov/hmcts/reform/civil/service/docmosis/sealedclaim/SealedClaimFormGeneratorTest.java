@@ -22,16 +22,14 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -77,19 +75,14 @@ class SealedClaimFormGeneratorTest {
     @MockBean
     private RepresentativeService representativeService;
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    LocationRefDataUtil locationRefDataUtil;
 
     @BeforeEach
     void setup() {
         when(representativeService.getRespondent1Representative(any())).thenReturn(representative1);
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
-        List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                          .courtTypeId("10").courtLocationCode("121")
-                          .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(false))).thenReturn("127");
     }
 
     @Test
