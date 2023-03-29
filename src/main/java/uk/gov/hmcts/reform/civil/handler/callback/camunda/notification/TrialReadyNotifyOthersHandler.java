@@ -70,7 +70,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         String eventId = callbackParams.getRequest().getEventId();
         String emailAddress;
         if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name())) {
-            emailAddress = caseData.getApplicantSolicitor1CheckEmail().getEmail();
+            emailAddress = caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name())) {
             emailAddress = caseData.getRespondentSolicitor1EmailAddress();
         } else {
