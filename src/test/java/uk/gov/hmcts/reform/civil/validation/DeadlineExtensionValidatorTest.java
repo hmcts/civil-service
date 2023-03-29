@@ -132,8 +132,8 @@ class DeadlineExtensionValidatorTest {
             assertThat(errors).contains("The agreed extension date must be after the current deadline");
         }
 
-        /*@Test
-        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond42DaysForSpec() {
+        @Test
+        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond56DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
             LocalDate agreedExtension = NOW.with(DayOfWeek.SUNDAY).plusDays(7);
@@ -146,10 +146,10 @@ class DeadlineExtensionValidatorTest {
                 false
             );
 
-            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 42 days.");
-        }*/
+            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 56 days.");
+        }
 
-        /*@Test
+        @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsBeyond29And56DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
@@ -162,9 +162,8 @@ class DeadlineExtensionValidatorTest {
                 currentResponseDeadline,
                 true
             );
-
             assertThat(errors).contains("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
-        }*/
+        }
 
         @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsWeekendForSpec() {
@@ -181,7 +180,22 @@ class DeadlineExtensionValidatorTest {
                 false
             );
 
-            assertThat(errors).contains("Date must be Weekday/Working Day");
+            assertThat(errors).contains("Date must be next working weekday");
+        }
+
+        @Test
+        void shouldReturnErrors_whenExtensionIsMoreThan28DaysFromResponseDeadlineSpec() {
+            LocalDate agreedExtension = NOW.plusDays(29);
+            LocalDateTime currentResponseDeadline = NOW.atTime(16, 0);
+
+            List<String> errors = validator.specValidateProposedDeadline(
+                agreedExtension,
+                currentResponseDeadline,
+                false
+            );
+
+            assertThat(errors)
+                .containsOnly("The agreed extension date cannot be more than 28 days after the current deadline");
         }
     }
 }
