@@ -40,7 +40,7 @@ public class HearingValuesController {
         @NonNull @RequestBody HearingValuesRequest requestDetails) {
 
         var hearingValues = hearingValuesService.getValues(
-            requestDetails.getCaseReference(), requestDetails.getHearingId());
+            requestDetails.getCaseReference(), requestDetails.getHearingId(), authorization);
 
         return new ResponseEntity<>(hearingValues, HttpStatus.OK);
     }

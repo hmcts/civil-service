@@ -33,6 +33,7 @@ public class GenAppStateHelperService {
         APPLICATION_CLOSED("APPLICATION_CLOSED"),
         APPLICATION_PROCEEDS_OFFLINE("PROCEEDS_IN_HERITAGE");
         private final String requiredState;
+
         public String getRequiredState() {
             return this.requiredState;
         }
