@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Optional;
 
-
 import static java.lang.String.format;
 
 @Component
