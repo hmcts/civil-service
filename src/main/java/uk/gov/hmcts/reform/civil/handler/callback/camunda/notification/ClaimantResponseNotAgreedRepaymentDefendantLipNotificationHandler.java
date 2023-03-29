@@ -8,12 +8,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_LIP_DEFENDANT_REJECT_REPAYMENT);
     private static final String REFERENCE_TEMPLATE_LIP = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_LIP = "ClaimantDisAgreedRepaymentPlanNotifyLip";
@@ -45,13 +42,12 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private CallbackResponse notifyDefendantLip(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if(isRespondentNotRepresented(caseData) && caseData.getRespondent1().getPartyEmail() != null){
-        notificationService.sendMail(
-            addEmail(caseData),
-            addTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
+        if (isRespondentNotRepresented(caseData) && caseData.getRespondent1().getPartyEmail() != null) {
+            notificationService.sendMail(
+                addEmail(caseData),
+                addTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
 

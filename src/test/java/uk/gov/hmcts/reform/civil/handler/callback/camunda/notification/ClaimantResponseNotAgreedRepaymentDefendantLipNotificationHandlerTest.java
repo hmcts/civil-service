@@ -8,25 +8,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.Map;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 
 @SpringBootTest(classes = {
-    ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler.class,
+    ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
 class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -35,59 +37,47 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
-
     @Autowired
     private ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        private final String emailTemplate = "emailTemplate";
-        private final String defendantEmail = "Jessica@hsbcbank.co.uk";
-        private final String legacyReference = "000MC009";
-
         @BeforeEach
-        void setUp() {
-            given(notificationsProperties.getNotifyDefendantLipTemplate()).willReturn(emailTemplate);
+        void setup() {
+            when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn("template-id");
         }
 
         @Test
-        void shouldSendEmailToLipDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .build()
-                .builder()
-                .legacyCaseReference(legacyReference)
-                .respondent1(Party
-                                 .builder().type(Party.Type.INDIVIDUAL)
-                                 .individualTitle("Mr")
-                                 .individualFirstName("John")
-                                 .individualLastName("Wincent")
-                                 .partyEmail(defendantEmail)
-                                 .build())
-                .applicant1(Party.builder()
-                                .type(Party.Type.COMPANY)
-                                .companyName("XYZ Company ltd")
-                                .build())
+        void shouldNotifyRespondentParty_whenInvoked() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
                 .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_REJECT_REPAYMENT")
+                    .build()).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                defendantEmail,
-                emailTemplate,
-                getNotificationDataMap(caseData),
-                "notification-" + legacyReference
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "claimant-reject-repayment-respondent-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-
     }
 }
