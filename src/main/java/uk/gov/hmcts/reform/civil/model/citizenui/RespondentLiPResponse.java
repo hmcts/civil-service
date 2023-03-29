@@ -13,8 +13,6 @@ import uk.gov.hmcts.reform.civil.model.Address;
 @AllArgsConstructor
 public class RespondentLiPResponse {
 
-    @JsonUnwrapped
-    private PartAdmitResponseLiP partAdmitResponseLiP;
     private String timelineComment;
     private String evidenceComment;
     private MediationLiP respondent1MediationLiPResponse;
