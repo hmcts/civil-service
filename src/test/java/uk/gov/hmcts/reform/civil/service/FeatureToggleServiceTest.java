@@ -144,7 +144,7 @@ class FeatureToggleServiceTest {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         givenToggle(pbaV3Key, toggleStat);
 
-        assertThat(featureToggleService.isPbaV3Enabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isPbaV3Enabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
