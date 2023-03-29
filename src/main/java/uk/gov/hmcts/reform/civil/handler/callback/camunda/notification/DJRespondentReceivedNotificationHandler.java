@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -36,6 +38,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,6 +81,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented()) && toggleService.isPinInPostEnabled()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
