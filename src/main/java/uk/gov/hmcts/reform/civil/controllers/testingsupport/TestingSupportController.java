@@ -80,14 +80,6 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
-    @GetMapping("/testing-support/feature-toggle/pba-version-3-ways-to-pay")
-    @ApiOperation("Check if a feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkPBAv3ToggleEnabled() {
-        boolean featureEnabled = featureToggleService.isPbaV3Enabled();
-        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
-        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
-    }
-
     @GetMapping("/testing-support/feature-toggle/noc")
     @ApiOperation("Check if noc feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkNoCToggleEnabled() {
