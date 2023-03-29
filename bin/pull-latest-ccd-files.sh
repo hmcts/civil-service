@@ -16,5 +16,6 @@ cp -r ./civil-ccd-definition/e2e .
 cp -r ./civil-ccd-definition/package.json .
 cp -r ./civil-ccd-definition/yarn.lock .
 cp -r ./civil-ccd-definition/codecept.conf.js .
+cp -r ./civil-ccd-definition/saucelabs.conf.js .
 echo *
 rm -rf ./civil-ccd-definition
