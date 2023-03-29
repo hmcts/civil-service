@@ -814,18 +814,20 @@ public class EventHistoryMapper {
 
     private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
-            .stream()
-            .map(caseNote ->
-                     Event.builder()
-                         .eventSequence(prepareEventSequence(builder.build()))
-                         .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn())
-                         .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
-                         .eventDetails(EventDetails.builder()
-                                           .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
-                                           .build())
-                         .build())
-            .collect(Collectors.toList());
+                .stream()
+                .map(caseNote ->
+                        Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseNote.getCreatedOn())
+                                .eventDetailsText(left((format("case note added: %s",
+                                        caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                .eventDetails(EventDetails.builder()
+                                        .miscText(left((format("case note added: %s",
+                                                caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
         builder.miscellaneous(events);
     }
 
