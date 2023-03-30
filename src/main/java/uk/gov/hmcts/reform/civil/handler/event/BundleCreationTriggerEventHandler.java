@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @Slf4j
@@ -38,6 +39,7 @@ public class BundleCreationTriggerEventHandler {
     private BundleCreationService bundleCreationService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+
 
     /**
      * This method will call bundle API and save required details in case data.
@@ -64,6 +66,7 @@ public class BundleCreationTriggerEventHandler {
             ).collect(Collectors.toList()));
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
+        coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {
