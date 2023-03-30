@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final AssignCategoryId assignCategoryId;
 
     private final FeatureToggleService featureToggleService;
 
@@ -112,6 +114,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+            assignCategoryId.setCategoryIdCaseDocument(sealedClaim, "detailsOfClaim");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
