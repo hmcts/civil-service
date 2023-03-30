@@ -83,6 +83,5 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return null;
     }
 
-
 }
 
