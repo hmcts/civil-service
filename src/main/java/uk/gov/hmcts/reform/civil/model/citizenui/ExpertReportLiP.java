@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpertReportLiP {
+
     private String expertName;
     private LocalDate reportDate;
 }
