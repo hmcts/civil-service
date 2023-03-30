@@ -50,12 +50,11 @@ public enum DocmosisTemplates {
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01235.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf"),
-    CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01066.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01246.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01234.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01219.docx", "%s_directions_questionnaire_form_%s.pdf");
-
+    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01243.docx", "%s_directions_questionnaire_form_%s.pdf");
 
     private final String template;
     private final String documentTitle;
