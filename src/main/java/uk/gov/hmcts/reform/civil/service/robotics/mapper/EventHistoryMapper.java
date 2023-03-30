@@ -130,14 +130,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
-                    // Notice of change:
-                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT: {
-                        // this would change in CIV-1620
-                        if (featureToggleService.isNoticeOfChangeEnabled()) {
-                            buildClaimIssued(builder, caseData);
-                        }
-                        break;
-                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
@@ -813,18 +805,20 @@ public class EventHistoryMapper {
 
     private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
-            .stream()
-            .map(caseNote ->
-                     Event.builder()
-                         .eventSequence(prepareEventSequence(builder.build()))
-                         .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn())
-                         .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
-                         .eventDetails(EventDetails.builder()
-                                           .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
-                                           .build())
-                         .build())
-            .collect(Collectors.toList());
+                .stream()
+                .map(caseNote ->
+                        Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseNote.getCreatedOn())
+                                .eventDetailsText(left((format("case note added: %s",
+                                        caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                .eventDetails(EventDetails.builder()
+                                        .miscText(left((format("case note added: %s",
+                                                caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
         builder.miscellaneous(events);
     }
 
