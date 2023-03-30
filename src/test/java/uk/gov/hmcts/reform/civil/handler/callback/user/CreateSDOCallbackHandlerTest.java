@@ -1199,7 +1199,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CONFIRMATION_SUMMARY_1v1,
                 "Mr. John Rambo",
                 "Mr. Sole Trader"
-            ) + format(FEEDBACK_LINK,"Feedback: Please provide judicial feedback");
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1227,7 +1227,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Sole Trader",
                 "Mr. John Rambo"
-            ) + format(FEEDBACK_LINK,"Feedback: Please provide judicial feedback");
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1255,7 +1255,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Jason Rambo",
                 "Mr. Sole Trader"
-            ) + format(FEEDBACK_LINK,"Feedback: Please provide judicial feedback");
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
