@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
 
@@ -108,6 +109,8 @@ class RoboticsNotificationServiceTest {
     private Time time;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
 
     LocalDateTime localDateTime;
 

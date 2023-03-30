@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -57,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -179,6 +181,7 @@ public class FlowStateAllowedEventService {
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
@@ -259,7 +262,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 GENERATE_DIRECTIONS_ORDER,
-                TRIAL_READINESS
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -509,7 +513,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -777,7 +782,8 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
         entry(
@@ -812,7 +818,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
         entry(
@@ -966,7 +973,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 

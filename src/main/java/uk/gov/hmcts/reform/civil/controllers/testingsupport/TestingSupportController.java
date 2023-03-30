@@ -162,4 +162,11 @@ public class TestingSupportController {
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
+
+    @GetMapping("/testing-support/case/{caseId}")
+    public ResponseEntity<CaseData> getCaseData(@PathVariable("caseId") Long caseId) {
+
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        return new ResponseEntity<>(caseData, HttpStatus.OK);
+    }
 }
