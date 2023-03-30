@@ -383,6 +383,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
+    private final ClaimProceedsInCaseman claimProceedsInCasemanLR;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
@@ -410,5 +411,4 @@ public class CaseDataParent implements MappableObject {
             && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
     }
-
 }
