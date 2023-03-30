@@ -408,13 +408,6 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
 
-    private List<Element<PartyFlagStructure>> applicantExperts;
-    private List<Element<PartyFlagStructure>> applicantWitnesses;
-    private List<Element<PartyFlagStructure>> respondent1Experts;
-    private List<Element<PartyFlagStructure>> respondent1Witnesses;
-    private List<Element<PartyFlagStructure>> respondent2Experts;
-    private List<Element<PartyFlagStructure>> respondent2Witnesses;
-
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
