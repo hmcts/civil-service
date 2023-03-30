@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -628,7 +626,9 @@ class PartyUtilsTest {
         void shouldNotAppendParty_whenPartyIdExists() {
             List<Element<PartyFlagStructure>> expected = wrapElements(List.of(
                 PartyFlagStructure.builder()
-                    .firstName("structure").build()
+                    .firstName("structure")
+                    .partyID("some id")
+                    .build()
             ));
 
             List<Element<PartyFlagStructure>> actual = PartyUtils.appendWithNewPartyIds(expected);
@@ -637,7 +637,7 @@ class PartyUtilsTest {
         }
 
         @Test
-        void shouldReturnNull_whenGiventoGivenListOfPartyFlagStructuresIsNull() {
+        void shouldReturnNull_whenGivenListOfPartyFlagStructuresIsNull() {
             List<Element<PartyFlagStructure>> party = null;
 
             List<Element<PartyFlagStructure>> actual = PartyUtils.appendWithNewPartyIds(party);
