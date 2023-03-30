@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -244,7 +245,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         MEDIATION_UNSUCCESSFUL,
                         EVIDENCE_UPLOAD_RESPONDENT
-
                     }
                 ),
                 of(
@@ -306,7 +306,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
@@ -547,6 +548,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(

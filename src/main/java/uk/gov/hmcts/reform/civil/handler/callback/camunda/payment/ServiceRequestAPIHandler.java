@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
@@ -35,7 +37,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
-    private final FeesService feesService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -59,46 +60,47 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            log.info("calling payment service request {}", caseData.getCcdCaseReference());
-            String serviceRequestReference;
-
-            if (caseData.getHearingDueDate() != null) {
-                if (caseData.getHearingFeePBADetails() == null || (caseData.getHearingFeePBADetails() != null
-                    && caseData.getHearingFeePBADetails().getServiceReqReference() == null)) {
-                    serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
-                        .getServiceRequestReference();
-
-                    caseData = caseData.toBuilder()
-                        .hearingFeePBADetails(SRPbaDetails.builder()
-                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                                                  .fee(caseData.getHearingFee())
-                                                  .serviceReqReference(serviceRequestReference).build())
-                        .build();
-                }
-            } else {
-                if (caseData.getClaimIssuedPBADetails() == null || (caseData.getClaimIssuedPBADetails() != null
-                    && caseData.getClaimIssuedPBADetails().getServiceReqReference() == null)) {
-                    serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
-                        .getServiceRequestReference();
-
-                    caseData = caseData.toBuilder()
-                        .claimIssuedPBADetails(SRPbaDetails.builder()
-                                                   .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                                                   .fee(caseData.getClaimFee())
-                                                   .serviceReqReference(serviceRequestReference).build())
-                        .build();
-                }
+            if (isHearingFeeServiceRequest(caseData)) {
+                log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
+                SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
+                    .fee(caseData.getHearingFee());
+                caseData = caseData.toBuilder().hearingFeePBADetails(paymentDetails.build()).build();
+            } else if (isClaimFeeServiceRequest(caseData)) {
+                log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
+                SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
+                    .fee(caseData.getClaimFee());
+                caseData = caseData.toBuilder().claimIssuedPBADetails(paymentDetails.build()).build();
             }
-
         } catch (FeignException e) {
-            log.error("Http Status {}", e.status());
+            log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
+                      caseData.getCcdCaseReference(), e.status(), e);
             errors.add(ERROR_MESSAGE);
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
+    private SRPbaDetails.SRPbaDetailsBuilder prepareCommonPaymentDetails(CaseData caseData, String authToken) {
+        String serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+            .getServiceRequestReference();
+        return SRPbaDetails.builder()
+            .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+            .serviceReqReference(serviceRequestReference);
+    }
+
+    private boolean isHearingFeeServiceRequest(CaseData caseData) {
+        return nonNull(caseData.getHearingDueDate())
+            && isServiceRequestNotRequested(caseData.getHearingFeePBADetails());
+    }
+
+    private boolean isClaimFeeServiceRequest(CaseData caseData) {
+        return isNull(caseData.getHearingDueDate())
+            && isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails());
+    }
+
+    private boolean isServiceRequestNotRequested(SRPbaDetails details) {
+        return isNull(details) || isNull(details.getServiceReqReference());
+    }
 }
