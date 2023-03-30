@@ -54,7 +54,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "If there are any additional changes between now and the hearing date, "
         + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
         + "The trial will go ahead on the specified date "
-        + "unless a judge makes an order changing the date of the hearing"
+        + "unless a judge makes an order changing the date of the hearing. "
         + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
         + "you will need to make an application to the court and pay the appropriate fee.";
 
