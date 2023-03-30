@@ -704,6 +704,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
     private final Flags caseFlags;
+    private final YesOrNo urgentFlag;
     private final String caseProgAllocatedTrack;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
