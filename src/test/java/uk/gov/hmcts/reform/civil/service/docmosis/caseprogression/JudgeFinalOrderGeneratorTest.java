@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_
 public class JudgeFinalOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
-    private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileFreeForm = String.format(FREE_FORM_ORDER_PDF.getDocumentTitle(), LocalDate.now());
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
