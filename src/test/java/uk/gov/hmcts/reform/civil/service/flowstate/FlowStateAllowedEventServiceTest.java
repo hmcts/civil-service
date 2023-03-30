@@ -547,7 +547,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
-                        TRIAL_READINESS
+                        TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
