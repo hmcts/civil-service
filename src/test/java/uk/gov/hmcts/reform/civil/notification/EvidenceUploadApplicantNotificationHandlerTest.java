@@ -21,8 +21,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @SpringBootTest(classes = {
-        EvidenceUploadApplicantNotificationHandler.class,
-        JacksonAutoConfiguration.class
+    EvidenceUploadApplicantNotificationHandler.class,
+    JacksonAutoConfiguration.class
 })
 class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
