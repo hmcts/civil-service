@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
@@ -40,19 +39,14 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(caseData, docmosisTemplate),
+                getFileName(docmosisTemplate),
                 docmosisDocument.getBytes(),
                 DocumentType.JUDGE_FINAL_ORDER
             )
         );
     }
 
-    @Override
-    public JudgeFinalOrderForm getTemplateData(CaseData caseData) throws IOException {
-        return null;
-    }
-
-    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
+    private String getFileName(DocmosisTemplates docmosisTemplate) {
         return String.format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
     }
 
@@ -65,9 +59,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
             .caseName(caseData.getCaseNameHmctsInternal())
-            .claimantReference(checkReference(caseData)
+            .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .defendantReference(checkReference(caseData)
+            .defendantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .freeFormRecitalText(caseData.getFreeFormRecitalTextArea())
             .freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
@@ -89,9 +83,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return null;
     }
 
-    private boolean checkReference(CaseData caseData) {
-        return nonNull(caseData.getSolicitorReferences());
-    }
 
 }
 

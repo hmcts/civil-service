@@ -72,6 +72,25 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
+    void shouldGenerateFreeFormOrder_whenClaimantAndDefendantReferenceNotAddedToCase() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FREE_FROM_ORDER);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .solicitorReferences(null)
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
     void shouldGenerateFreeFormOrder_whenOrderOnCourtInitiativeSelected() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
