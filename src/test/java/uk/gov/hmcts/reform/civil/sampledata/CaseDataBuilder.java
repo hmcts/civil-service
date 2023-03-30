@@ -314,6 +314,8 @@ public class CaseDataBuilder {
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected Address respondentSolicitor2ServiceAddress;
+    protected YesOrNo respondentSolicitor1ServiceAddressRequired;
+    protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
@@ -494,6 +496,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor2ServiceAddress(Address respondentSolicitor2ServiceAddress) {
         this.respondentSolicitor2ServiceAddress = respondentSolicitor2ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1ServiceAddressRequired(YesOrNo respondentSolicitor1ServiceAddressRequired) {
+        this.respondentSolicitor1ServiceAddressRequired = respondentSolicitor1ServiceAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2ServiceAddressRequired(YesOrNo respondentSolicitor2ServiceAddressRequired) {
+        this.respondentSolicitor2ServiceAddressRequired = respondentSolicitor2ServiceAddressRequired;
         return this;
     }
 
@@ -1507,6 +1519,7 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
+        respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -5017,6 +5030,8 @@ public class CaseDataBuilder {
             .respondent1Witnesses(respondent1Witnesses)
             .respondent2Experts(respondent2Experts)
             .respondent2Witnesses(respondent2Witnesses)
+            .respondentSolicitor1ServiceAddressRequired(respondentSolicitor1ServiceAddressRequired)
+            .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .build();
     }
 
