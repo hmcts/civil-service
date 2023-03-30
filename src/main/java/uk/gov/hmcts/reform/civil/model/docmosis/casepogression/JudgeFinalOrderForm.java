@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
+package uk.gov.hmcts.reform.civil.model.docmosis.casepogression;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
