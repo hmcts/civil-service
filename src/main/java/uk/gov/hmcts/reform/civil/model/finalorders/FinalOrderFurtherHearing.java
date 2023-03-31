@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.finalorders.HearingMethodFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDate;
@@ -19,6 +19,6 @@ public class FinalOrderFurtherHearing {
     private LocalDate dateToDate;
     private CaseHearingLengthElement lengthListOther;
     private DynamicList alternativeHearingList;
-    private HearingMethodFinalOrderList hearingMethodList;
+    private HearingChannel hearingMethodList;
     private String hearingNotesText;
 }
