@@ -71,7 +71,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            log.info("DocumentMetaDataList: " + documentMetaDataList);
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
