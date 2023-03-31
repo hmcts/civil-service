@@ -32,7 +32,7 @@ public class RespondentLiPResponse {
         boolean responseLanguage = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(respondent1ResponseLanguage -> Language.BOTH.toString().equals(respondent1ResponseLanguage))
+            .filter(Language.BOTH.toString()::equals)
             .isPresent();
 
         return responseLanguage;
