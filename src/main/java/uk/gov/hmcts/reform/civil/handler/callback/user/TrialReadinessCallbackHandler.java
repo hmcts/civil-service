@@ -108,11 +108,13 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE) 
+                && caseData.getTrialReadyApplicant() == YesOrNo.YES) {
             updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
-        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE) 
+                    && caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
             updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
-        } else {
+        } else if (caseData.getTrialReadyRespondent2() == YesOrNo.YES) {
             updatedData.businessProcess(BusinessProcess.ready(RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS));
         }
 
