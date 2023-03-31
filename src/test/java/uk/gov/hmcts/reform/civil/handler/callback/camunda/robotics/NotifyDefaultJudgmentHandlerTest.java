@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
@@ -81,6 +82,8 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
     private JsonSchemaValidationService validationService;
     @MockBean
     private Time time;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
 
     @Autowired
     private NotifyDefaultJudgmentHandler handler;
