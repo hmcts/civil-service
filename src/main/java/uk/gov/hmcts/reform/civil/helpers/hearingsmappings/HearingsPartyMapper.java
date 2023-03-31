@@ -193,25 +193,30 @@ public class HearingsPartyMapper {
             String lastName = party.getIndividualLastName() == null
                 ? party.getSoleTraderLastName() : party.getIndividualLastName();
 
-            return buildIndividualPartyObject(firstName,
-                                       lastName,
-                                       party.getPartyName(),
-                                       partyRole,
-                                       party.getPartyEmail(),
-                                       party.getPartyPhone());
+            return buildIndividualPartyObject(
+                party.getPartyID(),
+                firstName,
+                lastName,
+                party.getPartyName(),
+                partyRole,
+                party.getPartyEmail(),
+                party.getPartyPhone()
+            );
         } else {
             return buildOrganisationPartyObject(party.getPartyName(), partyRole, null);
         }
     }
 
     private static PartyDetailsModel getDetailsForLitigationFriendObject(LitigationFriend litigationFriend) {
-        return buildIndividualPartyObject(litigationFriend.getFirstName(),
-                                          litigationFriend.getLastName(),
-                                          String.format(FULL_NAME, litigationFriend.getFirstName(),
-                                                        litigationFriend.getLastName()),
-                                          LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
-                                          litigationFriend.getEmailAddress(),
-                                          litigationFriend.getPhoneNumber());
+        return buildIndividualPartyObject(
+            litigationFriend.getPartyID(),
+            litigationFriend.getFirstName(),
+            litigationFriend.getLastName(),
+            String.format(FULL_NAME, litigationFriend.getFirstName(), litigationFriend.getLastName()),
+            LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
+            litigationFriend.getEmailAddress(),
+            litigationFriend.getPhoneNumber()
+        );
     }
 
     private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
@@ -220,6 +225,7 @@ public class HearingsPartyMapper {
         if (!filteredList.isEmpty()) {
             for (PartyFlagStructure partyFlagStructure : filteredList) {
                 partyDetails.add(buildIndividualPartyObject(
+                    partyFlagStructure.getPartyID(),
                     partyFlagStructure.getFirstName(),
                     partyFlagStructure.getLastName(),
                     String.format(FULL_NAME, partyFlagStructure.getFirstName(),
@@ -242,7 +248,7 @@ public class HearingsPartyMapper {
         return buildOrganisationPartyObject(orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID);
     }
 
-    public static PartyDetailsModel buildIndividualPartyObject(String firstName, String lastName,
+    public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
                                                                String partyName, String partyRole,
                                                                String email, String phone) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
@@ -261,7 +267,7 @@ public class HearingsPartyMapper {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("") //todo civ-7690
+            .partyID(partyId)
             .partyType(IND)
             .partyName(partyName)
             .partyRole(partyRole)

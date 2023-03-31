@@ -336,19 +336,23 @@ public class PartyUtils {
                           ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
+    private static String createPartyId() {
+        return UUID.randomUUID().toString().substring(0, 16);
+    }
+
     public static Party appendWithNewPartyId(Party party) {
         return party != null && party.getPartyID() == null
-            ? party.toBuilder().partyID(UUID.randomUUID().toString()).build() : party;
+            ? party.toBuilder().partyID(createPartyId()).build() : party;
     }
 
     public static LitigationFriend appendWithNewPartyId(LitigationFriend litigationFriend) {
         return litigationFriend != null && litigationFriend.getPartyID() == null
-            ? litigationFriend.toBuilder().partyID(UUID.randomUUID().toString()).build() : litigationFriend;
+            ? litigationFriend.toBuilder().partyID(createPartyId()).build() : litigationFriend;
     }
 
     public static PartyFlagStructure appendWithNewPartyId(PartyFlagStructure partyFlagStructure) {
         return partyFlagStructure != null && partyFlagStructure.getPartyID() == null
-            ? partyFlagStructure.toBuilder().partyID(UUID.randomUUID().toString()).build() : partyFlagStructure;
+            ? partyFlagStructure.toBuilder().partyID(createPartyId()).build() : partyFlagStructure;
     }
 
     public static List<Element<PartyFlagStructure>> appendWithNewPartyIds(List<Element<PartyFlagStructure>> partyFlagStructures) {
