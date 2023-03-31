@@ -192,7 +192,7 @@ tasks.withType(Test) {
 }
 
 test {
-  failFast = false
+  failFast = true
 }
 
 task integration(type: Test) {
