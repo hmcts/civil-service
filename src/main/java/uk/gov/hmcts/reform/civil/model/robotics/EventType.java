@@ -26,7 +26,6 @@ public enum EventType {
     INTERLOCUTORY_JUDGMENT_GRANTED("252"),
     DEFAULT_JUDGMENT_GRANTED("230");
 
-
     private String code;
 
     EventType(String code) {

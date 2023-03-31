@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -72,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -224,6 +226,7 @@ class FlowStateAllowedEventServiceTest {
                         NOTIFY_DEFENDANT_OF_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
+                        UPLOAD_TRANSLATED_DOCUMENT,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
@@ -241,7 +244,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         MEDIATION_UNSUCCESSFUL,
                         EVIDENCE_UPLOAD_RESPONDENT
-
                     }
                 ),
                 of(
@@ -303,7 +305,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
@@ -542,7 +545,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
