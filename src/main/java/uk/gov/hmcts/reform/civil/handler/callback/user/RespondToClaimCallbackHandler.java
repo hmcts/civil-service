@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -108,6 +109,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -529,6 +531,21 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+        assignCategoryId.setCategoryIdDocument(caseData.getRespondent1ClaimResponseDocument().getFile(),
+                                               "defendant1DefenseDirectionsQuestionnaire");
+        assignCategoryId.setCategoryIdDocument(caseData.getRespondent1DQ().getRespondent1DQDraftDirections(),
+                                               "defendant1DefenseDirectionsQuestionnaire");
+        if (caseData.getRespondent2ClaimResponseDocument() != null && caseData.getRespondent2DQ() != null) {
+            assignCategoryId.setCategoryIdDocument(
+                caseData.getRespondent2ClaimResponseDocument().getFile(),
+                "defendant2DefenseDirectionsQuestionnaire"
+            );
+            assignCategoryId.setCategoryIdDocument(
+                caseData.getRespondent2DQ().getRespondent2DQDraftDirections(),
+                "defendant2DefenseDirectionsQuestionnaire"
+            );
+        }
+
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
@@ -603,6 +620,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                                       updatedCaseData.build().getRespondent1ResponseDate(),
                                       DocumentType.DEFENDANT_DEFENCE
                 )));
+
         Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQDraftDirections)
             .ifPresent(respondent1DQ -> defendantUploads.add(

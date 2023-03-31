@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
@@ -95,6 +96,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService toggleService;
+    private final AssignCategoryId assignCategoryId;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -181,6 +184,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             }
             updatedCaseData = builder.build();
         }
+
+        assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                 document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                 document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                 document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
+                                                 document -> document.getValue().getDocument(), "particularsOfClaim");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseData.toMap(objectMapper))

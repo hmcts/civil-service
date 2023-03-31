@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -140,6 +141,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final AssignCategoryId assignCategoryId;
+
 
     private final CaseFlagsInitialiser caseFlagInitialiser;
 
@@ -197,6 +200,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse populateClaimantSolicitor(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -486,6 +490,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     dataBuilder.defendant2LIPAtClaimIssued(NO);
                 }
             }
+        }
+        if (caseData.getUploadParticularsOfClaim().equals(YES)) {
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                 document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
         }
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);

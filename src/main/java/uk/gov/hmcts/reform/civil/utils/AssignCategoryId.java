@@ -29,4 +29,11 @@ public class AssignCategoryId {
         documentUpload.getDocumentLink().setCategoryID(theID);
     }
 
+    public <T> void setCategoryIdDocument(Document documentUpload, String theID) {
+        if (documentUpload == null) {
+            return;
+        }
+        documentUpload.setCategoryID(theID);
+    }
+
 }

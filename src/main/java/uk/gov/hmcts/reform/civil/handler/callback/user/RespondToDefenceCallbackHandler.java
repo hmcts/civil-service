@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -78,6 +79,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final LocationRefDataUtil locationRefDataUtil;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -262,6 +264,21 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
+
+        assignCategoryId.setCategoryIdDocument(caseData.getApplicant1DefenceResponseDocument().getFile(),
+                                               "directionsQuestionnaire");
+        assignCategoryId.setCategoryIdDocument(caseData.getApplicant1DQ().getApplicant1DQDraftDirections(),
+                                               "directionsQuestionnaire");
+        if (caseData.getClaimantDefenceResDocToDefendant2() != null && caseData.getApplicant2DQ() != null) {
+            assignCategoryId.setCategoryIdDocument(
+                caseData.getClaimantDefenceResDocToDefendant2().getFile(),
+                "directionsQuestionnaire"
+            );
+            assignCategoryId.setCategoryIdDocument(
+                caseData.getApplicant2DQ().getApplicant2DQDraftDirections(),
+                "directionsQuestionnaire"
+            );
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 

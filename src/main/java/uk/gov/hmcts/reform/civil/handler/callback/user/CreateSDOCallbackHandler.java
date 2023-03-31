@@ -70,6 +70,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -131,6 +132,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -782,6 +784,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
