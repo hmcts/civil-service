@@ -1,19 +1,26 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 
 public class HearingDetailsMapper {
 
     private static String EMPTY_STRING = "";
     public static String STANDARD_PRIORITY = "Standard";
+
+    public static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -58,8 +65,18 @@ public class HearingDetailsMapper {
     }
 
     public static String getListingComments(CaseData caseData) {
-        return EMPTY_STRING;
-        //todo CIV-6855
+        String comments = getAllActiveFlags(caseData).stream()
+            .flatMap(flags -> flags.getDetails().stream())
+            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
+            .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
+            .reduce("", String::concat);
+
+        if(comments != null && !comments.isEmpty()) {
+            String refactoredComment = comments.substring(0, comments.length() -2);
+            return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
+        }
+
+        return null;
     }
 
     public static String getHearingRequester() {
