@@ -3402,19 +3402,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atState2v1Applicant1NotProceedApplicant2Proceeds() {
-        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
-        applicant1ProceedWithClaimMultiParty2v1 = NO;
-        applicant2ProceedWithClaimMultiParty2v1 = YES;
-        applicant2DefenceResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
-            .build();
-        applicant2DQ();
-        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
-        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-        return this;
-    }
-
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
         return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
     }
@@ -4249,11 +4236,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseAccessCategory(CaseCategory caseAccessCategory) {
         this.caseAccessCategory = caseAccessCategory;
-        return this;
-    }
-
-    public CaseDataBuilder caseManagementLocation(CaseLocationCivil caseManagementLocation) {
-        this.caseManagementLocation = caseManagementLocation;
         return this;
     }
 
