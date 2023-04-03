@@ -41,13 +41,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @Autowired
     private GenerateDirectionOrderCallbackHandler handler;
 
-    private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
+    private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
-
 
     @MockBean
     private LocationRefDataService locationRefDataService;
@@ -74,7 +73,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionTextArea")
-            .isEqualTo(ON_INITIATIVE_SELECTION_TEST);
+            .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
             .isEqualTo(LocalDate.now().toString());
         assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
@@ -90,13 +89,40 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldPopulateFields_whenIsCalled() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            String advancedDate = LocalDate.now().plusDays(14).toString();
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("assistedOrderCostsDefendantPaySub")).isNotNull();
+            // Then
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantPaySub")
+                .extracting("defendantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantPaySub")
+                .extracting("claimantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantSum")
+                .extracting("defendantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantSum")
+                .extracting("claimantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeText")
+                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeText")
+                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeDate")
+                .isEqualTo(LocalDate.now().toString());
         }
     }
 
@@ -128,5 +154,4 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(GENERATE_DIRECTIONS_ORDER);
     }
-
 }

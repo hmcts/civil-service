@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
@@ -25,7 +24,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -40,17 +38,12 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_DIRECTIONS_ORDER);
-    private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
+    private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
-    public static final String COURT_OWN_INITIATIVE = "As this order was made on the court's own initiative any party" +
-        " affected by the order may apply to set aside, vary or stay the order." +
-        " Any such application must be made by 4pm on";
-    public static final String ORDER_WITHOUT_NOTICE = "If you were not notified of the application before this order" +
-        " was made, you may apply to set aside, vary or stay the order. Any such application must be made by 4pm on";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
 
@@ -88,7 +81,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
@@ -107,19 +100,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 FinalOrderFurtherHearing.builder().alternativeHearingList(getLocationsFromList(locations)).build())
             .orderMadeOnDetailsOrderCourt(
                 OrderMadeOnDetails.builder().ownInitiativeDate(
-                    LocalDate.now()).ownInitiativeText(COURT_OWN_INITIATIVE).build())
+                    LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now()).withOutNoticeText(ORDER_WITHOUT_NOTICE).build());
+                    LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build());
     }
-
 
     public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.orderOnCourtInitiative(FreeFormOrderValues.builder()
-                                                   .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
+                                                   .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
                                                    .onInitiativeSelectionDate(LocalDate.now())
                                                    .build());
         caseDataBuilder.orderWithoutNotice(FreeFormOrderValues.builder()
@@ -131,5 +123,4 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 }
