@@ -61,8 +61,12 @@ public class Party {
         }
     }
 
+    public String getPartyName(boolean omitTitle) {
+        return getPartyNameBasedOnType(this, omitTitle);
+    }
+
     public String getPartyName() {
-        return getPartyNameBasedOnType(this);
+        return getPartyName(false);
     }
 
     public String getPartyTypeDisplayValue() {
