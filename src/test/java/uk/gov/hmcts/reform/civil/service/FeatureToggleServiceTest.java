@@ -156,6 +156,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
+        var caseFileKey = "case-file-view";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);

@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -96,6 +97,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
+    private final AssignCategoryId assignCategoryId;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -643,6 +645,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
         caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);

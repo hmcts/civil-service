@@ -783,8 +783,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .getSystemGeneratedCaseDocuments();
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
         }
-        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 

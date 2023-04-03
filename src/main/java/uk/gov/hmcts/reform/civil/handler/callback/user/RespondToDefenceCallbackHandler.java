@@ -264,22 +264,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         assembleResponseDocuments(caseData, builder);
-
-        assignCategoryId.setCategoryIdDocument(caseData.getApplicant1DefenceResponseDocument().getFile(),
-                                               "directionsQuestionnaire");
-        assignCategoryId.setCategoryIdDocument(caseData.getApplicant1DQ().getApplicant1DQDraftDirections(),
-                                               "directionsQuestionnaire");
-        if (caseData.getClaimantDefenceResDocToDefendant2() != null && caseData.getApplicant2DQ() != null) {
-            assignCategoryId.setCategoryIdDocument(
-                caseData.getClaimantDefenceResDocToDefendant2().getFile(),
-                "directionsQuestionnaire"
-            );
-            assignCategoryId.setCategoryIdDocument(
-                caseData.getApplicant2DQ().getApplicant2DQDraftDirections(),
-                "directionsQuestionnaire"
-            );
-        }
-
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
@@ -378,6 +362,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 )));
         if (!claimantUploads.isEmpty()) {
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            assignCategoryId.setCategoryIdCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
+                                                     "directionsQuestionnaire");
         }
     }
 

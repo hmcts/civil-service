@@ -25,11 +25,11 @@ public class FeatureToggleService {
     }
 
     public boolean isGlobalSearchEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
+        return true;
     }
 
     public boolean isSdoEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
     }
 
     public boolean isGeneralApplicationsEnabled() {
@@ -49,7 +49,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -65,7 +65,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -74,6 +74,10 @@ public class FeatureToggleService {
 
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
+    }
+
+    public boolean isCaseFileViewEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
 }

@@ -1,36 +1,39 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class AssignCategoryId {
+    private final FeatureToggleService featureToggleService;
 
-    public <T> void setCategoryIdCollection(List<Element<T>> documentUpload, Function<Element<T>,
-        Document> documentExtractor, String theID) {
+    public <T> void setCategoryIdCollection(List<Element<T>> documentUpload, Function<Element<T>, Document> documentExtractor, String theID) {
+        if (!featureToggleService.isCaseFileViewEnabled()) {
+            return;
+        }
         if (documentUpload == null) {
             return;
         }
-        documentUpload.forEach(document -> {
-            Document documentToAddId = documentExtractor.apply(document);
-            documentToAddId.setCategoryID(theID);
-        });
+        documentUpload.forEach(document -> documentExtractor.apply(document).setCategoryID(theID));
     }
 
-    public <T> void setCategoryIdCaseDocument(CaseDocument documentUpload, String theID) {
-        if (documentUpload == null) {
+    public void setCategoryIdCaseDocument(CaseDocument documentUpload, String theID) {
+        if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
         documentUpload.getDocumentLink().setCategoryID(theID);
     }
 
-    public <T> void setCategoryIdDocument(Document documentUpload, String theID) {
-        if (documentUpload == null) {
+    public void setCategoryIdDocument(Document documentUpload, String theID) {
+        if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
         documentUpload.setCategoryID(theID);
