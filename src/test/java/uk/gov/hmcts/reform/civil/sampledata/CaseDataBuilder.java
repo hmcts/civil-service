@@ -314,6 +314,8 @@ public class CaseDataBuilder {
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected Address respondentSolicitor2ServiceAddress;
+    protected YesOrNo respondentSolicitor1ServiceAddressRequired;
+    protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
@@ -494,6 +496,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor2ServiceAddress(Address respondentSolicitor2ServiceAddress) {
         this.respondentSolicitor2ServiceAddress = respondentSolicitor2ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1ServiceAddressRequired(YesOrNo respondentSolicitor1ServiceAddressRequired) {
+        this.respondentSolicitor1ServiceAddressRequired = respondentSolicitor1ServiceAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2ServiceAddressRequired(YesOrNo respondentSolicitor2ServiceAddressRequired) {
+        this.respondentSolicitor2ServiceAddressRequired = respondentSolicitor2ServiceAddressRequired;
         return this;
     }
 
@@ -1502,6 +1514,7 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
+        respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -3389,6 +3402,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState2v1Applicant1NotProceedApplicant2Proceeds() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimMultiParty2v1 = NO;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceed() {
         return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
     }
@@ -4231,6 +4257,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder caseManagementLocation(CaseLocationCivil caseManagementLocation) {
+        this.caseManagementLocation = caseManagementLocation;
+        return this;
+    }
+
     public CaseDataBuilder removeSolicitorReferences() {
         this.solicitorReferences = null;
         this.respondentSolicitor2Reference = null;
@@ -4313,14 +4344,84 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildMakePaymentsCaseDataWithHearingDate() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimIssuedPBADetails(
+                SRPbaDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
+            .build();
+    }
+
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
+            .claimIssuedPBADetails(
+                SRPbaDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDueDate(LocalDate.now().plusWeeks(2))
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDueDate(LocalDate.now().plusWeeks(2))
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimIssuedPBADetails(
+                SRPbaDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
             .build();
     }
 
@@ -4942,6 +5043,8 @@ public class CaseDataBuilder {
             .respondent1Witnesses(respondent1Witnesses)
             .respondent2Experts(respondent2Experts)
             .respondent2Witnesses(respondent2Witnesses)
+            .respondentSolicitor1ServiceAddressRequired(respondentSolicitor1ServiceAddressRequired)
+            .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .build();
     }
 
