@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
@@ -868,6 +869,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
+                REQUEST_JUDGEMENT_BY_ADMISSION,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -888,6 +890,7 @@ public class FlowStateAllowedEventService {
             FULL_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                REQUEST_JUDGEMENT_BY_ADMISSION,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -907,6 +910,7 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                REQUEST_JUDGEMENT_BY_ADMISSION,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,

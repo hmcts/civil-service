@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -937,17 +938,20 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     true,
                     CaseDetailsBuilder.builder().atStateFullDefenceSpec().build(),
-                    CLAIMANT_RESPONSE_SPEC
+                    CLAIMANT_RESPONSE_SPEC,
+                    REQUEST_JUDGEMENT_BY_ADMISSION
                 ),
                 of(
                     true,
                     CaseDetailsBuilder.builder().atStatePartAdmitSpec().build(),
-                    CLAIMANT_RESPONSE_SPEC
+                    CLAIMANT_RESPONSE_SPEC,
+                    REQUEST_JUDGEMENT_BY_ADMISSION
                 ),
                 of(
                     true,
                     CaseDetailsBuilder.builder().atStateFullAdmitSpec().build(),
-                    CLAIMANT_RESPONSE_SPEC
+                    CLAIMANT_RESPONSE_SPEC,
+                    REQUEST_JUDGEMENT_BY_ADMISSION
                 )
             );
         }
