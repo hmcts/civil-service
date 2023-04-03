@@ -16,7 +16,7 @@ public class HearingDetailsMapper {
     private static String EMPTY_STRING = "";
     public static String STANDARD_PRIORITY = "Standard";
 
-    public static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
+    private static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP

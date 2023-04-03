@@ -260,7 +260,7 @@ public class HearingDetailsMapperTest {
                 )
                 .build();
 
-            assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(null);
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).isNull();
         }
 
         @Test
@@ -299,7 +299,7 @@ public class HearingDetailsMapperTest {
                 )
                 .build();
 
-            assertThat(HearingDetailsMapper.getListingComments(caseData).length()).isEqualTo(200);
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).hasSize(200);
         }
     }
 }
