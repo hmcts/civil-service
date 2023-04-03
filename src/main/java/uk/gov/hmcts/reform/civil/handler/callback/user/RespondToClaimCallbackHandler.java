@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -408,6 +409,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 }
 
                 updatedData.respondent1DQ(dq.build());
+
+                Party.PartyBuilder resp1 = caseData.getRespondent1().toBuilder()
+                    .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
+                updatedData.respondent1(resp1.build());
+
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
                 //1v2 same Solicitor responding to respondents individually
@@ -446,6 +452,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     updatedData.respondent2DQ(null);
                 }
 
+                Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
+                    .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
+                updatedData.respondent1(resp2.build());
+
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
 
@@ -475,6 +485,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
             }
             updatedData.respondent2DQ(dq.build());
+
+            Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
+                .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
+            updatedData.respondent1(resp2.build());
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
