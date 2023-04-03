@@ -1,16 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
@@ -71,8 +67,8 @@ public class HearingDetailsMapper {
             .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
             .reduce("", String::concat);
 
-        if(comments != null && !comments.isEmpty()) {
-            String refactoredComment = comments.substring(0, comments.length() -2);
+        if (comments != null && !comments.isEmpty()) {
+            String refactoredComment = comments.substring(0, comments.length() - 2);
             return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
         }
 
