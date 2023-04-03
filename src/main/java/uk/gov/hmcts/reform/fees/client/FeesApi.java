@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public interface FeesApi {
 
     String baseUrl = "/fees-register/fees";
+    
     @GetMapping("/health")
     InternalHealth health();
 
