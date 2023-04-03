@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
@@ -38,6 +40,12 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_DIRECTIONS_ORDER);
+    private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
+        + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
+        + "be made by 4pm on";
+    private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
+        + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
+        + "by 4pm on";
     public static final String COURT_OWN_INITIATIVE = "As this order was made on the court's own initiative any party" +
         " affected by the order may apply to set aside, vary or stay the order." +
         " Any such application must be made by 4pm on";
@@ -50,6 +58,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "populate-freeForm-values"), this::populateFreeFormValues,
             callbackKey(MID, "order"), this::populateOrderFields,
             callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
@@ -102,6 +111,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
                     LocalDate.now()).withOutNoticeText(ORDER_WITHOUT_NOTICE).build());
+    }
+
+
+    public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.orderOnCourtInitiative(FreeFormOrderValues.builder()
+                                                   .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
+                                                   .onInitiativeSelectionDate(LocalDate.now())
+                                                   .build());
+        caseDataBuilder.orderWithoutNotice(FreeFormOrderValues.builder()
+                                                   .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
+                                                   .withoutNoticeSelectionDate(LocalDate.now())
+                                                   .build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
 }
