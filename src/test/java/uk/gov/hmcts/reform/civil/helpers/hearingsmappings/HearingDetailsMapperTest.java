@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
@@ -43,8 +47,53 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnFalse_whenHearingInWelshFlagInvoked() {
-        assertThat(HearingDetailsMapper.getHearingInWelshFlag()).isEqualTo(false);
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndCaseManagementLocationNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndRegionInCaseManagementLocationNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().caseManagementLocation(
+            CaseLocationCivil.builder().build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndRegionNotWales() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().caseManagementLocation(
+            CaseLocationCivil.builder().region("2").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndDQsNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInRespondent1DQNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(Respondent1DQ.builder().build())
+            .build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInRespondent1DQNotWelsh() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
+    }
+
+    @Test
+    void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInRespondent2DQNull() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(Respondent2DQ.builder().build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isEqualTo(false);
     }
 
     @Test
