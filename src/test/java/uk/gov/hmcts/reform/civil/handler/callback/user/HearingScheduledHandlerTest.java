@@ -91,8 +91,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         // current date,hearing date,expected
         "2022-10-27,2022-11-04,2022-11-04",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
-        "2022-10-01,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
+        "2022-10-01,2022-11-14,2022-11-09",   // hearing date more than 36 days away -> expect in 28 days time
+        "2022-10-01,2022-10-14,2022-10-11",   // hearing date less than 36 days away -> expect in 7 business days
         "2022-10-01,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
     })
     void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
