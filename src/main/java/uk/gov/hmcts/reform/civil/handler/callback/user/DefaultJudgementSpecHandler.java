@@ -60,7 +60,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         + "The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
-    public static final String NOT_VALID_DJ_LIP = "The Claim is not eligible for Default Judgment.";
+    public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
@@ -130,7 +130,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (featureToggleService.isPinInPostEnabled() && caseData.isRespondentResponseBilingual()) {
-            errors.add(NOT_VALID_DJ_LIP);
+            errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
         } else if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
