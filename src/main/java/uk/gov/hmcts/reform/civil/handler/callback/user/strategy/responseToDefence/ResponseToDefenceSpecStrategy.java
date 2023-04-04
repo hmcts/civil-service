@@ -10,6 +10,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 
 public abstract class ResponseToDefenceSpecStrategy {
 
+    public abstract CallbackResponse populateCaseData(CallbackParams callbackParams, ObjectMapper objectMapper);
+
     protected CaseData updateCaseDataWithRespondent1Copy(CallbackParams callbackParams){
         var caseData = callbackParams.getCaseData();
 

@@ -17,8 +17,4 @@ public class ResponseToDefenceSpecDefault extends ResponseToDefenceSpecStrategy{
             .build();
     }
 
-    @Override
-    public CallbackResponse aboutToSubmit(CallbackParams callbackParams, ObjectMapper objectMapper) {
-        return null;
-    }
 }
