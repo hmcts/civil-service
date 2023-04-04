@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,11 +32,9 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
-import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -66,7 +63,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
-    private final PublicHolidaysCollection publicHolidaysCollection;
     private final Time time;
     private final HearingFeesService hearingFeesService;
 
@@ -171,8 +167,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         CaseState caseState = HEARING_READINESS;
         if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(
-                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
-                                                                   publicHolidaysCollection.getPublicHolidays()));
+                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
             caseDataBuilder.hearingFee(calculateAndApplyFee(caseData));
         } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -209,12 +204,12 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
     }
 
-    LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate, Set<LocalDate> holidays) {
+    LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate) {
         LocalDate calculatedHearingDueDate;
         if (now.isBefore(hearingDate.minusDays(36))) {
-            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 28, holidays);
+            calculatedHearingDueDate = now.plusDays(28);
         } else {
-            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
+            calculatedHearingDueDate = now.plusDays(7);
         }
 
         if (calculatedHearingDueDate.isAfter(hearingDate)) {
