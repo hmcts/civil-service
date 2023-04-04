@@ -167,11 +167,9 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
-    public ResponseEntity<String> getHearingFeeUnpaidEvent(@PathVariable("caseId") Long caseId) {
-
+    public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = "success";
         var event = new BundleCreationTriggerEvent(caseId);
-
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
