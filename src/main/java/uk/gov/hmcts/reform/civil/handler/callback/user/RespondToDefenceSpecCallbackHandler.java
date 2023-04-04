@@ -348,10 +348,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         if (V_2.equals(callbackParams.getVersion())) {
-            if (isOneVOne(caseData)
-                && caseData.getApplicant1ClaimMediationSpecRequired() != null
-                && YES.equals(caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation())
-                && featureToggleService.isPinInPostEnabled()) {
+            if (featureToggleService.isPinInPostEnabled() && isOneVOne(caseData)
+                && caseData.hasClaimantAgreedToFreeMediationForLipCase()) {
                 response.state(CaseState.IN_MEDIATION.name());
             }
         } else if (featureToggleService.isSdoEnabled()) {

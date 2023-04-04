@@ -413,4 +413,9 @@ public class CaseDataParent implements MappableObject {
             && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
     }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedToFreeMediationForLipCase(){
+        return caseDataLiP != null && caseDataLiP.hasClaimantAgreedToFreeMediaiton();
+    }
 }
