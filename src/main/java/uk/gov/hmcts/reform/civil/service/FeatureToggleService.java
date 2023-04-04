@@ -57,11 +57,11 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return true; //this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return false; //this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isSDOEnabled() {
