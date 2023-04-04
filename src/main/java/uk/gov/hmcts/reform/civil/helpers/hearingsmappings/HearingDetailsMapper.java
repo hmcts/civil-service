@@ -62,7 +62,7 @@ public class HearingDetailsMapper {
         List<WelshLanguageRequirements> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
         boolean isWelshHearing = false;
 
-        for (int index = 0; index < welshLanguageRequirements.size() - 1 && !isWelshHearing; index++) {
+        for (int index = 0; index < welshLanguageRequirements.size() && !isWelshHearing; index++) {
             WelshLanguageRequirements requirements = welshLanguageRequirements.get(index);
             isWelshHearing = requirements.getCourt().equals(Language.WELSH) || requirements.getCourt().equals(Language.BOTH);
         }
