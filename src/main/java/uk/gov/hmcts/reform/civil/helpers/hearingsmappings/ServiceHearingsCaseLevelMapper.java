@@ -4,6 +4,8 @@ import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,8 +26,8 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static String getPublicCaseName(CaseData caseData) {
-        //todo civ-7030
-        return null;
+        return caseData.getCaseNamePublic() != null ? caseData.getCaseNamePublic()
+            : CaseNameUtils.buildCaseNamePublic(caseData);
     }
 
     public static String getCaseDeepLink(Long caseId,
