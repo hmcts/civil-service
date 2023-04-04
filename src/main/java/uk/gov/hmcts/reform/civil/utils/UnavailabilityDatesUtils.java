@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,34 +25,38 @@ public class UnavailabilityDatesUtils {
         if (defendantResponse) {
             if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getHearing() != null
                 && caseData.getRespondent1().getUnavailableDates() != null) {
-                List<UnavailabilityRangeModel> respondent1UnavailableDates = caseData.getRespondent1DQ().getHearing().getUnavailableDates().stream().
-                map( date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
+                List<UnavailabilityRangeModel> respondent1UnavailableDates = caseData.getRespondent1DQ().getHearing()
+                    .getUnavailableDates().stream()
+                    .map(date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
                 unavailabilityDates.addAll(respondent1UnavailableDates);
             }
             if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null
                 && caseData.getRespondent2().getUnavailableDates() != null) {
-                List<UnavailabilityRangeModel> respondent2UnavailableDates = caseData.getRespondent2DQ().getHearing().getUnavailableDates().stream().
-                    map( date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
+                List<UnavailabilityRangeModel> respondent2UnavailableDates = caseData.getRespondent2DQ().getHearing()
+                    .getUnavailableDates().stream()
+                    .map(date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
                 unavailabilityDates.addAll(respondent2UnavailableDates);
             }
         } else {
             if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getHearing() != null
                 && caseData.getApplicant1().getUnavailableDates() != null) {
-                List<UnavailabilityRangeModel> applicant1UnavailableDates = caseData.getApplicant1DQ().getHearing().getUnavailableDates().stream().
-                    map( date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
+                List<UnavailabilityRangeModel> applicant1UnavailableDates = caseData.getApplicant1DQ().getHearing()
+                    .getUnavailableDates().stream()
+                    .map(date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
                 unavailabilityDates.addAll(applicant1UnavailableDates);
             }
             if (caseData.getApplicant2DQ() != null && caseData.getApplicant2DQ().getHearing() != null
                 && caseData.getApplicant2().getUnavailableDates() != null) {
-                List<UnavailabilityRangeModel> applicant2UnavailableDates = caseData.getApplicant2DQ().getHearing().getUnavailableDates().stream().
-                    map( date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
+                List<UnavailabilityRangeModel> applicant2UnavailableDates = caseData.getApplicant2DQ().getHearing()
+                    .getUnavailableDates().stream()
+                    .map(date -> mapUnAvailableDateToRange(date.getValue())).collect(Collectors.toList());
                 unavailabilityDates.addAll(applicant2UnavailableDates);
             }
         }
         return unavailabilityDates;
     }
 
-/*
+    /*
     private static void getUnavailableDatesForParty(ArrayList<UnavailabilityRangeModel> unavailabilityDates,
                                                     List<Element<UnavailableDate>> unavailableDates) {
         for (Element<UnavailableDate> dateElement : unavailableDates) {
@@ -79,13 +82,14 @@ public class UnavailabilityDatesUtils {
             .unavailabilityType(ALL_DAY)
             .build();
     }
-*/
+    */
 
-
-    private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date){
+    private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
         return UnavailabilityRangeModel.builder()
             .unavailabilityType(ALL_DAY)
-            .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getFromDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getFromDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .unavailableToDate(date.getToDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .build();
     }
