@@ -104,6 +104,9 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+manage-case-ui:
+  baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
+
 payments:
   api:
     site_id: AAA7
@@ -238,6 +241,7 @@ notifications:
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
+  bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
