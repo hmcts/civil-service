@@ -121,8 +121,10 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_WITH_TWO_DAY_DIGIT;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -847,11 +849,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasClaimantRejectedClaimAmount() {
         return YesOrNo.NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
-    }
-
-    @JsonIgnore
-    public boolean isMediationAcceptedByDefendant() {
-        return YesOrNo.YES.equals(getResponseClaimMediationSpecRequired());
     }
 
     @JsonIgnore
