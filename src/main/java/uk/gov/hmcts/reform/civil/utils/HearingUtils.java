@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -44,24 +43,6 @@ public class HearingUtils {
             }
         }
         return result;
-    }
-
-    public static BigDecimal getSmallTrackFee(int claimFee) {
-        if (claimFee == 0) {
-            return new BigDecimal(0);
-        } else if (claimFee < 300_00) {
-            return new BigDecimal(2700);
-        } else if (claimFee < 500_00) {
-            return new BigDecimal(5900);
-        } else if (claimFee < 1000_00) {
-            return new BigDecimal(8500);
-        } else if (claimFee < 1500_00) {
-            return new BigDecimal(12300);
-        } else if (claimFee < 3000_00) {
-            return new BigDecimal(18100);
-        } else {
-            return new BigDecimal(34600);
-        }
     }
 
     public static String getHearingType(CaseData caseData) {
