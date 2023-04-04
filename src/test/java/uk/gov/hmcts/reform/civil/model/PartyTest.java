@@ -17,4 +17,48 @@ class PartyTest {
         assertThat(party.getPartyTypeDisplayValue()).isEqualTo("Company");
     }
 
+    @Test
+    void shouldGetIndividualPartyNameIncludingTitle_whenInstantiated() {
+        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("James")
+            .individualLastName("Carver")
+            .build();
+
+        assertThat(party.getPartyName()).isEqualTo("Mr James Carver");
+    }
+
+    @Test
+    void shouldGetIndividualPartyNameExcludingTitle_whenInstantiated() {
+        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("James")
+            .individualLastName("Carver")
+            .build();
+
+        assertThat(party.getPartyName(true)).isEqualTo("James Carver");
+    }
+
+    @Test
+    void shouldGetSoulTraderPartyNameIncludingTitle_whenInstantiated() {
+        Party party = Party.builder().type(Party.Type.SOLE_TRADER)
+            .soleTraderTitle("Mr")
+            .soleTraderFirstName("James")
+            .soleTraderLastName("Carver")
+            .build();
+
+        assertThat(party.getPartyName()).isEqualTo("Mr James Carver");
+    }
+
+    @Test
+    void shouldGetSoulTraderPartyNameExcludingTitle_whenInstantiated() {
+        Party party = Party.builder().type(Party.Type.SOLE_TRADER)
+            .soleTraderTitle("Mr")
+            .soleTraderFirstName("James")
+            .soleTraderLastName("Carver")
+            .build();
+
+        assertThat(party.getPartyName(true)).isEqualTo("James Carver");
+    }
+
 }
