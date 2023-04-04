@@ -9,21 +9,26 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
-public class ResponseToDefenceSpecV2 extends ResponseToDefenceSpecStrategy {
+public class ResponseToDefenceSpecV2 extends ResponseToDefenceSpecV1 {
 
-    private final FeatureToggleService featureToggleService;
+    public ResponseToDefenceSpecV2(FeatureToggleService featureToggleService, LocationRefDataService locationRefDataService, CourtLocationUtils courtLocationUtils) {
+        super(featureToggleService, locationRefDataService, courtLocationUtils);
+    }
+
     @Override
     public CallbackResponse populateCaseData(CallbackParams callbackParams, ObjectMapper objectMapper) {
         CaseData caseData = updateCaseDataWithRespondent1Copy(callbackParams);
         var caseDataBuilder = caseData.builder();
+        populateDQCourtLocations(caseDataBuilder, callbackParams);
         if(featureToggleService.isPinInPostEnabled()) {
             ResponseOneVOneShowTag responseOneVOneShowTag = caseData.getResponseOneVOneShowTag();
             caseDataBuilder.showResponseOneVOneFlag(responseOneVOneShowTag);
