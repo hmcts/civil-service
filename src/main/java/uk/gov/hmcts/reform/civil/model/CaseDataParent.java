@@ -84,7 +84,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -388,14 +387,14 @@ public class CaseDataParent implements MappableObject {
     private final ClaimProceedsInCaseman claimProceedsInCasemanLR;
 
     @JsonIgnore
-    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
+    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
         BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
         BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
-        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+        if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return ZERO;
         }
         if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
@@ -408,9 +407,9 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
-        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
-            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
-            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
+    public boolean isRespondentResponseBilingual() {
+        return getCaseDataLiP() != null
+            && getCaseDataLiP().getRespondent1LiPResponse() != null
+            && getCaseDataLiP().getRespondent1LiPResponse().isRespondentResponseBilingual();
     }
 }
