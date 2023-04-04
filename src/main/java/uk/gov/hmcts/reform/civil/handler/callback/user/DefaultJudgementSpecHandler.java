@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -65,6 +66,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeesService feesService;
     BigDecimal theOverallTotal;
     private final Time time;
+    private final RespondentLiPResponse respondentLiPResponse;
+    public static final String NOT_VALID_DJ_LIP = "The Claim is not eligible for Default Judgment.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -126,7 +129,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getRespondent1ResponseDeadline())
+        if (respondentLiPResponse.isRespondentResponseBilingual(caseData)) {
+            errors.add(NOT_VALID_DJ_LIP);
+        } else if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
