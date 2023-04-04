@@ -12,6 +12,7 @@ public class Query {
     private final QueryBuilder queryBuilder;
     private final List<String> dataToReturn;
     private final int startIndex;
+    private final int batchSize;
 
     public Query(QueryBuilder queryBuilder, List<String> dataToReturn, int startIndex) {
         Objects.requireNonNull(queryBuilder, "QueryBuilder cannot be null in search");
@@ -21,6 +22,21 @@ public class Query {
         this.queryBuilder = queryBuilder;
         this.dataToReturn = dataToReturn;
         this.startIndex = startIndex;
+        this.batchSize = 0;
+
+    }
+    public Query(QueryBuilder queryBuilder,
+                 List<String> dataToReturn,
+                 int startIndex,
+                 int batchSize){
+        Objects.requireNonNull(queryBuilder, "QueryBuilder cannot be null in search");
+        if (startIndex < 0) {
+            throw new IllegalArgumentException("Start index cannot be less than 0");
+        }
+        this.queryBuilder = queryBuilder;
+        this.dataToReturn = dataToReturn;
+        this.startIndex = startIndex;
+        this.batchSize = batchSize;
     }
 
     @Override

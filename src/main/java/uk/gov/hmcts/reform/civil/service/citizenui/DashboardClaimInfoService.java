@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ import static java.util.Collections.emptyList;
 @RequiredArgsConstructor
 public class DashboardClaimInfoService {
 
+    public static final int BATCH_SIZE = 100;
     private final ClaimStoreService claimStoreService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -43,12 +45,22 @@ public class DashboardClaimInfoService {
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
-        SearchResult claims = coreCaseDataService.searchCases(query, authorisation);
-        if (claims.getTotal() == 0) {
-            return Collections.emptyList();
-        }
-        return translateSearchResultToDashboardItems(claims);
+        List<DashboardClaimInfo> dashboardClaimItems = new ArrayList<>();
+
+        int batchSize = BATCH_SIZE; // fetch 100 cases per batch
+        int totalCases = 0;
+
+        SearchResult claims;
+        do {
+            Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases, batchSize);
+            claims = coreCaseDataService.searchCases(query, authorisation);
+
+            dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
+            totalCases += claims.getCases().size();
+
+        } while (totalCases < claims.getTotal());
+
+        return dashboardClaimItems;
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
