@@ -95,6 +95,7 @@ public class HearingValuesServiceTest {
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
     private static final String RESPONDENT_ONE_LR_ORG_NAME = "Respondent 1 LR Org name";
+    private static final String BASE_LOCATION_ID = "1234";
     private static final String WELSH_REGION_ID = "7";
 
     @Test
@@ -106,7 +107,7 @@ public class HearingValuesServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(WELSH_REGION_ID)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
@@ -136,7 +137,7 @@ public class HearingValuesServiceTest {
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                       .locationId(WELSH_REGION_ID)
+                                                       .locationId(BASE_LOCATION_ID)
                                                        .locationType(COURT)
                                                        .build());
 
@@ -151,7 +152,7 @@ public class HearingValuesServiceTest {
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
-            .caseManagementLocationCode(WELSH_REGION_ID)
+            .caseManagementLocationCode(BASE_LOCATION_ID)
             .caseSLAStartDate("2023-01-30")
             .autoListFlag(false)
             .hearingType("")
