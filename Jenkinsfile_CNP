@@ -74,7 +74,7 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
-  after('checkout') {
+  afterSuccess('checkout') {
     onMaster {
       withCredentials([usernamePassword(credentialsId: 'jenkins-github-hmcts-api-token', usernameVariable: 'USERNAME', passwordVariable: 'BEARER_TOKEN')]) {
         try {
@@ -109,7 +109,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
-  after('smoketest:preview') {
+  afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
@@ -121,7 +121,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
-  after('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
@@ -139,7 +139,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-staging.service.core-compute-aat.internal"
   }
 
-  after('smoketest:aat') {
+  afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
@@ -152,7 +152,7 @@ withPipeline(type, product, component) {
     env.CIVIL_SERVICE_URL="https://civil-service-staging.service.core-compute-aat.internal"
   }
 
-  after('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
