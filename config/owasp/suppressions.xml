@@ -18,7 +18,6 @@
     <cve>CVE-2021-4277</cve>
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2021-4235</cve>
-    <cve>CVE-2022-1471</cve>
   </suppress>
   <suppress until="2023-05-05">
     <notes>Temporarily suppressing as the latest snakeyaml 1.33 also has these vulnerabilities.</notes>
@@ -37,5 +36,6 @@
   <suppress until="2023-05-26">
     <cve>CVE-2023-28708</cve>
     <cve>CVE-2023-20861</cve>
+    <cve>CVE-2023-20860</cve>
   </suppress>
 </suppressions>
