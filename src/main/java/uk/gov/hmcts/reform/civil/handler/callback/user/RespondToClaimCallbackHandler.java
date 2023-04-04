@@ -435,6 +435,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
                     }
                     updatedData.respondent1DQ(dq.build());
+
+                    Party.PartyBuilder resp1 = caseData.getRespondent1().toBuilder()
+                        .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
+                    updatedData.respondent2(resp1.build());
                 } else {
                     //required as ccd populated the respondent DQ with null objects.
                     updatedData.respondent1DQ(null);
@@ -448,13 +452,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
                     }
                     updatedData.respondent2DQ(dq2.build());
+
+                    Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
+                        .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
+                    updatedData.respondent2(resp2.build());
                 } else {
                     updatedData.respondent2DQ(null);
                 }
-
-                Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
-                    .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
-                updatedData.respondent1(resp2.build());
 
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -488,7 +492,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                 .unavailableDates(UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(caseData.toBuilder(), isAwaitingAnotherDefendantResponse(caseData)));
-            updatedData.respondent1(resp2.build());
+            updatedData.respondent2(resp2.build());
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
