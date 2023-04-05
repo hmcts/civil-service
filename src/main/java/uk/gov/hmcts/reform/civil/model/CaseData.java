@@ -847,83 +847,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public ResponseOneVOneShowTag getResponseOneVOneShowTag() {
-        if(isOneVOne(this)){
-            if (getRespondent1ClaimResponseTypeForSpec() == null) {
-                return null;
-            }
-            switch (getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_DEFENCE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
-                case FULL_ADMISSION:
-                    return getResponseOneVOneTagForFullAdmit();
-                case PART_ADMISSION:
-                    return getResponseOneVOneTagForPartAdmit();
-                case COUNTER_CLAIM:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
-
-    @JsonIgnore
-    public String getPayDateAsString(){
-        if (getRespondToClaimAdmitPartLRspec() != null
-            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
-            return getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
-        }
-        if (getRespondToAdmittedClaim() != null
-            && getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
-            return getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
-        }
-        if (getRespondent1ResponseDate() != null) {
-            return getRespondent1ResponseDate().plusDays(5)
-                .format(DateTimeFormatter.ofPattern(DATE_WITH_TWO_DAY_DIGIT, Locale.ENGLISH));
-        }
-        return null;
-    }
-
-    @JsonIgnore
     public boolean hasApplicantProceededWithClaim(){
         return getApplicant1ProceedWithClaim() == YES
             || getApplicant1ProceedWithClaimSpec2v1() == YES;
     }
 
-    @JsonIgnore
-    private ResponseOneVOneShowTag getResponseOneVOneTagForFullAdmit(){
-        if (YES.equals(getSpecDefenceFullAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
-        }
-        switch (getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-        }
-    }
 
-    @JsonIgnore
-    private ResponseOneVOneShowTag getResponseOneVOneTagForPartAdmit(){
-        if (YES.equals(getSpecDefenceAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
-        }
-        switch (getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-        }
-    }
 }
