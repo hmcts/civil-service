@@ -141,7 +141,7 @@ ccd:
       imagePullPolicy: Always
       devcpuRequests: 500m
       devmemoryRequests: 2048Mi
-      devmemoryLimits: 4096Mi
+      devmemoryLimits: 8Gi
       autoscaling:
         enabled: false
       environment:
@@ -210,7 +210,7 @@ aac-manage-case-assignment:
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctspublic.azurecr.io/aac/manage-case-assignment:prod-b741c71-20230323103650
     ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
