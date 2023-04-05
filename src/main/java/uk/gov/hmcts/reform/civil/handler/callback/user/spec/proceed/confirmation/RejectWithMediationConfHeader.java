@@ -13,7 +13,7 @@ public class RejectWithMediationConfHeader implements RespondToResponseConfirmat
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.hasClaimantRejectedClaimAmount()) {
+        if (caseData.isClaimantRejectsClaimAmount()) {
             return Optional.empty();
         }
 

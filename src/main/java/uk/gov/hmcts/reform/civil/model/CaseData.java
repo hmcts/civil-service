@@ -847,11 +847,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasClaimantRejectedClaimAmount() {
-        return YesOrNo.NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
-    }
-
-    @JsonIgnore
     public ResponseOneVOneShowTag getResponseOneVOneShowTag() {
         if(isOneVOne(this)){
             if (getRespondent1ClaimResponseTypeForSpec() == null) {
