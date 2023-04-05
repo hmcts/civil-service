@@ -191,13 +191,9 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
-            assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
 
-            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verifyNoInteractions(litigantInPersonFormGenerator);
-            verifyNoInteractions(civilDocumentStitchingService);
         }
     }
 

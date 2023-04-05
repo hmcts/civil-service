@@ -25,11 +25,11 @@ public class FeatureToggleService {
     }
 
     public boolean isGlobalSearchEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
     }
 
     public boolean isSdoEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isGeneralApplicationsEnabled() {
@@ -49,7 +49,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -65,7 +65,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSDOEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isCertificateOfServiceEnabled() {
