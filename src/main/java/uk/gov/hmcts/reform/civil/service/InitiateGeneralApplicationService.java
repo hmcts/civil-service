@@ -293,7 +293,7 @@ public class InitiateGeneralApplicationService {
     }
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
-        return helper.isGAApplicantSameAsPCClaimant(caseData, userDetails);
+        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
     }
 
     private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
@@ -318,7 +318,7 @@ public class InitiateGeneralApplicationService {
         return respondentCaseRoles;
     }
 
-    private Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+    public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
             if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
                 if (INDIVIDUAL.equals(caseData.getRespondent1().getType())

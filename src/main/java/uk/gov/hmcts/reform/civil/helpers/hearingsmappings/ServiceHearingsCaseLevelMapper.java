@@ -4,7 +4,10 @@ import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +15,7 @@ public class ServiceHearingsCaseLevelMapper {
 
     public static final String CASE_DETAILS_URL = "%s/cases/case-details/%s";
     public static final String EMPTY_STRING = "";
+    private static String DATE_FORMAT = "yyyy-MM-dd";
 
     private ServiceHearingsCaseLevelMapper() {
         //NO-OP
@@ -22,8 +26,8 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static String getPublicCaseName(CaseData caseData) {
-        //todo civ-7030
-        return null;
+        return caseData.getCaseNamePublic() != null ? caseData.getCaseNamePublic()
+            : CaseNameUtils.buildCaseNamePublic(caseData);
     }
 
     public static String getCaseDeepLink(Long caseId,
@@ -36,7 +40,7 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static String getExternalCaseReference() {
-        return EMPTY_STRING;
+        return null;
     }
 
     public static boolean getAutoListFlag() {
@@ -47,9 +51,8 @@ public class ServiceHearingsCaseLevelMapper {
         return caseData.getCaseManagementLocation().getBaseLocation();
     }
 
-    //todo civ-6854
-    public static String getCaseSLAStartDate(CaseData caseData) {
-        return "";
+    public static String getCaseSLAStartDate(LocalDate slaStartDate) {
+        return slaStartDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
     public static boolean getCaseAdditionalSecurityFlag() {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
@@ -46,6 +48,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -64,6 +68,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
     private final Time time;
+    private final HearingFeesService hearingFeesService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -168,7 +173,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             caseDataBuilder.hearingDueDate(
                 calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
                                                                    publicHolidaysCollection.getPublicHolidays()));
-            calculateAndApplyFee(caseData, caseDataBuilder);
+            caseDataBuilder.hearingFee(calculateAndApplyFee(caseData));
+        } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
@@ -178,32 +184,29 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
     }
 
-    private static void calculateAndApplyFee(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        Fee hearingFee = Fee.builder().code("FEE0202").version("4").build();
+    private Fee calculateAndApplyFee(CaseData caseData) {
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         if (isNull(caseData.getAllocatedTrack())) {
             allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
         }
-        switch (allocatedTrack) {
-            case FAST_CLAIM:
-                hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
-                break;
-            case SMALL_CLAIM:
-                int claimAmount;
-                if (nonNull(caseData.getClaimValue())) {
-                    claimAmount = caseData.getClaimValue().getStatementOfValueInPennies().intValue();
-                } else {
-                    claimAmount = caseData.getTotalClaimAmount().intValue() * 100;
-                }
-                hearingFee.setCalculatedAmountInPence(HearingUtils.getSmallTrackFee(claimAmount));
-                break;
-            case MULTI_CLAIM:
-                hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
-                break;
-            default:
-                hearingFee.setCalculatedAmountInPence(new BigDecimal(0));
+        BigDecimal claimAmount;
+        if (nonNull(caseData.getClaimValue())) {
+            claimAmount = caseData.getClaimValue().toPounds();
+        } else if (nonNull(caseData.getTotalInterest())) {
+            claimAmount = caseData.getTotalClaimAmount()
+                .add(caseData.getTotalInterest())
+                .setScale(2, RoundingMode.UNNECESSARY);
+        } else {
+            claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
         }
-        caseDataBuilder.hearingFee(hearingFee).build();
+
+        if (SMALL_CLAIM.equals(allocatedTrack)) {
+            return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
+        } else if (FAST_CLAIM.equals(allocatedTrack)) {
+            return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
+        } else {
+            return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
+        }
     }
 
     LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate, Set<LocalDate> holidays) {

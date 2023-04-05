@@ -26,9 +26,6 @@ public class HearingDetailsMapper {
 
     public static HearingWindowModel getHearingWindow() {
         return HearingWindowModel.builder()
-            .dateRangeEnd(EMPTY_STRING)
-            .dateRangeStart(EMPTY_STRING)
-            .firstDateTimeMustBe(EMPTY_STRING)
             .build();
     }
 
@@ -41,7 +38,7 @@ public class HearingDetailsMapper {
     }
 
     public static Integer getNumberOfPhysicalAttendees() {
-        return null;
+        return 0;
     }
 
     public static boolean getHearingInWelshFlag() {
