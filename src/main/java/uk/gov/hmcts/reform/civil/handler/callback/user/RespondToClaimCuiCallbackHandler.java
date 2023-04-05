@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
