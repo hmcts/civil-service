@@ -314,6 +314,8 @@ public class CaseDataBuilder {
     protected Address applicantSolicitor1ServiceAddress;
     protected Address respondentSolicitor1ServiceAddress;
     protected Address respondentSolicitor2ServiceAddress;
+    protected YesOrNo respondentSolicitor1ServiceAddressRequired;
+    protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
@@ -388,6 +390,8 @@ public class CaseDataBuilder {
     private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
+    private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
     private CCJPaymentDetails ccjPaymentDetails;
 
@@ -494,6 +498,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondentSolicitor2ServiceAddress(Address respondentSolicitor2ServiceAddress) {
         this.respondentSolicitor2ServiceAddress = respondentSolicitor2ServiceAddress;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor1ServiceAddressRequired(YesOrNo respondentSolicitor1ServiceAddressRequired) {
+        this.respondentSolicitor1ServiceAddressRequired = respondentSolicitor1ServiceAddressRequired;
+        return this;
+    }
+
+    public CaseDataBuilder respondentSolicitor2ServiceAddressRequired(YesOrNo respondentSolicitor2ServiceAddressRequired) {
+        this.respondentSolicitor2ServiceAddressRequired = respondentSolicitor2ServiceAddressRequired;
         return this;
     }
 
@@ -1502,6 +1516,7 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
+        respondent2SameLegalRepresentative = NO;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -4333,7 +4348,7 @@ public class CaseDataBuilder {
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
-    
+
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -4774,6 +4789,31 @@ public class CaseDataBuilder {
         return wrapElements(details1, details2, details3, details4);
     }
 
+    public CaseDataBuilder applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo intentionToSettle) {
+        this.applicant1PartAdmitIntentionToSettleClaimSpec = intentionToSettle;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimTrack(String claimType) {
+        this.responseClaimTrack = claimType;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo confirmation) {
+        this.applicant1PartAdmitConfirmAmountPaidSpec = confirmation;
+        return this;
+    }
+
+    public CaseDataBuilder defendantSingleResponseToBothClaimants(YesOrNo response) {
+        this.defendantSingleResponseToBothClaimants = response;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5012,6 +5052,10 @@ public class CaseDataBuilder {
             .respondent1Witnesses(respondent1Witnesses)
             .respondent2Experts(respondent2Experts)
             .respondent2Witnesses(respondent2Witnesses)
+            .respondentSolicitor1ServiceAddressRequired(respondentSolicitor1ServiceAddressRequired)
+            .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
+            .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .build();
     }
 
