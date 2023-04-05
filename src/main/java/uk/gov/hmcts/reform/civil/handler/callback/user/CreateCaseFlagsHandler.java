@@ -51,7 +51,7 @@ public class CreateCaseFlagsHandler extends CallbackHandler {
                 .filter(details -> (details.getValue().getFlagCode().equals("CF0007")
                     && details.getValue().getStatus().equals("Active"))).collect(Collectors.toList());
             updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
-        }else {
+        } else {
             updatedData.urgentFlag(YesOrNo.NO);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
