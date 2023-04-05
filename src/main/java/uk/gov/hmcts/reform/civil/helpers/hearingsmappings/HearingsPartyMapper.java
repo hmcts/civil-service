@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.hearing.PartyRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.util.Lists.emptyList;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -83,7 +85,9 @@ public class HearingsPartyMapper {
             if (((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
                 && NO.equals(caseData.getDefendantSingleResponseToBothClaimants()))
                 || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)))
-                && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
+                && (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                ? caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+                : FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
                 // respondent 2 expert
                 if (caseData.getRespondent2Experts() != null
                     && !caseData.getRespondent2Experts().isEmpty()) {
@@ -260,9 +264,6 @@ public class HearingsPartyMapper {
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .interpreterLanguage(null)
-            .reasonableAdjustments(null)
-            .vulnerableFlag(false)
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)

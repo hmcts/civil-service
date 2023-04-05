@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -44,10 +45,14 @@ import java.util.Optional;
 import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+
+import java.time.LocalDate;
+
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
@@ -74,6 +79,8 @@ public class HearingValuesServiceTest {
     private CaseCategoriesService caseCategoriesService;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -98,7 +105,8 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -113,9 +121,6 @@ public class HearingValuesServiceTest {
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 
         HearingWindowModel expectedHearingWindow = HearingWindowModel.builder()
-            .dateRangeEnd("")
-            .dateRangeStart("")
-            .firstDateTimeMustBe("")
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
@@ -128,20 +133,20 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
             .hmctsServiceID("AAA7")
             .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName(null)
+            .publicCaseName("'John Rambo' v 'Sole Trader'")
             .caseAdditionalSecurityFlag(false)
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
-            .externalCaseReference("")
+            .externalCaseReference(null)
             .caseManagementLocationCode("1234")
-            .caseSLAStartDate("")
+            .caseSLAStartDate("2023-01-30")
             .autoListFlag(false)
             .hearingType("")
             .hearingWindow(expectedHearingWindow)
             .duration(0)
             .hearingPriorityType("Standard")
-            .numberOfPhysicalAttendees(null)
+            .numberOfPhysicalAttendees(0)
             .hearingInWelshFlag(false)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
@@ -149,7 +154,7 @@ public class HearingValuesServiceTest {
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
-            .panelRequirements(null)
+            .panelRequirements(PanelRequirementsModel.builder().build())
             .leadJudgeContractType("")
             .judiciary(expectedJudiciary)
             .hearingIsLinkedFlag(false)
@@ -162,6 +167,8 @@ public class HearingValuesServiceTest {
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
+        verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
+        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         assertThat(actual).isEqualTo(expected);
     }
 
