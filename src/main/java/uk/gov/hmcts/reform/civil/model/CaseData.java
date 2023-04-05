@@ -118,6 +118,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -801,6 +802,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isSettlePartAdmitClaimYes() {
+        return (
+            getApplicant1ProceedsWithClaimSpec() == null
+                && PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
+                && YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                && YesOrNo.YES.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
+    }
+
+    @JsonIgnore
+    public boolean isSettlePartAdmitClaimNo() {
+        return (
+            getApplicant1ProceedsWithClaimSpec() != null
+                || !PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
+                || YesOrNo.NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                || YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
     }
 
     @JsonIgnore
