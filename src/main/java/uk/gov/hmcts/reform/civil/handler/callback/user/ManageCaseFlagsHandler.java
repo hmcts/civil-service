@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,13 +44,15 @@ public class ManageCaseFlagsHandler extends CallbackHandler {
     private CallbackResponse updateUrgentFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-
-        List<Element<FlagDetail>>  flagsDetails = caseData.getCaseFlags().getDetails();
-        List<Element<FlagDetail>>  urgentFlags = flagsDetails.stream()
-            .filter(details -> (details.getValue().getFlagCode().equals("CF0007")
-            && details.getValue().getStatus().equals("Active"))).collect(Collectors.toList());
-
-        updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
+        List<Element<FlagDetail>> urgentFlags = null;
+        if (caseData.getCaseFlags() != null) {
+            urgentFlags = caseData.getCaseFlags().getDetails().stream()
+                .filter(details -> (details.getValue().getFlagCode().equals("CF0007")
+                    && details.getValue().getStatus().equals("Active"))).collect(Collectors.toList());
+            updatedData.urgentFlag(urgentFlags.isEmpty() ? YesOrNo.NO : YesOrNo.YES);
+        } else {
+            updatedData.urgentFlag(YesOrNo.NO);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
