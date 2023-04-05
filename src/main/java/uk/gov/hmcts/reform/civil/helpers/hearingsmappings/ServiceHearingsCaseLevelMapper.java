@@ -57,7 +57,7 @@ public class ServiceHearingsCaseLevelMapper {
     }
 
     public static boolean getCaseAdditionalSecurityFlag(CaseData caseData) {
-        return CaseFlagsToHearingValueMapper.getAdditionalSecurity(CaseFlagUtils.getAllCaseFlags(caseData));;
+        return CaseFlagsToHearingValueMapper.getAdditionalSecurity(CaseFlagUtils.getAllCaseFlags(caseData));
     }
 
     public static List<CaseCategoryModel> getCaseCategories(CaseData caseData, CaseCategoriesService caseCategoriesService, String authToken) {
