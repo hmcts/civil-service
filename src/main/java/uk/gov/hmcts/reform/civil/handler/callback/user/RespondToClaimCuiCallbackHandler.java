@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
-
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -69,6 +69,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
+        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null);
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -79,6 +80,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 responseDate,
                 allocatedTrack
             ))
+            .respondent1GeneratedResponseDocument(dummyDocument)
+            .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .build();
         return updatedData;
     }
