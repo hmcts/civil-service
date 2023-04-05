@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -41,6 +42,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService toggleService;
+    private final AssignCategoryId assignCategoryId;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -66,6 +68,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        assignCategoryId.setCategoryIdCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,6 +51,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
+    private final AssignCategoryId assignCategoryId;
 
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -81,6 +83,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        assignCategoryId.setCategoryIdCaseDocument(sealedClaim, "detailsOfClaim");
 
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,12 +53,16 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 @SpringBootTest(classes = {
     GenerateClaimFormForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private GenerateClaimFormForSpecCallbackHandler handler;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
@@ -129,6 +134,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
     @BeforeEach
     void setup() {
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(false);
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
         when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
@@ -214,12 +220,37 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            specClaimTimelineDocuments.get(0).getDocument().setCategoryID(null);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verify(civilDocumentStitchingService).bundle(eq(specClaimTimelineDocuments), anyString(), anyString(),
                                                          anyString(), eq(caseData));
+        }
+
+        @Test
+        void shouldGenerateClaimForm_andAssignCategoryId() {
+            when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build().toBuilder()
+                .specRespondent1Represented(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            // Then
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("detailsOfClaim");
+
+            verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+            verifyNoInteractions(litigantInPersonFormGenerator);
+            verifyNoInteractions(civilDocumentStitchingService);
         }
 
         @Test
