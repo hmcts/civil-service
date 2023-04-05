@@ -364,7 +364,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()){
+        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
