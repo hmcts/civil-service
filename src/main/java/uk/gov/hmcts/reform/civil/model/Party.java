@@ -6,11 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import javax.validation.constraints.PastOrPresent;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -45,7 +44,9 @@ public class Party {
     private String partyEmail;
     private String partyPhone;
 
-    private Flags flags;
+    private final String partyEmail;
+
+    private final String partyEmail;
 
     public enum Type {
         INDIVIDUAL,
@@ -58,12 +59,8 @@ public class Party {
         }
     }
 
-    public String getPartyName(boolean omitTitle) {
-        return getPartyNameBasedOnType(this, omitTitle);
-    }
-
     public String getPartyName() {
-        return getPartyName(false);
+        return getPartyNameBasedOnType(this);
     }
 
     public String getPartyTypeDisplayValue() {

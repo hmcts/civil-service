@@ -49,20 +49,6 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
-
-serviceRequest:
-  api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
-
-serviceRequestClaimIssued:
-  api:
-    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
-    site_id: AAA7
-    service: CIVIL
-
-
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
@@ -87,7 +73,6 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       free: CopyPagesUpTo10
-      appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -104,16 +89,12 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
-manage-case-ui:
-  baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
-
 payments:
   api:
     site_id: AAA7
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
-    url: http://localhost:8765
 
 idam:
   s2s-auth:
@@ -132,9 +113,6 @@ nonworking-days:
 
 civil:
   response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
-  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
-  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
-  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -178,21 +156,16 @@ notifications:
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
-  solicitorClaimDismissedWithin4Months: "2775485e-aaeb-49c6-a2c8-07a15f628e8a"
-  solicitorClaimDismissedWithin14Days: "1ca6bd16-61b9-4e3d-b7c4-ab726dc8abdd"
-  solicitorClaimDismissedWithinDeadline: "847f080c-998b-4483-865f-72353f518d85"
+  solicitorClaimDismissed: "e2f1d745-979e-43e6-9f50-e35bb30c88c1"
   claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
   claimantSolicitorAgreedExtensionDate: "9a09dde2-dfe3-4770-b98e-3ce920fb5a6e"
   claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
   claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
   claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
-  claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
-  claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
   solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
   solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
-  claimantClaimContinuingOnlineForSpec: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
@@ -221,26 +194,11 @@ notifications:
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
-  respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
-  claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
   respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
-  applicantHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
-  respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
-  respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
-  hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
-  hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
-  hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
-  solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
-  respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
-  respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
-  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
-  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
-  evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
-  bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -254,11 +212,6 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
-
-bundle:
-  api:
-    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/"
-  config: ${BUNDLE_CONFIG:caseprogression-bundle-config.yaml}
 
 http:
   client:
@@ -327,18 +280,6 @@ payments:
   api:
     url: http://localhost:8765
 
-serviceRequest:
-  api:
-    callback-url : http://localhost:4000/service-request-update
-    site_id : AAA7
-    service : CIVIL
-
-serviceRequestClaimIssued:
-  api:
-    callback-url: http://localhost:4000/service-request-update-claim-issued
-    site_id: AAA7
-    service: CIVIL
-
 idam:
   web:
     url: http://localhost:9002
@@ -370,10 +311,6 @@ testing:
     enabled: true
 
 rd_professional:
-  api:
-    url: http://localhost:8765
-
-rd_commondata:
   api:
     url: http://localhost:8765
 
@@ -459,10 +396,6 @@ testing:
     enabled: true
 
 rd_professional:
-  api:
-    url: http://fake-prd-api
-
-rd_commondata:
   api:
     url: http://fake-prd-api
 

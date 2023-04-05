@@ -50,7 +50,6 @@ public interface NotificationData {
     String AMOUNT_OF_COSTS = "amountOfCosts";
     String AMOUNT_PAID = "amountPaidBeforeJudgment";
     String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
-    String RESPONDENT = "respondent";
 
     // CUI Pin in Post
     String CLAIMANT_NAME = "claimantName";
@@ -66,17 +65,6 @@ public interface NotificationData {
     String HEARING_DUE_DATE = "hearingDueDate";
     String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
     String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
-    String HEARING_OR_TRIAL = "hearing/trial";
-    String CLAIMANT_DEFENDANT_REFERENCE = "claimant/defendantReferenceNumber";
-    String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
-
-    //NoC
-    String CASE_NAME = "case name";
-    String ISSUE_DATE = "issue date";
-    String CCD_REF = "ccd reference code";
-    String NEW_SOL = "new solicitor";
-    String FORMER_SOL = "former solicitor";
-    String OTHER_SOL_NAME = "other solicitor name";
 
     Map<String, String> addProperties(CaseData caseData);
 

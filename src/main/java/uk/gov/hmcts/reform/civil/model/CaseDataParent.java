@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +9,6 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -31,16 +28,13 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -84,7 +78,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -93,9 +86,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.math.BigDecimal.ZERO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
 @SuperBuilder(toBuilder = true)
@@ -131,11 +121,7 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-    private final Witnesses applicant1DQWitnessesSmallClaim;
-    private final Witnesses respondent1DQWitnessesSmallClaim;
-    private final Witnesses respondent2DQWitnessesSmallClaim;
 
-    @Deprecated
     private final LocalDateTime addLegalRepDeadline;
 
     @Builder.Default
@@ -145,9 +131,6 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
-
-    @JsonUnwrapped
-    private final Mediation mediation;
 
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
@@ -233,6 +216,7 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
@@ -270,6 +254,7 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmount2;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
+    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
@@ -286,7 +271,6 @@ public class CaseDataParent implements MappableObject {
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
-
     /**
      * This field is not used.
      *
@@ -309,14 +293,12 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
-    private final ChangeOfRepresentation changeOfRepresentation;
+    private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
 
     /**
      * Adding for PiP to citizen UI.
@@ -326,91 +308,7 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
-    private final YesOrNo applicant1Represented;
 
-    /**
-     * Adding for LR ITP Update.
-     */
-    private final ResponseOneVOneShowTag showResponseOneVOneFlag;
-    private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
-    private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
-    private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
-    private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
-    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
-    private final CaseDocument respondent1ClaimResponseDocumentSpec;
-    private final CaseDocument respondent2ClaimResponseDocumentSpec;
-    private final String respondent1PaymentDateToStringSpec;
-    private final PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
-    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
-    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
-    private final String currentDateboxDefendantSpec;
-    @JsonUnwrapped
-    private final CCJPaymentDetails ccjPaymentDetails;
-
-    @JsonUnwrapped
-    private final CaseDataLiP caseDataLiP;
-
-    private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
-    @JsonIgnore
-    public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == YesOrNo.NO;
-    }
-
-    /**
-     * Adding for Certificate of Service.
-     */
-    private final CertificateOfService cosNotifyClaimDetails1;
-    private final CertificateOfService cosNotifyClaimDetails2;
-    private final YesOrNo defendant1LIPAtClaimIssued;
-    private final YesOrNo defendant2LIPAtClaimIssued;
-    private final CertificateOfService cosNotifyClaimDefendant1;
-    private final CertificateOfService cosNotifyClaimDefendant2;
-
-    private final List<Element<PartyFlagStructure>> applicantExperts;
-    private final List<Element<PartyFlagStructure>> respondent1Experts;
-    private final List<Element<PartyFlagStructure>> respondent2Experts;
-    private final List<Element<PartyFlagStructure>> applicantWitnesses;
-    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
-    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-
-    @JsonIgnore
-    public boolean isResponseAcceptedByClaimant() {
-        return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
-            || applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES
-            || applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
-    }
-
-    private final IdamUserDetails claimantUserDetails;
-    private final ClaimProceedsInCaseman claimProceedsInCasemanLR;
-
-    @JsonIgnore
-    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
-        BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
-        BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-        BigDecimal lowCostAmount = ZERO;
-        BigDecimal midCostAmount = BigDecimal.valueOf(40);
-        BigDecimal highCostAmount = BigDecimal.valueOf(55);
-
-        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
-            return ZERO;
-        }
-        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
-            return lowCostAmount;
-        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
-            return midCostAmount;
-        } else {
-            return highCostAmount;
-        }
-    }
-
-    @JsonIgnore
-    public boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
-        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
-            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
-            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
-    }
 }

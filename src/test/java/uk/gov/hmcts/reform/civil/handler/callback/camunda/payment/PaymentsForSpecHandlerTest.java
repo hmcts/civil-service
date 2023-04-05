@@ -1,25 +1,21 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
     PaymentsForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
+class PaymentsForSpecHandlerTest {
 
     @Autowired
     private PaymentsForSpecCallbackHandler handler;
@@ -30,11 +26,13 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private Time time;
 
-    @Test
-    void shouldReturnCorrectActivityId_whenRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+    @MockBean
+    private FeatureToggleService toggleService;
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePaymentForSpec");
+    @Test
+    void ldBlock() {
+        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 }

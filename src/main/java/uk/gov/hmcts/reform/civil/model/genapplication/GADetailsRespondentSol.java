@@ -15,7 +15,7 @@ public class GADetailsRespondentSol implements MappableObject {
     private final String generalApplicationType;
     private final LocalDateTime generalAppSubmittedDateGAspec;
     private CaseLink caseLink;
-    private String caseState;
+    private final String caseState;
 
     @JsonCreator
     GADetailsRespondentSol(@JsonProperty("generalApplicationType") String generalApplicationType,

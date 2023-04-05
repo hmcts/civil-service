@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -77,7 +77,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         properties.put(DEFENDANT_REFERENCE_NUMBER, defRefNumber);
         String emailTemplate = notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
         notificationService.sendMail(recipient, emailTemplate, properties,
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
+                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReference())
         );
     }
 
@@ -98,7 +98,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
-            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
+            time.toString()
         ));
     }
 }

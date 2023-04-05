@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -21,16 +19,14 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,15 +35,11 @@ import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
 
 @SpringBootTest(classes = {
     UpdateFromGACaseEventTaskHandler.class,
@@ -102,8 +94,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithGeneralOrderPDFDocument(CaseData.builder().build());
-        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithGeneralOrderStaffPDFDocument(CaseData.builder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -112,7 +102,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
 
-        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockExternalTask, externalTaskService);
 
@@ -136,14 +126,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
 
-        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDismissalOrderStaffPDFDocument(CaseData.builder().build());
-
         when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
 
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
 
-        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockExternalTask, externalTaskService);
 
@@ -164,9 +151,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDirectionOrderPDFDocument(CaseData.builder().build());
 
-        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData.builder().build());
-
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
 
@@ -174,191 +158,13 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
 
-        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockExternalTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask);
-    }
-
-    @Test
-    void testShouldAddHearingNoticeDocument() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .build();
-
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        StartEventResponse startEventResponse = startEventResponse(caseDetails);
-
-        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithHearingNoticeDocumentPDFDocument(CaseData.builder().build());
-        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument((CaseData.builder().build()));
-
-        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
-                .thenReturn(generalCaseData);
-
-        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
-
-        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-
-        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
-
-        handler.execute(mockExternalTask, externalTaskService);
-
-        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
-        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService).complete(mockExternalTask);
-    }
-
-    @Test
-    void testCanViewWithoutNoticeGaCreatedByResp2() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        false,
-                        false,
-                        true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
-    }
-
-    @Test
-    void testCanViewWithoutNoticeGaCreatedByResp1() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        false,
-                        true,
-                        false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
-    }
-
-    @Test
-    void testCanViewWithoutNoticeGaCreatedByClaimant() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        false,
-                        false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
-    }
-
-    @Test
-    void testCanViewWithNoticeGaCreatedByResp2() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        true,
-                        true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void shouldUpdateDocCollection() {
-        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .build();
-        String uid = "f000aa01-0451-4000-b000-000000000000";
-        gaCaseData = gaCaseData.toBuilder()
-                .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid))
-                        .value(pdfDocument).build())).build();
-        Map<String, Object> output = new HashMap<>();
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
-        try {
-            handler.updateDocCollection(output, gaCaseData, "directionOrderDocument",
-                    caseData, "directionOrderDocStaff");
-            List<Element<CaseDocument>> toUpdatedDocs =
-                    (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
-            assertThat(toUpdatedDocs).isNotNull();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void testUpdateDocCollectionWithoutNoticeGaCreatedByResp2() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        false,
-                        false,
-                        true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        String uid = "f000aa01-0451-4000-b000-000000000000";
-        CaseData generalAppCaseData = CaseData.builder()
-                .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
-                .id(UUID.fromString(uid))
-                .value(pdfDocument).build())).ccdCaseReference(1234L).build();
-        Map<String, Object> output = new HashMap<>();
-        try {
-            handler.updateDocCollectionField(output, caseData, generalAppCaseData, "directionOrder");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        assertThat(output.get("directionOrderDocStaff")).isNotNull();
-        assertThat(output.get("directionOrderDocRespondentSolTwo")).isNotNull();
-        assertThat(output.get("directionOrderDocClaimant")).isNull();
-        assertThat(output.get("directionOrderDocRespondentSol")).isNull();
-    }
-
-    @Test
-    void testUpdateDocCollectionWithNoticeGaCreatedByResp2() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        true,
-                        true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
-                );
-        String uid = "f000aa01-0451-4000-b000-000000000000";
-        CaseData generalAppCaseData = CaseData.builder()
-                .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid))
-                        .value(pdfDocument).build())).ccdCaseReference(1234L).build();
-        Map<String, Object> output = new HashMap<>();
-        try {
-            handler.updateDocCollectionField(output, caseData, generalAppCaseData, "directionOrder");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        assertThat(output.get("directionOrderDocStaff")).isNotNull();
-        assertThat(output.get("directionOrderDocRespondentSolTwo")).isNotNull();
-        assertThat(output.get("directionOrderDocClaimant")).isNotNull();
-        assertThat(output.get("directionOrderDocRespondentSol")).isNotNull();
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
@@ -413,69 +219,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask);
-    }
-
-    @Nested
-    class NotRetryableFailureTest {
-        @Test
-        void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
-            //given: ExternalTask.getAllVariables throws ValueMapperException
-            when(mockExternalTask.getAllVariables())
-                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
-
-            //when: Task handler is called and ValueMapperException is thrown
-            handler.execute(mockExternalTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
-            //given: ExternalTask variables with incompatible event type
-            String incompatibleEventType = "test";
-            Map<String, Object> allVariables = Map.of("caseId", CIVIL_CASE_ID, "caseEvent", incompatibleEventType);
-            when(mockExternalTask.getAllVariables())
-                .thenReturn(allVariables);
-
-            //when: Task handler is called and IllegalArgumentException is thrown
-            handler.execute(mockExternalTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
-            //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", ADD_PDF_TO_MAIN_CASE);
-            when(mockExternalTask.getAllVariables())
-                .thenReturn(allVariables);
-
-            //when: Task handler is called and CaseIdNotProvidedException is thrown
-            handler.execute(mockExternalTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()

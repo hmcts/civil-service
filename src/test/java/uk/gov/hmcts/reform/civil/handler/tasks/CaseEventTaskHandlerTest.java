@@ -5,7 +5,6 @@ import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -34,7 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -48,7 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -212,12 +211,6 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
-            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .build();
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-            when(coreCaseDataService.startUpdate(any(), any()))
-                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
             doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
                 .when(externalTaskService).complete(mockTask);
@@ -246,7 +239,6 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -710,9 +702,7 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -723,17 +713,11 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
-                );
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true);
             }
             return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                          FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
-                    );
+                          FlowFlag.NOTICE_OF_CHANGE.name(), true);
         }
 
         private CaseData getCaseData(FlowState.Main state) {
@@ -797,7 +781,7 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);
+                        .respondent2OrgRegistered(YES);;
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
                     caseDataBuilder.atStateTakenOfflineByStaff()
@@ -809,68 +793,6 @@ class CaseEventTaskHandlerTest {
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
             }
             return caseDataBuilder.build();
-        }
-    }
-
-    @Nested
-    class NotRetryableFailureTest {
-        @Test
-        void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
-            //given: ExternalTask.getAllVariables throws ValueMapperException
-            when(mockTask.getAllVariables())
-                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
-
-            //when: Task handler is called and ValueMapperException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
-            //given: ExternalTask variables with incompatible event type
-            String incompatibleEventType = "test";
-            Map<String, Object> allVariables = Map.of("caseId", CASE_ID, "caseEvent", incompatibleEventType);
-            when(mockTask.getAllVariables()).thenReturn(allVariables);
-
-            //when: Task handler is called and IllegalArgumentException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
-            //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-            when(mockTask.getAllVariables())
-                .thenReturn(allVariables);
-
-            //when: Task handler is called and CaseIdNotProvidedException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
         }
     }
 }

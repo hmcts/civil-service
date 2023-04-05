@@ -1,4 +1,5 @@
-
+postgresql:
+  enabled: false
 idam-pr:
   enabled: false
 
@@ -6,9 +7,6 @@ xui-webapp:
   enabled: false
 
 camunda-bpm:
-  enabled: false
-
-aac-manage-case-assignment:
   enabled: false
 ccd:
   enabled: false
@@ -26,7 +24,6 @@ java:
     IDAM_S2S_AUTH_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CORE_CASE_DATA_API_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
-    ACA_SERVICE_API_BASEURL: http://aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_SECURITY_ENABLED: true
     CMC_DB_USERNAME: 'cmc@cmc-db-v11-{{ .Values.global.environment }}'
     CMC_DB_HOST: cmc-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
@@ -43,8 +40,7 @@ java:
     GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_JRD_URL: http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    SERVICE_REQUEST_UPDATE: https://civil-service-{{ .Values.global.environment }}.platform.hmcts.net/service-request-update
-    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://civil-service-{{ .Values.global.environment }}.platform.hmcts.net/service-request-update-claim-issued
+    SERVICE_REQUEST_UPDATE: http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{- .Values.global.environment }}.internal/service-request-update
     DOCMOSIS_TORNADO_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net
     SEND_LETTER_URL: http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -57,12 +53,10 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    RD_COMMONDATA_API_URL: http://rd-commondata-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
-    POLLING_EVENT_EMITTER_ENABLED: false
 
   keyVaults:
     civil:
@@ -76,7 +70,7 @@ java:
         - cross-access-user-password
         - prd-admin-user-username
         - prd-admin-user-password
-        - appinsights-connection-string
+        - appinsights-instrumentation-key
         - docmosis-api-key
         - cmc-db-password-v11
         - gov-notify-api-key

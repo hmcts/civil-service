@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getApplicantHearingFeeUnpaid(),
+            notificationsProperties.getSolicitorHearingFeeUnpaid(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -71,6 +71,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
+
         );
     }
 }

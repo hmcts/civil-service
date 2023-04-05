@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -45,10 +43,6 @@ public class TestingSupportController {
     private final StateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
-
-    private final ClaimDismissedHandler claimDismissedHandler;
-
-    private static final String BEARER_TOKEN = "Bearer Token";
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
@@ -96,10 +90,10 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
-    @GetMapping("/testing-support/feature-toggle/isCertificateOfServiceEnabled")
+    @GetMapping("/testing-support/feature-toggle/access-profiles")
     @ApiOperation("Check if access profiles feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkCertificateOfServiceEnabled() {
-        boolean featureEnabled = featureToggleService.isCertificateOfServiceEnabled();
+    public ResponseEntity<FeatureToggleInfo> checkAccessProfilesEnabled() {
+        boolean featureEnabled = featureToggleService.isAccessProfilesEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
@@ -147,26 +141,6 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
-    }
-
-    @GetMapping("/testing-support/trigger-case-dismissal-scheduler")
-    public ResponseEntity<String> getCaseDismissalScheduler() {
-
-        String responseMsg = "success";
-        ExternalTaskImpl externalTask = new ExternalTaskImpl();
-        try {
-            claimDismissedHandler.handleTask(externalTask);
-        } catch (Exception e) {
-            responseMsg = "failed";
-        }
-        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
-    }
-
-    @GetMapping("/testing-support/case/{caseId}")
-    public ResponseEntity<CaseData> getCaseData(@PathVariable("caseId") Long caseId) {
-
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
-        return new ResponseEntity<>(caseData, HttpStatus.OK);
+        return roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
     }
 }

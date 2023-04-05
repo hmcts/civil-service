@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ import javax.validation.constraints.NotNull;
 )
 public class DocumentController {
 
+    @Autowired
     private final ClaimFormService claimFormService;
 
     @PostMapping("/generateSealedDoc")
@@ -38,8 +40,8 @@ public class DocumentController {
         produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     byte[] downloadSealedDocument(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @NotNull @RequestBody CaseDocument caseDocument) {
-        return claimFormService.downloadSealedDocument(caseDocument);
+        return claimFormService.downloadSealedDocument(authorisation, caseDocument);
     }
-
 }

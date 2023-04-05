@@ -10,14 +10,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
@@ -58,7 +61,11 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if (toggleService.isLrSpecEnabled()) {
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {

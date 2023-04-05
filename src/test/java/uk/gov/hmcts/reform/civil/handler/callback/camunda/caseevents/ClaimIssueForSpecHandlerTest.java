@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,19 +8,19 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.aos.AcknowledgementOfClaimGeneratorForSpec;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 @SpringBootTest(classes = {
-    GenerateAcknowledgementOfClaimForSpecCallbackHandler.class,
+    ClaimIssueForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-class GenerateAcknowledgementOfClaimForSpecHandlerTest {
+class ClaimIssueForSpecHandlerTest {
 
     @Autowired
-    private GenerateAcknowledgementOfClaimForSpecCallbackHandler handler;
+    private ClaimIssueForSpecCallbackHandler handler;
 
     @MockBean
-    private AcknowledgementOfClaimGeneratorForSpec acknowledgementOfClaimGenerator;
+    private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
     private FeatureToggleService toggleService;

@@ -3,18 +3,19 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -22,11 +23,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -53,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
-@ExtendWith(SpringExtension.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class,
@@ -69,6 +72,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private OrganisationService organisationService;
     @MockBean
+    private FeatureToggleService toggleService;
+    @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
     private BulkPrintService bulkPrintService;
@@ -83,6 +88,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
+
+    @org.junit.Test
+    public void ldBlock() {
+        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        assertTrue(handler.handledEvents().isEmpty());
+        assertFalse(handler.handledEvents().isEmpty());
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -102,14 +114,11 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
-            // Given
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
-            // When
             handler.handle(params);
 
-            // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
                 "template-id",
@@ -120,35 +129,25 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
-            // Given
             CaseData caseData = getCaseData(null);
             CallbackParams params = getCallbackParams(caseData);
 
-            // When
             handler.handle(params);
-
-            // Then
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
-            // Given
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
-            // When
             handler.handle(params);
-
-            // Then
             verify(bulkPrintService)
-                .printLetter(
-                    LETTER_CONTENT,
-                    caseData.getLegacyCaseReference(),
-                    caseData.getLegacyCaseReference(),
-                    "first-contact-pack"
-                );
+                .printLetter(LETTER_CONTENT,
+                             caseData.getLegacyCaseReference(),
+                             caseData.getLegacyCaseReference(),
+                             "first-contact-pack");
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {

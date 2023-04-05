@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,20 +39,5 @@ public class CaseDetailsConverter {
         data.put("ccdCaseReference", caseDetails.getId());
 
         return objectMapper.convertValue(data, CaseData.class);
-    }
-
-    public GeneralApplication toGeneralApplication(CaseDetails caseDetails) {
-        Map<String, Object> data = new HashMap<>(caseDetails.getData());
-
-        Map<String, Object> caseReference = new HashMap<>();
-        caseReference.put("CaseReference", caseDetails.getId());
-
-        data.put("caseLink", caseReference);
-
-        if (caseDetails.getState() != null) {
-            data.put("generalApplicationState", caseDetails.getState());
-        }
-
-        return objectMapper.convertValue(data, GeneralApplication.class);
     }
 }

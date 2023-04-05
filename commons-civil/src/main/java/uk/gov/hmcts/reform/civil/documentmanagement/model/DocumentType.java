@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.documentmanagement.model;
+package uk.gov.hmcts.reform.civil.model.documents;
 
 public enum DocumentType {
     SEALED_CLAIM,
@@ -13,7 +13,6 @@ public enum DocumentType {
     DEFAULT_JUDGMENT_SDO_ORDER,
     LITIGANT_IN_PERSON_CLAIM_FORM,
     SDO_ORDER,
-    HEARING_FORM,
     PIP_LETTER,
 
     //General Application Document Type
@@ -23,6 +22,5 @@ public enum DocumentType {
     REQUEST_FOR_INFORMATION,
     HEARING_ORDER,
     WRITTEN_REPRESENTATION_SEQUENTIAL,
-    WRITTEN_REPRESENTATION_CONCURRENT,
-    HEARING_NOTICE;
+    WRITTEN_REPRESENTATION_CONCURRENT;
 }

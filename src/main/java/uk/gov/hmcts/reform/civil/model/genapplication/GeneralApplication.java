@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -11,17 +10,15 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class GeneralApplication implements MappableObject {
 
-    private final String generalApplicationState;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
@@ -47,20 +44,14 @@ public class GeneralApplication implements MappableObject {
     private final String defendant1PartyName;
     private final String defendant2PartyName;
     private final String generalAppSuperClaimType;
-    private final CaseLocationCivil caseManagementLocation;
+    private final CaseLocation caseManagementLocation;
     private final YesOrNo isCcmccLocation;
     private final GACaseManagementCategory caseManagementCategory;
     private final CaseCategory caseAccessCategory;
     private final String locationName;
-    private final LocalDateTime applicationClosedDate;
-    private final LocalDateTime applicationTakenOfflineDate;
-    private final YesOrNo generalAppVaryJudgementType;
-    private final Document generalAppN245FormUpload;
-    private final GAHearingDateGAspec generalAppHearingDate;
 
     @JsonCreator
-    GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
-                       @JsonProperty("generalAppType") GAApplicationType generalAppType,
+    GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
@@ -87,18 +78,11 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
                        @JsonProperty("defendant2PartyName") String defendant2PartyName,
                        @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
-                       @JsonProperty("caseManagementLocation") CaseLocationCivil caseManagementLocation,
+                       @JsonProperty("caseManagementLocation") CaseLocation caseManagementLocation,
                        @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
-                       @JsonProperty("locationName") String locationName,
-                       @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
-                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
-                       @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
-                       @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
-                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate) {
-
-        this.generalApplicationState = generalApplicationState;
+                       @JsonProperty("locationName") String locationName) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -129,10 +113,5 @@ public class GeneralApplication implements MappableObject {
         this.caseManagementCategory = caseManagementCategory;
         this.caseAccessCategory = caseAccessCategory;
         this.locationName = locationName;
-        this.applicationClosedDate = applicationClosedDate;
-        this.applicationTakenOfflineDate = applicationTakenOfflineDate;
-        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
-        this.generalAppN245FormUpload = generalAppN245FormUpload;
-        this.generalAppHearingDate = generalAppHearingDate;
     }
 }

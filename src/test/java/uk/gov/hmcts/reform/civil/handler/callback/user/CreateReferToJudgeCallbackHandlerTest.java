@@ -73,11 +73,12 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class AboutToSubmitCallback {
 
-        private static final String EMAIL = "example@email.com";
-        private final LocalDateTime submittedDate = LocalDateTime.now();
         private CallbackParams params;
         private CaseData caseData;
         private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
@@ -89,6 +90,16 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+        }
+
+        @Test
+        void shouldUpdateBusinessProcess_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(REFER_TO_JUDGE.name(), "READY");
         }
     }
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notify;
+package uk.gov.hmcts.reform.civil.config.properties.notification;
 
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -43,22 +43,12 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissedWithin4Months;
+    private String solicitorClaimDismissed;
 
-    @NotEmpty
-    private String solicitorClaimDismissedWithin14Days;
-
-    @NotEmpty
-    private String solicitorClaimDismissedWithinDeadline;
-
-    @NotEmpty String applicantHearingFeeUnpaid;
-    @NotEmpty String respondentHearingFeeUnpaid;
+    @NotEmpty String solicitorHearingFeeUnpaid;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
-
-    @NotEmpty
-    private String claimantSolicitorSpecCaseWillProgressOffline;
 
     @NotEmpty
     private String claimantSolicitorAgreedExtensionDate;
@@ -85,16 +75,10 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
 
     @NotEmpty
-    private String claimantClaimContinuingOnlineForSpec;
-
-    @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
     private String solicitorCaseTakenOffline;
-
-    @NotEmpty
-    private String solicitorTrialReady;
 
     @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
@@ -154,12 +138,6 @@ public class NotificationsProperties {
     private String respondentSolicitorCounterClaimForSpec;
 
     @NotEmpty
-    private String respondentDeadlineExtension;
-
-    @NotEmpty
-    private String claimantDeadlineExtension;
-
-    @NotEmpty
     private String respondentSolicitor1DefaultJudgmentRequested;
 
     @NotEmpty
@@ -193,38 +171,5 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipFullDefenceNoMediationTemplate;
-
-    @NotEmpty
-    private String respondentLipResponseSubmissionTemplate;
-
-    @NotEmpty
-    private String hearingListedFeeClaimantLrTemplate;
-
-    @NotEmpty
-    private String hearingListedNoFeeClaimantLrTemplate;
-
-    @NotEmpty
-    private String hearingListedNoFeeDefendantLrTemplate;
-
-    @NotEmpty
-    private String noticeOfChangeFormerSolicitor;
-
-    @NotEmpty
-    private String noticeOfChangeOtherParties;
-
-    @NotEmpty
-    private String claimantSolicitorClaimContinuingOnlineCos;
-
-    @NotEmpty
-    private String evidenceUploadTemplate;
-
-    @NotEmpty
-    private String respondentCcjNotificationTemplate;
-
-    @NotEmpty
-    private String respondentSolicitorCcjNotificationTemplate;
-
-    @NotEmpty
-    private String bundleCreationTemplate;
 
 }
