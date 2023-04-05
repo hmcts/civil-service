@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -139,5 +140,46 @@ public class CaseFlagsToHearingValueMapperTest {
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
         assertEquals("C", getCustodyStatus(flagDetails));
+    }
+
+    @Test
+    public void testHasReasonableAdjustments() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("SM0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail3 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0026")
+            .name("Support worker or carer with me")
+            .build();
+
+        List<FlagDetail> flagCodeNameAndComment = List.of(flagDetail1, flagDetail2);
+        List<FlagDetail> flagCodeAndName = List.of(flagDetail3);
+
+        String expectedWithComment = "[RA0033 : Private waiting area : this is a comment, SM0002 : Screening witness from accused : this is a comment]";
+        String actualWithComment = String.valueOf(getReasonableAdjustments(flagCodeNameAndComment));
+
+        String expectedWithoutComment = "[RA0012 : Reasonable Adjustments]";
+        String actualWithoutComment = String.valueOf(getReasonableAdjustments(flagCodeAndName));
+
+        assertEquals(expectedWithComment, actualWithComment);
+        assertEquals(expectedWithoutComment, actualWithoutComment);
+//
+//        assertEquals("[RA0033 : Private waiting area : this is a comment, SM0002 : Screening witness from accused : this is a comment]", getReasonableAdjustments(flagCodeNameAndComment));
+//        assertEquals("[PF0015 : Language interpreter]", getReasonableAdjustments(flagCodeAndName));
     }
 }

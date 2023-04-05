@@ -18,6 +18,7 @@ public class CaseFlagPredicates {
     private static final List<String> LANGUAGE_INTERPRETER_FLAGS = List.of("PF0015");
     private static final List<String> SIGN_LANGUAGE_INTERPRETER_FLAGS = List.of("RA0042");
     private static final List<String> DETAINED_INDIVIDUAL_FLAGS = List.of("PF0019");
+    private static final List<String> REASONABLE_ADJUSTMENT_FLAGS = List.of("RA", "SM");
 
     public static Predicate<FlagDetail> isActive() {
         return flagDetail -> flagDetail.getStatus().equals("Active");
@@ -47,4 +48,11 @@ public class CaseFlagPredicates {
     public static Predicate<FlagDetail> isDetainedIndividual() {
         return flagDetail -> DETAINED_INDIVIDUAL_FLAGS.contains(flagDetail.getFlagCode());
     }
-}
+
+    public static Predicate<FlagDetail> hasReasonableAdjustmentFlagCodes() {
+        return flagDetail -> REASONABLE_ADJUSTMENT_FLAGS.stream().anyMatch(flagDetail.getFlagCode()::startsWith);
+    }
+
+    public static final Predicate<FlagDetail> hasFlagComments =
+        flagDetail -> flagDetail.getFlagComment() != null;
+    }
