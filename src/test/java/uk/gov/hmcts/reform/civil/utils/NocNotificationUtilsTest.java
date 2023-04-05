@@ -237,4 +237,24 @@ public class NocNotificationUtilsTest {
         assertEquals(String.format("%s, %s v %s, %s", PARTY_1_NAME, PARTY_1_NAME, PARTY_2_NAME, PARTY_2_NAME),
                      NocNotificationUtils.getCaseName(caseData));
     }
+
+    @Test
+    void testGetCaseDataWithoutFormerSolicitorEmail() {
+        CaseData caseData = CaseData.builder()
+            .changeOfRepresentation(
+                ChangeOfRepresentation.builder()
+                    .formerRepresentationEmailAddress("former-sol-email")
+                    .organisationToAddID("some org")
+                    .build()).build();
+
+        CaseData expected = CaseData.builder()
+            .changeOfRepresentation(
+                ChangeOfRepresentation.builder()
+                    .organisationToAddID("some org")
+                    .build()).build();
+
+        CaseData actual = NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData);
+
+        assertEquals(expected, actual);
+    }
 }

@@ -42,8 +42,8 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearings
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getHmctsInternalCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getPublicCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMapper.getVocabulary;
-import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 @Slf4j
 @Service
@@ -56,6 +56,7 @@ public class HearingValuesService {
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final OrganisationService organisationService;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
         CaseData caseData = retrieveCaseData(caseId);
@@ -72,7 +73,7 @@ public class HearingValuesService {
             .caseRestrictedFlag(getCaseRestrictedFlag())
             .externalCaseReference(getExternalCaseReference())
             .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
-            .caseSLAStartDate(getCaseSLAStartDate(caseData)) //todo civ-6854
+            .caseSLAStartDate(getCaseSLAStartDate(deadlinesCalculator.getSlaStartDate(caseData)))
             .autoListFlag(getAutoListFlag())
             .hearingType(getHearingType())
             .hearingWindow(getHearingWindow())

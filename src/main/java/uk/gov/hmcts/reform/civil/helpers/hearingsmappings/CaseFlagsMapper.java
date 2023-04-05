@@ -28,7 +28,7 @@ public class CaseFlagsMapper {
         if (allActiveFlags.isEmpty()) {
             return CaseFlags.builder()
                 .flags(List.of(PartyFlagsModel.builder()
-                                   .build()))
+                           .build()))
                 .build();
         }
 
