@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -185,6 +186,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = builder.build();
         }
 
+        assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                 Element::getValue, "particularsOfClaim");
         assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
                                                  document -> document.getValue().getDocument(), "particularsOfClaim");
         assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
