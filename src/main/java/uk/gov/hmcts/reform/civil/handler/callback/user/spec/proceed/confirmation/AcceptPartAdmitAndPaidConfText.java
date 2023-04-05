@@ -10,6 +10,7 @@ import static java.lang.String.format;
 
 @Component
 public class AcceptPartAdmitAndPaidConfText implements RespondToResponseConfirmationTextGenerator {
+
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (caseData.isSettlePartAdmitClaimNo()) {
