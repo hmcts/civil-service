@@ -12,10 +12,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.getAllCaseFlags;
 
 public class CaseFlagsToHearingValueMapper {
 
-    private static final String SIGN_LANGUAGE_INTERPRETER_FLAG_CODE = "RA0042";
-    private static final String REASONABLE_ADJUSTMENTS_WITH_COMMENT = "%s : %s : %s";
-    private static final String REASONABLE_ADJUSTMENTS_WITHOUT_COMMENT = "%s : %s";
-
     private CaseFlagsToHearingValueMapper() {
         //NO-OP
     }
@@ -66,21 +62,7 @@ public class CaseFlagsToHearingValueMapper {
             CaseFlagPredicates.isActive(),
             CaseFlagPredicates.isHearingRelevant(),
             CaseFlagPredicates.hasReasonableAdjustmentFlagCodes()
-        ).stream().map(flagDetail -> {
-            if (flagDetail.getFlagCode().equals(SIGN_LANGUAGE_INTERPRETER_FLAG_CODE)) {
-                return String.format(REASONABLE_ADJUSTMENTS_WITHOUT_COMMENT,
-                                                            flagDetail.getFlagCode(),
-                                                            flagDetail.getName());
-            } else {
-                String reasonableAdjustment = String.format(flagDetail.getFlagComment() != null ? REASONABLE_ADJUSTMENTS_WITH_COMMENT
-                                                                : REASONABLE_ADJUSTMENTS_WITHOUT_COMMENT,
-                                                            flagDetail.getFlagCode(),
-                                                            flagDetail.getName(),
-                                                            flagDetail.getFlagComment());
-
-                return reasonableAdjustment.length() > 200 ? reasonableAdjustment.substring(0, 200) : reasonableAdjustment;
-            }
-            })
+        ).stream().map(FlagDetail::getFlagCode)
             .collect(Collectors.toList());
     }
 }

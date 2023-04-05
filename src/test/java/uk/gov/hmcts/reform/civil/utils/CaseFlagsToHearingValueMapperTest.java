@@ -183,10 +183,10 @@ public class CaseFlagsToHearingValueMapperTest {
             .build();
 
         List<String> expected = List.of(
-            "RA0033 : Private waiting area : this is a comment",
-            "SM0002 : Screening witness from accused : this is a comment",
-            "RA0026 : Support worker or carer with me",
-            "RA0042 : Sign Language Interpreter"
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
         );
 
         List<String> actualReasonableAdjustments = getReasonableAdjustments(
