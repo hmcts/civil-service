@@ -167,19 +167,37 @@ public class CaseFlagsToHearingValueMapperTest {
             .name("Support worker or carer with me")
             .build();
 
-        List<FlagDetail> flagCodeNameAndComment = List.of(flagDetail1, flagDetail2);
-        List<FlagDetail> flagCodeAndName = List.of(flagDetail3);
+        FlagDetail flagDetail4 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("OT0001")
+            .name("Other")
+            .build();
 
-        String expectedWithComment = "[RA0033 : Private waiting area : this is a comment, SM0002 : Screening witness from accused : this is a comment]";
-        String actualWithComment = String.valueOf(getReasonableAdjustments(flagCodeNameAndComment));
+        FlagDetail flagDetail5 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
 
-        String expectedWithoutComment = "[RA0012 : Reasonable Adjustments]";
-        String actualWithoutComment = String.valueOf(getReasonableAdjustments(flagCodeAndName));
+        List<String> expected = List.of(
+            "RA0033 : Private waiting area : this is a comment",
+            "SM0002 : Screening witness from accused : this is a comment",
+            "RA0026 : Support worker or carer with me",
+            "RA0042 : Sign Language Interpreter"
+        );
 
-        assertEquals(expectedWithComment, actualWithComment);
-        assertEquals(expectedWithoutComment, actualWithoutComment);
-//
-//        assertEquals("[RA0033 : Private waiting area : this is a comment, SM0002 : Screening witness from accused : this is a comment]", getReasonableAdjustments(flagCodeNameAndComment));
-//        assertEquals("[PF0015 : Language interpreter]", getReasonableAdjustments(flagCodeAndName));
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2,
+                flagDetail3,
+                flagDetail4,
+                flagDetail5
+        ));
+
+        assertEquals(expected, actualReasonableAdjustments);
     }
 }

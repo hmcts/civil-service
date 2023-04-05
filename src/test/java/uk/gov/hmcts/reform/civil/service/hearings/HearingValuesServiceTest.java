@@ -45,7 +45,6 @@ import java.util.Optional;
 import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -249,7 +248,7 @@ public class HearingValuesServiceTest {
             .firstName(firstName)
             .lastName(lastName)
             .interpreterLanguage(null)
-            .reasonableAdjustments(null)
+            .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)

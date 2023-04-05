@@ -404,15 +404,6 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
     private CaseDataLiP caseDataLiP;
 
-    private List<Element<PartyFlagStructure>> applicantExperts;
-    private List<Element<PartyFlagStructure>> applicantWitnesses;
-    private List<Element<PartyFlagStructure>> respondent1Experts;
-    private List<Element<PartyFlagStructure>> respondent1Witnesses;
-    private List<Element<PartyFlagStructure>> respondent2Experts;
-    private List<Element<PartyFlagStructure>> respondent2Witnesses;
-    private List<Element<PartyFlagStructure>> applicant2Witnesses;
-    private List<Element<PartyFlagStructure>> applicant2Experts;
-
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4189,15 +4180,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder buildHmctsInternalCaseName() {
-        String applicant2Name = applicant2 != null ? " and " + applicant2.getPartyName() : "";
-        String respondent2Name = respondent2 != null ? " and " + respondent2.getPartyName() : "";
-
-        this.caseNameHmctsInternal = String.format("%s%s v %s%s", applicant1.getPartyName(),
-                                                   applicant2Name, respondent1.getPartyName(), respondent2Name);
-        return this;
-    }
-
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
         YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
         this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
@@ -4258,11 +4240,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseAccessCategory(CaseCategory caseAccessCategory) {
         this.caseAccessCategory = caseAccessCategory;
-        return this;
-    }
-
-    public CaseDataBuilder caseManagementLocation(CaseLocationCivil caseManagementLocation) {
-        this.caseManagementLocation = caseManagementLocation;
         return this;
     }
 

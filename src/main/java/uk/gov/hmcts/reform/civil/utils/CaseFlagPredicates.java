@@ -52,7 +52,4 @@ public class CaseFlagPredicates {
     public static Predicate<FlagDetail> hasReasonableAdjustmentFlagCodes() {
         return flagDetail -> REASONABLE_ADJUSTMENT_FLAGS.stream().anyMatch(flagDetail.getFlagCode()::startsWith);
     }
-
-    public static final Predicate<FlagDetail> hasFlagComments =
-        flagDetail -> flagDetail.getFlagComment() != null;
-    }
+}
