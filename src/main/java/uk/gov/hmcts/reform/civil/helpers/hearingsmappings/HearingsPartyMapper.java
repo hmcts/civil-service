@@ -265,8 +265,6 @@ public class HearingsPartyMapper {
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .interpreterLanguage(null)
-            .vulnerableFlag(false)
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
