@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -23,7 +24,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
@@ -55,14 +59,19 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private GenerateDJFormHandler handler;
+    @Autowired
+    private AssignCategoryId assignCategoryId;
     @MockBean
     private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
         @Test
         public void shouldGenerateTwoForm_when1v2() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseDocument document = CaseDocument.builder()
                 .createdBy("John")
                 .documentName("document name")
@@ -101,7 +110,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
-
+            assertThat(updatedData.getDefaultJudgmentDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
         }
 
         @Test
@@ -169,6 +178,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldGenerateTwoForm_when1v2Specified() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseDocument document = CaseDocument.builder()
                 .createdBy("John")
                 .documentName("document name")
@@ -207,6 +217,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
 
         }
 
