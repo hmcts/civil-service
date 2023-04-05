@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,7 +52,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 @SpringBootTest(classes = {
     GenerateClaimFormCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -71,6 +73,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     private GenerateClaimFormCallbackHandler handler;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final CaseDocument CLAIM_FORM =
@@ -177,6 +181,24 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(litigantInPersonFormGenerator);
             verifyNoInteractions(civilDocumentStitchingService);
         }
+
+        @Test
+        void shouldGenerateClaimForm_andAssignCategoryId() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
+
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+            verifyNoInteractions(litigantInPersonFormGenerator);
+            verifyNoInteractions(civilDocumentStitchingService);
+        }
     }
 
     @Nested
@@ -269,7 +291,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     @SpringBootTest(classes = {
         GenerateClaimFormCallbackHandler.class,
         JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+        CaseDetailsConverter.class,
+        AssignCategoryId.class
     })
     class GenerateSealedClaimNoStitch {
 
@@ -284,6 +307,9 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Autowired
         private GenerateClaimFormCallbackHandler handler;
+
+        @Autowired
+        private AssignCategoryId assignCategoryId;
 
         @MockBean
         private FeatureToggleService featureToggleService;
@@ -313,12 +339,15 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     @SpringBootTest(classes = {
         GenerateClaimFormCallbackHandler.class,
         JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+        CaseDetailsConverter.class,
+        AssignCategoryId.class
     })
     class GenerateSealedClaimNoNoC {
 
         @Autowired
         private GenerateClaimFormCallbackHandler handler;
+        @Autowired
+        private AssignCategoryId assignCategoryId;
 
         @BeforeEach
         void setup() {

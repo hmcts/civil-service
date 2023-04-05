@@ -491,20 +491,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
         }
-
-            if (caseData.getUploadParticularsOfClaim().equals(YES)) {
-                assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                         document -> document.getValue().getDocument(), "particularsOfClaim");
-                assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                         document -> document.getValue().getDocument(), "particularsOfClaim");
-                assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                         document -> document.getValue().getDocument(), "particularsOfClaim");
-                assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
-                                                         document -> document.getValue().getDocument(), "particularsOfClaim");
-            }
-
-
-
+        if (caseData.getUploadParticularsOfClaim().equals(YES)) {
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                     Element::getValue, "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+        }
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
