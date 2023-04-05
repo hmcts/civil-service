@@ -1610,7 +1610,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // When
             CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
             // Then
@@ -1636,7 +1636,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // Then
             assertThat(response.getData()).extracting("servedDocumentFiles").isNull();
         }
@@ -1655,7 +1655,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
             // Then
             assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument()).isNull();
