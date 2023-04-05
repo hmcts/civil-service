@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -401,6 +402,7 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent1Witnesses;
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
+    private CaseDataLiP caseDataLiP;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4813,7 +4815,12 @@ public class CaseDataBuilder {
         this.defendantSingleResponseToBothClaimants = response;
         return this;
     }
-
+  
+    public CaseDataBuilder caseDataLip(CaseDataLiP caseDataLiP) {
+        this.caseDataLiP = caseDataLiP;
+        return this;
+    }
+  
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5056,6 +5063,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .caseDataLiP(caseDataLiP)
             .build();
     }
 
