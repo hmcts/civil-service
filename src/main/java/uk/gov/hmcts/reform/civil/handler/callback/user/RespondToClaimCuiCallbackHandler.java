@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -38,6 +39,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final RespondentLiPResponse respondentLiPResponse;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,10 +58,15 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData updatedData = getUpdatedCaseData(callbackParams);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.toMap(objectMapper))
-            .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
-            .build();
+        boolean responseLanguageIsBilingual = respondentLiPResponse.isRespondentResponseBilingual(updatedData);
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
+
+        if (!responseLanguageIsBilingual) {
+            responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
+
+        return responseBuilder.build();
     }
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
