@@ -720,6 +720,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (document != null) {
             updatedData.sdoOrderDocument(document);
         }
+        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -783,7 +784,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .getSystemGeneratedCaseDocuments();
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
-            assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
         }
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
