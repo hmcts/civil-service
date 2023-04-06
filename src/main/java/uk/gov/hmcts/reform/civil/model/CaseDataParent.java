@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -410,8 +411,10 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isRespondentResponseBilingual() {
-        return getCaseDataLiP() != null
-            && getCaseDataLiP().getRespondent1LiPResponse() != null
-            && Language.BOTH.toString().equals(getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage());
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .filter(Language.BOTH.toString()::equals)
+            .isPresent();
     }
 }
