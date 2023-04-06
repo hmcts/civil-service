@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ExpertLiP {
 
-    private YesOrNo expertCanStillExamine;
+    private YesOrNo caseNeedsAnExpert;
     private String expertCanStillExamineDetails;
     private YesOrNo expertReportRequired;
     private List<Element<ExpertReportLiP>> details;
