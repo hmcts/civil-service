@@ -112,7 +112,7 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         );
         compare(
             "owningCourtCode",
-            "390",
+            "807",
             ofNullable(header.getOwningCourtCode())
         );
         compare(
