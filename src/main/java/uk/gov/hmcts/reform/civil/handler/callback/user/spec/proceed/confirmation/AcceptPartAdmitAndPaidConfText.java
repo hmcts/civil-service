@@ -18,7 +18,7 @@ public class AcceptPartAdmitAndPaidConfText implements RespondToResponseConfirma
         }
         String respondentName = caseData.getRespondent1().getPartyName();
         return Optional.of(format(
-            "The claim is now settled. We have emailed %s to tell them.",
+            "<br>The claim is now settled. We have emailed %s to tell them.",
             respondentName
         ));
     }
