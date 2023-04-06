@@ -596,13 +596,15 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[]{
-                        CASE_PROCEEDS_IN_CASEMAN
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[]{
-                        CASE_PROCEEDS_IN_CASEMAN
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
