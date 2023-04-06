@@ -32,7 +32,7 @@ public enum DocmosisTemplates {
     ),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     SDO_DISPOSAL("CV-UNS-STD-ENG-01260.docx", "disposal_hearing_sdo_%s.pdf"),
-    DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01264", "Order_disposal_%s.pdf"),
+    DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01264.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01263.docx", "Order_trial_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-UNS-STD-ENG-01262.docx", "small_claims_sdo_%s.pdf"),
