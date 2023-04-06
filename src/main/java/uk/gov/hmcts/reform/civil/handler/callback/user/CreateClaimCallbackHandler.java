@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -141,7 +142,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
-
+    private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.unspecified-claim.region-id}")
@@ -485,6 +486,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     dataBuilder.defendant2LIPAtClaimIssued(NO);
                 }
             }
+        }
+
+        if (caseData.getUploadParticularsOfClaim().equals(YES)) {
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                     Element::getValue, "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
         }
 
         dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));

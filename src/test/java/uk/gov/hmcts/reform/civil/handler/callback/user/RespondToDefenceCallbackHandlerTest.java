@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -84,7 +85,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    LocationHelper.class
+    LocationHelper.class,
+    AssignCategoryId.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -109,11 +111,15 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    private AssignCategoryId assignCategoryId;
+
     @MockBean
     private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
+
         @Test
         void shouldPopulateClaimantResponseScenarioFlag_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -631,6 +637,46 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=claimant-1-draft-dir.pdf")
                 .contains("documentName=claimant-2-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            //Then
+            assertThat(updatedData.getClaimantResponseDocuments().stream()
+                           .filter(document -> document.getValue().getDocumentLink().getCategoryID().equals("directionsQuestionnaire")));
         }
 
         @Nested

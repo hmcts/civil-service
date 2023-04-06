@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.aos.AcknowledgementOfClaimGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +37,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SpringBootTest(classes = {
     GenerateAcknowledgementOfClaimCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -61,6 +64,12 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    private AssignCategoryId assignCategoryId;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
         when(acknowledgementOfClaimGenerator.generate(any(CaseData.class), anyString())).thenReturn(DOCUMENT);
@@ -81,6 +90,23 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
 
         assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvoked() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(acknowledgementOfClaimGenerator).generate(caseData, "BEARER_TOKEN");
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
     }
 
     @Test
