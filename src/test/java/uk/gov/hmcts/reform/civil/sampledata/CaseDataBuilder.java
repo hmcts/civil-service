@@ -66,6 +66,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -403,6 +404,9 @@ public class CaseDataBuilder {
     private RevisedHearingRequirements respondent1RevisedHearingRequirements;
     private RevisedHearingRequirements respondent2RevisedHearingRequirements;
 
+    private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
+    private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
+
     private CCJPaymentDetails ccjPaymentDetails;
 
     private List<Element<PartyFlagStructure>> applicantExperts;
@@ -411,6 +415,7 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent1Witnesses;
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
+    private CaseDataLiP caseDataLiP;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4427,7 +4432,7 @@ public class CaseDataBuilder {
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
-    
+
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -4868,6 +4873,36 @@ public class CaseDataBuilder {
         return wrapElements(details1, details2, details3, details4);
     }
 
+    public CaseDataBuilder applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo intentionToSettle) {
+        this.applicant1PartAdmitIntentionToSettleClaimSpec = intentionToSettle;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimTrack(String claimType) {
+        this.responseClaimTrack = claimType;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimantMediationFlag(YesOrNo response) {
+        respondent1MediationRequired = response;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo confirmation) {
+        this.applicant1PartAdmitConfirmAmountPaidSpec = confirmation;
+        return this;
+    }
+
+    public CaseDataBuilder defendantSingleResponseToBothClaimants(YesOrNo response) {
+        this.defendantSingleResponseToBothClaimants = response;
+        return this;
+    }
+  
+    public CaseDataBuilder caseDataLip(CaseDataLiP caseDataLiP) {
+        this.caseDataLiP = caseDataLiP;
+        return this;
+    }
+  
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5112,6 +5147,9 @@ public class CaseDataBuilder {
             .respondent2Witnesses(respondent2Witnesses)
             .respondentSolicitor1ServiceAddressRequired(respondentSolicitor1ServiceAddressRequired)
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
+            .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .caseDataLiP(caseDataLiP)
             .build();
     }
 
