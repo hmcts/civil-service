@@ -24,10 +24,4 @@ public class RespondentLiPResponse {
     private HearingSupportLip respondent1DQHearingSupportLip;
     private String respondent1ResponseLanguage;
 
-    @JsonIgnore
-    public boolean isRespondentResponseBilingual() {
-        return Optional.ofNullable(respondent1ResponseLanguage)
-            .filter(Language.BOTH.toString()::equals)
-            .isPresent();
-    }
 }

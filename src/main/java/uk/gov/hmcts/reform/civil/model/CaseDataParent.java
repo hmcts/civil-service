@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
@@ -91,6 +92,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
@@ -410,6 +412,6 @@ public class CaseDataParent implements MappableObject {
     public boolean isRespondentResponseBilingual() {
         return getCaseDataLiP() != null
             && getCaseDataLiP().getRespondent1LiPResponse() != null
-            && getCaseDataLiP().getRespondent1LiPResponse().isRespondentResponseBilingual();
+            && Language.BOTH.toString().equals(getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage());
     }
 }
