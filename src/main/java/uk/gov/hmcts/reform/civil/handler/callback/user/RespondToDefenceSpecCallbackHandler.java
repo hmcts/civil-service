@@ -274,7 +274,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
-        if (v1) {
+        boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
+
+        if (hasVersion) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -294,7 +296,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion())
+            if (hasVersion
                 && featureToggleService.isCourtLocationDynamicListEnabled()) {
 
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
@@ -351,7 +353,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (v1 && featureToggleService.isSdoEnabled()) {
+        if (hasVersion && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
