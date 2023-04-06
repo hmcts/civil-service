@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class CaseDataContentConverter {
 
-    private CaseDataContentConverter(){
+    private CaseDataContentConverter() {
 
     }
 
