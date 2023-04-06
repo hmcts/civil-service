@@ -406,6 +406,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
+    @Valid
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;

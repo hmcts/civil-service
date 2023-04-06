@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -241,6 +242,7 @@ public class CaseDataBuilder {
 
     //Case proceeds in caseman
     protected ClaimProceedsInCaseman claimProceedsInCaseman;
+    protected ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     protected CloseClaim withdrawClaim;
     protected CloseClaim discontinueClaim;
@@ -1185,6 +1187,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder claimProceedsInCaseman(ClaimProceedsInCaseman claimProceedsInCaseman) {
         this.claimProceedsInCaseman = claimProceedsInCaseman;
+        return this;
+    }
+
+    public CaseDataBuilder claimProceedsInCasemanLR(ClaimProceedsInCasemanLR claimProceedsInCasemanLR) {
+        this.claimProceedsInCasemanLR = claimProceedsInCasemanLR;
         return this;
     }
 
@@ -2732,6 +2739,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTakenOfflineByStaffSpec() {
+        atStateClaimIssued();
+        takenOfflineByStaffSpec();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineByStaffSpec1v2SS() {
+        atStateClaimIssued();
+        multiPartyClaimTwoDefendantSameSolicitorsSpec();
+        takenOfflineByStaffSpec();
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineByStaffAfterClaimNotified() {
         atStateClaimNotified();
         takenOfflineByStaff();
@@ -2785,6 +2805,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder takenOfflineByStaff() {
         claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
+            .date(LocalDate.now())
+            .reason(ReasonForProceedingOnPaper.APPLICATION)
+            .build();
+        takenOfflineByStaffDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder takenOfflineByStaffSpec() {
+        claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
             .date(LocalDate.now())
             .reason(ReasonForProceedingOnPaper.APPLICATION)
             .build();
@@ -4118,6 +4147,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSameSolicitorsSpec() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = YES;
+        this.respondentSolicitor2Reference = "01234";
+        this.specRespondent1Represented = YES;
+        this.specRespondent2Represented = YES;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimOneClaimant1ClaimResponseType() {
         this.claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
         return this;
@@ -4930,12 +4969,12 @@ public class CaseDataBuilder {
         this.defendantSingleResponseToBothClaimants = response;
         return this;
     }
-  
+
     public CaseDataBuilder caseDataLip(CaseDataLiP caseDataLiP) {
         this.caseDataLiP = caseDataLiP;
         return this;
     }
-  
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5009,6 +5048,7 @@ public class CaseDataBuilder {
 
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
+            .claimProceedsInCasemanLR(claimProceedsInCasemanLR)
 
             .ccdState(ccdState)
             .businessProcess(businessProcess)
