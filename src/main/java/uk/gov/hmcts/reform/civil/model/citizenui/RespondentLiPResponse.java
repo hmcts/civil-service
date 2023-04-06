@@ -4,11 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.Address;
-
-import java.util.Optional;
 
 @Data
 @Builder
@@ -23,5 +19,4 @@ public class RespondentLiPResponse {
     private DQExtraDetailsLip respondent1DQExtraDetails;
     private HearingSupportLip respondent1DQHearingSupportLip;
     private String respondent1ResponseLanguage;
-
 }
