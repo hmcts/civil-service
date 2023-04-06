@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -106,7 +107,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     LocationRefDataService.class,
     CourtLocationUtils.class,
-    StateFlowEngine.class
+    StateFlowEngine.class,
+    AssignCategoryId.class
 })
 class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -124,6 +126,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -1034,6 +1039,28 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=defendant2-directions.pdf")
                 .contains("createdBy=Defendant 2")
                 .contains("documentType=DEFENDANT_DRAFT_DIRECTIONS");
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("defendantResponseDocuments")
+                .asString()
+                .contains("category_id=defendant1DefenseDirectionsQuestionnaire")
+                .contains("category_id=defendant2DefenseDirectionsQuestionnaire");
         }
 
         @Test

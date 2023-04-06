@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -53,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SpringBootTest(classes = {
     DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 
 public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
@@ -62,6 +64,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private StandardDirectionOrderDJ handler;
+    @Autowired
+    private AssignCategoryId assignCategoryId;
     @MockBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
@@ -548,6 +552,24 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            //Then
+            assertThat(updatedData.getOrderSDODocumentDJ().getCategoryID().equals("sdo"));
         }
     }
 

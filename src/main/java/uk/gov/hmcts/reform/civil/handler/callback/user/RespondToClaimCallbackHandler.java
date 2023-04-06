@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -108,6 +109,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -529,6 +531,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
@@ -597,36 +600,65 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
-        Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
-            .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
-                buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                      updatedCaseData.build().getRespondent1ResponseDate(),
-                                      DocumentType.DEFENDANT_DEFENCE
-                )));
-        Optional.ofNullable(caseData.getRespondent1DQ())
-            .map(Respondent1DQ::getRespondent1DQDraftDirections)
-            .ifPresent(respondent1DQ -> defendantUploads.add(
-                buildElemCaseDocument(
-                    respondent1DQ,
-                    "Defendant",
-                    updatedCaseData.build().getRespondent1ResponseDate(),
-                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                )));
-        Optional.ofNullable(caseData.getRespondent2ClaimResponseDocument())
-            .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
-                buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                      updatedCaseData.build().getRespondent2ResponseDate(),
-                                      DocumentType.DEFENDANT_DEFENCE
-                )));
-        Optional.ofNullable(caseData.getRespondent2DQ())
-            .map(Respondent2DQ::getRespondent2DQDraftDirections)
-            .ifPresent(respondent2DQ -> defendantUploads.add(
-                buildElemCaseDocument(
-                    respondent2DQ,
-                    "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(),
-                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                )));
+        ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
+        if (respondent1ClaimResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
+            if (respondent1ClaimDocument != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                                          updatedCaseData.build().getRespondent1ResponseDate(),
+                                          DocumentType.DEFENDANT_DEFENCE
+                    ));
+                assignCategoryId.setCategoryIdDocument(respondent1ClaimDocument,
+                                                       "defendant1DefenseDirectionsQuestionnaire");
+            }
+        }
+
+        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        if (respondent1DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
+            if (respondent1DQDraftDirections != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(
+                        respondent1DQDraftDirections,
+                        "Defendant",
+                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    ));
+                assignCategoryId.setCategoryIdDocument(respondent1DQDraftDirections,
+                                                       "defendant1DefenseDirectionsQuestionnaire");
+            }
+        }
+
+        ResponseDocument respondent2ClaimResponseDocument = caseData.getRespondent2ClaimResponseDocument();
+        if (respondent2ClaimResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2ClaimResponseDocument.getFile();
+            if (respondent2ClaimDocument != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                          updatedCaseData.build().getRespondent2ResponseDate(),
+                                          DocumentType.DEFENDANT_DEFENCE
+                    ));
+                assignCategoryId.setCategoryIdDocument(respondent2ClaimDocument,
+                                                       "defendant2DefenseDirectionsQuestionnaire");
+            }
+        }
+        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+        if (respondent2DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
+            if (respondent2DQDraftDirections != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(
+                        respondent2DQDraftDirections,
+                        "Defendant 2",
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    ));
+                assignCategoryId.setCategoryIdDocument(respondent2DQDraftDirections,
+                                                       "defendant2DefenseDirectionsQuestionnaire");
+            }
+        }
+
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }

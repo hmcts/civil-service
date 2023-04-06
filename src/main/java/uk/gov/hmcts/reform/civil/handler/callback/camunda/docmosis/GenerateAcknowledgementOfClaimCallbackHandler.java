@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.aos.AcknowledgementOfClaimGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
 
     private final AcknowledgementOfClaimGenerator acknowledgementOfClaimGenerator;
     private final ObjectMapper objectMapper;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -60,6 +62,8 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+
+        assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "detailsOfClaim");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
