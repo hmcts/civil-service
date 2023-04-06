@@ -14,14 +14,13 @@ public class RejectWithMediationConfHeader implements RespondToResponseConfirmat
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (caseData.isClaimantRejectsClaimAmount()) {
-            return Optional.empty();
+            String claimNumber = caseData.getLegacyCaseReference();
+            return Optional.of(format(
+                "# You have rejected their response"
+                    + "%n## Claim number: %s",
+                claimNumber
+            ));
         }
-
-        String claimNumber = caseData.getLegacyCaseReference();
-        return Optional.of(format(
-            "# You have rejected their response"
-                + "%n## Claim number: %s",
-            claimNumber
-        ));
+        return Optional.empty();
     }
 }

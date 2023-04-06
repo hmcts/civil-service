@@ -467,8 +467,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private String getDefaultConfirmationText(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
+        if (caseData.hasApplicantProceededWithClaim()) {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
