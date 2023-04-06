@@ -18,5 +18,5 @@ public class ExpertLiP {
     private YesOrNo caseNeedsAnExpert;
     private String expertCanStillExamineDetails;
     private YesOrNo expertReportRequired;
-    private List<Element<ExpertReportLiP>> details;
+    private List<Element<ExpertReportLiP>> reportDetails;
 }
