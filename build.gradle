@@ -352,6 +352,7 @@ def versions = [
 
 ext.libraries = [
   junit5: [
+    "org.junit.jupiter:junit-jupiter:${versions.junit}",
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
     "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
     "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
