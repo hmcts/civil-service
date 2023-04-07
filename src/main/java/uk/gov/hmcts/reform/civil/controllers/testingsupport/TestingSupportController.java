@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
+import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
@@ -53,6 +55,8 @@ public class TestingSupportController {
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
+    private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
+
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
@@ -196,6 +200,18 @@ public class TestingSupportController {
         var event = new HearingFeeUnpaidEvent(caseId);
         try {
             hearingFeeUnpaidHandler.moveCaseToStruckOut(event);
+        } catch (Exception e) {
+            responseMsg = "failed";
+        }
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
+    public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
+        String responseMsg = "success";
+        var event = new BundleCreationTriggerEvent(caseId);
+        try {
+            bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
             responseMsg = "failed";
         }

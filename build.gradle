@@ -75,18 +75,18 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.69'
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
       // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.12'
+      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
       dependencySet(group: 'com.google.guava', version: '31.1-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.7.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.7.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.7.10'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.7.10'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.7.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
       // CVE-2020-29582
 
       // CVE-2021-29425
@@ -117,7 +117,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.421'
+        version: '1.12.444'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -387,7 +387,7 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.30.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.37.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -418,7 +418,7 @@ dependencies {
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.4'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.5'
 
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
@@ -439,7 +439,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.73'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.7'
 
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
