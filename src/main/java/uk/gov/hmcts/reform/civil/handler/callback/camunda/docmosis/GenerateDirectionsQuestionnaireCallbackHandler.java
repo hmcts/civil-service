@@ -192,7 +192,12 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData,
             bearerToken
         );
-
+        if (directionsQuestionnaire.getDocumentName().contains("claimant")) {
+            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+        }
+        if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+        }
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
