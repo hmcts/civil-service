@@ -13,6 +13,7 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class AssignCategoryId {
+
     private final FeatureToggleService featureToggleService;
 
     public <T> void setCategoryIdCollection(List<Element<T>> documentUpload, Function<Element<T>, Document> documentExtractor, String theID) {
