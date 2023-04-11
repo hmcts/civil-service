@@ -1628,6 +1628,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                            .getCategoryID()).isEqualTo("particularsOfClaim");
 
         }
+
         @Test
         void shouldNotAssignCategoryIds_whenDocumentNotExist() {
             //Given
