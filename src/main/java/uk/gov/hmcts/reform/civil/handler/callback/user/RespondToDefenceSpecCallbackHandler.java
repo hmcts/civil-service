@@ -353,11 +353,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_2.equals(callbackParams.getVersion())) {
             if (featureToggleService.isPinInPostEnabled() && isOneVOne(caseData)
-                && caseData.hasClaimantAgreedToFreeMediationForLipCase()) {
+                && caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
+            } else if (!caseData.hasClaimantAgreedToFreeMediation() && featureToggleService.isSdoEnabled()) {
+                putCaseStateInJudicialReferral(caseData, response);
             }
-        } else if (featureToggleService.isSdoEnabled()) {
-            putCaseStateInJudicialReferral(caseData, response);
         }
         return response.build();
     }

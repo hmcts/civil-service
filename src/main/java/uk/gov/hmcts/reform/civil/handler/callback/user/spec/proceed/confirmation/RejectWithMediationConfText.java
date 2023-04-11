@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -14,7 +13,7 @@ public class RejectWithMediationConfText implements RespondToResponseConfirmatio
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.hasClaimantAgreedToFreeMediationForLipCase()) {
+        if (caseData.hasClaimantAgreedToFreeMediation()) {
             return Optional.of(format(
                 "<br />You have agreed to try free mediation.<br>" +
                     "<br>Your mediation appointment will be arranged within 28 days.<br>"
