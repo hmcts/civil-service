@@ -406,6 +406,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
+    @Valid
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
@@ -483,6 +485,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDatebox;
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
+    private final String caseNamePublic;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
