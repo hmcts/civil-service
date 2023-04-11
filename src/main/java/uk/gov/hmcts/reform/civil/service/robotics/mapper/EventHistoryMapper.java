@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
@@ -1040,7 +1041,7 @@ public class EventHistoryMapper {
         } else {
             return left(format(
                 "RPA Reason: Manually moved offline for reason %s on date %s.",
-                prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCasemanLR()),
+                prepareTakenOfflineByStaffReasonSpec(caseData.getClaimProceedsInCasemanLR()),
                 caseData.getClaimProceedsInCasemanLR().getDate().format(ISO_DATE)
             ), 250); // Max chars allowed by Caseman
         }
@@ -1051,6 +1052,13 @@ public class EventHistoryMapper {
             return claimProceedsInCaseman.getOther();
         }
         return claimProceedsInCaseman.getReason().name();
+    }
+
+    private String prepareTakenOfflineByStaffReasonSpec(ClaimProceedsInCasemanLR claimProceedsInCasemanLR) {
+        if (claimProceedsInCasemanLR.getReason() == ReasonForProceedingOnPaper.OTHER) {
+            return claimProceedsInCasemanLR.getOther();
+        }
+        return claimProceedsInCasemanLR.getReason().name();
     }
 
     private void buildClaimantHasNotifiedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
