@@ -2294,9 +2294,16 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenAcceptFullAndPartAdmitPaymentPlanSpecYes() {
-            CaseData caseData = caseDataBuilder.build().toBuilder().applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+        void shouldReturnFalse_whenAcceptFullAdmitPaymentPlanSpecYes() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES).build();
+            assertFalse(rejectRepaymentPlan.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenAcceptPartAdmitPaymentPlanSpecYes() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .build();
             assertFalse(rejectRepaymentPlan.test(caseData));
         }
     }

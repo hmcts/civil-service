@@ -894,6 +894,5 @@ public class FlowPredicate {
             || YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()));
 
     public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        (NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()));
+        caseData.hasApplicantRejectedRepaymentPlan();
 }
