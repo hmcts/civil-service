@@ -106,7 +106,7 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("defendant1DefenseDirectionsQuestionnaire"));
     }
 
     @Test

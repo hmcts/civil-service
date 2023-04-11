@@ -604,6 +604,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
+        //  we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
+        // showing, we remove.
+        caseDataBuilder.orderSDODocumentDJ(null);
+        assignCategoryId.setCategoryIdCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -645,7 +651,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
-        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));

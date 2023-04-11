@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -48,7 +49,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -553,23 +556,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
         }
 
-        @Test
-        void shouldAssignCategoryId_whenInvoked() {
-            //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
-            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
-            //When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            //Then
-            assertThat(updatedData.getOrderSDODocumentDJ().getCategoryID().equals("sdo"));
-        }
     }
 
     @Nested
@@ -622,6 +608,36 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(locations.get(0).getRegionId());
             assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
                 .isEqualTo(locations.get(0).getEpimmsId());
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            CaseDocument testDocument = CaseDocument.builder()
+                .createdBy("John")
+                .documentName("document name")
+                .documentSize(0L)
+                .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                                  .documentUrl("fake-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build())
+                .build();
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(testDocument));
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .orderSDODocumentDJCollection(documentList)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            //Then
+            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink().getCategoryID().equals("sdo"));
         }
     }
 

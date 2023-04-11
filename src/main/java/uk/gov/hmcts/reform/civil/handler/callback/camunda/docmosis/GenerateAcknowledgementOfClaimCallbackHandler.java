@@ -63,7 +63,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
-        assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "detailsOfClaim");
+        assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -99,7 +99,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
