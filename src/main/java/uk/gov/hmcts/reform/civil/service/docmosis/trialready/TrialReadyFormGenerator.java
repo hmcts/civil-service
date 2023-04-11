@@ -130,7 +130,9 @@ public class TrialReadyFormGenerator {
             .trialReadyDeclined(trialReadyCheck.equals(YesOrNo.NO))
             .hearingRequirementsCheck(YesOrNo.YES.equals(
                 hearingRequirements.getRevisedHearingRequirements()) ? "Yes" : "No")
-            .hearingRequirementsText(hearingRequirements.getRevisedHearingComments())
+            .hearingRequirementsText(YesOrNo.YES.equals(
+                hearingRequirements
+                    .getRevisedHearingRequirements()) ? hearingRequirements.getRevisedHearingComments() : null)
             .additionalInfo(nonNull(hearingOtherComments) ? hearingOtherComments.getHearingOtherComments() : null);
 
     }
