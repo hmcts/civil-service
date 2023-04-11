@@ -807,24 +807,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isSettlePartAdmitClaimYes() {
-        return (
-            getApplicant1ProceedsWithClaimSpec() == null
-                && PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
-                && YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
-                && YesOrNo.YES.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
-    }
-
-    @JsonIgnore
-    public boolean isSettlePartAdmitClaimNo() {
-        return (
-            getApplicant1ProceedsWithClaimSpec() != null
-                || !PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
-                || YesOrNo.NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
-                || YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
-    }
-
-    @JsonIgnore
     public boolean hasDefendantNotPaid() {
         return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }

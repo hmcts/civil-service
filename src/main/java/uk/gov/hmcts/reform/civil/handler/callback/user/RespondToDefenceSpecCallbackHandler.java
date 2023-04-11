@@ -78,7 +78,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -130,7 +129,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "set-mediation-show-tag"), this::setMediationShowTag)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
-            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
@@ -274,9 +272,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
-        boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
-
-        if (hasVersion) {
+        if (v1) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -296,7 +292,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (hasVersion
+            if (V_1.equals(callbackParams.getVersion())
                 && featureToggleService.isCourtLocationDynamicListEnabled()) {
 
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
@@ -353,7 +349,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (hasVersion && featureToggleService.isSdoEnabled()) {
+        if (v1 && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
@@ -364,12 +360,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                         response.state(CaseState.JUDICIAL_REFERRAL.name());
                     }
                 }
-            }
-        }
-
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            if (caseData.isSettlePartAdmitClaimYes()) {
-                response.state(CaseState.CASE_SETTLED.name());
             }
         }
 

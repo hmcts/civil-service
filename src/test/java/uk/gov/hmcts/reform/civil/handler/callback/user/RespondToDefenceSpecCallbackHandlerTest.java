@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -1133,33 +1132,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("showConditionFlags").isNull();
-        }
-    }
-
-    @Nested
-    class AboutToSubmitCallbackForLiP {
-        private final LocalDateTime localDateTime = now();
-
-        @BeforeEach
-        void setup() {
-            when(time.now()).thenReturn(localDateTime);
-        }
-
-        @Test
-        void shouldUpdateToCaseSettled_whenClaimantChooseToSettle() {
-
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
     }
 

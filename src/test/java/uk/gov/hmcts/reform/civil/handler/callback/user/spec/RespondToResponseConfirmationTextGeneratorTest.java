@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AcceptPartAdmitAndPaidConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfText;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildAcceptPartAdmitAndPaidCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitNotProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullDefenceNotProceedCaseData;
@@ -42,8 +40,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
             Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfText.class),
             Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfText.class),
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfText.class),
-            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class),
-            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class)
+            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class)
 
         );
     }
