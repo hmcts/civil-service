@@ -890,7 +890,7 @@ public class FlowPredicate {
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
     public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        !caseData.hasApplicantRejectedRepaymentPlan();
+        caseData.hasApplicantAcceptedRepaymentPlan();
 
     public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
         caseData.hasApplicantRejectedRepaymentPlan();
