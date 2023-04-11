@@ -100,9 +100,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         } else {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
         }
-        //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
-        //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
-        // below creates a show condition for these fields if user is respondent 2 solicitor
+        //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
+        //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
+        //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
+        //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
         //default flag for respondent 1 solicitor
         caseDataBuilder.caseTypeFlag("do_not_show");
         //set flag for respondent2
