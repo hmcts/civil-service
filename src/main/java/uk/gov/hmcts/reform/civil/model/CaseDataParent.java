@@ -333,6 +333,8 @@ public class CaseDataParent implements MappableObject {
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
+    private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
     private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
@@ -383,6 +385,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
@@ -410,5 +413,4 @@ public class CaseDataParent implements MappableObject {
             && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
     }
-
 }

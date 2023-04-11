@@ -117,6 +117,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -403,6 +406,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
+    @Valid
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
@@ -480,6 +485,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDatebox;
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
+    private final String caseNamePublic;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -797,5 +803,43 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantNotPaid() {
+        return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isSettlementDeclinedByClaimant() {
+        return NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantRejectsClaimAmount() {
+        return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefence() {
+        return YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean isMediationAcceptedByDefendant() {
+        return YES.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyDefendant() {
+        return !YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyClaimant(MultiPartyScenario multiPartyScenario) {
+        return multiPartyScenario.equals(TWO_V_ONE)
+            && YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaimSpec2v1());
     }
 }
