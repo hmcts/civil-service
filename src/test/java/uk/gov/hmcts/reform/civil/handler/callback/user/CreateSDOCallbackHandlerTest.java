@@ -1197,7 +1197,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID().equals("sdo"));     }
+            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID().equals("sdo"));
+        }
+
     }
 
     @Nested
