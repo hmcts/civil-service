@@ -95,7 +95,7 @@ public class RoboticsDataMapper {
     private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("390")
+            .owningCourtCode("807")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
