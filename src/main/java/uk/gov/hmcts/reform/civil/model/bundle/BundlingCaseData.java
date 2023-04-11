@@ -110,6 +110,8 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> documentEvidenceForTrialRes;
     @JsonProperty("documentEvidenceForTrialRes2")
     private final List<Element<BundlingRequestDocument>> documentEvidenceForTrialRes2;
+    @JsonProperty("expertDocs")
+    private final List<Element<BundlingRequestDocument>> expertDocs;
     @JsonProperty("courtLocation")
     private final String courtLocation;
     @JsonProperty("applicant1")

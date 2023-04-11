@@ -66,6 +66,7 @@ class BundleRequestMapperTest {
             .getDocumentExpertReportRes().get(0).getValue().getDocumentFileName());
         assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
             .getDocumentExpertReportRes2().get(0).getValue().getDocumentFileName());
+        System.out.println(bundleCreateRequest.getCaseDetails().getCaseData().getExpertDocs());
     }
 
     private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -141,6 +142,18 @@ class BundleRequestMapperTest {
         return  expertEvidenceDocs;
     }
 
+    private List<Element<UploadEvidenceExpert>> getExpert2Docs() {
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .expertOptionName("Expert2Fname LastName").build()));
+
+        return  expertEvidenceDocs;
+    }
+
     private List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
@@ -205,5 +218,31 @@ class BundleRequestMapperTest {
         // Then: hasApplicant2 and hasRespondant2 should return false
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+    }
+
+    @Test
+    void testBundleCreateRequestMapperForExpertDetails() {
+        // Given
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L)
+            .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build()).hearingDate(LocalDate.now())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .documentExpertReport(getExpertDocs())
+            .documentJointStatement(getExpertDocs())
+            .documentAnswers(getExpertDocs())
+            .documentQuestions(getExpertDocs())
+            .documentExpertReport(getExpert2Docs())
+            .documentJointStatement(getExpert2Docs())
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+                                                                                                           ".yaml",
+                                                                                                       "test", "test",
+                                                                                                       1L
+        );
+        System.out.println(bundleCreateRequest.getCaseDetails().getCaseData().getExpertDocs());
+        // Then
+        assertNotNull(bundleCreateRequest);
     }
 }

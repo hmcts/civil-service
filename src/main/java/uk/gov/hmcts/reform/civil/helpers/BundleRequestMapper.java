@@ -24,8 +24,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -123,6 +128,7 @@ public class BundleRequestMapper {
                 .documentEvidenceForTrialRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialRes2()))
                 .defendantResponseDocuments(mapSystemGeneratedcaseDocument(caseData.getDefendantResponseDocuments(),
                                                                            null))
+                .expertDocs(mapAllExpertDocs(caseData))
                 .applicant1(caseData.getApplicant1())
                 .respondent1(caseData.getRespondent1())
                 .courtLocation(caseData.getHearingLocation().getValue().getLabel())
@@ -132,6 +138,40 @@ public class BundleRequestMapper {
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
         return  bundlingCaseData;
+    }
+
+    private List<Element<BundlingRequestDocument>> mapAllExpertDocs(CaseData caseData) {
+        List<BundlingRequestDocument> allExpertDocs = new ArrayList<>();
+
+        List<Element<UploadEvidenceExpert>> documentExpertReport = caseData.getDocumentExpertReport();
+        List<Element<UploadEvidenceExpert>> documentJointStatement = caseData.getDocumentJointStatement();
+        List<Element<UploadEvidenceExpert>> documentQuestions = caseData.getDocumentQuestions();
+        List<Element<UploadEvidenceExpert>> documentAnswers = caseData.getDocumentAnswers();
+        List<Element<UploadEvidenceExpert>> allList = Stream.of(documentExpertReport, documentJointStatement,
+                                                                documentQuestions, documentAnswers
+            ).filter(elements -> elements != null)
+            .flatMap(Collection::stream).toList();
+        Map<String, List<Element<UploadEvidenceExpert>>> listMap = allList.stream().collect(Collectors.groupingBy(
+            uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionName()));
+        Iterator<Map.Entry<String, List<Element<UploadEvidenceExpert>>>> iterator = listMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<Element<UploadEvidenceExpert>>> next = iterator.next();
+            List<Element<UploadEvidenceExpert>> temp = next.getValue();
+            temp.forEach(uploadEvidenceExpertElement -> {
+                StringBuilder fileNameBuilder = new StringBuilder();
+                if (Optional.ofNullable(uploadEvidenceExpertElement.getValue().getExpertDocument()).isPresent()) {
+                    fileNameBuilder.append("_" + uploadEvidenceExpertElement.getValue().getExpertOptionName());
+                }
+                allExpertDocs.add(BundlingRequestDocument.builder()
+                                        .documentFileName(fileNameBuilder.toString())
+                                        .documentLink(DocumentLink.builder()
+                                                          .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
+                                                          .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
+                                                          .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
+                                        .build());
+            });
+        }
+        return  ElementUtils.wrapElements(allExpertDocs);
     }
 
     private BundlingCaseData mapRespondent2Applicant2Details(BundlingCaseData bundlingCaseData, CaseData caseData) {
