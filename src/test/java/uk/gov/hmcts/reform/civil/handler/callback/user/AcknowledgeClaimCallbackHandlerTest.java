@@ -181,7 +181,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
-        System.out.println("banana"+AcknowledgeClaimCallbackHandler.defendantFlag);
         var result = AcknowledgeClaimCallbackHandler.defendantFlag;
         // Then
         assertThat(result).isEqualTo("userRespondent2");
