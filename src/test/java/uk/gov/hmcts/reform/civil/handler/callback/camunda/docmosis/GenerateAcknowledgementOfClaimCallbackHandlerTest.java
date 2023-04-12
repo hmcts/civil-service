@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.AcknowledgeClaimCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -93,20 +94,39 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     }
 
     @Test
-    void shouldAssignCategoryId_whenInvoked() {
+    void shouldAssignCategoryId_whenInvokedAnd1v2DifferentSol() {
+        //Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        AcknowledgeClaimCallbackHandler.defendantFlag = "userRespondent2";
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
         verify(acknowledgementOfClaimGenerator).generate(caseData, "BEARER_TOKEN");
-
+        // When
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
+    }
 
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals("defendant1DefenseDirectionsQuestionnaire"));
+    @Test
+    void shouldAssignCategoryId_whenInvokedAnd1v1Or1v2SameSol() {
+        //Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        AcknowledgeClaimCallbackHandler.defendantFlag = null;
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        verify(acknowledgementOfClaimGenerator).generate(caseData, "BEARER_TOKEN");
+        // When
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
     }
 
     @Test

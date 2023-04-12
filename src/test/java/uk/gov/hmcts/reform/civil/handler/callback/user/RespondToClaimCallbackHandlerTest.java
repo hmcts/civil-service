@@ -75,6 +75,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -381,6 +382,55 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 return objectMapper.convertValue(response.getData(), CaseData.class);
             }
         }
+
+    }
+
+    @Test
+    void shouldPopulateRespondent2Flag_WhenInvoked() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        var result = RespondToClaimCallbackHandler.defendantFlag;
+        // Given
+        assertThat(result).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void shouldNotPopulateRespondent2Flag_WhenInvoked() {
+        // Given
+        RespondToClaimCallbackHandler.defendantFlag = null;
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        var result = RespondToClaimCallbackHandler.defendantFlag;
+        // Then
+        assertThat(result).isNull();
     }
 
     @Nested
