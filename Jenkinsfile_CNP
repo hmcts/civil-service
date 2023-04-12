@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "SNI-3489_Repeated_Paragraph_on_Credit_Hire"
+def ccdBranch = "master"
 def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 

@@ -16,12 +16,4 @@ public class LocalDateTimeHelper {
             .withZoneSameInstant(LOCAL_ZONE)
             .toLocalDateTime();
     }
-
-    public static LocalDateTime nowInLocalZone() {
-        return LocalDateTime.now(LOCAL_ZONE);
-    }
-
-    public static LocalDateTime nowInUTC() {
-        return LocalDateTime.now(UTC_ZONE);
-    }
 }
