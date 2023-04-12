@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -49,7 +49,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -292,7 +292,7 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
-        void specGenerateRespondent() {
+        void shouldGenerateDQ_specRespondent() {
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)))
@@ -324,39 +324,7 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
-        void specGenerateRespondentHnl() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL)))
-                .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL.getDocumentTitle(), bytes));
-
-            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL.getDocumentTitle(),
-                                          "defendant", REFERENCE_NUMBER
-            );
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_DEFENDANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .build().toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .build();
-
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(
-                any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL)
-            );
-        }
-
-        @Test
-        void specGenerateClaimant() {
+        void shouldGenerateDQ_specClaimant() {
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)))
@@ -390,44 +358,6 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
                 eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
-            );
-        }
-
-        @Test
-        void specGenerateClaimantHln() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL)))
-                .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL.getDocumentTitle(), bytes));
-
-            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL.getDocumentTitle(),
-                                          "claimant", REFERENCE_NUMBER
-            );
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimantFullDefence()
-                .applicant1DQWithExperts()
-                .applicant1DQWithWitnesses()
-                .applicant1DQWithHearingSupport()
-                .build()
-                .toBuilder()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
-                .caseAccessCategory(SPEC_CLAIM)
-                .build();
-
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(
-                any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL)
             );
         }
 
@@ -2203,120 +2133,6 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                                                                       eq(HNL_DQ_RESPONSE_1V1));
-        }
-
-        @Test
-        void shouldGenerateHnl_dq_response_1V1Document_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimTwoApplicants()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("CLAIMANT_RESPONSE").build())
-                .applicantsProceedIntention(YES)
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(NO)
-                .build();
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(HNL_DQ_RESPONSE_1V1));
-        }
-
-        @Test
-        void shouldGenerateHnl_dq_response_2V1Document_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_2V1)))
-                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_2V1.getDocumentTitle(), bytes));
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimTwoApplicants()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("CLAIMANT_RESPONSE").build())
-                .applicantsProceedIntention(YES)
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .build();
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(HNL_DQ_RESPONSE_2V1));
-        }
-
-        @Test
-        void shouldGenerateHnl_dq_response_1V2_ds_DsDocument_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V2_DS)))
-                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V2_DS.getDocumentTitle(), bytes));
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQWithExperts()
-                .applicant1DQWithWitnesses()
-                .applicant1DQWithHearingSupport()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("CLAIMANT_RESPONSE").build())
-                .applicantsProceedIntention(YES)
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .build();
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(HNL_DQ_RESPONSE_1V2_DS));
-        }
-
-        @Test
-        void shouldGenerateHnl_dq_response_1V2_ss_DsDocument_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V2_SS)))
-                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V2_SS.getDocumentTitle(), bytes));
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQWithExperts()
-                .applicant1DQWithWitnesses()
-                .applicant1DQWithHearingSupport()
-                .multiPartyClaimOneDefendantSolicitor()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent("CLAIMANT_RESPONSE").build())
-                .applicantsProceedIntention(YES)
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .build();
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(HNL_DQ_RESPONSE_1V2_SS));
         }
 
         @Test
