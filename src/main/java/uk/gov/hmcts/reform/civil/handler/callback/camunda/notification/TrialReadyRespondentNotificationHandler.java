@@ -74,7 +74,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
+    public Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
         String defRefNumber;
         if (isFirst) {
             if (caseData.getSolicitorReferences() == null
@@ -84,13 +84,8 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
                 defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
             }
         } else {
-            if (caseData.getSolicitorReferences() == null
-                || caseData.getSolicitorReferences().getRespondentSolicitor2Reference() == null) {
-                defRefNumber = caseData.getRespondentSolicitor2Reference() == null ? "" :
-                    caseData.getRespondentSolicitor2Reference();
-            } else {
-                defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
-            }
+            defRefNumber = caseData.getRespondentSolicitor2Reference() == null ? "" :
+                caseData.getRespondentSolicitor2Reference();
         }
         return Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
