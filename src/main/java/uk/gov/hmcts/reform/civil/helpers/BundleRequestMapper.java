@@ -167,7 +167,7 @@ public class BundleRequestMapper {
             temp.forEach(uploadEvidenceExpertElement -> {
                 StringBuilder fileNameBuilder = new StringBuilder();
                 if (Optional.ofNullable(uploadEvidenceExpertElement.getValue().getExpertDocument()).isPresent()) {
-                    fileNameBuilder.append("_" + uploadEvidenceExpertElement.getValue().getExpertOptionName());
+                    fileNameBuilder.append(uploadEvidenceExpertElement.getValue().getExpertOptionName());
                 }
                 allExpertDocs.add(BundlingRequestDocument.builder()
                                         .documentFileName(fileNameBuilder.toString())
