@@ -27,11 +27,9 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -154,30 +152,27 @@ public class BundleRequestMapper {
         List<Element<UploadEvidenceExpert>> documentJointStatement = caseData.getDocumentJointStatement();
         List<Element<UploadEvidenceExpert>> documentQuestions = caseData.getDocumentQuestions();
         List<Element<UploadEvidenceExpert>> documentAnswers = caseData.getDocumentAnswers();
-        List<Element<UploadEvidenceExpert>> allList = Stream.of(documentExpertReport, documentJointStatement,
-                                                                documentQuestions, documentAnswers
+        List<Element<UploadEvidenceExpert>> allList = new ArrayList<>(Stream.of(documentExpertReport,
+                                                                                documentJointStatement,
+                                                                                documentQuestions,
+                                                                                documentAnswers
             ).filter(elements -> elements != null)
-            .flatMap(Collection::stream).toList();
-        Map<String, List<Element<UploadEvidenceExpert>>> listMap = allList.stream().collect(Collectors.groupingBy(
-            uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionName()));
-        Iterator<Map.Entry<String, List<Element<UploadEvidenceExpert>>>> iterator = listMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, List<Element<UploadEvidenceExpert>>> next = iterator.next();
-            List<Element<UploadEvidenceExpert>> temp = next.getValue();
-            temp.forEach(uploadEvidenceExpertElement -> {
-                StringBuilder fileNameBuilder = new StringBuilder();
-                if (Optional.ofNullable(uploadEvidenceExpertElement.getValue().getExpertDocument()).isPresent()) {
-                    fileNameBuilder.append(uploadEvidenceExpertElement.getValue().getExpertOptionName());
-                }
-                allExpertDocs.add(BundlingRequestDocument.builder()
-                                        .documentFileName(fileNameBuilder.toString())
-                                        .documentLink(DocumentLink.builder()
-                                                          .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
-                                                          .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
-                                                          .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
-                                        .build());
-            });
-        }
+                                                                          .flatMap(Collection::stream).toList());
+        allList.sort(Comparator.comparing(o -> o.getValue().getExpertOptionName()));
+        allList.forEach(uploadEvidenceExpertElement -> {
+            StringBuilder fileNameBuilder = new StringBuilder();
+            if (Optional.ofNullable(uploadEvidenceExpertElement.getValue().getExpertDocument()).isPresent()) {
+                fileNameBuilder.append(uploadEvidenceExpertElement.getValue().getExpertOptionName());
+            }
+            allExpertDocs.add(BundlingRequestDocument.builder()
+                                  .documentFileName(fileNameBuilder.toString())
+                                  .documentLink(DocumentLink.builder()
+                                                    .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
+                                                    .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
+                                                    .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
+                                  .build());
+
+        });
         return  ElementUtils.wrapElements(allExpertDocs);
     }
 
