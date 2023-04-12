@@ -87,6 +87,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       free: CopyPagesUpTo10
+      appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -102,6 +103,9 @@ pin-in-post:
     url: ${CUI_URL_RESPOND_TO_CLAIM:http://localhost:3001/first-contact/start}
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
+
+manage-case-ui:
+  baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
 payments:
   api:
@@ -236,6 +240,7 @@ notifications:
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
+  bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -249,6 +254,11 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
+
+bundle:
+  api:
+    url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/"
+  config: ${BUNDLE_CONFIG:caseprogression-bundle-config.yaml}
 
 http:
   client:
@@ -470,4 +480,3 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
-

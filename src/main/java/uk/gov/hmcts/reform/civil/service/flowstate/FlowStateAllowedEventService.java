@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
@@ -52,8 +54,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -176,6 +181,7 @@ public class FlowStateAllowedEventService {
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
+                UPLOAD_TRANSLATED_DOCUMENT,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
@@ -191,6 +197,7 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
+                MEDIATION_UNSUCCESSFUL,
                 EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
@@ -255,7 +262,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 GENERATE_DIRECTIONS_ORDER,
-                TRIAL_READINESS
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -274,12 +282,17 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -301,9 +314,14 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -325,9 +343,14 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -490,7 +513,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -540,7 +564,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -737,9 +762,11 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
                 NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION,
                 NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION,
+                EXTEND_RESPONSE_DEADLINE,
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
+                MEDIATION_SUCCESSFUL,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
@@ -756,7 +783,8 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
         entry(
@@ -767,9 +795,11 @@ public class FlowStateAllowedEventService {
                 LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
+                EXTEND_RESPONSE_DEADLINE,
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
+                MEDIATION_SUCCESSFUL,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -789,7 +819,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
         entry(
@@ -943,7 +974,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 

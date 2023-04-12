@@ -10,22 +10,20 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -34,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final RepresentativeService representativeService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimForm templateData = getTemplateData(caseData);
@@ -69,19 +66,16 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     public SealedClaimForm getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        List<LocationRefData> courtLocations = (locationRefDataService
-            .getCourtLocationsByEpimmsId(
-                CallbackParams.Params.BEARER_TOKEN.toString(),
-                caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+        String hearingCourtLocation = locationRefDataUtil.getPreferredCourtData(
+                caseData,
+                CallbackParams.Params.BEARER_TOKEN.toString(), true);
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
             .applicants(getApplicants(caseData, multiPartyScenario))
             .respondents(getRespondents(caseData, multiPartyScenario))
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
-            .hearingCourtLocation(courtLocations.isEmpty() ? "" : courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .collect(Collectors.toList()).get(0).getCourtLocationCode())
+            .hearingCourtLocation(hearingCourtLocation)
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
