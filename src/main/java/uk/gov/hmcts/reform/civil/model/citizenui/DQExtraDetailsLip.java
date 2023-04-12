@@ -16,4 +16,11 @@ public class DQExtraDetailsLip {
     private String whyPhoneOrVideoHearing;
     private String whyUnavailableForHearing;
     private YesOrNo giveEvidenceYourSelf;
+    private YesOrNo triedToSettle;
+    private YesOrNo determinationWithoutHearingRequired;
+    private String determinationWithoutHearingReason;
+    private YesOrNo requestExtra4weeks;
+    private YesOrNo considerClaimantDocuments;
+    private String considerClaimantDocumentsDetails;
+    private ExpertLiP respondent1DQLiPExpert;
 }
