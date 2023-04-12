@@ -19,9 +19,10 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -32,7 +33,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -41,7 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -51,7 +52,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -1056,6 +1057,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAddCaseNamePublic_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).containsEntry("caseNamePublic", "'John Rambo' v 'Sole Trader'");
+        }
+
+        @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1072,6 +1080,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+        }
+
+        @Test
+        void shouldCopyRespondent1SolicitorReferenceSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondentSolicitor2Reference = response.getData().get("solicitorReferences");
+            var respondentSolicitor2ServiceAddressRequired = response.getData().get(
+                "respondentSolicitor2ServiceAddressRequired");
+            var respondentSolicitor2ServiceAddress =
+                response.getData().get("respondentSolicitor2ServiceAddress");
+
+            assertThat(respondentSolicitor2Reference)
+                .extracting("respondentSolicitor2Reference").isEqualTo("6789");
+            assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
+            assertThat(respondentSolicitor2ServiceAddress).isNull();
         }
 
         @Test

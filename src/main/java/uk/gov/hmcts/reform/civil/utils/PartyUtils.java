@@ -29,19 +29,23 @@ public class PartyUtils {
         //NO-OP
     }
 
-    public static String getPartyNameBasedOnType(Party party) {
+    public static String getPartyNameBasedOnType(Party party, boolean omitTitle) {
         switch (party.getType()) {
             case COMPANY:
                 return party.getCompanyName();
             case INDIVIDUAL:
-                return getIndividualName(party);
+                return getIndividualName(party, omitTitle);
             case SOLE_TRADER:
-                return getSoleTraderName(party);
+                return getSoleTraderName(party, omitTitle);
             case ORGANISATION:
                 return party.getOrganisationName();
             default:
                 throw new IllegalArgumentException("Invalid Party type in " + party);
         }
+    }
+
+    public static String getPartyNameBasedOnType(Party party) {
+        return getPartyNameBasedOnType(party, false);
     }
 
     private static String getTitle(String title) {
@@ -80,18 +84,26 @@ public class PartyUtils {
         }
     }
 
-    private static String getSoleTraderName(Party party) {
-        return getTitle(party.getSoleTraderTitle())
+    private static String getSoleTraderName(Party party, boolean omitTitle) {
+        return (omitTitle ? "" : getTitle(party.getSoleTraderTitle()))
             + party.getSoleTraderFirstName()
             + " "
             + party.getSoleTraderLastName();
     }
 
-    private static String getIndividualName(Party party) {
-        return getTitle(party.getIndividualTitle())
+    private static String getSoleTraderName(Party party) {
+        return getSoleTraderName(party, false);
+    }
+
+    private static String getIndividualName(Party party, boolean omitTitle) {
+        return (omitTitle ? "" : getTitle(party.getIndividualTitle()))
             + party.getIndividualFirstName()
             + " "
             + party.getIndividualLastName();
+    }
+
+    private static String getIndividualName(Party party) {
+        return getIndividualName(party, false);
     }
 
     public static String buildPartiesReferences(CaseData caseData) {

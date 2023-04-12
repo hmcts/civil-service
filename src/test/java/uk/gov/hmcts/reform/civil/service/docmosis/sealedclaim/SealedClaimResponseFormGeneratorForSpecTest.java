@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 

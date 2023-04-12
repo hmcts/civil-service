@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -58,7 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -162,7 +162,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -294,6 +294,8 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000")
+                                                   .region("2").build());
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -327,6 +329,52 @@ public class GeneralApplicationDetailsBuilder {
         if (withGADetailsResp2) {
             caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
                                                                        .toArray(new GADetailsRespondentSol[0])));
+        }
+        return caseDataBuilder.build();
+    }
+
+    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+                                               boolean withGADetails,
+                                               boolean withGADetailsResp,
+                                               boolean withGADetailsResp2, boolean withGADetailsMaster,
+                                               Map<String, String> applicationIdStatus) {
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
+                                                   .region("2").build());
+        caseDataBuilder.ccdCaseReference(1L);
+        if (!Collections.isEmpty(applicationIdStatus)) {
+            List<GeneralApplication> genApps = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
+            caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
+        }
+
+        if (withGADetails) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.claimantGaAppDetails(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        if (withGADetailsMaster) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.gaDetailsMasterCollection(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
+        applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
+        if (withGADetailsResp) {
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
+
+        if (withGADetailsResp2) {
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
+                                                                          .toArray(new GADetailsRespondentSol[0])));
         }
         return caseDataBuilder.build();
     }
@@ -1108,6 +1156,11 @@ public class GeneralApplicationDetailsBuilder {
         return builder.generalAppType(GAApplicationType.builder()
                         .types(singletonList(SUMMARY_JUDGEMENT))
                         .build())
+                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication
+                                            .CaseLocationCivil.builder()
+                                            .baseLocation("34567")
+                                            .region("4").build())
+                .isCcmccLocation(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())

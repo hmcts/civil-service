@@ -48,6 +48,17 @@ class PartyUtilsTest {
         }
 
         @Test
+        void shouldProvideNameWithoutTitle_whenPartyTypeIsIndividual() {
+            Party individual = Party.builder()
+                .individualTitle("Mr")
+                .individualFirstName("Jacob")
+                .individualLastName("Martin")
+                .type(Party.Type.INDIVIDUAL).build();
+
+            assertEquals("Jacob Martin", PartyUtils.getPartyNameBasedOnType(individual, true));
+        }
+
+        @Test
         void shouldProvideName_whenPartyTypeIsIndividualWithoutTitle() {
             Party individual = Party.builder()
                 .individualFirstName("Jacob")
@@ -84,6 +95,17 @@ class PartyUtilsTest {
                 .type(Party.Type.SOLE_TRADER).build();
 
             assertEquals("Mr Jacob Martin", PartyUtils.getPartyNameBasedOnType(soleTrader));
+        }
+
+        @Test
+        void shouldProvideNameWithoutTitle_whenPartyTypeIsSoleTrader() {
+            Party soleTrader = Party.builder()
+                .soleTraderTitle("Mr")
+                .soleTraderFirstName("Jacob")
+                .soleTraderLastName("Martin")
+                .type(Party.Type.SOLE_TRADER).build();
+
+            assertEquals("Jacob Martin", PartyUtils.getPartyNameBasedOnType(soleTrader, true));
         }
     }
 

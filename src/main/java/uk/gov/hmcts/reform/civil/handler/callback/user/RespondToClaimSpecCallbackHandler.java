@@ -24,15 +24,20 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -41,13 +46,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -121,6 +126,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -1313,6 +1319,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
+        if (respondent2HasSameLegalRep(caseData)) {
+            // if responses are marked as same, copy respondent 1 values into respondent 2
+            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
+                updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
+                updatedData
+                    .respondent2ResponseDate(responseDate);
+            }
+        }
+
         updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
@@ -1456,11 +1471,50 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
+        assembleResponseDocumentsSpec(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+
+        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        Optional.ofNullable(caseData.getRespondent1SpecDefenceResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                                      updatedCaseData.build().getRespondent1ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQDraftDirections)
+            .ifPresent(respondent1DQ -> defendantUploads.add(
+                buildElemCaseDocument(
+                    respondent1DQ,
+                    "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        Optional.ofNullable(caseData.getRespondent2SpecDefenceResponseDocument())
+            .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
+                buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                      updatedCaseData.build().getRespondent2ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
+                )));
+        Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getRespondent2DQDraftDirections)
+            .ifPresent(respondent2DQ -> defendantUploads.add(
+                buildElemCaseDocument(
+                    respondent2DQ,
+                    "Defendant 2",
+                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                )));
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
@@ -1484,13 +1538,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
 
             dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                           .getRespondToCourtLocation().toBuilder()
+                                               .getRespondToCourtLocation().toBuilder()
                                                .reasonForHearingAtSpecificCourt(
                                                    caseData.getRespondent1DQ()
                                                        .getRespondToCourtLocation()
                                                        .getReasonForHearingAtSpecificCourt())
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build());
             dq.respondToCourtLocation(RequestedCourt.builder()
                                           .responseCourtLocations(null)
@@ -1524,7 +1578,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build())
                 .respondToCourtLocation2(RequestedCourt.builder()
                                              .responseCourtLocations(null)

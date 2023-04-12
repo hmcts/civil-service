@@ -3,24 +3,25 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -157,7 +158,7 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
 
         return Optional.ofNullable(organisationPolicy)
             .map(OrganisationPolicy::getOrganisation)
-            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
             .flatMap(value -> value.map(o -> Party.builder()
                 .name(o.getName())

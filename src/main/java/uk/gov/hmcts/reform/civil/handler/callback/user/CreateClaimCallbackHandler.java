@@ -19,7 +19,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -34,15 +35,16 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -51,7 +53,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -400,6 +402,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder
                 .respondent2OrgRegistered(YES)
                 .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            references.ifPresent(ref -> {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                    .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            });
+            dataBuilder
+                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
         }
 
         // moving statement of truth value to correct field, this was not possible in mid event.
@@ -475,6 +489,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         }
 
+        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
@@ -644,7 +659,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                   .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());

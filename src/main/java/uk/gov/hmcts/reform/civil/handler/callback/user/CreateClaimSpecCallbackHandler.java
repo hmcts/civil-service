@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -55,7 +55,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -226,7 +226,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validatePostCodeForDefendant(
+            errors = postcodeValidator.validate(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
@@ -451,6 +451,37 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder
                 .respondent2OrgRegistered(YES)
                 .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            references.ifPresent(ref -> {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                        .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            });
+            dataBuilder
+                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+        } else if (temporaryCaseData.getRespondent1OrgRegistered() == NO
+                && temporaryCaseData.getRespondent1Represented() == YES
+                && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            dataBuilder
+                    .respondent2OrgRegistered(NO)
+                    .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            references.ifPresent(ref -> {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                        .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            });
+            dataBuilder
+                  .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -463,10 +494,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
-
+            if (respondent1OrganisationPolicy != null) {
+                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                    .build();
+            }
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
@@ -578,7 +610,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validatePostCode(String postCode) {
-        List<String> errors = postcodeValidator.validatePostCodeForDefendant(postCode);
+        List<String> errors = postcodeValidator.validate(postCode);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
