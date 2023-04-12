@@ -538,7 +538,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         if (toggleService.isHmcEnabled()){
             UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
-
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);

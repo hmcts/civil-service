@@ -385,11 +385,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
-<<<<<<< HEAD
-    private final ClaimProceedsInCaseman claimProceedsInCasemanLR;
-=======
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
->>>>>>> master
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
