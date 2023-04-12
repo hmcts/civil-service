@@ -331,7 +331,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(false);
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3).plusDays(1)))
+                .thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
