@@ -93,7 +93,9 @@ public class UnavailabilityDatesUtils {
             .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getFromDate()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .unavailableToDate(date.getToDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            .unavailableToDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getToDate()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .build();
     }
 }
