@@ -101,7 +101,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             log.info("claim is spec");
         } else {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
-            log.info("claim is unspec, caseprogallocated should be" + getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+            log.info("claim is unspec, caseprogallocated should be %s".formatted(getAllocatedTrack(
+                caseData.getClaimValue().toPounds(),
+                caseData.getClaimType()
+            ).name()));
         }
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
@@ -116,8 +119,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             log.info("user is respondent and has RESPONDENTSOLICITORTWO");
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
-        log.info("user roles is " + coreCaseUserService.getUserCaseRoles(caseData
-            .getCcdCaseReference().toString(), userInfo.getUid()));
+        log.info("user roles is %s".formatted(coreCaseUserService.getUserCaseRoles(
+            caseData
+                .getCcdCaseReference().toString(),
+            userInfo.getUid()
+        )));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
