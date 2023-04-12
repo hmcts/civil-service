@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimCallbackHandler.defendantFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -192,12 +194,15 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData,
             bearerToken
         );
-        if (directionsQuestionnaire.getDocumentName().contains("claimant")) {
-            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
-        }
+
+        assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
         if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
             assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
         }
+        if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+        }
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);

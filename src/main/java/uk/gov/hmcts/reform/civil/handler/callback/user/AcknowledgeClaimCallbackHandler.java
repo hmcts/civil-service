@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -70,6 +71,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UserService userService;
+    public static String defendantFlag;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -95,6 +98,15 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
         }
+
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            defendantFlag(caseData, userInfo);
+        }
+
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
         if ((solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1AcknowledgeNotificationDate() != null)
@@ -309,4 +321,15 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private boolean isRespondent1(CallbackParams callbackParams) {
         return !solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
     }
+
+    public String defendantFlag(CaseData caseData, UserInfo userInfo) {
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE) &&
+            coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            defendantFlag = "userRespondent2";
+        }
+        return defendantFlag;
+    }
+
 }

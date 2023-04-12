@@ -18,9 +18,11 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.AcknowledgeClaimCallbackHandler.defendantFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -64,6 +66,9 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
+        if(nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+            assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -41,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -64,7 +66,8 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
-    FeatureToggleService.class
+    FeatureToggleService.class,
+    AssignCategoryId.class
 })
 class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -82,6 +85,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -156,6 +162,52 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
             assertThat(response.getData().get("respondent2Copy")).isNull();
         }
+
+    }
+
+    @Test
+    void shouldPopulateRespondent2Flag_WhenInvoked() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        System.out.println("banana"+AcknowledgeClaimCallbackHandler.defendantFlag);
+        var result = AcknowledgeClaimCallbackHandler.defendantFlag;
+        // Then
+        assertThat(result).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void shouldNotPopulateRespondent2Flag_WhenInvoked() {
+        // Given
+        AcknowledgeClaimCallbackHandler.defendantFlag = null;
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        var result = AcknowledgeClaimCallbackHandler.defendantFlag;
+        // Then
+        assertThat(result).isNull();
     }
 
     @Nested

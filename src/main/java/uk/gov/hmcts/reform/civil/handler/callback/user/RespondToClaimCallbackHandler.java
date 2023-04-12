@@ -110,6 +110,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
+    public static String defendantFlag;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -216,6 +217,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
                 .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
+
+        if (toggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            defendantFlag(caseData, userInfo);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -841,4 +850,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
+
+    private String defendantFlag(CaseData caseData, UserInfo userInfo) {
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE) &&
+            coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            defendantFlag = "userRespondent2";
+        }
+        return defendantFlag;
+    }
+
 }
