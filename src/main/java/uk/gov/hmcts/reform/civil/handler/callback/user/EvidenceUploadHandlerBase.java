@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -97,8 +98,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //determine claim path, and assign to CCD object for show hide functionality
         if (caseData.getClaimType() == null) {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
+            log.info("claim is spec");
         } else {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+            log.info("claim is unspec, caseprogallocated should be" + getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
         }
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
@@ -110,9 +113,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-
+            log.info("user is respondent and has RESPONDENTSOLICITORTWO");
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
+        log.info("user roles is " + coreCaseUserService.getUserCaseRoles(caseData
+            .getCcdCaseReference().toString(), userInfo.getUid()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
