@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,6 +55,11 @@ public class BundleRequestMapper {
             )
             .caseTypeId(caseTypeId)
             .jurisdictionId(jurisdiction).build();
+        try {
+            log.info("bundle request : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateRequest));
+        } catch (Exception e) {
+            log.error("error in bundle request object", e);
+        }
         return bundleCreateRequest;
     }
 
