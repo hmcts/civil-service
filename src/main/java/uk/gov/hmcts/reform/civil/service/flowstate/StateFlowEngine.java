@@ -254,8 +254,7 @@ public class StateFlowEngine {
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
-                        LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
@@ -450,11 +449,7 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
             .state(FULL_DEFENCE)
-                .transitionTo(IN_MEDIATION)
-            .onlyIf(agreedToMediation)
-            .set(flags -> {
-                flags.put(LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
-            })
+                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation))
             .set(flags -> {
@@ -496,11 +491,7 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION)
-            .onlyIf(agreedToMediation)
-            .set(flags -> {
-                flags.put(LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
-            })
+                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
@@ -543,6 +534,7 @@ public class StateFlowEngine {
             .state(FULL_ADMIT_PROCEED)
             .state(FULL_ADMIT_NOT_PROCEED)
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
+            .state(IN_MEDIATION)
             .build();
     }
 
