@@ -53,6 +53,8 @@ public class TestingSupportController {
     private final RoboticsDataMapper roboticsDataMapper;
 
     private final ClaimDismissedHandler claimDismissedHandler;
+    private final HearingFeePaidEventHandler hearingFeePaidHandler;
+    private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
