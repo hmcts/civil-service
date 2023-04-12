@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -126,6 +127,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
+    private static final long NUMBER_OF_WEEKS_TO_HEARING = 3;
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
@@ -134,6 +136,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final WorkingDayIndicator workingDayIndicator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -356,6 +359,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+            .dateFrom(presetDateFrom())
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
             .helpText2("Not more than seven nor less than three clear days before the trial, "
@@ -548,6 +552,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
+            .dateFrom(presetDateFrom())
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
@@ -612,6 +617,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private LocalDate presetDateFrom() {
+        LocalDate date = LocalDate.now().plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
+        while (!workingDayIndicator.isWorkingDay(date)) {
+            date = date.plusDays(1);
+        }
+
+        return date;
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
