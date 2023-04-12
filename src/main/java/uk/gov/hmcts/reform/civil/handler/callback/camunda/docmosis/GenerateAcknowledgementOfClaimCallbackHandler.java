@@ -66,7 +66,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
-        if(nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+        if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
             assignCategoryId.setCategoryIdCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
         }
 

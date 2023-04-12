@@ -324,8 +324,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     public String defendantFlag(CaseData caseData, UserInfo userInfo) {
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE) &&
-            coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             defendantFlag = "userRespondent2";
         }
