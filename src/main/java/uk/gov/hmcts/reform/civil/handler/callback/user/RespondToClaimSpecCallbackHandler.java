@@ -1321,6 +1321,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
+        if (respondent2HasSameLegalRep(caseData)) {
+            // if responses are marked as same, copy respondent 1 values into respondent 2
+            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
+                updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
+                updatedData
+                    .respondent2ResponseDate(responseDate);
+            }
+        }
+
         updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
