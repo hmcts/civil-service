@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
@@ -55,6 +56,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -130,14 +132,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
-                    // Notice of change:
-                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT: {
-                        // this would change in CIV-1620
-                        if (featureToggleService.isNoticeOfChangeEnabled()) {
-                            buildClaimIssued(builder, caseData);
-                        }
-                        break;
-                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
@@ -813,18 +807,20 @@ public class EventHistoryMapper {
 
     private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
-            .stream()
-            .map(caseNote ->
-                     Event.builder()
-                         .eventSequence(prepareEventSequence(builder.build()))
-                         .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn())
-                         .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
-                         .eventDetails(EventDetails.builder()
-                                           .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
-                                           .build())
-                         .build())
-            .collect(Collectors.toList());
+                .stream()
+                .map(caseNote ->
+                        Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseNote.getCreatedOn())
+                                .eventDetailsText(left((format("case note added: %s",
+                                        caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                .eventDetails(EventDetails.builder()
+                                        .miscText(left((format("case note added: %s",
+                                                caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
         builder.miscellaneous(events);
     }
 
@@ -1036,11 +1032,19 @@ public class EventHistoryMapper {
     }
 
     public String prepareTakenOfflineEventDetails(CaseData caseData) {
-        return left(format(
-            "RPA Reason: Manually moved offline for reason %s on date %s.",
-            prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCaseman()),
-            caseData.getClaimProceedsInCaseman().getDate().format(ISO_DATE)
-        ), 250); // Max chars allowed by Caseman
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return left(format(
+                "RPA Reason: Manually moved offline for reason %s on date %s.",
+                prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCaseman()),
+                caseData.getClaimProceedsInCaseman().getDate().format(ISO_DATE)
+            ), 250); // Max chars allowed by Caseman
+        } else {
+            return left(format(
+                "RPA Reason: Manually moved offline for reason %s on date %s.",
+                prepareTakenOfflineByStaffReasonSpec(caseData.getClaimProceedsInCasemanLR()),
+                caseData.getClaimProceedsInCasemanLR().getDate().format(ISO_DATE)
+            ), 250); // Max chars allowed by Caseman
+        }
     }
 
     private String prepareTakenOfflineByStaffReason(ClaimProceedsInCaseman claimProceedsInCaseman) {
@@ -1048,6 +1052,13 @@ public class EventHistoryMapper {
             return claimProceedsInCaseman.getOther();
         }
         return claimProceedsInCaseman.getReason().name();
+    }
+
+    private String prepareTakenOfflineByStaffReasonSpec(ClaimProceedsInCasemanLR claimProceedsInCasemanLR) {
+        if (claimProceedsInCasemanLR.getReason() == ReasonForProceedingOnPaper.OTHER) {
+            return claimProceedsInCasemanLR.getOther();
+        }
+        return claimProceedsInCasemanLR.getReason().name();
     }
 
     private void buildClaimantHasNotifiedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

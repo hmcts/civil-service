@@ -351,9 +351,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -378,9 +377,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -409,9 +407,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -437,9 +434,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -465,9 +461,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -480,7 +475,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
-        + " date entered must not be in the future (5).",
+            + " date entered must not be in the future (5).",
         "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (6).",
         "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
@@ -498,9 +493,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
                                    collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -527,9 +521,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
                                    collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -553,9 +546,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
                                    collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -579,9 +571,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
                                    collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -613,9 +604,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -642,9 +632,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -671,9 +660,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -704,9 +692,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -734,9 +721,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -764,9 +750,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -799,9 +784,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -834,9 +818,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -864,9 +847,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -894,9 +876,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -932,9 +913,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
