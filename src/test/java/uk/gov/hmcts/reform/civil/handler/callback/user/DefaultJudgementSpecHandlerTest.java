@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -68,6 +70,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
@@ -805,6 +810,56 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + "£1.00\n"
                 + " ## Total still owed \n"
                 + " £5001.00";
+            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+        }
+
+        @Test
+        void shouldReturnFixedAmount_whenClaimAmountLessthan5000AndLRvLiP() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(100)
+                );
+            when(feesService.getFeeDataByTotalClaimAmount(any()))
+                .thenReturn(Fee.builder()
+                                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                .version("1")
+                                .code("CODE")
+                                .build());
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPayment(YesOrNo.YES)
+                .paymentSetDate(LocalDate.now().minusDays(15))
+                .partialPaymentAmount("100")
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .build())
+                                          .build())
+                .specRespondent1Represented(NO)
+
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String test = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                + "### Claim amount \n"
+                + " £1010.00\n"
+                + " ### Claim interest amount \n"
+                + "£100.00\n"
+                + " ### Fixed cost amount \n"
+                + "£112.00\n"
+                + "### Claim fee amount \n"
+                + " £1.00\n"
+                + " ## Subtotal \n"
+                + " £1223.00\n"
+                + "\n"
+                + " ### Amount already paid \n"
+                + "£1.00\n"
+                + " ## Total still owed \n"
+                + " £1222.00";
+
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
     }
