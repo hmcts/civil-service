@@ -54,6 +54,8 @@ class HearingUtilsTest {
         assertThat(days).isNotNull();
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {"0;£0"}, delimiter = ';')
     @DisplayName("HearingUtils.formatHearingFee should return <null> when the hearing fee is zero.")
     void shouldReturnNull_when0ClaimFee() {
         assertThat(HearingUtils.formatHearingFee(
