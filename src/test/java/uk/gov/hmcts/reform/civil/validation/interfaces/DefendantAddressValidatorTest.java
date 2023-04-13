@@ -64,7 +64,7 @@ public class DefendantAddressValidatorTest {
             .build();
 
         List<String> errors = List.of("error 1");
-        Mockito.when(postcodeValidator.validatePostCodeForDefendant("postcode"))
+        Mockito.when(postcodeValidator.validate("postcode"))
             .thenReturn(errors);
 
         AboutToStartOrSubmitCallbackResponse response = validator
@@ -74,7 +74,7 @@ public class DefendantAddressValidatorTest {
             );
 
         Assertions.assertNotNull(response);
-        Mockito.verify(postcodeValidator).validatePostCodeForDefendant("postcode");
+        Mockito.verify(postcodeValidator).validate("postcode");
         Assertions.assertEquals(errors, response.getErrors());
     }
 }

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;

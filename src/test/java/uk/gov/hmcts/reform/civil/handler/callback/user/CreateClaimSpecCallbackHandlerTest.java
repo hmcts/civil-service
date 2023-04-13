@@ -23,9 +23,10 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -57,7 +58,7 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -973,7 +974,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -995,7 +996,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                given(postcodeValidator.validate(any()))
                     .willReturn(List.of("Please enter Postcode"));
 
                 // When
@@ -1025,7 +1026,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1052,7 +1053,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                given(postcodeValidator.validate(any()))
                     .willReturn(List.of("Please enter Postcode"));
 
                 // When
@@ -1085,7 +1086,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1109,7 +1110,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                given(postcodeValidator.validate(any()))
                     .willReturn(List.of("Please enter Postcode"));
 
                 // When
@@ -1137,7 +1138,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1159,7 +1160,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1182,7 +1183,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                given(postcodeValidator.validate(any()))
                     .willReturn(List.of("Please enter Postcode"));
 
                 // When
@@ -1210,7 +1211,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1232,7 +1233,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any())).willReturn(List.of());
+                given(postcodeValidator.validate(any())).willReturn(List.of());
 
                 // When
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1255,7 +1256,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
-                given(postcodeValidator.validatePostCodeForDefendant(any()))
+                given(postcodeValidator.validate(any()))
                     .willReturn(List.of("Please enter Postcode"));
 
                 // When
@@ -1491,6 +1492,30 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+        }
+
+        @Test
+        void shouldCopyRespondent1SolicitorReferenceSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondentSolicitor2Reference = response.getData().get("solicitorReferences");
+            var respondentSolicitor2ServiceAddressRequired = response.getData().get(
+                "respondentSolicitor2ServiceAddressRequired");
+            var respondentSolicitor2ServiceAddress =
+                response.getData().get("respondentSolicitor2ServiceAddress");
+
+            assertThat(respondentSolicitor2Reference)
+                .extracting("respondentSolicitor2Reference").isEqualTo("6789");
+            assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
+            assertThat(respondentSolicitor2ServiceAddress).isNull();
         }
 
         @Nested
