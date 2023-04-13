@@ -80,11 +80,6 @@ public class HearingDetailsMapper {
             welshLanguageRequirements.add(caseData.getApplicant1DQ().getWelshLanguageRequirements().getCourt());
         }
 
-        if (Objects.nonNull(caseData.getApplicant2DQ()) && Objects.nonNull(caseData.getApplicant2DQ()
-                                                                               .getWelshLanguageRequirements())) {
-            welshLanguageRequirements.add(caseData.getApplicant2DQ().getWelshLanguageRequirements().getCourt());
-        }
-
         return welshLanguageRequirements;
     }
 
