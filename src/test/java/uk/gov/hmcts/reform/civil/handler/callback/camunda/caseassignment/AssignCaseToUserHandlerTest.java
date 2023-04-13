@@ -91,15 +91,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotUpdateSupplementaryDataOnSubmittedWhenGlobalSearchOff() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
-            assignCaseToUserHandler.handle(params);
-            verify(coreCaseDataService, never()).setSupplementaryData(any(), any());
-        }
-
-        @Test
         void shouldReturnSupplementaryDataOnSubmittedWhenGlobalSearchOn() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
@@ -119,15 +111,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotUpdateSpecSupplementaryDataOnSubmittedWhenGlobalSearchOff() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
-            assignCaseToUserHandler.handle(params);
-            verify(coreCaseDataService, never()).setSupplementaryData(any(), any());
-        }
-
-        @Test
         void shouldReturnSpecSupplementaryDataWhenGlobalSearchEnabled() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
@@ -139,7 +123,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -158,7 +142,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
@@ -181,7 +165,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -198,7 +182,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
@@ -212,9 +196,13 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AssignRolesIn1v2Cases {
 
+        @BeforeEach
+        void setup() {
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+        }
+
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -235,7 +223,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
@@ -244,7 +232,6 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2DS() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -270,7 +257,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
@@ -279,7 +266,6 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator1v2DSUnregisteredRespondent2() {
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(false);
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -302,7 +288,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
