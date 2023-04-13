@@ -28,7 +28,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void givenApplicantAgreedToMediation_whenHasClaimantAgreedToFreeMediation_thenTrue(){
+    void givenApplicantAgreedToMediation_whenHasClaimantAgreedToFreeMediation_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
@@ -44,7 +44,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void givenNoDataForAgreedToMediation_whenHasClaimantAgreedToFeeMediation_thenFalse(){
+    void givenNoDataForAgreedToMediation_whenHasClaimantAgreedToFeeMediation_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder().build();
         //When
@@ -54,7 +54,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void givenApplicantDidNotAgreeToFreeMediation_whenHasClaimantAgreedToFeeMediation_thenFalse(){
+    void givenApplicantDidNotAgreeToFreeMediation_whenHasClaimantAgreedToFeeMediation_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
