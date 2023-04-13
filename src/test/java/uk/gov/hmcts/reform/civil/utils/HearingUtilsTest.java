@@ -182,7 +182,7 @@ class HearingUtilsTest {
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);
 
-        assertThat(actual).isEqualTo(null);
+        assertThat(actual).isNull();
     }
 
     @Test
