@@ -324,6 +324,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
 
+        @BeforeEach
+        void setup() {
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
+        }
+
         @Test
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
@@ -367,7 +372,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -405,7 +409,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -449,7 +452,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -480,6 +482,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
         }
 
         private final LocalDate date = LocalDate.of(2020, 1, 15);
@@ -493,7 +496,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -985,7 +987,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                                        .build()).build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -1007,7 +1008,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void testSDOSortsLocationListThroughDecideDamagesOrderType() {
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().respondent1DQWithLocation().applicant1DQWithLocation()
                 .setClaimTypeToSpecClaim().atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(10000))
@@ -1053,7 +1053,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
-            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
