@@ -59,37 +59,31 @@ public class HearingDetailsMapper {
     }
 
     private static boolean isWelshHearingSelected(CaseData caseData) {
-        List<WelshLanguageRequirements> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
-        boolean isWelshHearing = false;
+        List<Language> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
 
-        for (int index = 0; index < welshLanguageRequirements.size() && !isWelshHearing; index++) {
-            WelshLanguageRequirements requirements = welshLanguageRequirements.get(index);
-            isWelshHearing = requirements.getCourt().equals(Language.WELSH) || requirements.getCourt().equals(Language.BOTH);
-        }
-
-        return isWelshHearing;
+        return (welshLanguageRequirements.contains(Language.WELSH) || welshLanguageRequirements.contains(Language.BOTH));
     }
 
-    private static List<WelshLanguageRequirements> getWelshLanguageRequirements(CaseData caseData) {
-        List<WelshLanguageRequirements> welshLanguageRequirements = new ArrayList<>();
+    private static List<Language> getWelshLanguageRequirements(CaseData caseData) {
+        List<Language> welshLanguageRequirements = new ArrayList<>();
         if (Objects.nonNull(caseData.getRespondent1DQ()) && Objects.nonNull(caseData.getRespondent1DQ()
                                                                                 .getWelshLanguageRequirements())) {
-            welshLanguageRequirements.add(caseData.getRespondent1DQ().getWelshLanguageRequirements());
+            welshLanguageRequirements.add(caseData.getRespondent1DQ().getWelshLanguageRequirements().getCourt());
         }
 
         if (Objects.nonNull(caseData.getRespondent2DQ()) && Objects.nonNull(caseData.getRespondent2DQ()
                                                                                 .getWelshLanguageRequirements())) {
-            welshLanguageRequirements.add(caseData.getRespondent2DQ().getWelshLanguageRequirements());
+            welshLanguageRequirements.add(caseData.getRespondent2DQ().getWelshLanguageRequirements().getCourt());
         }
 
         if (Objects.nonNull(caseData.getApplicant1DQ()) && Objects.nonNull(caseData.getApplicant1DQ()
                                                                                .getWelshLanguageRequirements())) {
-            welshLanguageRequirements.add(caseData.getApplicant1DQ().getWelshLanguageRequirements());
+            welshLanguageRequirements.add(caseData.getApplicant1DQ().getWelshLanguageRequirements().getCourt());
         }
 
         if (Objects.nonNull(caseData.getApplicant2DQ()) && Objects.nonNull(caseData.getApplicant2DQ()
                                                                                .getWelshLanguageRequirements())) {
-            welshLanguageRequirements.add(caseData.getApplicant2DQ().getWelshLanguageRequirements());
+            welshLanguageRequirements.add(caseData.getApplicant2DQ().getWelshLanguageRequirements().getCourt());
         }
 
         return welshLanguageRequirements;
