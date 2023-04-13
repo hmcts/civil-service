@@ -46,8 +46,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -104,20 +102,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
-
-    @MockBean
     LocationRefDataUtil locationRefDataUtil;
-
-    @MockBean
-    private CaseFlagsInitialiser caseFlagsInitialiser;
-
-    @MockBean
-    private LocationRefDataUtil locationRefDataUtil;
 
     @Nested
     class AboutToStartCallback {
-
         @Test
         void shouldPopulateClaimantResponseScenarioFlag_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()

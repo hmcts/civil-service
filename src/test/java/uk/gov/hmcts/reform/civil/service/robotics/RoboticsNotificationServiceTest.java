@@ -112,9 +112,6 @@ class RoboticsNotificationServiceTest {
     @MockBean
     LocationRefDataUtil locationRefDataUtil;
 
-    @MockBean
-    LocationRefDataUtil locationRefDataUtil;
-
     LocalDateTime localDateTime;
 
     @BeforeEach

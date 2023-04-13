@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
@@ -42,6 +43,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -91,9 +93,6 @@ class EventHistoryMapperTest {
     @MockBean
     LocationRefDataUtil locationRefDataUtil;
 
-    @MockBean
-    LocationRefDataUtil locationRefDataUtil;
-
     @Autowired
     EventHistoryMapper mapper;
 
@@ -101,6 +100,7 @@ class EventHistoryMapperTest {
     private Time time;
 
     LocalDateTime localDateTime;
+    List<LocationRefData> courtLocations;
 
     @BeforeEach
     void setup() {

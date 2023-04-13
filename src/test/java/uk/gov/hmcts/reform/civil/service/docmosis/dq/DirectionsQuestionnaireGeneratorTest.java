@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -48,7 +49,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -83,13 +83,15 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     DirectionsQuestionnaireGenerator.class,
     JacksonAutoConfiguration.class,
     StateFlowEngine.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    LocationRefDataService.class
 })
 class DirectionsQuestionnaireGeneratorTest {
 
@@ -148,9 +150,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
-
-    @MockBean
-    private LocationRefDataService locationRefDataService;
 
     @Nested
     class RespondentOne {

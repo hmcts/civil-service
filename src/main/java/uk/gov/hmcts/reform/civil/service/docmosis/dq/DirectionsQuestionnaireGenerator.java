@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -34,14 +37,11 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -160,7 +160,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         if (respondent.equals("ONE")) {
             templateData = getRespondent1TemplateData(caseData, "ONE");
         } else if (respondent.equals("TWO")) {
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         } else {
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
@@ -208,7 +208,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             templateData = getRespondent1TemplateData(caseData, "ONE");
         } else {
             // TWO
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -557,7 +557,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
-    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier) {
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent2DQ();
 
         return  DirectionsQuestionnaireForm.builder()
@@ -583,7 +583,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
-            .requestedCourt(getRequestedCourt(dq))
+            .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
 
