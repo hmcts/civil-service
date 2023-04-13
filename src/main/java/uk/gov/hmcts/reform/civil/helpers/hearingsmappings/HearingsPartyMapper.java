@@ -238,7 +238,7 @@ public class HearingsPartyMapper {
                     partyFlagStructure.getEmail(),
                     partyFlagStructure.getPhone(),
                     partyFlagStructure.getFlags())
-                ));
+                );
             }
         }
         return partyDetails;
