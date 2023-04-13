@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -119,5 +121,16 @@ public class HearingUtils {
         } else {
             return null;
         }
+    }
+
+    public static LocalDate getHearingDateFrom(WorkingDayIndicator workingDayIndicator, long numberOfWeeksToHearing) {
+        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
+        LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
+        LocalDate hearingDate = baseDate.plusWeeks(numberOfWeeksToHearing);
+        if (!workingDayIndicator.isWorkingDay(hearingDate)) {
+            hearingDate = workingDayIndicator.getNextWorkingDay(hearingDate);
+        }
+
+        return hearingDate;
     }
 }

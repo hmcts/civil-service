@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -420,7 +421,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         // copy of above method as to not break existing cases
         caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
-                                               .date1(presetDateFrom())
+                                               .date1(HearingUtils.getHearingDateFrom(workingDayIndicator, NUMBER_OF_WEEKS_TO_HEARING))
                                                .helpText1(
                                                    "If either party considers that the time estimate is insufficient, "
                                                        + "they must inform the court within 7 days of the date of "
@@ -602,17 +603,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private LocalDate presetDateFrom() {
-        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
-        LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
-        LocalDate hearingDate = baseDate.plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
-        if (!workingDayIndicator.isWorkingDay(hearingDate)) {
-            hearingDate = workingDayIndicator.getNextWorkingDay(hearingDate);
-        }
-
-        return hearingDate;
     }
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
