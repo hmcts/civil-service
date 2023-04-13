@@ -71,6 +71,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -260,7 +261,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // existing cases
         DisposalHearingHearingTime tempDisposalHearingHearingTime =
             DisposalHearingHearingTime.builder()
-                .dateFrom(presetDateFrom())
+                .dateFrom(HearingUtils.getHearingDateFrom(workingDayIndicator, NUMBER_OF_WEEKS_TO_HEARING))
                 .input(
                     "This claim will be listed for final disposal before a judge on the first available date after")
                 .dateTo(LocalDate.now().plusWeeks(16))
@@ -361,7 +362,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
-            .dateFrom(presetDateFrom())
+            .dateFrom(HearingUtils.getHearingDateFrom(workingDayIndicator, NUMBER_OF_WEEKS_TO_HEARING))
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
             .helpText2("Not more than seven nor less than three clear days before the trial, "
@@ -554,7 +555,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
-            .dateFrom(presetDateFrom())
+            .dateFrom(HearingUtils.getHearingDateFrom(workingDayIndicator, NUMBER_OF_WEEKS_TO_HEARING))
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
@@ -619,17 +620,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
-    }
-
-    private LocalDate presetDateFrom() {
-        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
-        LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
-        LocalDate hearingDate = baseDate.plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
-        if (!workingDayIndicator.isWorkingDay(hearingDate)) {
-            hearingDate = workingDayIndicator.getNextWorkingDay(hearingDate);
-        }
-
-        return hearingDate;
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
