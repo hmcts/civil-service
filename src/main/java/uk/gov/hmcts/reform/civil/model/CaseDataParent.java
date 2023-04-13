@@ -415,7 +415,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasClaimantAgreedToFreeMediation(){
+    public boolean hasClaimantAgreedToFreeMediation() {
         return caseDataLiP != null && caseDataLiP.hasClaimantAgreedToFreeMediaiton();
     }
 }

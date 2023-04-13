@@ -847,5 +847,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || YES == getApplicant1ProceedWithClaimSpec2v1();
     }
 
-
 }
