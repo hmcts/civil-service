@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 
 import java.util.List;
 
@@ -120,5 +123,10 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
+    }
+
+    public static CaseData buildCaseWithMediation() {
+        return CaseData.builder().caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+            ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build()).build();
     }
 }
