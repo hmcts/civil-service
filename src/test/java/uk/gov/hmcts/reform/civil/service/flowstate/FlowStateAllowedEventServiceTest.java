@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -53,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
@@ -243,7 +245,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         MEDIATION_UNSUCCESSFUL,
                         EVIDENCE_UPLOAD_RESPONDENT
-
                     }
                 ),
                 of(
@@ -305,7 +306,8 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
@@ -544,7 +546,9 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
@@ -593,13 +597,15 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[]{
-                        CASE_PROCEEDS_IN_CASEMAN
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[]{
-                        CASE_PROCEEDS_IN_CASEMAN
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        ADD_CASE_NOTE
                     }
                 ),
                 of(

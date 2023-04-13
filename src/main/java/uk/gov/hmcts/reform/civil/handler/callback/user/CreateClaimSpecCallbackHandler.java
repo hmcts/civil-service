@@ -319,7 +319,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+        caseDataBuilder.claimFee(feesService
+            .getFeeDataByClaimValue(caseData.getClaimValue()))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
@@ -451,6 +452,37 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder
                 .respondent2OrgRegistered(YES)
                 .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            references.ifPresent(ref -> {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                        .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            });
+            dataBuilder
+                .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+        } else if (temporaryCaseData.getRespondent1OrgRegistered() == NO
+                && temporaryCaseData.getRespondent1Represented() == YES
+                && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            dataBuilder
+                    .respondent2OrgRegistered(NO)
+                    .respondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
+            references.ifPresent(ref -> {
+                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                        .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
+                        .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
+                        .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
+                        .build();
+                dataBuilder.solicitorReferences(updatedSolicitorReferences);
+            });
+            dataBuilder
+                  .respondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
+            dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
+            dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -463,10 +495,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
-
+            if (respondent1OrganisationPolicy != null) {
+                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                    .build();
+            }
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
