@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +97,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
+    private static final long NUMBER_OF_WEEKS_TO_HEARING = 3;
     private final IdamClient idamClient;
+    private final WorkingDayIndicator workingDayIndicator;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -416,6 +420,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         // copy of above method as to not break existing cases
         caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
+                                               .date1(presetDateFrom())
                                                .helpText1(
                                                    "If either party considers that the time estimate is insufficient, "
                                                        + "they must inform the court within 7 days of the date of "
@@ -597,6 +602,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private LocalDate presetDateFrom() {
+        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
+        LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
+        LocalDate hearingDate = baseDate.plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
+        if (!workingDayIndicator.isWorkingDay(hearingDate)) {
+            hearingDate = workingDayIndicator.getNextWorkingDay(hearingDate);
+        }
+
+        return hearingDate;
     }
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {

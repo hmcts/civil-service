@@ -73,6 +73,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -259,6 +260,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // existing cases
         DisposalHearingHearingTime tempDisposalHearingHearingTime =
             DisposalHearingHearingTime.builder()
+                .dateFrom(presetDateFrom())
                 .input(
                     "This claim will be listed for final disposal before a judge on the first available date after")
                 .dateTo(LocalDate.now().plusWeeks(16))
@@ -620,12 +622,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private LocalDate presetDateFrom() {
-        LocalDate date = LocalDate.now().plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
-        while (!workingDayIndicator.isWorkingDay(date)) {
-            date = date.plusDays(1);
+        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
+        LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
+        LocalDate hearingDate = baseDate.plusWeeks(NUMBER_OF_WEEKS_TO_HEARING);
+        if (!workingDayIndicator.isWorkingDay(hearingDate)) {
+            hearingDate = workingDayIndicator.getNextWorkingDay(hearingDate);
         }
 
-        return date;
+        return hearingDate;
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
