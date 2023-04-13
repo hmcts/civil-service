@@ -332,6 +332,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(false);
+            when(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(3)))
+                .thenReturn(LocalDate.now().plusWeeks(3).plusDays(1));
             when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3).plusDays(1)))
                 .thenReturn(true);
 
