@@ -235,10 +235,10 @@ public class HearingsPartyMapper {
                     String.format(FULL_NAME, partyFlagStructure.getFirstName(),
                                   partyFlagStructure.getLastName()),
                     partyRole.getPartyRoleValue(),
-                    null, //todo add email here
-                    null, //todo add phone number here
+                    partyFlagStructure.getEmail(),
+                    partyFlagStructure.getPhone(),
                     partyFlagStructure.getFlags())
-                );
+                ));
             }
         }
         return partyDetails;
