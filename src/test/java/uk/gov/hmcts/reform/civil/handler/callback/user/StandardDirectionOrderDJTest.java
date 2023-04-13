@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -74,6 +75,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
 
     @Nested
     class AboutToStartCallback {
@@ -129,6 +132,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(true);
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
@@ -523,6 +527,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDJTrialHearingToggle() {
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(false);
+            when(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(3)))
+                .thenReturn(LocalDate.now().plusWeeks(3).plusDays(1));
+            when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3).plusDays(1)))
+                .thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimIssuedTrialHearing().build();
