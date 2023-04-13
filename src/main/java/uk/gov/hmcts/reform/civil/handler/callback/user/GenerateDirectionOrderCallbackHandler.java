@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.lang.String.format;
@@ -71,8 +72,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
-            callbackKey(MID, "validate-form-values"), this::validateFormValues,
-            callbackKey(MID, "generate-document-preview"), this::generatePreviewDocument,
+            callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -86,7 +86,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
 
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -102,20 +101,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse validateFormValues(CallbackParams callbackParams) {
+    private CallbackResponse validateFormAndGeneratePreviewDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        checkFieldDate(caseData, errors);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse generatePreviewDocument(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
+            checkFieldDate(caseData, errors);
+        }
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -128,6 +120,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
@@ -147,6 +140,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
+                            .sorted()
                             .toList());
     }
 
@@ -173,7 +167,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
-        if (caseData.getFinalOrderDateHeardComplex().getDate().isBefore(LocalDate.now())) {
+        if (nonNull(caseData.getFinalOrderDateHeardComplex())
+            && caseData.getFinalOrderDateHeardComplex().getDate().isBefore(LocalDate.now())) {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
         }
     }
