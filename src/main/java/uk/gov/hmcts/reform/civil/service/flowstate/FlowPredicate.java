@@ -881,6 +881,9 @@ public class FlowPredicate {
                 .filter(YesOrNo.NO::equals).isPresent()) {
                 return false;
             }
+            if (!caseData.hasClaimantAgreedToFreeMediation()) {
+                return false;
+            }
             return true;
         }
         return false;
