@@ -692,11 +692,13 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase
                     }
                 ),
-                of(IN_MEDIATION,
-                   new CaseEvent[] {
-                       MEDIATION_SUCCESSFUL,
-                       MEDIATION_UNSUCCESSFUL
-                   })
+                of(
+                    IN_MEDIATION,
+                    new CaseEvent[]{
+                        MEDIATION_SUCCESSFUL,
+                        MEDIATION_UNSUCCESSFUL
+                    }
+                )
             );
         }
     }
