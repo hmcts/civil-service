@@ -405,6 +405,7 @@ public class CaseDataBuilder {
     private RevisedHearingRequirements applicantRevisedHearingRequirements;
     private RevisedHearingRequirements respondent1RevisedHearingRequirements;
     private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
     private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 

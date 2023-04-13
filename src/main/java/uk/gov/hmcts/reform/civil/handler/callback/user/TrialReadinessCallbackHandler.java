@@ -53,7 +53,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             + "If there are any additional changes between now and the hearing date, "
             + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
             + "The trial will go ahead on the specified date "
-            + "unless a judge makes an order changing the date of the hearing"
+            + "unless a judge makes an order changing the date of the hearing. "
             + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
             + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
@@ -71,7 +71,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
