@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.civil.enums.hearing;
 
 public enum HearingDuration {
-    MINUTES_30,
-    MINUTES_60,
-    MINUTES_90,
-    MINUTES_120,
-    MINUTES_150,
-    MINUTES_180,
-    MINUTES_240,
-    DAY_1,
-    DAY_2
+    MINUTES_30("30 minutes"),
+    MINUTES_60("1 hour"),
+    MINUTES_90("1 and a half hours"),
+    MINUTES_120("2 hours"),
+    MINUTES_150("2 and a half hours"),
+    MINUTES_180("3 hours"),
+    MINUTES_240("4 hours"),
+    DAY_1("1 day"),
+    DAY_2("2 days");
+
+    private String label;
+
+    HearingDuration(String value) {
+        this.label = value;
+    }
 }

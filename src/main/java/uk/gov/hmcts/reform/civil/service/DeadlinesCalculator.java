@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,5 +98,39 @@ public class DeadlinesCalculator {
             currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
         }
         return currentDate;
+    }
+
+    public LocalDate getSlaStartDate(CaseData caseData) {
+        var caseIssueDate = caseData.getIssueDate();
+        if (caseIssueDate == null) {
+            throw new IllegalArgumentException("Case issue data cannot be null");
+        }
+        var allocatedTrackName = caseData.getAllocatedTrack() != null
+            ? caseData.getAllocatedTrack().name()
+            : caseData.getResponseClaimTrack();
+
+        AllocatedTrack allocatedTrack;
+        try {
+            allocatedTrack = AllocatedTrack.valueOf(allocatedTrackName);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("The allocated track provided was not of type AllocatedTrack");
+        } catch (NullPointerException ex) {
+            throw new IllegalArgumentException("Allocated track cannot be null");
+        }
+
+        switch (allocatedTrack) {
+            case FAST_CLAIM: {
+                return caseIssueDate.plusWeeks(50);
+            }
+            case SMALL_CLAIM: {
+                return caseIssueDate.plusWeeks(30);
+            }
+            case MULTI_CLAIM: {
+                return caseIssueDate.plusWeeks(80);
+            }
+            default: {
+                throw new IllegalArgumentException("Unexpected allocated track provided");
+            }
+        }
     }
 }

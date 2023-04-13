@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -243,6 +243,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
+
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                     .setCoSClaimDetailsWithDate(true, false, cosDate, null, true, false)
@@ -250,11 +251,13 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getCosNotifyClaimDetails1()
                            .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
+            assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
 
         @Test
@@ -264,6 +267,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
+
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                     .setCoSClaimDetailsWithDate(false, true, null, cosDate, false, true)
@@ -271,11 +275,13 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getCosNotifyClaimDetails2()
                            .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());
+            assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
 
         @Test
@@ -288,6 +294,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
+
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                     .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
@@ -295,10 +302,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
+            assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
 
         @Test
@@ -311,6 +320,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .thenReturn(newDate.minusDays(3));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
+
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                     .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
@@ -318,10 +328,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
+            assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
         }
     }
 
