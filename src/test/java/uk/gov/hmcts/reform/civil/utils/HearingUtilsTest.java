@@ -6,6 +6,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -22,8 +27,18 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-public class HearingUtilsTest {
+@SpringBootTest(classes = {
+    WorkingDayIndicator.class
+})
+class HearingUtilsTest {
+
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+
+    @Autowired
+    ApplicationContext context;
 
     @Test
     void shouldThrowNullException_whenGivenNullDate() {
@@ -166,6 +181,26 @@ public class HearingUtilsTest {
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);
 
         assertThat(actual).isEqualTo(null);
+    }
+
+    @Test
+    void shouldReturnExpectedDate_whenHearingDateIsNotWorkingDay() {
+        LocalDate expectedDate = LocalDate.now().plusWeeks(3).plusDays(1);
+        when(workingDayIndicator.isWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(false);
+        when(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(3))).thenReturn(expectedDate);
+        when(workingDayIndicator.isWorkingDay(expectedDate)).thenReturn(true);
+        WorkingDayIndicator indicator = context.getBean(WorkingDayIndicator.class);
+        LocalDate actualDate = HearingUtils.getHearingDateFrom(indicator, 3);
+        assertThat(actualDate).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void shouldReturnExpectedDate_whenHearingDateIsWorkingDay() {
+        LocalDate expectedDate = LocalDate.now().plusWeeks(3);
+        when(workingDayIndicator.isWorkingDay(expectedDate)).thenReturn(true);
+        WorkingDayIndicator indicator = context.getBean(WorkingDayIndicator.class);
+        LocalDate actualDate = HearingUtils.getHearingDateFrom(indicator, 3);
+        assertThat(actualDate).isEqualTo(expectedDate);
     }
 
 }
