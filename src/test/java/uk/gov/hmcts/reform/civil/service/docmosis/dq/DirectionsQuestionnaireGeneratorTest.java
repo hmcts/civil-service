@@ -83,17 +83,18 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     DirectionsQuestionnaireGenerator.class,
     JacksonAutoConfiguration.class,
     StateFlowEngine.class,
-    CaseDetailsConverter.class,
-    LocationRefDataService.class
+    CaseDetailsConverter.class
 })
 class DirectionsQuestionnaireGeneratorTest {
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
