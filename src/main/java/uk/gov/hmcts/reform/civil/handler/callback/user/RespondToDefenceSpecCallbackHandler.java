@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isTwoVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -192,7 +193,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
+            caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
@@ -243,8 +245,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      *
      * @param caseData current case data
      * @return true if and only if either of the following conditions are satisfied: (a) applicant does not
-     *     accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
-     *     wants to proceed with the claim
+     * accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
+     * wants to proceed with the claim
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
@@ -362,17 +364,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return response.build();
     }
 
-    private static void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
-        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-            if ((isOneVOne(caseData) || isTwoVOne(caseData))
-                || isOneVTwoLegalRep(caseData)) {
-                response.state(CaseState.JUDICIAL_REFERRAL.name());
-            } else if (isOneVTwoLegalRep(caseData)) {
-                if (caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    response.state(CaseState.JUDICIAL_REFERRAL.name());
-                }
-            }
+    private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE) && !isOneVTwoTwoLegalRep(
+            caseData)) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
+            .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
 
@@ -655,11 +654,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
-        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
         BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
+        BigDecimal subTotal = claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
