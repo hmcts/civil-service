@@ -6,8 +6,11 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 public class CaseDataTest {
 
@@ -67,5 +70,56 @@ public class CaseDataTest {
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
         //Then
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void givenNotOneVTwoTwoLegalRepCaseResponseFullDefence_whenIsRespondentResponseFullDefence_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder().respondent1ClaimResponseTypeForSpec(FULL_DEFENCE).build();
+        //When
+        boolean result = caseData.isRespondentResponseFullDefence();
+        //Then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void givenNotOneVTwoTowLegalRepCaseResponsePartAdmit_whenIsRespondentResponseFullDefence_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder().respondent1ClaimResponseTypeForSpec(PART_ADMISSION).build();
+        //When
+        boolean result = caseData.isRespondentResponseFullDefence();
+        //Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void givenOneVTwoTwoLegalRepCaseRespondent1FullDefence_whenIsRespondentResponseFullDefence_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().build())
+            .respondent2(PartyBuilder.builder().build())
+            .applicant1(PartyBuilder.builder().build())
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .build();
+        //When
+        boolean result = caseData.isRespondentResponseFullDefence();
+        //Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void givenOneVTwoTwoLegalRepCaseRespondent1And2FullDefence_whenIsRespondentResponseFullDefence_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().build())
+            .respondent2(PartyBuilder.builder().build())
+            .applicant1(PartyBuilder.builder().build())
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .build();
+        //When
+        boolean result = caseData.isRespondentResponseFullDefence();
+        //Then
+        assertThat(result).isTrue();
     }
 }

@@ -365,12 +365,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
-        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE) && !isOneVTwoTwoLegalRep(
-            caseData)) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
-
-        } else if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE) && caseData.getRespondent2ClaimResponseTypeForSpec()
-            .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+        if (caseData.isRespondentResponseFullDefence()) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }

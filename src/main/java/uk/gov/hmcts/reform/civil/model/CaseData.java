@@ -118,6 +118,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -845,6 +846,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasApplicantProceededWithClaim() {
         return YES == getApplicant1ProceedWithClaim()
             || YES == getApplicant1ProceedWithClaimSpec2v1();
+    }
+
+    @JsonIgnore
+    public boolean isRespondentResponseFullDefence() {
+        return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && !isOneVTwoTwoLegalRep(this))
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent2ClaimResponseTypeForSpec()));
     }
 
 }
