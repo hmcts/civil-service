@@ -109,7 +109,7 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsApplicantIsWelsh() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForApplicantDQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
@@ -123,21 +123,7 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsRespondent1IsWelsh() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
-        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
-    }
-
-    @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsRespondent2IsWelsh() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent2DQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
@@ -151,7 +137,21 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsComboIsWelsh() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent1DQ() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent1And2DQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
@@ -165,7 +165,7 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndAllWelshLanguageRequirementsInAnyDQ() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndAllWelshLanguageRequirementsIsWelshForAllDQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
@@ -179,7 +179,34 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndBothLanguageRequirementsInAnyDQ() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsBothForRespondent1DQ() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsBothForRespondent1And2DQ() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+    @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndLanguageRequirementIsBothForAllDQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
@@ -193,13 +220,27 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo() {
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo1() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
             WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
         Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo2() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
                 CaseLocationCivil.builder().region("7").build()).build();
