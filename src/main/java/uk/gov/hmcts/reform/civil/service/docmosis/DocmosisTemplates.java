@@ -48,9 +48,9 @@ public enum DocmosisTemplates {
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf"),
     CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01246.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01234.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01271.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01269.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01270.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01243.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf");
     private final String template;
