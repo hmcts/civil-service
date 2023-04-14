@@ -23,18 +23,18 @@ public enum DocmosisTemplates {
     N181_2V1("CV-UNS-HRN-ENG-01172.docx", "%s_directions_questionnaire_form_%s.pdf"),
     N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR("CV-UNS-HRN-ENG-01173.docx",
                                             "%s_directions_questionnaire_form_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01046.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01274.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v1(
-        "CV-SPC-HRN-ENG-01065.docx", "%s_response_sealed_form.pdf"
+        "CV-SPC-HRN-ENG-01277.docx", "%s_response_sealed_form.pdf"
     ),
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
-        "CV-SPC-HRN-ENG-01064.docx", "%s_response_sealed_form.pdf"
+        "CV-SPC-HRN-ENG-01276.docx", "%s_response_sealed_form.pdf"
     ),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     SDO_DISPOSAL("CV-UNS-STD-ENG-01260.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01264.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01263.docx", "Order_trial_%s.pdf"),
-    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01275.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-UNS-STD-ENG-01262.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST(" CV-UNS-STD-ENG-01259.docx", "fast_track_sdo_%s.pdf"),
     SDO_SMALL_HNL("CV-UNS-STD-ENG-01262.docx", "small_claims_sdo_%s.pdf"),
@@ -49,8 +49,8 @@ public enum DocmosisTemplates {
     //HNL uplifted docs to be replaced with original once ready
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01260.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf"),
-    CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01246.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01278.docx", "%s_response_sealed_form.pdf"),
+    CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01279.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01234.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),
