@@ -39,8 +39,8 @@ public class CaseCategoriesService {
         String allocatedTrack = caseData.getAllocatedTrack() != null
             ? caseData.getAllocatedTrack().toString()  //unspec
             : caseData.getResponseClaimTrack(); //spec
-
-        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, caseData.getAllocatedTrack().toString());
+            
+        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
