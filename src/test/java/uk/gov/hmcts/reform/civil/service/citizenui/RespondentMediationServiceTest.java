@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -20,6 +21,15 @@ public class RespondentMediationServiceTest {
 
     @InjectMocks
     RespondentMediationService respondentMediationService;
+
+    @Test
+    public void whenNotSmallClaim() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isEqualTo(null);
+    }
 
     @Test
     void shouldSetMediationRequired_whenItsFD_ClaimantAgreeToProceed() {
