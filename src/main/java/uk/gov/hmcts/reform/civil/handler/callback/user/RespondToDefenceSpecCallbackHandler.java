@@ -55,13 +55,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
@@ -232,8 +230,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
-
     }
 
     /**
