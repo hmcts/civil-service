@@ -23,12 +23,12 @@ public class RespondentMediationServiceTest {
     RespondentMediationService respondentMediationService;
 
     @Test
-    public void whenNotSmallClaim() {
+    void whenNotSmallClaim() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
-        assertThat(showConditionFlag).isEqualTo(null);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class RespondentMediationServiceTest {
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
-        assertThat(showConditionFlag).isEqualTo(null);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class RespondentMediationServiceTest {
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
-        assertThat(showConditionFlag).isEqualTo(null);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
