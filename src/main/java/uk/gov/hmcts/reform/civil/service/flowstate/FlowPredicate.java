@@ -872,19 +872,18 @@ public class FlowPredicate {
                 && caseData.getRespondent2SameLegalRepresentative().equals(NO)
                 && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
                 return false;
-            }
-            if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()
                 || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()) {
                 return false;
-            }
-            if (!caseData.hasClaimantAgreedToFreeMediation()) {
+            } else if (!caseData.hasClaimantAgreedToFreeMediation()) {
                 return false;
+            } else {
+                return true;
             }
-            return true;
         }
         return false;
     };

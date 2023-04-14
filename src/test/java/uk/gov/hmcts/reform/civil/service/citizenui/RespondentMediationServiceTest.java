@@ -32,6 +32,16 @@ public class RespondentMediationServiceTest {
     }
 
     @Test
+    void whenResponseTypeIsIncorrect() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
+    }
+
+    @Test
     void shouldSetMediationRequired_whenItsFD_ClaimantAgreeToProceed() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
