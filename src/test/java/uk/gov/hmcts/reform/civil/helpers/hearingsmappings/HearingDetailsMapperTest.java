@@ -205,6 +205,7 @@ public class HearingDetailsMapperTest {
                 CaseLocationCivil.builder().region("7").build()).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
+
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndLanguageRequirementIsBothForAllDQ() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
