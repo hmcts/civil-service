@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimCallbackHandler.defendantFlag;
@@ -195,18 +196,25 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             bearerToken
         );
 
-        assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
-        if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
-            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
-        }
-        if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
-            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+        System.out.println("single response");
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+            }
+            if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+            }
         }
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+            }
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
