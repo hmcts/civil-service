@@ -52,15 +52,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
@@ -211,6 +203,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setVulnerabilityFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+
         Set<DefendantResponseShowTag> showConditionFlags = caseData.getShowConditionFlags();
         showConditionFlags.add(DefendantResponseShowTag.VULNERABILITY);
         updatedCaseData.showConditionFlags(showConditionFlags);
@@ -219,7 +212,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         DefendantResponseShowTag mediationFlag = respondentMediationService.setMediationRequired(caseData);
         if (mediationFlag != null) {
-            Set<DefendantResponseShowTag> showConditionFlags = caseData.getShowConditionFlags();
+            Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
             showConditionFlags.add(mediationFlag);
             updatedCaseData.showConditionFlags(showConditionFlags);
         }
