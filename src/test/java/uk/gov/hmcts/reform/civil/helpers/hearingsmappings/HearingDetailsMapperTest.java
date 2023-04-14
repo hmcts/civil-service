@@ -165,6 +165,34 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndAllWelshLanguageRequirementsInAnyDQ() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndBothLanguageRequirementsInAnyDQ() {
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
+                CaseLocationCivil.builder().region("7").build()).build();
+        assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
+    }
+
+    @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
