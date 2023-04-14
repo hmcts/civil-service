@@ -221,7 +221,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         DefendantResponseShowTag mediationFlag = respondentMediationService.setMediationRequired(caseData);
         if (mediationFlag != null) {
-            Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>(caseData.getShowConditionFlags());
+            Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
+            showConditionFlags.addAll(caseData.getShowConditionFlags());
             showConditionFlags.add(mediationFlag);
             updatedCaseData.showConditionFlags(showConditionFlags);
         }
