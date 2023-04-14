@@ -369,7 +369,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
 
-        } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE) && caseData.getRespondent2ClaimResponseTypeForSpec()
             .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
