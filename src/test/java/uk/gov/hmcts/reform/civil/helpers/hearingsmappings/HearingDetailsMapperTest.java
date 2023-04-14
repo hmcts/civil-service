@@ -130,7 +130,7 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void getFacilitiesRequired_shouldReturnList_whenNoDetainedIndividualFlagExist() {
+    void getFacilitiesRequired_shouldReturnList_whenDetainedIndividualFlagExists() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .withRespondent1Flags(wrapElements(
                 FlagDetail.builder()
