@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
@@ -160,7 +162,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                     LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build());
+                    LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+            .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                         .appealGranted(
+                AppealGrantedRefused.builder().appealDate(LocalDate.now().plusDays(21)).build())
+                                         .appealRefused(
+                AppealGrantedRefused.builder().refusedText("[name] court")
+                    .appealDate(LocalDate.now().plusDays(21)).build()).build());
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
