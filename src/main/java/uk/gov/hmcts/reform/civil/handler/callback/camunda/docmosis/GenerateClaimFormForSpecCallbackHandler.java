@@ -108,18 +108,18 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 wrapElements(caseData.getSpecClaimDetailsDocumentFiles())).build());
         }
 
-//        if (documentMetaDataList.size() > 1) {
-//            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-//                documentMetaDataList,
-//                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-//                sealedClaim.getDocumentName(),
-//                sealedClaim.getDocumentName(),
-//                caseData
-//            );
-//            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
-//        } else {
+        if (documentMetaDataList.size() > 1) {
+            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+                documentMetaDataList,
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                sealedClaim.getDocumentName(),
+                sealedClaim.getDocumentName(),
+                caseData
+            );
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+        } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
-//        }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
