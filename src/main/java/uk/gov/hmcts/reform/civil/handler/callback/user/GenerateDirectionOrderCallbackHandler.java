@@ -71,7 +71,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "populate-form-values"), this::populateFormValues,
+            callbackKey(MID, "populate-Form-values"), this::populateFormValues,
             callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -112,11 +112,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        if (caseData.getFinalOrderSelection() == FinalOrderSelection.FREE_FORM_ORDER) {
-            caseDataBuilder.freeFormOrderDocument(finalDocument.getDocumentLink());
-        } else {
-            caseDataBuilder.assistedOrderDocument(finalDocument.getDocumentLink());
-        }
+        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -190,7 +187,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
-        caseDataBuilder.freeFormOrderDocument(null);
+        caseDataBuilder.finalOrderDocument(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

@@ -760,11 +760,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
 
-    private Document freeFormOrderDocument;
-    private Document assistedOrderDocument;
+    private Document finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
-
+    /**
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
