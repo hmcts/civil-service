@@ -127,6 +127,9 @@ public class NotificationsProperties {
     private String claimantSolicitorConfirmsNotToProceedSpec;
 
     @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpecLip;
+
+    @NotEmpty
     private String respondentSolicitorNotifyNotToProceedSpec;
 
     @NotEmpty
