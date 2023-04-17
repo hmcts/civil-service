@@ -355,6 +355,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        RespondToClaimCallbackHandler.defendantFlag = null;
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
@@ -365,8 +366,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals(
-            "directionsQuestionnaire"));
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "directionsQuestionnaire");
     }
 
     @Test
@@ -447,8 +448,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals(
-            "directionsQuestionnaire"));
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "directionsQuestionnaire");
     }
 
     @Test
@@ -477,8 +478,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID().equals(
-            "defendant1DefenseDirectionsQuestionnaire"));
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant1DefenseDirectionsQuestionnaire");
     }
 
     @Test

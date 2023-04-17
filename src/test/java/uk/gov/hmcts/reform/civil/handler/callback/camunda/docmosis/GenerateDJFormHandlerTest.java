@@ -258,7 +258,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().get(0).getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"));
+            assertThat(updatedData.getDefaultJudgmentDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("detailsOfClaim");
         }
 
     }
