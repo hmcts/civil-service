@@ -1057,6 +1057,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAddCaseNamePublic_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).containsEntry("caseNamePublic", "'John Rambo' v 'Sole Trader'");
+        }
+
+        @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -26,10 +27,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJRespondentReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_EMAIL;
@@ -51,6 +55,8 @@ public class DJRespondentReceivedNotificationHandlerTest {
     NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private DJRespondentReceivedNotificationHandler handler;
 
@@ -133,6 +139,21 @@ public class DJRespondentReceivedNotificationHandlerTest {
                 getNotificationDataMap1v2fail(caseData),
                 "default-judgment-respondent-requested-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldReturn_whenInvokedAnd1v1AndLRvLiP() {
+            //send Received email
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_1).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
         @NotNull

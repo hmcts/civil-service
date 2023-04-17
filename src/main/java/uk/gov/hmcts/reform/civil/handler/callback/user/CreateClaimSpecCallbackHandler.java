@@ -321,7 +321,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+        caseDataBuilder.claimFee(feesService
+            .getFeeDataByClaimValue(caseData.getClaimValue()))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
