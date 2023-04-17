@@ -46,9 +46,9 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.6'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core', version: '3.1.6'
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.10'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.2'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core', version: '4.0.2'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.3'
 
   implementation group: 'org.springframework.retry', name: 'spring-retry'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
