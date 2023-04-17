@@ -347,7 +347,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, Applicant1DQ.Applicant1DQBuilder dq) {
-        if(featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if (featureToggleService.isCourtLocationDynamicListEnabled()) {
             handleCourtLocationData(caseData, builder, dq, callbackParams);
             locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
