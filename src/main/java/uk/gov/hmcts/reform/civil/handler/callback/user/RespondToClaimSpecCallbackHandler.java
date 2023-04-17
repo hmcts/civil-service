@@ -154,6 +154,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
+    public static String defendantFlagSpec;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1136,6 +1137,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
+        if (toggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            defendantFlagSpec(caseData, userInfo);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -1482,7 +1491,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
         if (respondent1SpecDefenceResponseDocument != null) {
@@ -1798,5 +1806,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         return false;
+    }
+
+    private String defendantFlagSpec(CaseData caseData, UserInfo userInfo) {
+        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            defendantFlagSpec = "userRespondent2";
+        }
+        return defendantFlagSpec;
     }
 }
