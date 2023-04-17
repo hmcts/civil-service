@@ -291,21 +291,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion())
-                && featureToggleService.isCourtLocationDynamicListEnabled()) {
-
-                handleCourtLocationData(caseData, builder, dq, callbackParams);
-                locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
-                    .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                        builder,
-                        requestedCourt,
-                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
-                            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
-                    ));
-                if (log.isDebugEnabled()) {
-                    log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                                  + " is " + builder.build().getCaseManagementLocation());
-                }
+            if (V_1.equals(callbackParams.getVersion()) || V_2.equals((callbackParams.getVersion()))) {
+                updateDQCourtLocations(callbackParams, caseData, builder, dq);
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -357,6 +344,23 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             }
         }
         return response.build();
+    }
+
+    private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, Applicant1DQ.Applicant1DQBuilder dq) {
+        if(featureToggleService.isCourtLocationDynamicListEnabled()) {
+            handleCourtLocationData(caseData, builder, dq, callbackParams);
+            locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
+                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+            if (log.isDebugEnabled()) {
+                log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                              + " is " + builder.build().getCaseManagementLocation());
+            }
+        }
     }
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
