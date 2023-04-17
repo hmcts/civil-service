@@ -83,7 +83,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void givenNotOneVTwoTowLegalRepCaseResponsePartAdmit_whenIsRespondentResponseFullDefence_thenFalse() {
+    void givenNotOneVTwoTwoLegalRepCaseResponsePartAdmit_whenIsRespondentResponseFullDefence_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder().respondent1ClaimResponseTypeForSpec(PART_ADMISSION).build();
         //When

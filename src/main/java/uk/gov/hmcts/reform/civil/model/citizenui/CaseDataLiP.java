@@ -20,7 +20,7 @@ public class CaseDataLiP {
     private ClaimantMediationLip applicant1ClaimMediationSpecRequiredLip;
 
     @JsonIgnore
-    public boolean hasClaimantAgreedToFreeMediaiton() {
+    public boolean hasClaimantAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
             && applicant1ClaimMediationSpecRequiredLip.hasClaimantAgreedToFreeMediation();
     }

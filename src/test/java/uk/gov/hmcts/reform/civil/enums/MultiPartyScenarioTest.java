@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -88,21 +89,21 @@ class MultiPartyScenarioTest {
     @Test
     void shouldReturnTrueWhenMultiPartyScenario() {
         CaseData caseData = get2V1CaseData();
-        Assertions.assertTrue(isMultiPartyScenario(caseData));
+        assertTrue(isMultiPartyScenario(caseData));
 
     }
 
     @Test
     void shouldReturnFalseWhenNotMultiPartyScenario() {
         CaseData caseData = get1V1CaseData();
-        Assertions.assertFalse(isMultiPartyScenario(caseData));
+        assertFalse(isMultiPartyScenario(caseData));
 
     }
 
     @Test
     void shouldReturnTrueWhenOneToOne() {
         CaseData caseData = get1V1CaseData();
-        assertThat(isOneVOne(caseData)).isTrue();
+        assertTrue(isOneVOne(caseData));
     }
 
     private static CaseData get1V1CaseData() {
@@ -116,43 +117,43 @@ class MultiPartyScenarioTest {
     @Test
     void shouldReturnFalseWhenNotOneVOne() {
         CaseData caseData = get1V2CaseData();
-        assertThat(isOneVOne(caseData)).isFalse();
+        assertFalse(isOneVOne(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenOneVTwo() {
         CaseData caseData = get1V2CaseData();
-        assertThat(isOneVTwoLegalRep(caseData)).isTrue();
+        assertTrue(isOneVTwoLegalRep(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenNotOneVTwo() {
         CaseData caseData = get1V1CaseData();
-        assertThat(isOneVTwoLegalRep(caseData)).isFalse();
+        assertFalse(isOneVTwoLegalRep(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenTwoVOne() {
         CaseData caseData = get2V1CaseData();
-        assertThat(isTwoVOne(caseData)).isTrue();
+        assertTrue(isTwoVOne(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenNotTwoVOne() {
         CaseData caseData = get1V1CaseData();
-        assertThat(isTwoVOne(caseData)).isFalse();
+        assertFalse(isTwoVOne(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenOneVTwoTwoLegalRep() {
         CaseData caseData = getOneVTwoTwoLegalRepCaseData();
-        assertThat(isOneVTwoTwoLegalRep(caseData)).isTrue();
+        assertTrue(isOneVTwoTwoLegalRep(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenNotOneVTwoTwoLegalRep() {
         CaseData caseData = get1V1CaseData();
-        assertThat(isOneVTwoTwoLegalRep(caseData)).isFalse();
+        assertFalse(isOneVTwoTwoLegalRep(caseData));
     }
 
     private static CaseData get1V2CaseData() {
