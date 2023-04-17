@@ -816,10 +816,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
+    void shouldReturnTrue_with_app_displayName_whenApplicantIsClaimantAtMainCase() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseData(CaseDataBuilder.builder().build());
-
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+        when(locationRefDataService.getCcmccLocation(any()))
+                .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
@@ -831,13 +832,18 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
             .id("org1Sol1").build());
         assertTrue(result);
+        CaseData gaData = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).id("org1Sol1").build(), CallbackParams.builder().toString());
+        assertThat(gaData.getGeneralApplications().get(0).getValue()
+                .getGaApplicantDisplayName()).isEqualTo("Applicant1" + " - Claimant");
     }
 
     @Test
-    void shouldReturnFalse_whenApplicantIsClaimantAtMainCase() {
+    void shouldReturnFalse_with_app_displayName_whenApplicantIsClaimantAtMainCase() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseData(CaseDataBuilder.builder().build());
-
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+        when(locationRefDataService.getCcmccLocation(any()))
+                .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
@@ -850,6 +856,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .id("org3Sol1").build());
 
         assertFalse(result);
+        CaseData gaData = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).id("org3Sol1").build(), CallbackParams.builder().toString());
+        assertThat(gaData.getGeneralApplications().get(0).getValue()
+                .getGaApplicantDisplayName()).isEqualTo("Applicant1" + " - Defendant");
     }
 
     @Test

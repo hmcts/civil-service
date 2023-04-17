@@ -182,6 +182,13 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
         }
 
+        String gaApplicantDisplayName;
+        if (isGAApplicantSameAsParentCaseClaimant(caseData, userDetails)) {
+            gaApplicantDisplayName = caseData.getApplicant1().getPartyName() + " - Claimant";
+        } else {
+            gaApplicantDisplayName = caseData.getApplicant1().getPartyName() + " - Defendant";
+        }
+
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
@@ -198,6 +205,7 @@ public class InitiateGeneralApplicationService {
             .caseAccessCategory(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
+            .gaApplicantDisplayName(gaApplicantDisplayName)
             .build();
 
         return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
