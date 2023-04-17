@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -20,6 +21,25 @@ public class RespondentMediationServiceTest {
 
     @InjectMocks
     RespondentMediationService respondentMediationService;
+
+    @Test
+    void whenNotSmallClaim() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
+    }
+
+    @Test
+    void whenResponseTypeIsIncorrect() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
+    }
 
     @Test
     void shouldSetMediationRequired_whenItsFD_ClaimantAgreeToProceed() {
@@ -44,7 +64,7 @@ public class RespondentMediationServiceTest {
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
-        assertThat(showConditionFlag).isEqualTo(null);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
@@ -57,7 +77,20 @@ public class RespondentMediationServiceTest {
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
-        assertThat(showConditionFlag).isEqualTo(null);
+        assertThat(showConditionFlag).isNull();
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenItsFD_NotAgreeToProcceed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .setClaimantMediationFlag(NO)
+            .applicant1ProceedWithClaim(YES)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
@@ -104,6 +137,33 @@ public class RespondentMediationServiceTest {
     }
 
     @Test
+    void shouldSetMediationRequired_whenItsPA_DefendantHasNotPaid_ClaimantAcceptedDefendantPaymentPlan() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .setClaimantMediationFlag(YES)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
+
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenItsPA_DefendantNotAgreedForMediation() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .setClaimantMediationFlag(NO)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
+
+    }
+
+    @Test
     void shouldSetMediationRequired_whenItsFullAdmission() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
@@ -114,6 +174,19 @@ public class RespondentMediationServiceTest {
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
         assertThat(showConditionFlag).isEqualTo(DefendantResponseShowTag.CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE);
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenItsFullAdmissionWithoutMultiParty() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1ProceedWithClaim(YES)
+            .defendantSingleResponseToBothClaimants(YES)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test
@@ -140,6 +213,19 @@ public class RespondentMediationServiceTest {
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
         assertThat(showConditionFlag).isEqualTo(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO);
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenIts1V2ClaimNegativePath() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaim(NO)
+            .defendantSingleResponseToBothClaimants(NO)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
     }
 
 }
