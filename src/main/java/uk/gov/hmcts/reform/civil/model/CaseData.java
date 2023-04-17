@@ -43,10 +43,8 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-
 import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
-
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 
@@ -564,6 +562,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingOtherComments applicantHearingOtherComments;
     private HearingOtherComments respondent1HearingOtherComments;
     private HearingOtherComments respondent2HearingOtherComments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;

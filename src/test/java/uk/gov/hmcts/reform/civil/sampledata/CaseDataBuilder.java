@@ -396,6 +396,16 @@ public class CaseDataBuilder {
     private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    //Trial Readiness
+    private HearingDuration hearingDuration;
+    private YesOrNo trialReadyApplicant;
+    private YesOrNo trialReadyRespondent1;
+    private YesOrNo trialReadyRespondent2;
+
+    private RevisedHearingRequirements applicantRevisedHearingRequirements;
+    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
+    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
     private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
@@ -4939,6 +4949,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseDataLip(CaseDataLiP caseDataLiP) {
         this.caseDataLiP = caseDataLiP;
+        return this;
+    }
+
+    public CaseDataBuilder specClaim1v1LrVsLip() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = NO;
         return this;
     }
 

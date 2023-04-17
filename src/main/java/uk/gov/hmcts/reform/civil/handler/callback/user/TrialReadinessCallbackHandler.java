@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -29,7 +30,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 
 @Service
@@ -49,7 +56,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             + "If there are any additional changes between now and the hearing date, "
             + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
             + "The trial will go ahead on the specified date "
-            + "unless a judge makes an order changing the date of the hearing"
+            + "unless a judge makes an order changing the date of the hearing. "
             + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
             + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
@@ -60,14 +67,14 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateValues,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::setBusinessProcess,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
@@ -97,6 +104,35 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .errors(errors)
             .data(errors.size() == 0
                       ? updatedData.build().toMap(objectMapper) : null)
+            .build();
+    }
+
+    private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+            if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
+                updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
+            } else {
+                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
+            }
+        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+            if (caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
+                updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
+            } else {
+                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1));
+            }
+        } else {
+            if (caseData.getTrialReadyRespondent2() == YesOrNo.YES) {
+                updatedData.businessProcess(BusinessProcess.ready(RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS));
+            } else {
+                updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2));
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 

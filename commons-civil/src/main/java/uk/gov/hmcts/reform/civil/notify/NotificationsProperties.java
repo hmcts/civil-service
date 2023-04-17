@@ -97,6 +97,9 @@ public class NotificationsProperties {
     private String solicitorTrialReady;
 
     @NotEmpty
+    private String otherPartyTrialReady;
+
+    @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
 
     @NotEmpty
@@ -119,6 +122,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpecLip;
 
     @NotEmpty
     private String respondentSolicitorNotifyNotToProceedSpec;
