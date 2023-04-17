@@ -163,6 +163,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeDate")
                 .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGranted")
+                .extracting("appealDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
         }
     }
 
