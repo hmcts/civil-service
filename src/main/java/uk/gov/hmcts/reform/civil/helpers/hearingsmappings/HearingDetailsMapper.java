@@ -1,18 +1,22 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 
 public class HearingDetailsMapper {
 
     private static String EMPTY_STRING = "";
+    private static final String WELSH_REGION_ID = "7";
     public static String STANDARD_PRIORITY = "Standard";
 
     private HearingDetailsMapper() {
@@ -40,8 +44,43 @@ public class HearingDetailsMapper {
         return 0;
     }
 
-    public static boolean getHearingInWelshFlag() {
-        return false;
+    public static boolean getHearingInWelshFlag(CaseData caseData) {
+        return isHearingInWales(caseData) && isWelshHearingSelected(caseData);
+    }
+
+    private static boolean isHearingInWales(CaseData caseData) {
+        if (Objects.nonNull(caseData.getCaseManagementLocation()) && Objects.nonNull(caseData.getCaseManagementLocation()
+                                                                                         .getRegion())) {
+            return caseData.getCaseManagementLocation().getRegion().equals(WELSH_REGION_ID);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isWelshHearingSelected(CaseData caseData) {
+        List<Language> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
+
+        return (welshLanguageRequirements.contains(Language.WELSH) || welshLanguageRequirements.contains(Language.BOTH));
+    }
+
+    private static List<Language> getWelshLanguageRequirements(CaseData caseData) {
+        List<Language> welshLanguageRequirements = new ArrayList<>();
+        if (Objects.nonNull(caseData.getRespondent1DQ()) && Objects.nonNull(caseData.getRespondent1DQ()
+                                                                                .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getRespondent1DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        if (Objects.nonNull(caseData.getRespondent2DQ()) && Objects.nonNull(caseData.getRespondent2DQ()
+                                                                                .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getRespondent2DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        if (Objects.nonNull(caseData.getApplicant1DQ()) && Objects.nonNull(caseData.getApplicant1DQ()
+                                                                               .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getApplicant1DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        return welshLanguageRequirements;
     }
 
     public static List<HearingLocationModel> getHearingLocations(CaseData caseData) {
