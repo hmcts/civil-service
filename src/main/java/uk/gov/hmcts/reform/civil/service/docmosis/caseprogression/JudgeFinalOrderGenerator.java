@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -93,7 +94,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .finalOrderHeardDate(nonNull(caseData.getFinalOrderDateHeardComplex()) ?
                                      caseData.getFinalOrderDateHeardComplex().getDate() : null)
-            .finalOrderRepresented(caseData.getFinalOrderRepresentation().getTypeRepresentationList().name())
+            .finalOrderRepresented(nonNull(caseData.getFinalOrderRepresentation()) ?
+                                       caseData.getFinalOrderRepresentation().getTypeRepresentationList().name() : "")
             .defendantAttended(!(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
                                    .getTypeRepresentationDefendantList()
                                    .equals(DEFENDANT_NOT_ATTENDING)))
@@ -128,9 +130,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                         caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : "")
             .furtherHearingMethod(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name())
             .isAppeal(caseData.getFinalOrderAppealToggle().equals(FinalOrderToggle.SHOW))
-            .appealFor(caseData.getFinalOrderAppealComplex().getApplicationList().name())
-            .appealGranted(caseData.getFinalOrderAppealComplex().getList().name())
-            .appealReason(caseData.getFinalOrderAppealComplex().getReasonsText())
+            .appealFor(caseData.getFinalOrderAppealComplex().getList().name())
+            .appealGranted(caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED))
+            .appealReason(nonNull(caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED))
+                              ? caseData.getFinalOrderAppealComplex().getAppealGranted().getReasonsText() : caseData.getFinalOrderAppealComplex().getAppealRefused().getReasonsText())
             .orderWithoutNotice(caseData.getOrderMadeOnDetailsList().name())
             .isReason(caseData.getFinalOrderGiveReasonsYesNo())
             .reasonText(caseData.getFinalOrderGiveReasonsComplex().getReasonsText());

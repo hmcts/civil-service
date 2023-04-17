@@ -73,7 +73,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(MID, "populate-Form-values"), this::populateFormValues,
+            callbackKey(MID, "populate-form-values"), this::populateFormValues,
             callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
             callbackKey(SUBMITTED), this::buildConfirmation
