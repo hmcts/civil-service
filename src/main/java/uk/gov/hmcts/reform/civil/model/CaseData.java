@@ -40,10 +40,14 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -117,6 +121,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -403,6 +410,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
+    @Valid
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
@@ -480,6 +489,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDatebox;
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
+    private final String caseNamePublic;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -535,10 +545,26 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingDuration hearingDuration;
     private String information;
     private String hearingNoticeListOther;
-
     private LocalDateTime caseDismissedHearingFeeDueDate;
+
+    //Trial Readiness
     private YesOrNo trialReadyNotified;
     private YesOrNo trialReadyChecked;
+
+    private YesOrNo trialReadyApplicant;
+    private YesOrNo trialReadyRespondent1;
+    private YesOrNo trialReadyRespondent2;
+
+    private RevisedHearingRequirements applicantRevisedHearingRequirements;
+    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
+    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
+    private HearingOtherComments applicantHearingOtherComments;
+    private HearingOtherComments respondent1HearingOtherComments;
+    private HearingOtherComments respondent2HearingOtherComments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -797,5 +823,43 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantNotPaid() {
+        return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isSettlementDeclinedByClaimant() {
+        return NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantRejectsClaimAmount() {
+        return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefence() {
+        return YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean isMediationAcceptedByDefendant() {
+        return YES.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyDefendant() {
+        return !YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyClaimant(MultiPartyScenario multiPartyScenario) {
+        return multiPartyScenario.equals(TWO_V_ONE)
+            && YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaimSpec2v1());
     }
 }
