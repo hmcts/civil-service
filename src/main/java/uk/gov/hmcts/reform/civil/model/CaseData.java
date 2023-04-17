@@ -763,6 +763,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Document finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
+
     /**
     /**
      * There are several fields that can hold the I2P of applicant1 depending

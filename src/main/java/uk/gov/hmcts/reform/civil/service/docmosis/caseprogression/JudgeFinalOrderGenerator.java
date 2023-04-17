@@ -7,11 +7,16 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.finalorders.*;
+import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -92,10 +97,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .defendantReference(nonNull(caseData.getSolicitorReferences())
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
-            .finalOrderHeardDate(nonNull(caseData.getFinalOrderDateHeardComplex()) ?
-                                     caseData.getFinalOrderDateHeardComplex().getDate() : null)
-            .finalOrderRepresented(nonNull(caseData.getFinalOrderRepresentation()) ?
-                                       caseData.getFinalOrderRepresentation().getTypeRepresentationList().name() : "")
+            .finalOrderHeardDate(nonNull(caseData.getFinalOrderDateHeardComplex())
+                                     ? caseData.getFinalOrderDateHeardComplex().getDate() : null)
+            .finalOrderRepresented(nonNull(caseData.getFinalOrderRepresentation())
+                                      ? caseData.getFinalOrderRepresentation().getTypeRepresentationList().name() : "")
             .defendantAttended(!(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
                                    .getTypeRepresentationDefendantList()
                                    .equals(DEFENDANT_NOT_ATTENDING)))
@@ -106,45 +111,52 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                       .getTypeRepresentationDefendantList()))
             .judgeHeardClaimantNotAttendedText(nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex())
                                                    ?
-                                                   getNotAttendedText(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList(), "CLAIMANT") : "")
-            .judgeHeardDefendantNotAttendedText(nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex()) ?
-                                                    getNotAttendedText(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getListDef(), "DEFENDANT") : "")
-            .otherRepresentedText(nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex()) ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "" )
-            .judgeConsideredPapers(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList().stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
+                                                   getNotAttendedText(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
+                                                                          .getTrialProcedureClaimantComplex().getList(), "CLAIMANT") : "")
+            .judgeHeardDefendantNotAttendedText(nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex())
+                                                    ?
+            getNotAttendedText(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
+                                                                           .getTrialProcedureComplex().getListDef(), "DEFENDANT") : "")
+            .otherRepresentedText(nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex())
+                                      ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "")
+            .judgeConsideredPapers(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
+                                       .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
                 FinalOrdersJudgePapers.CONSIDERED)))
             .isRecorded(caseData.getFinalOrderRecitals().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
                 FinalOrderToggle.SHOW)))
             .recordedText(caseData.getFinalOrderRecitalsRecorded().getText())
             .orderedText(caseData.getFinalOrderOrderedThatText())
             .costSelection(caseData.getAssistedOrderCostList().name())
-            .costReservedText(nonNull(caseData.getAssistedOrderCostsReserved()) ?
+            .costReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
+                                  ?
                                   caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : "")
             .paidByDate(getPaidByDate(caseData))
             .costProtection(getCostProtection(caseData))
             .costAmount(getCostAmount(caseData))
-            .bespokeText(nonNull(caseData.getAssistedOrderCostsBespoke()) ?
+            .bespokeText(nonNull(caseData.getAssistedOrderCostsBespoke())
+                             ?
                              caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : "")
             .furtherHearingFromDate(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())
             .furtherHearingToDate(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
-            .furtherHearingLocation(nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList()) ?
+            .furtherHearingLocation(nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
+                                        ?
                                         caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : "")
             .furtherHearingMethod(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name())
             .isAppeal(caseData.getFinalOrderAppealToggle().equals(FinalOrderToggle.SHOW))
             .appealFor(caseData.getFinalOrderAppealComplex().getList().name())
             .appealGranted(caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED))
             .appealReason(nonNull(caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED))
-                              ? caseData.getFinalOrderAppealComplex().getAppealGranted().getReasonsText() : caseData.getFinalOrderAppealComplex().getAppealRefused().getReasonsText())
+                              ? caseData.getFinalOrderAppealComplex().getAppealGranted().getReasonsText()
+                              : caseData.getFinalOrderAppealComplex().getAppealRefused().getReasonsText())
             .orderWithoutNotice(caseData.getOrderMadeOnDetailsList().name())
             .isReason(caseData.getFinalOrderGiveReasonsYesNo())
             .reasonText(caseData.getFinalOrderGiveReasonsComplex().getReasonsText());
 
         return assistedFormOrderBuilder.build();
-
-
     }
 
     private LocalDate getPaidByDate(CaseData caseData) {
-        if(caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
+        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardDate();
         } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardDate();
@@ -158,7 +170,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private YesOrNo getCostProtection(CaseData caseData) {
-        if(caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
+        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardProtectionOption();
         } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardProtectionOption();
@@ -172,7 +184,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String getCostAmount(CaseData caseData) {
-        if(caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
+        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardText();
         } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
             return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardText();
@@ -189,24 +201,28 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         switch (notAttendingText) {
             case NOT_SATISFIED_NOTICE_OF_TRIAL:
                 if (party.equals("CLAIMANT")) {
-                    return "The claimant did not attend the trial, but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
+                    return "The claimant did not attend the trial, " +
+                        "but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
                 } else {
-                    return "The defendant did not attend the trial, but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
+                    return "The defendant did not attend the trial," +
+                        " but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
                 }
             case SATISFIED_NOTICE_OF_TRIAL:
                 if (party.equals("CLAIMANT")) {
                     return "The claimant did not attend the trial and whilst the Judge was satisfied that they had " +
                         "received notice of the trial it was not reasonable to proceed in their absence";
                 } else {
-                    return "The defendant did not attend the trial and whilst the Judge was satisfied that they had received notice of the trial it was not reasonable to proceed in their absence";
+                    return "The defendant did not attend the trial and whilst the Judge was satisfied " +
+                        "that they had received notice of the trial it was not reasonable to proceed in their absence";
                 }
-                case SATISFIED_REASONABLE_TO_PROCEED:
+            case SATISFIED_REASONABLE_TO_PROCEED:
                 if (party.equals("CLAIMANT")) {
                     return "The claimant did not attend the trial, but the Judge was satisfied that they had received" +
                         " notice" +
                         " of the trial and it was reasonable to proceed in their absence";
                 } else {
-                    return "The defendant did not attend the trial, but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence";
+                    return "The defendant did not attend the trial," +
+                        " but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence";
                 }
             default: return "";
         }

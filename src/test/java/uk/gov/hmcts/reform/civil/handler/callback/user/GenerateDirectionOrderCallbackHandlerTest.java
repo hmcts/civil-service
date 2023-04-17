@@ -185,7 +185,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
@@ -199,7 +199,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
