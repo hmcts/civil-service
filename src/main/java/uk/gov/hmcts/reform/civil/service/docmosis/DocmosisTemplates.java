@@ -51,7 +51,7 @@ public enum DocmosisTemplates {
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01271.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01269.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01270.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01243.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01272.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf");
     private final String template;
     private final String documentTitle;
