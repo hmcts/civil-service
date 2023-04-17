@@ -765,7 +765,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
     /**
-    /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
      * This method tries to simplify those conditions since only one field will be
