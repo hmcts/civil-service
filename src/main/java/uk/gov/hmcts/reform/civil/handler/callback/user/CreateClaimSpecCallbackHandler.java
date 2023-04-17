@@ -412,14 +412,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (toggleService.isCourtLocationDynamicListEnabled()) {
-            dataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
-        }
+        dataBuilder
+            .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1())
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
-
-        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         //assign case management category to the case and caseNameHMCTSinternal
         if (toggleService.isGlobalSearchEnabled()) {

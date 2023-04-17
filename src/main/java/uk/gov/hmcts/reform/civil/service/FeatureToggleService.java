@@ -48,10 +48,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
     }
 
-    public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
-    }
-
     public boolean isCaseFlagsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-flags");
     }

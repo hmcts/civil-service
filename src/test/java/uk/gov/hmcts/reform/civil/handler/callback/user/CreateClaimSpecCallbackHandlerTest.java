@@ -81,7 +81,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -1274,7 +1273,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmitCallbackV1 {
+    class AboutToSubmitCallback {
 
         private CallbackParams params;
         private CaseData caseData;
@@ -1287,83 +1286,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
-            given(time.now()).willReturn(submittedDate);
-        }
-
-        // TODO: move this test case to AboutToSubmitCallbackV0 after release
-        @Test
-        void shouldUpdateCaseManagementLocation_whenInvoked() {
-            // Given
-            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData())
-                .extracting("caseManagementLocation")
-                .extracting("region", "baseLocation")
-                .containsExactly("2", "420219");
-        }
-
-        @Test
-        void shouldAddMissingRespondent1OrgPolicyWithCaseRole_whenInvoked() {
-            // Given
-            var callbackParams = params.toBuilder()
-                .caseData(params.getCaseData().toBuilder()
-                              .respondent1OrganisationPolicy(null)
-                              .build())
-                .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-            // Then
-            assertThat(response.getData())
-                .extracting("respondent1OrganisationPolicy")
-                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORONE]");
-        }
-
-        @Test
-        void shouldAddMissingRespondent2OrgPolicyWithCaseRole_whenInvoked() {
-            // Given
-            var callbackParams = params.toBuilder()
-                .caseData(params.getCaseData().toBuilder().build())
-                .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-            // Then
-            assertThat(response.getData())
-                .extracting("respondent2OrganisationPolicy")
-                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORTWO]");
-        }
-    }
-
-    @Nested
-    class AboutToSubmitCallbackV0 {
-
-        private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
-        private static final String DIFFERENT_EMAIL = "other_example@email.com";
-        private final LocalDateTime submittedDate = LocalDateTime.now();
-
-        @BeforeEach
-        void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -1393,7 +1316,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             // Given
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_2).request(
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_SERVICE_REQUEST.name()).build())
                 .build();
 
@@ -1516,6 +1439,54 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondentSolicitor2Reference").isEqualTo("6789");
             assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
             assertThat(respondentSolicitor2ServiceAddress).isNull();
+        }
+
+        @Test
+        void shouldUpdateCaseManagementLocation_whenInvoked() {
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("2", "420219");
+        }
+
+        @Test
+        void shouldAddMissingRespondent1OrgPolicyWithCaseRole_whenInvoked() {
+            // Given
+            var callbackParams = params.toBuilder()
+                .caseData(params.getCaseData().toBuilder()
+                              .respondent1OrganisationPolicy(null)
+                              .build())
+                .build();
+            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+            // Then
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationPolicy")
+                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORONE]");
+        }
+
+        @Test
+        void shouldAddMissingRespondent2OrgPolicyWithCaseRole_whenInvoked() {
+            // Given
+            var callbackParams = params.toBuilder()
+                .caseData(params.getCaseData().toBuilder().build())
+                .build();
+            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+            // Then
+            assertThat(response.getData())
+                .extracting("respondent2OrganisationPolicy")
+                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORTWO]");
         }
 
         @Nested

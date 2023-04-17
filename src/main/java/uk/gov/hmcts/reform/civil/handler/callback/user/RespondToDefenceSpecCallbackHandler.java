@@ -125,10 +125,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
             .put(callbackKey(V_1, MID, "set-up-ccj-amount-summary"), this::buildJudgmentAmountSummaryDetails)
             .put(callbackKey(V_1, MID, "set-mediation-show-tag"), this::setMediationShowTag)
-            .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit)
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -261,21 +259,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
-        if (v1) {
-            locationHelper.getCaseManagementLocation(caseData)
-                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
-                    requestedCourt,
-                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString())
-                ));
-        }
+        locationHelper.getCaseManagementLocation(caseData)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                builder,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
+
         if (log.isDebugEnabled()) {
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
                           + " is " + builder.build().getCaseManagementLocation());
@@ -287,21 +284,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion())
-                && featureToggleService.isCourtLocationDynamicListEnabled()) {
 
-                handleCourtLocationData(caseData, builder, dq, callbackParams);
-                locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
-                    .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                        builder,
-                        requestedCourt,
-                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
-                            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
-                    ));
-                if (log.isDebugEnabled()) {
-                    log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                                  + " is " + builder.build().getCaseManagementLocation());
-                }
+            handleCourtLocationData(caseData, builder, dq, callbackParams);
+            locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
+                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+            if (log.isDebugEnabled()) {
+                log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                              + " is " + builder.build().getCaseManagementLocation());
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -344,7 +338,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (v1 && featureToggleService.isSdoEnabled()) {
+        if (featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
@@ -384,20 +378,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
 
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (hasVersion && featureToggleService.isCourtLocationDynamicListEnabled()) {
-            List<LocationRefData> locations = fetchLocationData(callbackParams);
-            updatedCaseData.applicant1DQ(
-                Applicant1DQ.builder().applicant1DQRequestedCourt(
-                    RequestedCourt.builder().responseCourtLocations(
-                        courtLocationUtils.getLocationsFromList(locations)).build()
-                ).build());
-        }
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        updatedCaseData.applicant1DQ(
+            Applicant1DQ.builder().applicant1DQRequestedCourt(
+                RequestedCourt.builder().responseCourtLocations(
+                    courtLocationUtils.getLocationsFromList(locations)).build()
+            ).build());
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));

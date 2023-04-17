@@ -66,8 +66,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -118,8 +116,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondentCopyObjects)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects)
-            .put(callbackKey(V_2, ABOUT_TO_START), this::populateRespondentCopyObjects)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
@@ -128,7 +124,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -170,42 +165,35 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
-        DynamicList courtLocationList = DynamicList.builder().build();
-        RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder();
-
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1);
 
-        if ((V_1.equals(callbackParams.getVersion()) || V_2.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
-            List<LocationRefData> locations = fetchLocationData(callbackParams);
-            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-            requestedCourt1.responseCourtLocations(courtLocationList);
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(locations);
+        RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder();
+        requestedCourt1.responseCourtLocations(courtLocationList);
 
-            if (V_2.equals(callbackParams.getVersion())) {
-                Optional.ofNullable(caseData.getCourtLocation())
-                    .map(CourtLocation::getApplicantPreferredCourt)
-                    .flatMap(applicantCourt -> locations.stream()
-                        .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
-                        .findFirst())
-                    .ifPresent(locationRefData -> requestedCourt1
-                        .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
-                                                     + " " + locationRefData.getSiteName()));
-            }
+        Optional.ofNullable(caseData.getCourtLocation())
+            .map(CourtLocation::getApplicantPreferredCourt)
+            .flatMap(applicantCourt -> locations.stream()
+                .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
+                .findFirst())
+            .ifPresent(locationRefData -> requestedCourt1
+                .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                                             + " " + locationRefData.getSiteName()));
 
-            updatedCaseData
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQRequestedCourt(
-                                       requestedCourt1
-                                           .build())
-                                   .build());
+        updatedCaseData
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   requestedCourt1
+                                       .build())
+                               .build());
 
-            if (caseData.getRespondent2() != null) {
-                updatedCaseData.respondent2DQ(
-                    Respondent2DQ.builder()
-                        .respondent2DQRequestedCourt(requestedCourt1.build()).build());
-            }
+        if (caseData.getRespondent2() != null) {
+            updatedCaseData.respondent2DQ(
+                Respondent2DQ.builder()
+                    .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
@@ -403,9 +391,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                     .respondent1DQStatementOfTruth(statementOfTruth);
 
-                if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                    handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-                }
+                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
 
                 updatedData.respondent1DQ(dq.build());
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -425,9 +411,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     // moving statement of truth value to correct field, this was not possible in mid event.
                     Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                         .respondent1DQStatementOfTruth(statementOfTruth);
-                    if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                        handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-                    }
+                    handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
                     updatedData.respondent1DQ(dq.build());
                 } else {
                     //required as ccd populated the respondent DQ with null objects.
@@ -438,9 +422,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                     Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
                         .respondent2DQStatementOfTruth(statementOfTruth);
-                    if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                        handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
-                    }
+                    handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
                     updatedData.respondent2DQ(dq2.build());
                 } else {
                     updatedData.respondent2DQ(null);
@@ -471,9 +453,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
-            }
+            handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -520,9 +500,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-            }
+            handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());

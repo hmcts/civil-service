@@ -84,7 +84,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
@@ -162,7 +161,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
@@ -181,7 +179,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -1114,24 +1111,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DetailsForClaimDetailsTab(r2)
             );
 
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
-            if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
-                updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                                                  .respondToCourtLocation(
-                                                      RequestedCourt.builder()
-                                                          .responseCourtLocations(courtLocationList)
-                                                          .build())
-                                                  .build());
-            }
-            if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
-                updatedCaseData.respondent2DQ(Respondent2DQ.builder()
-                                                  .respondToCourtLocation2(
-                                                      RequestedCourt.builder()
-                                                          .responseCourtLocations(courtLocationList)
-                                                          .build())
-                                                  .build());
-            }
+        DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
+        if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                                              .respondToCourtLocation(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
+                                              .build());
+        }
+        if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
+            updatedCaseData.respondent2DQ(Respondent2DQ.builder()
+                                              .respondToCourtLocation2(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
+                                              .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1360,9 +1355,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
-            }
+            handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -1397,9 +1390,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                             .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
                                             .details(caseData.getRespondent1DQWitnessesDetailsSpec())
                                             .build());
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
-            }
+            handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
