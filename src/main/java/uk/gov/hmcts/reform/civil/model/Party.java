@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
@@ -23,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @AllArgsConstructor
 public class Party {
 
-    private List<UnavailabilityRangeModel> unavailableDates;
+    private List<Element<UnavailableDate>> unavailableDates;
     private Type type;
     private String individualTitle;
     private String individualFirstName;
