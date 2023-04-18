@@ -297,7 +297,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (caseData.getFinalOrderRepresentation() == null) {
             return "";
         }
-        if (party.equals("DEFENDANT")){
+        if (party.equals("DEFENDANT")) {
             return getDefendantNotAttendedText(caseData);
         } else {
             return getClaimantNotAttendedText(caseData);
@@ -308,7 +308,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null
                 && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList() != null) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
                     caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
             switch (notAttendingType) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
@@ -322,7 +322,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         " notice" +
                         " of the trial and it was reasonable to proceed in their absence";
                 default:
-                        return "";
+                    return "";
             }
         }
         return "";
@@ -332,7 +332,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
                 && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
                     caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
             switch (notAttendingType) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
