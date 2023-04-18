@@ -219,6 +219,34 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
     }
 
+    @Test
+    void shouldGenerateFreeFormOrder_onMidEventCallback() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "generate-document-preview");
+        // When
+        when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
+    }
+
+    @Test
+    void shouldGenerateAssistedOrder_onMidEventCallback() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "generate-document-preview");
+        // When
+        when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+    }
+
     @Nested
     class AboutToSubmitCallback {
 

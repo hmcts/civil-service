@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -37,7 +39,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -63,23 +67,25 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
+    private final FeatureToggleService toggleService;
     BigDecimal theOverallTotal;
     private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
-            callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
-            callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec,
-            callbackKey(MID, "claimPartialPayment"), this::partialPayment,
-            callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
-            callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
-            callbackKey(MID, "repaymentValidate"), this::repaymentValidate,
-            callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
-            callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility)
+            .put(callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus)
+            .put(callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec)
+            .put(callbackKey(MID, "claimPartialPayment"), this::partialPayment)
+            .put(callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate)
+            .put(callbackKey(V_1, MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate)
+            .put(callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate)
+            .put(callbackKey(MID, "repaymentValidate"), this::repaymentValidate)
+            .put(callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     @Override
@@ -265,7 +271,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData,
             interest,
             claimFeePounds,
-            fixedCost
+            fixedCost,
+            callbackParams
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
@@ -276,7 +283,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost) {
+                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
 
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
@@ -290,17 +297,24 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
-            repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
-                theOverallTotal);
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+            && toggleService.isPinInPostEnabled()
+            && V_1.equals(callbackParams.getVersion())
+            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            repaymentBreakdown.append("The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
-            repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
-                .getValue().getLabel() + " to pay £").append(
-                theOverallTotal);
+            if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+                repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
+                    theOverallTotal);
+            } else {
+                repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
+                    .getValue().getLabel() + " to pay £").append(
+                    theOverallTotal);
+            }
+            repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
         }
 
-        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
-            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
+        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
