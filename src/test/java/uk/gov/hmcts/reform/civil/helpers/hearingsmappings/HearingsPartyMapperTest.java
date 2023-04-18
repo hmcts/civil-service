@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +12,14 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +30,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
+import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingsPartyMapper.buildPartyObjectForHearingPayload;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
@@ -69,11 +75,32 @@ public class HearingsPartyMapperTest {
                                         .build()));
     }
 
+    private String getLocalDateInString(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    private UnavailabilityRangeModel buildUnavailabilityDateRange(LocalDate from, LocalDate to) {
+        return  UnavailabilityRangeModel.builder()
+            .unavailabilityType(ALL_DAY)
+            .unavailableFromDate(getLocalDateInString(from))
+            .unavailableToDate(getLocalDateInString(to))
+            .build();
+    }
+
+    private CaseData rollUpUnavailableDate(CaseData caseData, boolean defendantResponse) {
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, defendantResponse);
+        caseData = builder.build();
+        return caseData;
+    }
+
     @Test
     void shouldBuildIndividualDetails_whenClaimantIsIndividualRespondentSoleTrader() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .applicant1DQWithUnavailableDate()
             .build();
+        caseData = rollUpUnavailableDate(caseData, false);
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "John",
@@ -83,6 +110,8 @@ public class HearingsPartyMapperTest {
             "rambo@email.com",
             "0123456789"
         );
+
+        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1),LocalDate.now().plusDays(1))));
 
         PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
             APPLICANT_LR_ORG_NAME,
@@ -122,6 +151,7 @@ public class HearingsPartyMapperTest {
     void shouldBuildOrganisationDetails_whenClaimantIsCompanyRespondentOrganisation() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .respondent1DQWithUnavailableDateRange()
             .build()
             .toBuilder()
             .applicant1(Party.builder()
@@ -133,6 +163,8 @@ public class HearingsPartyMapperTest {
                              .type(ORGANISATION)
                              .build())
             .build();
+
+        caseData = rollUpUnavailableDate(caseData, true);
 
         PartyDetailsModel applicantPartyDetails = buildExpectedOrganisationPartyObject(
             APPLICANT_COMPANY_NAME,
@@ -151,6 +183,7 @@ public class HearingsPartyMapperTest {
             DEFENDANT_ROLE,
             null
         );
+        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1),LocalDate.now().plusDays(2))));
 
         PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
             RESPONDENT_ONE_LR_ORG_NAME,

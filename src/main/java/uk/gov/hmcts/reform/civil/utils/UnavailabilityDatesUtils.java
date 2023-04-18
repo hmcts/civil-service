@@ -2,16 +2,6 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
-
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
-import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
 
 public class UnavailabilityDatesUtils {
 
@@ -53,33 +43,4 @@ public class UnavailabilityDatesUtils {
             }
         }
     }
-
-    /*
-    private static void getUnavailableDatesForParty(ArrayList<UnavailabilityRangeModel> unavailabilityDates,
-                                                    List<Element<UnavailableDate>> unavailableDates) {
-        for (Element<UnavailableDate> dateElement : unavailableDates) {
-            if (dateElement.getValue().getUnavailableDateType() != null) {
-                if (SINGLE_DATE.equals(dateElement.getValue().getUnavailableDateType())) {
-                    unavailabilityDates.add(buildUnavailabilityDateObject(dateElement.getValue().getDate(),
-                                                                          dateElement.getValue().getDate()));
-                } else if (DATE_RANGE.equals(dateElement.getValue().getUnavailableDateType())) {
-                    unavailabilityDates.add(buildUnavailabilityDateObject(dateElement.getValue().getFromDate(),
-                                                                          dateElement.getValue().getToDate()));
-                }
-            } else {
-                unavailabilityDates.add(buildUnavailabilityDateObject(dateElement.getValue().getDate(),
-                                                                      dateElement.getValue().getDate()));
-            }
-        }
-    }
-
-    private static UnavailabilityRangeModel buildUnavailabilityDateObject(LocalDate fromDate, LocalDate toDate) {
-        return UnavailabilityRangeModel.builder()
-            .unavailableFromDate(fromDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .unavailableToDate(toDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .unavailabilityType(ALL_DAY)
-            .build();
-    }
-    */
-
 }
