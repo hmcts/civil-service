@@ -5,12 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -2155,11 +2158,12 @@ class FlowPredicateTest {
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
-                new YesOrNo[]{null, null}, false,
-                new YesOrNo[]{NO, NO}, false,
-                new YesOrNo[]{NO, YES}, false,
-                new YesOrNo[]{YES, NO}, false,
-                new YesOrNo[]{YES, YES}, true
+                new YesOrNo[]{null, null, NO}, false,
+                new YesOrNo[]{NO, NO, NO}, false,
+                new YesOrNo[]{NO, YES, NO}, false,
+                new YesOrNo[]{YES, NO, NO}, false,
+                new YesOrNo[]{YES, NO, YES}, false,
+                new YesOrNo[]{YES, YES, YES}, true
             );
 
             defClaim.forEach((whoAgrees, expected) -> {
@@ -2168,6 +2172,10 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
+                    .caseDataLiP(CaseDataLiP.builder()
+                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
+                                     .build()).build())
                     .build();
                 Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
             });
@@ -2183,11 +2191,12 @@ class FlowPredicateTest {
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
-                new YesOrNo[]{null, null}, false,
-                new YesOrNo[]{NO, NO}, false,
-                new YesOrNo[]{NO, YES}, false,
-                new YesOrNo[]{YES, NO}, false,
-                new YesOrNo[]{YES, YES}, true
+                new YesOrNo[]{null, null, NO}, false,
+                new YesOrNo[]{NO, NO, NO}, false,
+                new YesOrNo[]{NO, YES, NO}, false,
+                new YesOrNo[]{YES, NO, NO}, false,
+                new YesOrNo[]{YES, NO, YES}, false,
+                new YesOrNo[]{YES, YES, YES}, true
             );
 
             defClaim.forEach((whoAgrees, expected) -> {
@@ -2196,6 +2205,10 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
+                    .caseDataLiP(CaseDataLiP.builder()
+                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
+                                     .build()).build())
                     .build();
                 Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
             });
@@ -2211,15 +2224,16 @@ class FlowPredicateTest {
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
-                new YesOrNo[]{null, null, null}, false,
-                new YesOrNo[]{NO, NO, NO}, false,
-                new YesOrNo[]{NO, NO, YES}, false,
-                new YesOrNo[]{NO, YES, NO}, false,
-                new YesOrNo[]{NO, YES, YES}, false,
-                new YesOrNo[]{YES, NO, NO}, false,
-                new YesOrNo[]{YES, NO, YES}, false,
-                new YesOrNo[]{YES, YES, NO}, false,
-                new YesOrNo[]{YES, YES, YES}, true
+                new YesOrNo[]{null, null, null, NO}, false,
+                new YesOrNo[]{NO, NO, NO, NO}, false,
+                new YesOrNo[]{NO, NO, YES, NO}, false,
+                new YesOrNo[]{NO, YES, NO, NO}, false,
+                new YesOrNo[]{NO, YES, YES, NO}, false,
+                new YesOrNo[]{YES, NO, NO, NO}, false,
+                new YesOrNo[]{YES, NO, YES, NO}, false,
+                new YesOrNo[]{YES, YES, NO, NO}, false,
+                new YesOrNo[]{YES, NO, NO, YES}, false,
+                new YesOrNo[]{YES, YES, YES, YES}, true
             );
 
             defClaim.forEach((whoAgrees, expected) -> {
@@ -2229,6 +2243,10 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[2])
                                                               .build())
+                    .caseDataLiP(CaseDataLiP.builder()
+                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
+                                     .build()).build())
                     .build();
                 Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
             });
@@ -2242,15 +2260,16 @@ class FlowPredicateTest {
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
-                new YesOrNo[]{null, null, null}, false,
-                new YesOrNo[]{NO, NO, NO}, false,
-                new YesOrNo[]{NO, NO, YES}, false,
-                new YesOrNo[]{NO, YES, NO}, false,
-                new YesOrNo[]{NO, YES, YES}, false,
-                new YesOrNo[]{YES, NO, NO}, false,
-                new YesOrNo[]{YES, NO, YES}, false,
-                new YesOrNo[]{YES, YES, NO}, false,
-                new YesOrNo[]{YES, YES, YES}, true
+                new YesOrNo[]{null, null, null, NO}, false,
+                new YesOrNo[]{NO, NO, NO, NO}, false,
+                new YesOrNo[]{NO, NO, YES, NO}, false,
+                new YesOrNo[]{NO, YES, NO, NO}, false,
+                new YesOrNo[]{NO, YES, YES, NO}, false,
+                new YesOrNo[]{YES, NO, NO, NO}, false,
+                new YesOrNo[]{YES, NO, YES, NO}, false,
+                new YesOrNo[]{YES, YES, NO, NO}, false,
+                new YesOrNo[]{YES, NO, NO, YES}, false,
+                new YesOrNo[]{YES, YES, YES, YES}, true
             );
 
             defClaim.forEach((whoAgrees, expected) -> {
@@ -2262,6 +2281,10 @@ class FlowPredicateTest {
                     .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                                .hasAgreedFreeMediation(whoAgrees[2])
                                                                .build())
+                    .caseDataLiP(CaseDataLiP.builder()
+                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
+                                     .build()).build())
                     .build();
                 Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
             });
