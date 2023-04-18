@@ -91,7 +91,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnSupplementaryDataOnSubmittedWhenGlobalSearchOn() {
+        void shouldReturnSupplementaryDataOnSubmitted() {
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
@@ -111,7 +111,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnSpecSupplementaryDataWhenGlobalSearchEnabled() {
+        void shouldReturnSpecSupplementaryData() {
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
