@@ -11,5 +11,9 @@ USER hmcts
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/civil-service.jar /opt/app/
 
+# Yarn 3 upgrade
+COPY .yarn ./.yarn
+COPY .yarnrc.yml ./
+
 EXPOSE 4000
 CMD [ "civil-service.jar" ]
