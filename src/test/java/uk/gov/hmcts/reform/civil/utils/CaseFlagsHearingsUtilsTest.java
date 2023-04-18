@@ -151,7 +151,7 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1ExpertFlags(flags)
                 .build();
 
-            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(true);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isTrue();
         }
 
         @Test
@@ -166,7 +166,7 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1ExpertFlags()
                 .build();
 
-            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(true);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isTrue();
         }
 
         @Test
@@ -181,7 +181,7 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1ExpertFlags()
                 .build();
 
-            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isEqualTo(false);
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isFalse();
         }
     }
 

@@ -19,7 +19,7 @@ public class HearingDetailsMapper {
     private static String EMPTY_STRING = "";
     private static final String WELSH_REGION_ID = "7";
     public static String STANDARD_PRIORITY = "Standard";
-    public static String SECURE_DOCK_KEY = "11";
+    public static final String SECURE_DOCK_KEY = "11";
 
     private HearingDetailsMapper() {
         //NO-OP

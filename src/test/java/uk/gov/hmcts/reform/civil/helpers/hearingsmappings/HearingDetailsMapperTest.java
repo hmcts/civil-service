@@ -272,7 +272,7 @@ public class HearingDetailsMapperTest {
     @Test
     void shouldReturnFacilitiesRequired_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(null);
+        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isNull();
     }
 
     @Test
