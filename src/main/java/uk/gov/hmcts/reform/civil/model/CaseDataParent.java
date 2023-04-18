@@ -11,6 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -92,6 +94,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
@@ -419,6 +422,8 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
-        return caseDataLiP != null && caseDataLiP.hasClaimantAgreedToFreeMediation();
+            return Optional.ofNullable(getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+                .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
     }
 }

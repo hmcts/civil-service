@@ -13,10 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -4439,6 +4442,10 @@ class StateFlowEngineTest {
                 // defendant agrees to mediation
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .responseClaimMediationSpecRequired(YES)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                 .hasAgreedFreeMediation(MediationDecision.Yes)
+                                 .build()).build())
                 .build();
 
             // When
