@@ -342,7 +342,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        if (featureToggleService.isHmcEnabled()){
+        if (featureToggleService.isHmcEnabled()) {
             UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
         }
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);

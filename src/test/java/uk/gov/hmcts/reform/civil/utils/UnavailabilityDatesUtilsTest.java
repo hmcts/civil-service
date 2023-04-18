@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 public class UnavailabilityDatesUtilsTest {
 
     @Test
-    public void shouldReturnSingleUnavailabilityDateWhenProvidedForRespondent1(){
+    public void shouldReturnSingleUnavailabilityDateWhenProvidedForRespondent1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDates()
@@ -31,18 +31,18 @@ public class UnavailabilityDatesUtilsTest {
     }
 
     @Test
-    public void shouldReturnEmptyWhenDefendantResponseIsFalse(){
+    public void shouldReturnEmptyWhenDefendantResponseIsFalse() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDates()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
-        assertThat(builder.build().getRespondent1().getUnavailableDates()==null).isTrue();
+        assertThat(builder.build().getRespondent1().getUnavailableDates() == null).isTrue();
     }
 
     @Test
-    public void shouldReturnDateRangesWhenProvidedForRespondent1(){
+    public void shouldReturnDateRangesWhenProvidedForRespondent1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .respondent1DQWithUnavailableDateRange()
@@ -59,7 +59,7 @@ public class UnavailabilityDatesUtilsTest {
     }
 
     @Test
-    public void shouldReturnDateRangesWhenProvidedForApplicant1(){
+    public void shouldReturnDateRangesWhenProvidedForApplicant1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .applicant1DQWithUnavailableDateRange()
@@ -76,7 +76,7 @@ public class UnavailabilityDatesUtilsTest {
     }
 
     @Test
-    public void shouldReturnSingleUnavailabilityDateWhenProvidedForApplicant1(){
+    public void shouldReturnSingleUnavailabilityDateWhenProvidedForApplicant1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .applicant1DQWithUnavailableDate()

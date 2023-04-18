@@ -11,7 +11,7 @@ public class UnavailabilityDatesUtils {
 
     public static void rollUpExpertUnavailabilityDates(CaseData.CaseDataBuilder<?, ?> builder, boolean defendantResponse) {
         CaseData caseData = builder.build();
-           if (defendantResponse) {
+        if (defendantResponse) {
             if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getHearing() != null) {
 
                 Party.PartyBuilder resp1 = caseData.getRespondent1().toBuilder()
@@ -21,8 +21,8 @@ public class UnavailabilityDatesUtils {
 
             }
             if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
-                  Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
-                    .unavailableDates(caseData.getRespondent2DQ().getHearing()
+                Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
+                      .unavailableDates(caseData.getRespondent2DQ().getHearing()
                                           .getUnavailableDates());
                 builder.respondent2(resp2.build());
             }

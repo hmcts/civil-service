@@ -756,7 +756,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
     public CaseDataBuilder respondent2DQWithLocation() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -2105,7 +2104,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atRespondToClaimWithSingleUnAvailabilityDate(){
+    public CaseDataBuilder atRespondToClaimWithSingleUnAvailabilityDate() {
 
         return  this;
     }

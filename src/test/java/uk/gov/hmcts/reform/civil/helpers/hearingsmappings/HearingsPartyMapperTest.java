@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,7 +110,7 @@ public class HearingsPartyMapperTest {
             "0123456789"
         );
 
-        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1),LocalDate.now().plusDays(1))));
+        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
 
         PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
             APPLICANT_LR_ORG_NAME,
@@ -183,7 +182,7 @@ public class HearingsPartyMapperTest {
             DEFENDANT_ROLE,
             null
         );
-        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1),LocalDate.now().plusDays(2))));
+        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
 
         PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
             RESPONDENT_ONE_LR_ORG_NAME,

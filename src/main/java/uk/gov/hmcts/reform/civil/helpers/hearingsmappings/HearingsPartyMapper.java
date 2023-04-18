@@ -204,7 +204,7 @@ public class HearingsPartyMapper {
                                        party.getPartyName(),
                                        partyRole,
                                        party.getPartyEmail(),
-                                       party.getPartyPhone(),party.getUnavailableDates());
+                                       party.getPartyPhone(), party.getUnavailableDates());
         } else {
             return buildOrganisationPartyObject(party.getPartyName(), partyRole, null, party.getUnavailableDates());
         }
@@ -246,7 +246,7 @@ public class HearingsPartyMapper {
         String orgName = organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
             .orElse("");
-        return buildOrganisationPartyObject(orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID,null);
+        return buildOrganisationPartyObject(orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID, null);
     }
 
     public static PartyDetailsModel buildIndividualPartyObject(String firstName, String lastName,
@@ -275,7 +275,7 @@ public class HearingsPartyMapper {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(unavailableDates!=null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
@@ -298,7 +298,7 @@ public class HearingsPartyMapper {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(unavailableDates!=null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
