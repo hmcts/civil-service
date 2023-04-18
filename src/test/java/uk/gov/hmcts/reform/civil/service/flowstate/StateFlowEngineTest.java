@@ -4442,10 +4442,8 @@ class StateFlowEngineTest {
                 // defendant agrees to mediation
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .responseClaimMediationSpecRequired(YES)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                 .hasAgreedFreeMediation(MediationDecision.Yes)
-                                 .build()).build())
+                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
+                                                          .hasAgreedFreeMediation(YES).build())
                 .build();
 
             // When
