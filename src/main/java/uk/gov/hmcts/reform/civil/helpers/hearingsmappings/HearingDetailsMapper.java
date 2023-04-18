@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class HearingDetailsMapper {
     private static String EMPTY_STRING = "";
     private static final String WELSH_REGION_ID = "7";
     public static String STANDARD_PRIORITY = "Standard";
+    public static final String SECURE_DOCK_KEY = "11";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -92,7 +94,9 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
-        // todo civ-6888
+        if (CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)) {
+            return List.of(SECURE_DOCK_KEY);
+        }
         return null;
     }
 
