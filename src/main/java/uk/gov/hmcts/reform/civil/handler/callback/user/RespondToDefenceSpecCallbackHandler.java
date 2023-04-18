@@ -105,6 +105,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
+    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -652,6 +654,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
+        String ccjJudgmentStatement;
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+            && featureToggleService.isPinInPostEnabled()
+            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            ccjJudgmentStatement = JUDGEMENT_BY_COURT;
+        } else {
+            ccjJudgmentStatement = String.format(JUDGEMENT_ORDER, subTotal);
+        }
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(claimAmount)
@@ -661,6 +671,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
             .ccjPaymentPaidSomeAmountInPounds(paidAmount)
             .ccjJudgmentFixedCostAmount(fixedCost)
+            .ccjJudgmentStatement(ccjJudgmentStatement)
             .build();
 
         updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);

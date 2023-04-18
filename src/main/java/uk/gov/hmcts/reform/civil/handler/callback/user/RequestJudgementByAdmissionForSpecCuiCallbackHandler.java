@@ -10,13 +10,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,17 +32,22 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
+public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Default Judgment By Admission until %s.";
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFAULT_JUDGEMENT_ADMISSION_SPEC);
+    private static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
+    private static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Request Judgment By Admission until %s.";
+    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_JUDGEMENT_ADMISSION_SPEC);
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -63,8 +71,10 @@ public class DefaultJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDate())
-            && caseData.getRespondent1ResponseDate().plusDays(5).isAfter(LocalDateTime.now())) {
-            String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDate().plusDays(5), DATE_TIME_AT);
+            && caseData.getRespondent1ResponseDate()
+            .toLocalDate().plusDays(5).atTime(END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
+            String formattedDeadline = formatLocalDateTime(
+                caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5).atTime(END_OF_BUSINESS_DAY), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, formattedDeadline));
         }
 
@@ -89,6 +99,14 @@ public class DefaultJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
+        String ccjJudgmentStatement;
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+            && featureToggleService.isPinInPostEnabled()
+            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            ccjJudgmentStatement = JUDGEMENT_BY_COURT;
+        } else {
+            ccjJudgmentStatement = String.format(JUDGEMENT_ORDER, subTotal);
+        }
 
         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(claimAmount)
@@ -98,6 +116,7 @@ public class DefaultJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
             .ccjPaymentPaidSomeAmountInPounds(paidAmount)
             .ccjJudgmentFixedCostAmount(fixedCost)
+            .ccjJudgmentStatement(ccjJudgmentStatement)
             .build();
 
         updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
