@@ -355,7 +355,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        RespondToClaimCallbackHandler.defendantFlag = null;
+        RespondToClaimCallbackHandler.defendantFlag = "test";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
