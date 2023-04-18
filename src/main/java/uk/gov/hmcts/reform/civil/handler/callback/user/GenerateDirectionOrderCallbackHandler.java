@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -111,13 +110,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             checkFieldDate(caseData, errors);
         }
 
-        //Remove when Assisted Order Document generation is developed
-        if (FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())) {
-            CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-                caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-
+        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
+            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
-        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)

@@ -58,7 +58,7 @@ public enum DocmosisTemplates {
 
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("OrderDoc.docx", "Order_%s.pdf");
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
     private final String template;
     private final String documentTitle;
 
