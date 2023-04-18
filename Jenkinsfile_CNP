@@ -5,10 +5,11 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
+
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "test/CIV-7645"
+def ccdBranch = "master"
 def camundaBranch = "master"
 AppPipelineConfig pipelineConf
 
