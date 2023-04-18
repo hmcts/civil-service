@@ -384,6 +384,7 @@ public class DeadlinesCalculatorTest {
 
     @Nested
     class PlusWorkingsDays {
+
         @Test
         void plusWorkingDays() {
             LocalDate start = LocalDate.of(2022, 9, 12);
@@ -391,7 +392,29 @@ public class DeadlinesCalculatorTest {
             int days = 10;
             Assertions.assertEquals(start.plusDays(15), calculator.plusWorkingDays(start, days));
         }
+
+        @Test
+        void plusWorkingDaysCalcultaionScenerio1() {
+            LocalDateTime start = LocalDateTime.of(2023, 3, 12, 18, 0, 0);
+
+            Assertions.assertEquals(start.plusDays(8).toLocalDate(), calculator.plusWorkingDaysCalcultion(start));
+        }
+
+        @Test
+        void plusWorkingDaysCalcultaionScenerio2() {
+            LocalDateTime start = LocalDateTime.of(2023, 4, 8, 18,0,0);
+
+            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalcultion(start));
+        }
+
+        @Test
+        void plusWorkingDaysCalcultaionScenerio3() {
+            LocalDateTime start = LocalDateTime.of(2023, 3, 25, 18,0,0);
+
+            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalcultion(start));
+        }
     }
+
 
     /**
      * The fixture is taken from the real bank holidays API.

@@ -72,6 +72,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -383,7 +384,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
                     + "on %s.",
-                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                deadlinesCalculator.plusWorkingDaysCalcultion(LocalDateTime.now())
                     .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
             ))
             .build();

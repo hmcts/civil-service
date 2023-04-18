@@ -100,6 +100,16 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
+    public LocalDate plusWorkingDaysCalcultion(LocalDateTime date) {
+        LocalDateTime currentDate = date;
+        LocalDate returnDate = null;
+        if (is4pmOrAfter(currentDate)) {
+            currentDate = currentDate.plusDays(1);
+        }
+        returnDate = calculateFirstWorkingDay(currentDate.toLocalDate()).plusDays(5);
+        return calculateFirstWorkingDay(returnDate);
+    }
+
     public LocalDate getSlaStartDate(CaseData caseData) {
         var caseIssueDate = caseData.getIssueDate();
         if (caseIssueDate == null) {
