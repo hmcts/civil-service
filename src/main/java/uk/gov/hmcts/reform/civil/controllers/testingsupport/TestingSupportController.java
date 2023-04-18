@@ -28,11 +28,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -52,7 +50,6 @@ public class TestingSupportController {
     private final FeatureToggleService featureToggleService;
     private final StateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
-    private final HearingValuesService hearingValuesService;
     private final RoboticsDataMapper roboticsDataMapper;
 
     private final ClaimDismissedHandler claimDismissedHandler;
@@ -151,16 +148,6 @@ public class TestingSupportController {
     public EventHistory getEventHistoryInformationForCaseData(
         @RequestBody CaseData caseData) {
         return eventHistoryMapper.buildEvents(caseData);
-    }
-
-    @RequestMapping(
-        value = "/testing-support/hearings",
-        method = RequestMethod.POST,
-        produces = "application/json")
-    public ServiceHearingValuesModel getServiceMapping(
-        @RequestBody Long caseId) {
-        return hearingValuesService.getValues(
-            caseId, "hearingID", "authorization");
     }
 
     @RequestMapping(
