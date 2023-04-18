@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -65,6 +66,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -149,6 +151,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.MORE_THAN_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
+import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_120;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -396,6 +399,16 @@ public class CaseDataBuilder {
     private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
 
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
+    //Trial Readiness
+    private HearingDuration hearingDuration;
+    private YesOrNo trialReadyApplicant;
+    private YesOrNo trialReadyRespondent1;
+    private YesOrNo trialReadyRespondent2;
+
+    private RevisedHearingRequirements applicantRevisedHearingRequirements;
+    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
+    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
     private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
@@ -1168,6 +1181,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder takenOfflineDate(LocalDateTime takenOfflineDate) {
         this.takenOfflineDate = takenOfflineDate;
+        return this;
+    }
+
+    public CaseDataBuilder hearingDate(LocalDate hearingDate) {
+        this.hearingDate = hearingDate;
         return this;
     }
 
@@ -3529,6 +3547,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyCheck(MultiPartyScenario mpScenario) {
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(6);
+        hearingDuration = MINUTES_120;
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
         if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
@@ -3546,6 +3565,69 @@ public class CaseDataBuilder {
         atStateHearingFeeDuePaid();
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyApplicant() {
+        atStateTrialReadyCheck();
+        trialReadyApplicant = YES;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+                                                                        .revisedHearingRequirements(YES)
+                                                                        .revisedHearingComments("Changes requested.")
+                                                                        .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialNotReadyApplicant() {
+        atStateTrialReadyCheck();
+        trialReadyApplicant = NO;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyRespondent1() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent1 = YES;
+        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
+                                                                            .revisedHearingRequirements(YES)
+                                                                            .revisedHearingComments("Changes requested.")
+                                                                            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialNotReadyRespondent1() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent1 = NO;
+        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyRespondent2() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent2 = YES;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+                                                                        .revisedHearingRequirements(YES)
+                                                                        .revisedHearingComments("Changes requested.")
+                                                                        .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialNotReadyRespondent2() {
+        atStateTrialReadyCheck();
+        trialReadyRespondent2 = NO;
+        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
         return this;
     }
 
@@ -4919,6 +5001,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LrVsLip() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = NO;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5071,6 +5159,10 @@ public class CaseDataBuilder {
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
             //case progression
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
+            .hearingDuration(hearingDuration)
+            .trialReadyApplicant(trialReadyApplicant)
+            .trialReadyRespondent1(trialReadyRespondent1)
+            .trialReadyRespondent2(trialReadyRespondent2)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
