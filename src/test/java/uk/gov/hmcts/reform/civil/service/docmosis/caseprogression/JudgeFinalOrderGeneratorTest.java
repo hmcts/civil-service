@@ -235,7 +235,8 @@ public class JudgeFinalOrderGeneratorTest {
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now()).build())
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList).typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
+            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList)
+                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
                 ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
             .finalOrderRecitals(toggleList)
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
@@ -282,6 +283,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
                     assertEquals("lay representative for the defendant", response);
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -311,6 +314,8 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
                     assertEquals("lay representative for the claimant", response);
+                    break;
+                default:
                     break;
             }
         }
@@ -345,6 +350,8 @@ public class JudgeFinalOrderGeneratorTest {
                         response
                     );
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -367,13 +374,15 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
                 case SATISFIED_NOTICE_OF_TRIAL:
                     assertEquals("The claimant did not attend the trial and whilst the Judge was satisfied that they had " +
-                                     "received notice of the trial it was not reasonable to proceed in their absence"
-                        , response);
+                                     "received notice of the trial it was not reasonable to proceed in their absence",
+                        response);
                     break;
                 case SATISFIED_REASONABLE_TO_PROCEED:
                     assertEquals("The claimant did not attend the trial, but the Judge was satisfied that they had " +
                                      "received notice of the trial and it was reasonable to proceed in their absence",
                                  response);
+                    break;
+                default:
                     break;
             }
         }
@@ -382,7 +391,7 @@ public class JudgeFinalOrderGeneratorTest {
     @Test
     void testGetCostAmount() {
         for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-            if(assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
+            if (assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
                 || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
                 || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
                 || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
@@ -405,10 +414,10 @@ public class JudgeFinalOrderGeneratorTest {
     @Test
     void testGetCostProtection() {
         for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-            if(assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
-            || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
-            || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
-            || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
+            if (assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
+                || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
+                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
+                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderRecitals(null)
                     .assistedOrderCostList(assistedCostTypesList)
@@ -498,6 +507,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case HOUR_2:
                     assertEquals("2 hours", response);
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -512,7 +523,7 @@ public class JudgeFinalOrderGeneratorTest {
                                                                       .lengthListOtherHours(new BigDecimal(1))
                                                                       .lengthListOtherMinutes(new BigDecimal(30)).build()).build()).build();
         String response = generator.getFurtherHearingLength(caseData);
-        assertEquals("12 days 1 hours 30 minutes",response);
+        assertEquals("12 days 1 hours 30 minutes", response);
     }
 
     @Test
