@@ -388,7 +388,6 @@ public class CaseDataParent implements MappableObject {
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
-
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
