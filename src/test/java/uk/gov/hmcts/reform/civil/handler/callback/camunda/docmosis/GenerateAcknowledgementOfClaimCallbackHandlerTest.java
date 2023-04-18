@@ -112,6 +112,24 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     }
 
     @Test
+    void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DifferentSolButWrongFlag() {
+        //Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        AcknowledgeClaimCallbackHandler.defendantFlag = "test";
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        verify(acknowledgementOfClaimGenerator).generate(caseData, "BEARER_TOKEN");
+        // When
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
     void shouldAssignCategoryId_whenInvokedAnd1v1Or1v2SameSol() {
         //Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);

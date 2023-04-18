@@ -209,6 +209,26 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(result).isNull();
     }
 
+    @Test
+    void shouldNotPopulateRespondent2Flag_WhenInvokedNoUser() {
+        // Given
+        AcknowledgeClaimCallbackHandler.defendantFlag = null;
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        var result = AcknowledgeClaimCallbackHandler.defendantFlag;
+        // Then
+        assertThat(result).isNull();
+    }
+
     @Nested
     class MidEventConfirmDetailsCallback {
 
