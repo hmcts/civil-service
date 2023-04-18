@@ -1,0 +1,11 @@
+## exclude all by default
+
+*
+
+# exceptions from `exclude all` rule
+
+# Yarn 3 files
+!.yarn/**
+!.yarnrc.yml
+.yarn/cache
+.yarn/install-state.gz

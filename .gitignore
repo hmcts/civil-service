@@ -36,3 +36,12 @@ smokeTest/
 infrastructure/.terraform/**
 infrastructure/.terraform.lock.hcl
 infrastructure/override.tf
+
+# Yarn 3 files
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
