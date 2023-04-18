@@ -1426,7 +1426,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
+        void shouldAssignCaseName1v2_whenCaseIs1v2() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
@@ -1442,7 +1442,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
+        void shouldAssignCaseName2v1_whenCaseIs2v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
@@ -1458,7 +1458,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
+        void shouldAssignCaseName1v1_whenCaseIs1v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
