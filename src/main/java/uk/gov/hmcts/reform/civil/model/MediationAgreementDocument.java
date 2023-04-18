@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -13,5 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 public class MediationAgreementDocument {
 
     private String title;
+    private LocalDate agreementDate;
+    private DocumentType documentType;
     private Document document;
 }
