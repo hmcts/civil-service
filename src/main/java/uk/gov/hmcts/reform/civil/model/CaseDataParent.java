@@ -141,7 +141,10 @@ public class CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
-
+    //TrialReadiness
+    private final String hearingDurationTextApplicant;
+    private final String hearingDurationTextRespondent1;
+    private final String hearingDurationTextRespondent2;
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
