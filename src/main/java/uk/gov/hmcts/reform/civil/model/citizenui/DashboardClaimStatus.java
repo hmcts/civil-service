@@ -12,6 +12,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
+        Claim::hasClaimantAskedToSignSettlementAgreement
+    ),
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
@@ -70,9 +73,7 @@ public enum DashboardClaimStatus {
     WAITING_FOR_CLAIMANT_TO_RESPOND(
         Claim::isWaitingForClaimantToRespond
     ),
-    CLAIMANT_ASKED_FOR_SETTLEMENT(
-        Claim::hasClaimantAskedToSignSettlementAgreement
-    ),
+
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
