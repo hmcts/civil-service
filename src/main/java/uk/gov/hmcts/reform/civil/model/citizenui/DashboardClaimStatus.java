@@ -15,9 +15,7 @@ public enum DashboardClaimStatus {
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
-    SETTLED(
-        Claim::isSettled
-    ),
+
     TRANSFERRED(
         Claim::isSentToCourt
     ),
@@ -26,6 +24,9 @@ public enum DashboardClaimStatus {
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
+    ),
+    SETTLED(
+        Claim::isSettled
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
