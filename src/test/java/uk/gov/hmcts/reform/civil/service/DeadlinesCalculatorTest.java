@@ -402,19 +402,18 @@ public class DeadlinesCalculatorTest {
 
         @Test
         void plusWorkingDaysCalcultaionScenerio2() {
-            LocalDateTime start = LocalDateTime.of(2023, 4, 8, 18,0,0);
+            LocalDateTime start = LocalDateTime.of(2023, 4, 8, 18, 0, 0);
 
             Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalcultion(start));
         }
 
         @Test
         void plusWorkingDaysCalcultaionScenerio3() {
-            LocalDateTime start = LocalDateTime.of(2023, 3, 25, 18,0,0);
+            LocalDateTime start = LocalDateTime.of(2023, 3, 25, 18, 0, 0);
 
             Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalcultion(start));
         }
     }
-
 
     /**
      * The fixture is taken from the real bank holidays API.
