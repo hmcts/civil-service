@@ -12,13 +12,12 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    CLAIMANT_ASKED_FOR_SETTLEMENT(
-        Claim::hasClaimantAskedToSignSettlementAgreement
-    ),
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
-
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
+        Claim::hasClaimantAskedToSignSettlementAgreement
+    ),
     TRANSFERRED(
         Claim::isSentToCourt
     ),
