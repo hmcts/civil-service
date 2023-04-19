@@ -108,7 +108,7 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
-    public LocalDate plusWorkingDaysCalcultion(LocalDateTime dateTime) {
+    public LocalDate plusWorkingDaysCalculation(LocalDateTime dateTime) {
         LocalDateTime currentDate = dateTime;
         System.out.println(" currentdate is " + currentDate);
         if (is4pmOrAfter(currentDate)) {
