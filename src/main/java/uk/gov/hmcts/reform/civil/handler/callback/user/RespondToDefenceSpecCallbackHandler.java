@@ -103,7 +103,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
-    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
+        + " this case will proceed offline, you will receive any further updates by post.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
 
     @Override

@@ -43,7 +43,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
     private static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Request Judgment By Admission until %s.";
-    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
+        + " this case will proceed offline, you will receive any further updates by post.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_JUDGEMENT_ADMISSION_SPEC);
     private final ObjectMapper objectMapper;
