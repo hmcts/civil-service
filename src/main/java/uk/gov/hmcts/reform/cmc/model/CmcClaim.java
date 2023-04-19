@@ -215,7 +215,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
-        return hasResponse() && response.isPartAdmitPayImmediately() && response.isPaymentDateOnTime()
+        return hasResponse() && response.isPartAdmitPayImmediately()
             && claimantAcceptedDefendantResponse();
     }
 
