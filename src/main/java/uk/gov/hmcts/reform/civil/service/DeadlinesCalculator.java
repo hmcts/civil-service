@@ -100,23 +100,16 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
-    public LocalDate plusWorkingDays1(LocalDate date, int workingDaysForward) {
-        LocalDate currentDate = date;
-        for (int i = 0; i < workingDaysForward; i++) {
-            currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
-        }
-        return currentDate;
-    }
-
     public LocalDate plusWorkingDaysCalculation(LocalDateTime dateTime) {
         LocalDateTime currentDate = dateTime;
-        System.out.println(" currentdate is " + currentDate);
         if (is4pmOrAfter(currentDate)) {
             currentDate = currentDate.plusDays(1);
-            System.out.println(" inside if condition");
         }
-        LocalDate returnDate = calculateFirstWorkingDay(LocalDate.now()).plusDays(5);
-        System.out.println(" returning  "+ returnDate);
+        LocalDate returnDate = currentDate.toLocalDate();
+        while (!workingDayIndicator.isWorkingDay(returnDate)) {
+            returnDate = returnDate.plusDays(1);
+        }
+        returnDate = calculateFirstWorkingDay(currentDate.toLocalDate()).plusDays(5);
         return calculateFirstWorkingDay(returnDate);
     }
 
