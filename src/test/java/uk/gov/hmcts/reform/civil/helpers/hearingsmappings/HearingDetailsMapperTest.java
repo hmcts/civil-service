@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -17,7 +18,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class HearingDetailsMapperTest {
 
@@ -269,7 +272,7 @@ public class HearingDetailsMapperTest {
     @Test
     void shouldReturnFacilitiesRequired_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(null);
+        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isNull();
     }
 
     @Test
@@ -319,5 +322,26 @@ public class HearingDetailsMapperTest {
     void shouldReturnList_whenHearingChannelsInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
+    }
+
+    @Test
+    void getFacilitiesRequired_shouldReturnNull_whenNoDetainedIndividualFlagExist() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(null);
+    }
+
+    @Test
+    void getFacilitiesRequired_shouldReturnList_whenDetainedIndividualFlagExists() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .withRespondent1Flags(wrapElements(
+                FlagDetail.builder()
+                    .name("Detained individual")
+                    .flagComment("comment")
+                    .flagCode("PF0019")
+                    .hearingRelevant(YES)
+                    .status("Active")
+                    .build()))
+            .build();
+        assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(List.of("11"));
     }
 }
