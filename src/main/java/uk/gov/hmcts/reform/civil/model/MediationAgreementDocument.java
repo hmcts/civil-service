@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
