@@ -264,9 +264,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        if (featureToggleService.isHmcEnabled()) {
-            UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
-        }
+        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 

@@ -535,9 +535,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         assembleResponseDocuments(caseData, updatedData);
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        if (toggleService.isHmcEnabled()) {
-            UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
-        }
+        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 

@@ -1444,9 +1444,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        if (toggleService.isHmcEnabled()) {
-            UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
-        }
+        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 

@@ -337,9 +337,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        if (featureToggleService.isHmcEnabled()) {
-            UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
-        }
+        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
