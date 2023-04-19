@@ -1109,7 +1109,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedWithoutDefendantSolicitor() {
-            String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+            String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
 
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
@@ -1133,7 +1133,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
 
-            assertThat(judgementStatement).isEqualTo(JUDGEMENT_BY_COURT);
+            assertThat(judgementStatement).isEqualTo(expected);
         }
     }
 
