@@ -86,12 +86,10 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
-        if (toggleService.isGlobalSearchEnabled()) {
-            CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-            String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
-                ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
-            setSupplementaryData(caseData.getCcdCaseReference(), siteId);
-        }
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
+            ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
+        setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
         return SubmittedCallbackResponse.builder().build();
     }
