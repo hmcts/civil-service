@@ -457,21 +457,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (toggleService.isGlobalSearchEnabled()) {
+        //casename
+        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
-            //casename
-            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        //case management category
+        CaseManagementCategoryElement civil =
+            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        dataBuilder.caseManagementCategory(
+            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        log.info("Case management equals: " + caseData.getCaseManagementCategory());
+        log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-            //case management category
-            CaseManagementCategoryElement civil =
-                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
-            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
-            itemList.add(element(civil));
-            dataBuilder.caseManagementCategory(
-                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-            log.info("Case management equals: " + caseData.getCaseManagementCategory());
-            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
-        }
         //Adding variables for feature Certificate of Service
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
