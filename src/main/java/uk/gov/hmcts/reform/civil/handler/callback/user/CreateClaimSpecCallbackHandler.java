@@ -101,7 +101,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "when you first notify the Defendant legal representative of the claim.";
 
     public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
         + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
@@ -120,7 +120,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "receive an email. The email will also include the date that the defendants have to respond.";
 
     public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date that the defendants have to " +
         "respond. <br/>[Pay your claim fee](%s)";
 
