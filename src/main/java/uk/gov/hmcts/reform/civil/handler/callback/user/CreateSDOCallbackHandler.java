@@ -260,7 +260,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // existing cases
         DisposalHearingHearingTime tempDisposalHearingHearingTime =
             DisposalHearingHearingTime.builder()
-                .dateFrom(HearingUtils.getHearingDateFrom(workingDayIndicator, NUMBER_OF_WEEKS_TO_HEARING))
                 .input(
                     "This claim will be listed for final disposal before a judge on the first available date after")
                 .dateTo(LocalDate.now().plusWeeks(16))
