@@ -525,7 +525,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -544,7 +543,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")
@@ -567,7 +565,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")

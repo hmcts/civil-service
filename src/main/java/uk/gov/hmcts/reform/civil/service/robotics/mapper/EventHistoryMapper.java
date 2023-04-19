@@ -1143,22 +1143,6 @@ public class EventHistoryMapper {
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
 
-        if (!featureToggleService.isSDOEnabled()) {
-            List<Event> miscText = IntStream.range(0, miscEventText.size())
-                .mapToObj(index ->
-                              Event.builder()
-                                  .eventSequence(prepareEventSequence(builder.build()))
-                                  .eventCode(MISCELLANEOUS.getCode())
-                                  .dateReceived(caseData.getApplicant1ResponseDate())
-                                  .eventDetailsText(miscEventText.get(index))
-                                  .eventDetails(EventDetails.builder()
-                                                    .miscText(miscEventText.get(index))
-                                                    .build())
-                                  .build())
-                .collect(Collectors.toList());
-            builder.miscellaneous(miscText);
-        } else {
-
             YesOrNo proceedRespondent1;
             YesOrNo proceedRespondent2;
             YesOrNo applicant1Proceeds;
@@ -1287,8 +1271,6 @@ public class EventHistoryMapper {
                 default:
             }
         }
-
-    }
 
     private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
         List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();
@@ -2108,7 +2090,6 @@ public class EventHistoryMapper {
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
 
-        if (featureToggleService.isSDOEnabled()) {
             String miscText = left(format(
                 "RPA Reason: Case proceeds offline. "
                     + "Judge / Legal Advisor did not draw a Direction's Order: %s",
@@ -2123,7 +2104,6 @@ public class EventHistoryMapper {
             List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
             builder.miscellaneous(miscTextEvent);
         }
-    }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {

@@ -107,15 +107,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
-        var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, toggleStat);
-
-        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
         var certificateOfServiceKey = "isCertificateOfServiceEnabled";
         givenToggle(certificateOfServiceKey, toggleStat);

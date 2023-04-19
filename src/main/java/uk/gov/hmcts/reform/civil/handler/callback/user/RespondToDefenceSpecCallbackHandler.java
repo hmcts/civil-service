@@ -295,7 +295,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (v1 && featureToggleService.isSdoEnabled()) {
+        if (v1) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
@@ -373,7 +373,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (!AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         }
 
