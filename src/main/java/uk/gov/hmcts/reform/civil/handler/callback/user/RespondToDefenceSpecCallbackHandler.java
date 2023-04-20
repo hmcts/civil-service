@@ -627,13 +627,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = judgementService.validateAmountPaid(caseData);
-        if (errors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .errors(errors)
+            .data(errors.size() == 0
+                      ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
