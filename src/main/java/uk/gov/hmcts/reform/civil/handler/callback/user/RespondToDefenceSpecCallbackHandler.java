@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -99,13 +99,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
+    private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
-    private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
-        + " this case will proceed offline, you will receive any further updates by post.";
-    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -623,14 +621,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (caseData.isPaidSomeAmountMoreThanClaimAmount(caseData)) {
-            errors.add("The amount paid must be less than the full claim amount.");
+        List<String> errors = judgementService.validateAmountPaid(caseData);
+        if (errors.size() > 0) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -640,37 +636,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
-            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        }
-        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
-            ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
-        BigDecimal finalTotal = subTotal.subtract(paidAmount);
-        String ccjJudgmentStatement;
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-            && featureToggleService.isPinInPostEnabled()
-            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            ccjJudgmentStatement = JUDGEMENT_BY_COURT;
-        } else {
-            ccjJudgmentStatement = String.format(JUDGEMENT_ORDER, subTotal);
-        }
-
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(claimAmount)
-            .ccjJudgmentAmountClaimFee(claimFee)
-            .ccjJudgmentSummarySubtotalAmount(subTotal)
-            .ccjJudgmentTotalStillOwed(finalTotal)
-            .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
-            .ccjPaymentPaidSomeAmountInPounds(paidAmount)
-            .ccjJudgmentFixedCostAmount(fixedCost)
-            .ccjJudgmentStatement(ccjJudgmentStatement)
-            .build();
-
-        updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
+        updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))

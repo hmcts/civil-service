@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -103,7 +104,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
-    LocationHelper.class
+    LocationHelper.class,
+    JudgementService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -112,6 +114,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JudgementService judgementService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -978,7 +983,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "validate-amount-paid";
 
         @Test
-        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+        void shouldCheckValidateAmountPaid_withErrorMessage() {
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(150000))

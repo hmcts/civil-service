@@ -11,21 +11,27 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -33,7 +39,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SpringBootTest(classes = {
     RequestJudgementByAdmissionForSpecCuiCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    JudgementService.class
 })
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -45,6 +52,38 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @Autowired
+    private JudgementService judgementService;
+
+    @Nested
+    class AboutToStartCallback {
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now().minusDays(15))
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
 
     @Nested
     class MidEventCallbackSetUpCcjSummaryPage {
@@ -193,7 +232,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         private static final String PAGE_ID = "validate-amount-paid";
 
         @Test
-        void shouldCheckValidateAmoundPaid_withErrorMessage() {
+        void shouldCheckValidateAmountPaid_withErrorMessage() {
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(150000))

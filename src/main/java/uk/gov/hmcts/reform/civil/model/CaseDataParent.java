@@ -391,14 +391,14 @@ public class CaseDataParent implements MappableObject {
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     @JsonIgnore
-    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount, CaseData caseData) {
+    public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
         BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
         BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
-        if (!YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+        if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return ZERO;
         }
         if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
@@ -410,10 +410,4 @@ public class CaseDataParent implements MappableObject {
         }
     }
 
-    @JsonIgnore
-    public boolean isPaidSomeAmountMoreThanClaimAmount(CaseData caseData) {
-        return caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
-            && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
-            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0;
-    }
 }

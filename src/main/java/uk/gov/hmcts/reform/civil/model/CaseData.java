@@ -109,6 +109,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -122,7 +124,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -866,10 +870,35 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount() {
+        return getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .map(ClaimantMediationLip::getHasAgreedFreeMediation)
             .filter(MediationDecision.Yes::equals).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isAcceptDefendantPaymentPlanForPartAdmitYes() {
+        return YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
+        return YesOrNo.NO.equals(getSpecRespondent1Represented())
+            && multiPartyScenario.equals(ONE_V_ONE);
+    }
+
+    @JsonIgnore
+    public boolean isNotPermitForRequestJudgementByAdmission() {
+        return nonNull(getRespondent1ResponseDate())
+            && getRespondent1ResponseDate()
+            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 }
