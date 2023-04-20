@@ -31,6 +31,13 @@ public class Settlement {
     }
 
     @JsonIgnore
+    public boolean isAcceptedByDefendant() {
+        return getPartyStatementStream()
+            .anyMatch(partyStatement -> partyStatement.isAccepted()
+                && partyStatement.isMadeByDefendant());
+    }
+
+    @JsonIgnore
     public boolean isSettled() {
         Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();
         return partyStatementsStream.anyMatch(partyStatement -> partyStatement.isCounterSigned());

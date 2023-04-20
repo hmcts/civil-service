@@ -302,9 +302,13 @@ public class CmcClaimStatusDashboardFactoryTest {
             .claimantResponse(ClaimantResponse.builder().build())
             .settlement(Settlement.builder()
                             .partyStatements(List.of(PartyStatement.builder()
-                                                         .type(StatementType.COUNTERSIGNATURE)
-                                                         .build())).build())
-            .build();
+                                                         .madeBy(MadeBy.CLAIMANT)
+                                                         .type(StatementType.ACCEPTATION)
+                                                         .build(), PartyStatement.builder()
+                                                         .madeBy(MadeBy.DEFENDANT)
+                                                         .type(StatementType.ACCEPTATION)
+                                                         .build())).build()).build();
+
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLEMENT_SIGNED);
     }
