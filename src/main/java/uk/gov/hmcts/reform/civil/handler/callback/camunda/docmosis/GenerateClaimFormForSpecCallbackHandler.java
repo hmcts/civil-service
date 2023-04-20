@@ -52,6 +52,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -124,6 +125,11 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        }
+
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            caseDataBuilder.specClaimTemplateDocumentFiles(null);
+            caseDataBuilder.specClaimDetailsDocumentFiles(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

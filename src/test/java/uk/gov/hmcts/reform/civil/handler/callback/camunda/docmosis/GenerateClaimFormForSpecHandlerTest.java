@@ -325,8 +325,32 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
         // Then
-        //assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+        assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
         assertThat(updatedData.getServedDocumentFiles().getTimelineEventUpload().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+
+    }
+
+    @Test
+    void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
+        // Given
+        Document testDocument = new Document("testurl",
+                                             "testBinUrl", "A Fancy Name",
+                                             "hash", null);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specClaimDetailsDocumentFiles(testDocument)
+            .specClaimTemplateDocumentFiles(testDocument)
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getSpecClaimDetailsDocumentFiles()).isNull();
+        assertThat(updatedData.getSpecClaimTemplateDocumentFiles()).isNull();
 
     }
 

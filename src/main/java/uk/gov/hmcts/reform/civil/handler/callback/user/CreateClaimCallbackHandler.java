@@ -65,6 +65,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -490,7 +491,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
         }
 
-        if (caseData.getUploadParticularsOfClaim().equals(YES)) {
+        if (nonNull(caseData.getUploadParticularsOfClaim()) && caseData.getUploadParticularsOfClaim().equals(YES)) {
             assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
                                                      Element::getValue, "particularsOfClaim");
             assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
@@ -667,7 +668,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams), courtLocations);
-        if (Objects.nonNull(courtLocation)) {
+        if (nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
                 .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
