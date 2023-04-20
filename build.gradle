@@ -254,10 +254,6 @@ task runApiTests(type: Exec, description: 'Runs Api tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
 }
 
-task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
-}
-
 task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
