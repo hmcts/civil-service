@@ -40,7 +40,7 @@ public class Settlement {
     @JsonIgnore
     public boolean isSettled() {
         Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();
-        return partyStatementsStream.anyMatch(partyStatement -> partyStatement.isCounterSigned());
+        return partyStatementsStream.anyMatch(PartyStatement::isCounterSigned);
     }
 
     public boolean isThroughAdmissions() {
