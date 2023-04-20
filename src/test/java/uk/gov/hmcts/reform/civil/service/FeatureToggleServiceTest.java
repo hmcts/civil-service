@@ -124,13 +124,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void globalSearch_LDTagName(Boolean toggleStat) {
-        givenToggle("global-search-specified", toggleStat);
-        assertThat(featureToggleService.isGlobalSearchEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         givenToggle(pbaV3Key, toggleStat);

@@ -420,19 +420,16 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (toggleService.isGlobalSearchEnabled()) {
-            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
-            CaseManagementCategoryElement civil =
-                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
-            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
-            itemList.add(element(civil));
-            dataBuilder.caseManagementCategory(
-                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-            log.info("Case management equals: " + caseData.getCaseManagementCategory());
-            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
-
-        }
+        CaseManagementCategoryElement civil =
+            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        dataBuilder.caseManagementCategory(
+            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        log.info("Case management equals: " + caseData.getCaseManagementCategory());
+        log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
         if (featureToggleService.isNoticeOfChangeEnabled()) {
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
