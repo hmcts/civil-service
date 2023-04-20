@@ -302,7 +302,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
         // Then
-        System.out.println("test" + updatedData.getServedDocumentFiles());
         assertThat(updatedData.getServedDocumentFiles().getTimelineEventUpload().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
     }
 
