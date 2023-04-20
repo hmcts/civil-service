@@ -188,8 +188,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
-            caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
@@ -332,10 +331,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             putCaseStateInJudicialReferral(caseData, response);
         }
 
-        if (V_2.equals(callbackParams.getVersion())) {
-            if (featureToggleService.isPinInPostEnabled() && isOneVOne(caseData)
+        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+            if (isOneVOne(caseData)
                 && caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
+            }else if (caseData.isRejectDefendantPaymentPlanNo()){
+                response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             }
         }
         return response.build();
