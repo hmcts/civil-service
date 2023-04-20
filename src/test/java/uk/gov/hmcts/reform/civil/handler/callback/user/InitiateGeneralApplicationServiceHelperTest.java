@@ -410,6 +410,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
 
     }
 
@@ -460,7 +461,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("123");
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
-
+        assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
     }
 
     @Test
