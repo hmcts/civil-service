@@ -84,7 +84,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        System.out.println("£should assign");
         assignCategoryId.setCategoryIdCaseDocument(sealedClaim, "detailsOfClaim");
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
