@@ -872,4 +872,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(ClaimantMediationLip::getHasAgreedFreeMediation)
             .filter(MediationDecision.Yes::equals).isPresent();
     }
+
+    @JsonIgnore
+    public boolean hasApplicantAcceptedRepaymentPlan() {
+        return YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantRejectedRepaymentPlan() {
+        return NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
 }
