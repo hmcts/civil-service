@@ -307,6 +307,8 @@ public class CmcClaimStatusDashboardFactoryTest {
                                                          .build(), PartyStatement.builder()
                                                          .madeBy(MadeBy.DEFENDANT)
                                                          .type(StatementType.ACCEPTATION)
+                                                         .build(), PartyStatement.builder()
+                                                         .type(StatementType.COUNTERSIGNATURE)
                                                          .build())).build()).build();
 
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
