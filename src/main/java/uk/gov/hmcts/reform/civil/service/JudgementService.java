@@ -45,7 +45,7 @@ public class JudgementService {
             ccjJudgmentStatement = String.format(JUDGEMENT_ORDER, subTotal);
         }
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+        return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(claimAmount)
             .ccjJudgmentAmountClaimFee(claimFee)
             .ccjJudgmentSummarySubtotalAmount(subTotal)
@@ -55,7 +55,6 @@ public class JudgementService {
             .ccjJudgmentFixedCostAmount(fixedCost)
             .ccjJudgmentStatement(ccjJudgmentStatement)
             .build();
-        return ccjPaymentDetails;
     }
 
     public List<String> validateAmountPaid(CaseData caseData) {

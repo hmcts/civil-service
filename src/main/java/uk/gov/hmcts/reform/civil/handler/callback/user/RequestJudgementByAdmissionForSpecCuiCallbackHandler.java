@@ -56,7 +56,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isNotPermitForRequestJudgementByAdmission()) {
             String formattedDeadline = formatLocalDateTime(
@@ -67,8 +67,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
-                      ? caseDataBuilder.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -87,8 +86,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
-                      ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
