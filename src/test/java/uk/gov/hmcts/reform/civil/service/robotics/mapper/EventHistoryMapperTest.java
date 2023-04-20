@@ -6784,7 +6784,7 @@ class EventHistoryMapperTest {
                                   .preferredCourtName("")
                                   .build())
                 .build();
-            String detailsText = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+            String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
