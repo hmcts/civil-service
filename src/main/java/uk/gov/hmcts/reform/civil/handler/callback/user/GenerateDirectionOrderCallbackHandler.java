@@ -28,9 +28,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +65,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "\n ### Defendant 1 \n %s";
     public static final String BODY_1v2 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s"
         + "\n ### Defendant 2 \n %s";
-    public static final String NOT_ALLOWED_DATE = "The date in %s may not be earlier than the established date";
+    public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -182,7 +179,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
         if (nonNull(caseData.getFinalOrderDateHeardComplex())
-            && caseData.getFinalOrderDateHeardComplex().getDate().isBefore(LocalDate.now())) {
+            && caseData.getFinalOrderDateHeardComplex().getDate().isAfter(LocalDate.now())) {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
         }
     }
