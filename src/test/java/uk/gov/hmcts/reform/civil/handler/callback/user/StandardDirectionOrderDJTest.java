@@ -237,8 +237,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 
             assertThat(response.getData()).extracting("disposalHearingBundleDJ").extracting("input")
-                .isEqualTo("At least 7 days before the disposal hearing, the claimant must upload to the"
-                               + " Digital Portal");
+                .isEqualTo("At least 7 days before the disposal hearing, the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
                 .isEqualTo("This order has been made without a hearing. Each "

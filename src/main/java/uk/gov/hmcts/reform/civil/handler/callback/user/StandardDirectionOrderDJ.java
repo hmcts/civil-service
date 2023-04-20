@@ -324,7 +324,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
                                                     .input("At least 7 days before the disposal hearing, the claimant"
-                                                               + " must upload to the Digital Portal")
+                                                               + " must file and serve")
                                                     .build());
 
         caseDataBuilder.disposalHearingNotesDJ(DisposalHearingNotesDJ

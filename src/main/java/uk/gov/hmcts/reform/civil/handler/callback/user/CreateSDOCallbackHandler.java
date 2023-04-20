@@ -300,7 +300,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
+            .input("At least 7 days before the disposal hearing, the claimant must file and serve")
             .build();
 
         updatedData.disposalHearingBundle(tempDisposalHearingBundle).build();
@@ -363,11 +363,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
                         + "counter-schedule.")
-            .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                        + "therefore final, no further schedule of loss shall be uploaded without permission to amend. "
-                        + "The defendant shall upload to the Digital Portal an up-to-date counter schedule of loss by "
-                        + "4pm on")
-            .date3(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
@@ -626,15 +621,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date3(LocalDate.now().plusWeeks(8))
             .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
-            .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                        + "available.")
-            .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date5(LocalDate.now().plusWeeks(8))
-            .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
-            .date6(LocalDate.now().plusWeeks(10))
             .input11("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 

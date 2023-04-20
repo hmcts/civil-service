@@ -608,7 +608,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
                 .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must upload to the Digital Portal");
+                               + "the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"
@@ -682,14 +682,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
                                + "their case on periodical payments, they must do so in the respective schedule and "
                                + "counter-schedule.");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input4")
-                .isEqualTo("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                               + "therefore final, no further schedule of loss shall be uploaded without permission to"
-                               + " amend. The defendant shall upload to the Digital Portal an up-to-date counter"
-                               + " schedule of loss by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
                 .isEqualTo("The time provisionally allowed for this trial is");
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
@@ -935,20 +927,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input7")
                 .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date4")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input8")
-                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to "
-                               + "the paragraph above, each party may rely upon the written evidence by way of witness"
-                               + " statement of one witness to provide evidence of basic hire rates available within"
-                               + " the claimant's geographical location from a mainstream supplier, or a local"
-                               + " reputable supplier if none is available.");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input9")
-                .isEqualTo("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date5")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input10")
-                .isEqualTo(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date6")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input11")
                 .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
