@@ -23,16 +23,16 @@ public class Response {
 
     @JsonIgnore
     public boolean isFullAdmitPayImmediately() {
-        return isFullAdmit() && paymentIntention.isPayImmediately();
+        return isFullAdmit() && paymentIntention != null && paymentIntention.isPayImmediately();
     }
 
     @JsonIgnore
     public boolean isFullAdmitPayBySetDate() {
-        return isFullAdmit() && paymentIntention.isPayByDate();
+        return isFullAdmit() && paymentIntention != null && paymentIntention.isPayByDate();
     }
 
     @JsonIgnore
     public boolean isFullAdmitPayByInstallments() {
-        return isFullAdmit() && paymentIntention.isPayByInstallments();
+        return isFullAdmit() && paymentIntention != null && paymentIntention.isPayByInstallments();
     }
 }
