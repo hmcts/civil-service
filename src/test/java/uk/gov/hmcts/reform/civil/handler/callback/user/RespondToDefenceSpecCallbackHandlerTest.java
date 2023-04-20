@@ -636,6 +636,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();;
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
@@ -647,6 +648,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
