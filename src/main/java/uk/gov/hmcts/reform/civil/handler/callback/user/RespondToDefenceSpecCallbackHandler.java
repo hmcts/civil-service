@@ -188,7 +188,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
+            caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
@@ -236,8 +237,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      *
      * @param caseData current case data
      * @return true if and only if either of the following conditions are satisfied: (a) applicant does not
-     *     accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
-     *     wants to proceed with the claim
+     * accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
+     * wants to proceed with the claim
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
@@ -335,7 +336,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (isOneVOne(caseData)
                 && caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            }else if (caseData.isRejectDefendantPaymentPlanNo()){
+            } else if (caseData.isRejectDefendantPaymentPlanNo()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             }
         }
