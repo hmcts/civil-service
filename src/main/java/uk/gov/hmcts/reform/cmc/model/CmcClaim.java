@@ -222,7 +222,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean haveBothPartiesSignedSettlementAgreement() {
-        return settlement != null && settlement.isAcceptedByDefendant() && settlement.isAcceptedByClaimant();
+        return hasClaimantAskedToSignSettlementAgreement() && settlement.isAcceptedByDefendant() ;
     }
 
     @Override
