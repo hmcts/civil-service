@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClai
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
@@ -2288,6 +2289,45 @@ class FlowPredicateTest {
                     .build();
                 Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
             });
+        }
+    }
+
+    @Nested
+    class RejectRepaymentScenarios {
+        CaseDataBuilder caseDataBuilder;
+
+        @BeforeEach
+        void setup() {
+            caseDataBuilder = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim();
+        }
+
+        @Test
+        void shouldReturnTrue_whenAcceptFullAdmitPaymentPlanSpecNo() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                .build();
+            assertTrue(rejectRepaymentPlan.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenAcceptPartAdmitPaymentPlanSpecNo() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .build();
+            assertTrue(rejectRepaymentPlan.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenAcceptFullAdmitPaymentPlanSpecYes() {
+            CaseData caseData = caseDataBuilder.build().toBuilder()
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES).build();
+            assertFalse(rejectRepaymentPlan.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenAcceptPartAdmitPaymentPlanSpecYes() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .build();
+            assertFalse(rejectRepaymentPlan.test(caseData));
         }
     }
 }
