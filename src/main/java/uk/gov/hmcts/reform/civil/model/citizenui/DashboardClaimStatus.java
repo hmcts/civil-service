@@ -51,6 +51,9 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
     DEFENDANT_PART_ADMIT(
         Claim::defendantRespondedWithPartAdmit
     ),
@@ -72,7 +75,6 @@ public enum DashboardClaimStatus {
     WAITING_FOR_CLAIMANT_TO_RESPOND(
         Claim::isWaitingForClaimantToRespond
     ),
-
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
