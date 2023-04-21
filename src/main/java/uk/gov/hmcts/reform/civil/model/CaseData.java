@@ -130,6 +130,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -908,9 +910,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isNotPermitForRequestJudgementByAdmission() {
-        return nonNull(getRespondent1ResponseDate())
+    public String setUpJudgementPermittedDate() {
+        if (nonNull(getRespondent1ResponseDate())
             && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
+            return formatLocalDateTime(getRespondent1ResponseDate().toLocalDate().plusDays(5)
+                    .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+        }
+        return null;
     }
 }

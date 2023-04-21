@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
 import java.util.ArrayList;
@@ -25,8 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +55,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isNotPermitForRequestJudgementByAdmission()) {
-            String formattedDeadline = formatLocalDateTime(
-                caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5)
-                    .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+        String formattedDeadline = caseData.setUpJudgementPermittedDate();
+        if (formattedDeadline != null) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, formattedDeadline));
         }
 

@@ -25,35 +25,15 @@ public class JudgementService {
     private final FeatureToggleService featureToggleService;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-        BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        if (caseData.isAcceptDefendantPaymentPlanForPartAdmitYes()) {
-            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        }
-        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
-            ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount);
-        BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
-        BigDecimal finalTotal = subTotal.subtract(paidAmount);
-        String ccjJudgmentStatement;
-        if (caseData.isLRvLipOneVOne(multiPartyScenario)
-            && featureToggleService.isPinInPostEnabled()) {
-            ccjJudgmentStatement = JUDGEMENT_BY_COURT;
-        } else {
-            ccjJudgmentStatement = String.format(JUDGEMENT_ORDER, subTotal);
-        }
-
         return CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(claimAmount)
-            .ccjJudgmentAmountClaimFee(claimFee)
-            .ccjJudgmentSummarySubtotalAmount(subTotal)
-            .ccjJudgmentTotalStillOwed(finalTotal)
-            .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
-            .ccjPaymentPaidSomeAmountInPounds(paidAmount)
-            .ccjJudgmentFixedCostAmount(fixedCost)
-            .ccjJudgmentStatement(ccjJudgmentStatement)
+            .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
+            .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
+            .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
+            .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
+            .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
+            .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
+            .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
+            .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
             .build();
     }
 
@@ -63,5 +43,53 @@ public class JudgementService {
             errors.add("The amount paid must be less than the full claim amount.");
         }
         return errors;
+    }
+
+    private BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
+        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+        if (caseData.isAcceptDefendantPaymentPlanForPartAdmitYes()) {
+            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        }
+        return claimAmount;
+    }
+
+    private BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
+        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+    }
+
+    private BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
+        return (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
+            ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
+    }
+
+    private BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
+        return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
+    }
+
+
+    private BigDecimal ccjJudgmentInterest(CaseData caseData) {
+        return caseData.getTotalInterest();
+    }
+
+    private BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+        return ccjJudgmentClaimAmount(caseData)
+            .add(ccjJudgmentClaimFee(caseData))
+            .add(caseData.getTotalInterest())
+            .add(ccjJudgmentFixedCost(caseData));
+    }
+
+    private BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
+        return ccjJudgementSubTotal(caseData)
+            .subtract(ccjJudgmentPaidAmount(caseData));
+    }
+
+    private String ccjJudgmentStatement(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (caseData.isLRvLipOneVOne(multiPartyScenario)
+            && featureToggleService.isPinInPostEnabled()) {
+            return JUDGEMENT_BY_COURT;
+        } else {
+            return String.format(JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
+        }
     }
 }
