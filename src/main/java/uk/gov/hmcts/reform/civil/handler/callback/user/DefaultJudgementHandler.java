@@ -210,7 +210,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
             LocalDateTime.now())) {
