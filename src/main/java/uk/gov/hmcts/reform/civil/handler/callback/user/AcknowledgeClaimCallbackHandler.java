@@ -322,14 +322,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         return !solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
     }
 
-    public String defendantFlag(CaseData caseData, UserInfo userInfo) {
+    public void defendantFlag(CaseData caseData, UserInfo userInfo) {
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                      .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             defendantFlag = "userRespondent2";
         }
-        return defendantFlag;
     }
 
 }

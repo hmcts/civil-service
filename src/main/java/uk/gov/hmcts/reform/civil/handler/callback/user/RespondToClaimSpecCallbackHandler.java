@@ -1501,7 +1501,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                           updatedCaseData.build().getRespondent1ResponseDate(),
                                           DocumentType.DEFENDANT_DEFENCE
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent1ClaimDocument,
+                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
                                                        "defendant1DefenseDirectionsQuestionnaire");
             }
         }
@@ -1516,7 +1516,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent1DQDraftDirections,
+                assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
                                                        "defendant1DefenseDirectionsQuestionnaire");
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
@@ -1528,7 +1528,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               updatedCaseData.build().getRespondent2ResponseDate(),
                                               DocumentType.DEFENDANT_DEFENCE
                         ));
-                    assignCategoryId.setCategoryIdDocument(respondent2ClaimDocument,
+                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
                                                            "defendant2DefenseDirectionsQuestionnaire");
                 }
             }
@@ -1542,7 +1542,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               updatedCaseData.build().getRespondent2ResponseDate(),
                                               DocumentType.DEFENDANT_DEFENCE
                         ));
-                    assignCategoryId.setCategoryIdDocument(respondent2ClaimDocument,
+                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
                                                            "defendant2DefenseDirectionsQuestionnaire");
                 }
             }
@@ -1558,7 +1558,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent2DQDraftDirections,
+                assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
                                                        "defendant2DefenseDirectionsQuestionnaire");
             }
         }
@@ -1808,13 +1808,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return false;
     }
 
-    private String defendantFlagSpec(CaseData caseData, UserInfo userInfo) {
+    private void defendantFlagSpec(CaseData caseData, UserInfo userInfo) {
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                      .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             defendantFlagSpec = "userRespondent2";
         }
-        return defendantFlagSpec;
     }
 }

@@ -71,9 +71,9 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        assignCategoryId.setCategoryIdCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
         if (nonNull(defendantFlagSpec) && defendantFlagSpec.equals("userRespondent2")) {
-            assignCategoryId.setCategoryIdCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
         }
 
         if (stitchEnabled) {

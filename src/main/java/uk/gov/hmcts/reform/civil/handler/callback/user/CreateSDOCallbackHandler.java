@@ -709,7 +709,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (document != null) {
             updatedData.sdoOrderDocument(document);
         }
-        assignCategoryId.setCategoryIdCaseDocument(document, "sdo");
+        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

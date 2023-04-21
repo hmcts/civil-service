@@ -67,7 +67,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 sol
             );
-        assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+        assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
@@ -126,7 +126,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
                     caseDataBuilder.respondent1GeneratedResponseDocument(document);
-                    assignCategoryId.setCategoryIdCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
+                    assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
                 });
             }
 
@@ -144,7 +144,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
                     caseDataBuilder.respondent2GeneratedResponseDocument(document);
-                    assignCategoryId.setCategoryIdCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
+                    assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
                 });
             }
 
@@ -198,12 +198,12 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         );
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
-                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
             }
             if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
-                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
             }
         }
 
@@ -211,9 +211,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
-                assignCategoryId.setCategoryIdCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
             }
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
