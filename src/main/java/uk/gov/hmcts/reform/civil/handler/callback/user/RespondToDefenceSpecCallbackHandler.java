@@ -188,8 +188,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(
-            caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
@@ -625,7 +624,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        if (caseData.isPaidSomeAmountMoreThanClaimAmount(caseData)) {
+        if (caseData.isPaidSomeAmountMoreThanClaimAmount()) {
             errors.add("The amount paid must be less than the full claim amount.");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)

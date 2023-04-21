@@ -105,6 +105,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -860,6 +861,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return multiPartyScenario.equals(TWO_V_ONE)
             && YES.equals(getDefendantSingleResponseToBothClaimants())
             && YES.equals(getApplicant1ProceedWithClaimSpec2v1());
+    }
+
+    @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount() {
+        return getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
     }
 
     @JsonIgnore

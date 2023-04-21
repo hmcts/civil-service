@@ -897,4 +897,8 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
         caseData.hasApplicantRejectedRepaymentPlan();
+
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
+        caseData.isRespondentResponseBilingual();
+
 }
