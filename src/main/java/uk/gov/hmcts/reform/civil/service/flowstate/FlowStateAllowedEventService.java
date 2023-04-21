@@ -882,7 +882,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -901,7 +902,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -920,7 +922,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
