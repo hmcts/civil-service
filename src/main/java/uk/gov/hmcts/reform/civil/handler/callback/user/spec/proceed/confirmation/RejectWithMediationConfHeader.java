@@ -8,11 +8,12 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 public class RejectWithMediationConfHeader implements RespondToResponseConfirmationHeaderGenerator {
+
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if(caseData.hasClaimantAgreedToFreeMediation()){
+        if (caseData.hasClaimantAgreedToFreeMediation()) {
             return Optional.of(format(
-                "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+                "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
             ));
         }
