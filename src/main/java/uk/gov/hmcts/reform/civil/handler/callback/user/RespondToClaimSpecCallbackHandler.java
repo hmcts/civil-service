@@ -1142,7 +1142,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // which user is "creating" the document and therefore which folder to move the documents
             // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
             UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            defendantFlagSpec(caseData, userInfo);
+            assignDefendantFlagSpec(caseData, userInfo);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1808,7 +1808,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return false;
     }
 
-    private void defendantFlagSpec(CaseData caseData, UserInfo userInfo) {
+    private void assignDefendantFlagSpec(CaseData caseData, UserInfo userInfo) {
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                      .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
