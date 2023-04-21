@@ -112,9 +112,11 @@ public class FlowPredicate {
             && caseData.getRespondent2Represented() == NO;
 
     public static final Predicate<CaseData> claimSubmittedBothUnregisteredSolicitors = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getRespondent1OrgRegistered() == NO
-            && (caseData.getAddRespondent2() == YES && caseData.getRespondent2OrgRegistered() == NO);
+            caseData.getSubmittedDate() != null
+                    && caseData.getRespondent1OrgRegistered() == NO
+                    && (caseData.getAddRespondent2() == YES && caseData.getRespondent2OrgRegistered() == NO
+                    && (caseData.getRespondent2SameLegalRepresentative() == NO
+                    || caseData.getRespondent2SameLegalRepresentative() == null));
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
@@ -863,31 +865,40 @@ public class FlowPredicate {
         caseData.getRespondent1PinToPostLRspec() != null;
 
     public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+        boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
             if (caseData.getRespondent2() != null
                 && caseData.getRespondent2SameLegalRepresentative().equals(NO)
                 && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
-                return false;
-            }
-            if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+                result = false;
+            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()
                 || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()) {
-                return false;
+                result = false;
+            } else if (!caseData.hasClaimantAgreedToFreeMediation()) {
+                result = false;
+            } else {
+                result = true;
             }
-            return true;
         }
-        return false;
+        return result;
     };
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
     public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        (YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()));
+        caseData.hasApplicantAcceptedRepaymentPlan();
+
+    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
+        caseData.hasApplicantRejectedRepaymentPlan();
+
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
+        caseData.isRespondentResponseBilingual();
+
 }

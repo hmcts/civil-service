@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
@@ -42,6 +43,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -98,11 +100,17 @@ class EventHistoryMapperTest {
     private Time time;
 
     LocalDateTime localDateTime;
+    List<LocationRefData> courtLocations;
 
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
+        courtLocations = new ArrayList<>();
+        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
     }
 
@@ -5241,6 +5249,45 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateTakenOfflineByStaffSpec()
+                .setClaimNotificationDate()
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimOrDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterClaimNotified()
@@ -5897,7 +5944,7 @@ class EventHistoryMapperTest {
                                   .preferredCourtName("")
                                   .build())
                 .build();
-            String detailsText = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+            String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)

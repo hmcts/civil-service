@@ -18,11 +18,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
@@ -45,10 +49,14 @@ import java.util.Optional;
 import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+
+import java.time.LocalDate;
+
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
@@ -75,6 +83,8 @@ public class HearingValuesServiceTest {
     private CaseCategoriesService caseCategoriesService;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -85,13 +95,22 @@ public class HearingValuesServiceTest {
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
     private static final String RESPONDENT_ONE_LR_ORG_NAME = "Respondent 1 LR Org name";
+    private static final String BASE_LOCATION_ID = "1234";
+    private static final String WELSH_REGION_ID = "7";
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1234").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
             .build();
         Long caseId = 1L;
         CaseDetails caseDetails = CaseDetails.builder()
@@ -99,7 +118,8 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -117,7 +137,7 @@ public class HearingValuesServiceTest {
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                       .locationId("1234")
+                                                       .locationId(BASE_LOCATION_ID)
                                                        .locationType(COURT)
                                                        .build());
 
@@ -126,21 +146,21 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
             .hmctsServiceID("AAA7")
             .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName(null)
+            .publicCaseName("'John Rambo' v 'Sole Trader'")
             .caseAdditionalSecurityFlag(false)
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
-            .caseManagementLocationCode("1234")
-            .caseSLAStartDate("")
+            .caseManagementLocationCode(BASE_LOCATION_ID)
+            .caseSLAStartDate("2023-01-30")
             .autoListFlag(false)
             .hearingType("")
             .hearingWindow(expectedHearingWindow)
             .duration(0)
             .hearingPriorityType("Standard")
             .numberOfPhysicalAttendees(0)
-            .hearingInWelshFlag(false)
+            .hearingInWelshFlag(true)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
             .listingComments("")
@@ -160,6 +180,8 @@ public class HearingValuesServiceTest {
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
+        verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
+        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         assertThat(actual).isEqualTo(expected);
     }
 

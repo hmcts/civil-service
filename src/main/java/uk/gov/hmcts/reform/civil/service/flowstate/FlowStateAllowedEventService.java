@@ -514,6 +514,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
             )
         ),
@@ -564,7 +565,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -880,7 +882,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -899,7 +902,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -918,7 +922,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -974,6 +979,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
             )
         ),

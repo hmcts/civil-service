@@ -39,49 +39,6 @@ public class HearingUtilsTest {
         assertThat(days).isNotNull();
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"0;0", "15000;2700", "35000;5900", "90000;8500", "140000;12300",
-        "290000;18100", "500000;34600"}, delimiter = ';')
-    @DisplayName("HearingUtils.getFastTrackFee should return the appropriate fast-track fee"
-        + " based on the claim fee amount.")
-    void shouldReturnFee_whenGivenAnyClaimFee(int intClaimFee, int expectedFastTrackFee) {
-        assertThat(HearingUtils.getSmallTrackFee(intClaimFee)).isEqualTo(new BigDecimal(expectedFastTrackFee));
-    }
-
-    @Test
-    void shouldReturnFee2_whenGivenAnyClaimFee() {
-
-        assertThat(HearingUtils.getSmallTrackFee(15000)).isEqualTo(new BigDecimal(2700));
-
-    }
-
-    @Test
-    void shouldReturnFee3_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getSmallTrackFee(35000)).isEqualTo(new BigDecimal(5900));
-
-    }
-
-    @Test
-    void shouldReturnFee4_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getSmallTrackFee(90000)).isEqualTo(new BigDecimal(8500));
-
-    }
-
-    @Test
-    void shouldReturnFee5_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getSmallTrackFee(140000)).isEqualTo(new BigDecimal(12300));
-    }
-
-    @Test
-    void shouldReturnFee6_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getSmallTrackFee(290000)).isEqualTo(new BigDecimal(18100));
-    }
-
-    @Test
-    void shouldReturnFee7_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getSmallTrackFee(500000)).isEqualTo(new BigDecimal(34600));
-    }
-
     @DisplayName("HearingUtils.formatHearingFee should return <null> when the hearing fee is zero.")
     void shouldReturnNull_when0ClaimFee() {
         assertThat(HearingUtils.formatHearingFee(

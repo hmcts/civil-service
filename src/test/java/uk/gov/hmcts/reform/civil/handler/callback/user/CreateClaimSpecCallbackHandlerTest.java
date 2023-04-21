@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -1425,9 +1426,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
+        void shouldAssignCaseName1v2_whenCaseIs1v2() {
             // Given
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -1442,9 +1442,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
+        void shouldAssignCaseName2v1_whenCaseIs2v1() {
             // Given
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -1459,9 +1458,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
+        void shouldAssignCaseName1v1_whenCaseIs1v1() {
             // Given
-            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -1491,6 +1489,30 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+        }
+
+        @Test
+        void shouldCopyRespondent1SolicitorReferenceSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondentSolicitor2Reference = response.getData().get("solicitorReferences");
+            var respondentSolicitor2ServiceAddressRequired = response.getData().get(
+                "respondentSolicitor2ServiceAddressRequired");
+            var respondentSolicitor2ServiceAddress =
+                response.getData().get("respondentSolicitor2ServiceAddress");
+
+            assertThat(respondentSolicitor2Reference)
+                .extracting("respondentSolicitor2Reference").isEqualTo("6789");
+            assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
+            assertThat(respondentSolicitor2ServiceAddress).isNull();
         }
 
         @Nested

@@ -24,10 +24,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
     }
 
-    public boolean isGlobalSearchEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
-    }
-
     public boolean isGeneralApplicationsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
