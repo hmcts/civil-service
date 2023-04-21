@@ -365,7 +365,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 )));
         if (!claimantUploads.isEmpty()) {
             updatedCaseData.claimantResponseDocuments(claimantUploads);
-            assignCategoryId.setCategoryIdCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
+            assignCategoryId.assignCategoryIdToCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
                                                      "directionsQuestionnaire");
         }
     }

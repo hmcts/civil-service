@@ -618,7 +618,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                                           updatedCaseData.build().getRespondent1ResponseDate(),
                                           DocumentType.DEFENDANT_DEFENCE
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent1ClaimDocument,
+                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
                                                        "defendant1DefenseDirectionsQuestionnaire");
             }
         }
@@ -634,7 +634,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent1DQDraftDirections,
+                assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
                                                        "defendant1DefenseDirectionsQuestionnaire");
             }
         }
@@ -648,7 +648,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                                           updatedCaseData.build().getRespondent2ResponseDate(),
                                           DocumentType.DEFENDANT_DEFENCE
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent2ClaimDocument,
+                assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
                                                        "defendant2DefenseDirectionsQuestionnaire");
             }
         }
@@ -663,7 +663,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.setCategoryIdDocument(respondent2DQDraftDirections,
+                assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
                                                        "defendant2DefenseDirectionsQuestionnaire");
             }
         }

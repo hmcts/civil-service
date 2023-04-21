@@ -84,13 +84,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        assignCategoryId.setCategoryIdCaseDocument(sealedClaim, "detailsOfClaim");
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
         if (caseData.getSpecClaimDetailsDocumentFiles() != null
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
-            assignCategoryId.setCategoryIdDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
-            assignCategoryId.setCategoryIdDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                     caseData.getSpecClaimDetailsDocumentFiles()))
                 .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
@@ -100,13 +100,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
                                .build());
         } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
-            assignCategoryId.setCategoryIdDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
                 caseData.getSpecClaimTemplateDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload(
                 wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
         } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
-            assignCategoryId.setCategoryIdDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                 caseData.getSpecClaimDetailsDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(

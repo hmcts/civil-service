@@ -78,7 +78,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        assignCategoryId.setCategoryIdCaseDocument(sealedClaim, "detailsOfClaim");
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
 
         if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())

@@ -54,10 +54,10 @@ public class AssignCategoryIdTests {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
-        assignCategoryId.setCategoryIdDocument(testDocument, "testDocumentID");
-        assignCategoryId.setCategoryIdCollection(documentList, document -> document.getValue().getDocumentLink(),
+        assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
+        assignCategoryId.assignCategoryIdToCollection(documentList, document -> document.getValue().getDocumentLink(),
                                                  "testDocumentCollectionID");
-        assignCategoryId.setCategoryIdCaseDocument(testCaseDocument, "testCaseDocumentID");
+        assignCategoryId.assignCategoryIdToCaseDocument(testCaseDocument, "testCaseDocumentID");
 
         assertThat(documentList.get(0).getValue().getDocumentLink().getCategoryID()).isNull();
         assertThat(testDocument.getCategoryID()).isNull();
@@ -67,7 +67,7 @@ public class AssignCategoryIdTests {
     @Test
     public void shouldAssignCaseDocumentCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        assignCategoryId.setCategoryIdCaseDocument(testCaseDocument, "testCaseDocumentID");
+        assignCategoryId.assignCategoryIdToCaseDocument(testCaseDocument, "testCaseDocumentID");
 
         assertThat(testCaseDocument.getDocumentLink().getCategoryID()).isEqualTo("testCaseDocumentID");
     }
@@ -75,7 +75,7 @@ public class AssignCategoryIdTests {
     @Test
     public void shouldAssignDocumentCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        assignCategoryId.setCategoryIdDocument(testDocument, "testDocumentID");
+        assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
 
         assertThat(testDocument.getCategoryID()).isEqualTo("testDocumentID");
     }
@@ -85,7 +85,7 @@ public class AssignCategoryIdTests {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
-        assignCategoryId.setCategoryIdCollection(documentList, document -> document.getValue().getDocumentLink(),
+        assignCategoryId.assignCategoryIdToCollection(documentList, document -> document.getValue().getDocumentLink(),
                                                  "testDocumentCollectionID");
 
         assertThat(documentList.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("testDocumentCollectionID");

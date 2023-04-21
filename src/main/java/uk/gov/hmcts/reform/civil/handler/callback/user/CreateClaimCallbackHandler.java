@@ -487,19 +487,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
         }
-
-        if (nonNull(caseData.getUploadParticularsOfClaim()) && caseData.getUploadParticularsOfClaim().equals(YES)) {
-            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                     Element::getValue, "particularsOfClaim");
-            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
-            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
-            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
-            assignCategoryId.setCategoryIdCollection(caseData.getServedDocumentFiles().getOther(),
-                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
-        }
+        //assign category ids to documents uploaded as part of particulars of claim
+        assignParticularOfClaimCategoryIds(caseData);
 
         dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
@@ -675,6 +664,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());
+        }
+    }
+
+    private void assignParticularOfClaimCategoryIds(CaseData caseData) {
+        if (YES.equals(caseData.getUploadParticularsOfClaim())) {
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                     Element::getValue, "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
         }
     }
 }

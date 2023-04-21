@@ -87,7 +87,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
         if (caseDocuments.size() > 1) {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
         }
-        assignCategoryId.setCategoryIdCollection(systemGeneratedCaseDocuments, document -> document.getValue().getDocumentLink(),
+        assignCategoryId.assignCategoryIdToCollection(systemGeneratedCaseDocuments, document -> document.getValue().getDocumentLink(),
                                                  "detailsOfClaim");
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }

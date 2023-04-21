@@ -16,7 +16,7 @@ public class AssignCategoryId {
 
     private final FeatureToggleService featureToggleService;
 
-    public <T> void setCategoryIdCollection(List<Element<T>> documentUpload, Function<Element<T>, Document> documentExtractor, String theID) {
+    public <T> void assignCategoryIdToCollection(List<Element<T>> documentUpload, Function<Element<T>, Document> documentExtractor, String theID) {
         if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
@@ -26,14 +26,14 @@ public class AssignCategoryId {
         documentUpload.forEach(document -> documentExtractor.apply(document).setCategoryID(theID));
     }
 
-    public void setCategoryIdCaseDocument(CaseDocument documentUpload, String theID) {
+    public void assignCategoryIdToCaseDocument(CaseDocument documentUpload, String theID) {
         if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
         documentUpload.getDocumentLink().setCategoryID(theID);
     }
 
-    public void setCategoryIdDocument(Document documentUpload, String theID) {
+    public void assignCategoryIdToDocument(Document documentUpload, String theID) {
         if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
