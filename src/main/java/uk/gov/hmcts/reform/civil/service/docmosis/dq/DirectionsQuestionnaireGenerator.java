@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -37,8 +40,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -76,17 +79,19 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
 @RequiredArgsConstructor
-public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<DirectionsQuestionnaireForm> {
+public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DocmosisTemplates templateId;
@@ -104,7 +109,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             templateId = getDocmosisTemplate(caseData);
         }
 
-        templateData = getTemplateData(caseData);
+        templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
         return documentManagementService.uploadDocument(
@@ -155,7 +160,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (respondent.equals("ONE")) {
             templateData = getRespondent1TemplateData(caseData, "ONE");
         } else if (respondent.equals("TWO")) {
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         } else {
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
@@ -203,7 +208,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             templateData = getRespondent1TemplateData(caseData, "ONE");
         } else {
             // TWO
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -245,7 +250,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     @Override
-    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
+    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
@@ -300,7 +305,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .requestedCourt(getRequestedCourt(dq));
+            .requestedCourt(getRequestedCourt(dq, authorisation));
 
         return builder.build();
     }
@@ -495,17 +500,23 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private RequestedCourt getRequestedCourt(DQ dq) {
+    private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
-        if (rc == null) {
+        if (rc != null && null !=  rc.getCaseLocation()) {
+            List<LocationRefData> courtLocations = (locationRefDataService
+                .getCourtLocationsByEpimmsId(authorisation,
+                    rc.getCaseLocation().getBaseLocation()
+                ));
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
+                .responseCourtName(courtLocations.isEmpty() ? null : courtLocations.stream()
+                    .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                    .collect(Collectors.toList()).get(0).getCourtName())
+                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .build();
         } else {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .responseCourtCode(rc.getResponseCourtCode())
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         }
     }
@@ -546,7 +557,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
-    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier) {
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent2DQ();
 
         return  DirectionsQuestionnaireForm.builder()
@@ -572,7 +583,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
-            .requestedCourt(getRequestedCourt(dq))
+            .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
 
