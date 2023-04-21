@@ -224,7 +224,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // which user is "creating" the document and therefore which folder to move the documents
             // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
             UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            defendantFlag(caseData, userInfo);
+            assignDefendantFlag(caseData, userInfo);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -851,14 +851,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
     }
 
-    private String defendantFlag(CaseData caseData, UserInfo userInfo) {
+    private void assignDefendantFlag(CaseData caseData, UserInfo userInfo) {
         if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                      .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             defendantFlag = "userRespondent2";
         }
-        return defendantFlag;
     }
 
 }
