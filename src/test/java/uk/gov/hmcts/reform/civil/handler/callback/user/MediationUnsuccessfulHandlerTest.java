@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import net.bytebuddy.implementation.bind.MethodDelegationBinder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +49,6 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("unsuccessfulMediationReason").isNotNull();
             assertThat(response.getState())
                 .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
-            MethodDelegationBinder.BindingResolver.StreamWriting.toSystemOut();
         }
     }
 }
