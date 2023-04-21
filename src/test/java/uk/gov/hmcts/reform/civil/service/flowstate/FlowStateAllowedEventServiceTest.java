@@ -412,6 +412,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        DEFAULT_JUDGEMENT,
                         NotSuitable_SDO,
                         migrateCase
                     }
@@ -434,6 +435,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        DEFAULT_JUDGEMENT,
                         NotSuitable_SDO,
                         migrateCase
                     }
