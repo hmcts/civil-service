@@ -206,6 +206,7 @@ notifications:
   sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
   sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
   claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
+  claimantSolicitorConfirmsNotToProceedSpecLip: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
@@ -234,6 +235,7 @@ notifications:
   hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
   hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
+  otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
   respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
   respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
@@ -242,6 +244,10 @@ notifications:
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   finalOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
+
+  notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
+  notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
+
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

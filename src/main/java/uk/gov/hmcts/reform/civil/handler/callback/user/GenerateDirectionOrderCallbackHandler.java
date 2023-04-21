@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -126,7 +125,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.freeFormOrderDocument(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(FINAL_ORDER));
+        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_DIRECTIONS_ORDER));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
