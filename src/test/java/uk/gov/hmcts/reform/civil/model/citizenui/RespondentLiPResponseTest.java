@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,9 +12,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(SpringExtension.class)
 public class RespondentLiPResponseTest {
 
-    @InjectMocks
-    RespondentLiPResponse respondentLiPResponse;
-
     @Test
     void when_RespondentResponseLanguage_Is_Welsh_and_English() {
         CaseData caseData = CaseDataBuilder.builder()
@@ -25,7 +21,7 @@ public class RespondentLiPResponseTest {
                              .build())
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
+        boolean isBilingualResponse = caseData.isRespondentResponseBilingual();
         assertThat(isBilingualResponse).isEqualTo(true);
     }
 
@@ -38,7 +34,7 @@ public class RespondentLiPResponseTest {
                              .build())
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
+        boolean isBilingualResponse = caseData.isRespondentResponseBilingual();
         assertThat(isBilingualResponse).isEqualTo(false);
     }
 
@@ -48,7 +44,7 @@ public class RespondentLiPResponseTest {
             .caseDataLip(null)
             .build();
 
-        boolean isBilingualResponse = respondentLiPResponse.isRespondentResponseBilingual(caseData);
+        boolean isBilingualResponse = caseData.isRespondentResponseBilingual();
         assertThat(isBilingualResponse).isEqualTo(false);
     }
 }
