@@ -807,20 +807,24 @@ public class EventHistoryMapper {
 
     private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
-                .stream()
-                .map(caseNote ->
-                        Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseNote.getCreatedOn())
-                                .eventDetailsText(left((format("case note added: %s",
-                                        caseNote.getNote().replaceAll("\\s+", " "))), 250))
-                                .eventDetails(EventDetails.builder()
-                                        .miscText(left((format("case note added: %s",
-                                                caseNote.getNote().replaceAll("\\s+", " "))), 250))
-                                        .build())
-                                .build())
-                .collect(Collectors.toList());
+            .stream()
+            .map(caseNote ->
+                     Event.builder()
+                         .eventSequence(prepareEventSequence(builder.build()))
+                         .eventCode(MISCELLANEOUS.getCode())
+                         .dateReceived(caseNote.getCreatedOn())
+                         .eventDetailsText(left((format(
+                             "case note added: %s",
+                             caseNote.getNote().replaceAll("\\s+", " ")
+                         )), 250))
+                         .eventDetails(EventDetails.builder()
+                                           .miscText(left((format(
+                                               "case note added: %s",
+                                               caseNote.getNote().replaceAll("\\s+", " ")
+                                           )), 250))
+                                           .build())
+                         .build())
+            .collect(Collectors.toList());
         builder.miscellaneous(events);
     }
 
@@ -1153,134 +1157,134 @@ public class EventHistoryMapper {
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
 
-            YesOrNo proceedRespondent1;
-            YesOrNo proceedRespondent2;
-            YesOrNo applicant1Proceeds;
-            YesOrNo applicant2Proceeds;
-            YesOrNo applicant1MediationRequired;
+        YesOrNo proceedRespondent1;
+        YesOrNo proceedRespondent2;
+        YesOrNo applicant1Proceeds;
+        YesOrNo applicant2Proceeds;
+        YesOrNo applicant1MediationRequired;
 
-            if (caseData.getApplicant1ClaimMediationSpecRequired() == null
-                || caseData.getApplicant1ClaimMediationSpecRequired()
-                .getHasAgreedFreeMediation() == null
-            ) {
-                applicant1MediationRequired = NO;
-            } else {
-                applicant1MediationRequired = caseData.getApplicant1ClaimMediationSpecRequired()
-                    .getHasAgreedFreeMediation();
-            }
-
-            YesOrNo applicant2MediationRequired;
-
-            if (caseData.getApplicantMPClaimMediationSpecRequired() == null
-                || caseData.getApplicantMPClaimMediationSpecRequired()
-                .getHasAgreedFreeMediation() == null
-            ) {
-                applicant2MediationRequired = NO;
-            } else {
-                applicant2MediationRequired = caseData.getApplicantMPClaimMediationSpecRequired()
-                    .getHasAgreedFreeMediation();
-            }
-
-            YesOrNo respondent1MediationRequired;
-            YesOrNo respondent2MediationRequired;
-
-            String track = caseData.getResponseClaimTrack();
-
-            switch (getMultiPartyScenario(caseData)) {
-
-                case ONE_V_ONE:
-
-                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
-
-                    if (claimType == SPEC_CLAIM
-                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                        && respondent1MediationRequired == YesOrNo.YES
-                        && applicant1MediationRequired == YesOrNo.YES
-                    ) {
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
-                        builder.miscellaneous(miscText);
-                    } else {
-                        List<String> applicantProceedsText = new ArrayList<>();
-                        applicantProceedsText.add("Claimant proceeds.");
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
-                        builder.miscellaneous(miscText);
-                    }
-                    break;
-                case ONE_V_TWO_ONE_LEGAL_REP:
-                    proceedRespondent1 =
-                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
-                    proceedRespondent2 =
-                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
-
-                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                        )
-                    ) {
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
-                        builder.miscellaneous(miscText);
-                    } else {
-                        List<String> applicantProceedsText = new ArrayList<>();
-                        applicantProceedsText.add("Claimant proceeds.");
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
-                        builder.miscellaneous(miscText);
-                    }
-                    break;
-                case ONE_V_TWO_TWO_LEGAL_REP:
-
-                    proceedRespondent1 =
-                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
-                    proceedRespondent2 =
-                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
-                    respondent2MediationRequired = caseData.getResponseClaimMediationSpec2Required();
-
-                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && respondent2MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                        )
-                    ) {
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
-                        builder.miscellaneous(miscText);
-                    } else {
-                        List<String> applicantProceedsText = new ArrayList<>();
-                        applicantProceedsText.add("Claimant proceeds.");
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
-                        builder.miscellaneous(miscText);
-                    }
-                    break;
-                case TWO_V_ONE:
-
-                    applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
-                    applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
-                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
-
-                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
-                        || (claimType == SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                            && applicant2MediationRequired == YesOrNo.YES
-                        )
-                    ) {
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
-                        builder.miscellaneous(miscText);
-                    } else {
-                        List<String> applicantProceedsText = new ArrayList<>();
-                        applicantProceedsText.add("Claimants proceed.");
-                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
-                        builder.miscellaneous(miscText);
-                    }
-                    break;
-                default:
-            }
+        if (caseData.getApplicant1ClaimMediationSpecRequired() == null
+            || caseData.getApplicant1ClaimMediationSpecRequired()
+            .getHasAgreedFreeMediation() == null
+        ) {
+            applicant1MediationRequired = NO;
+        } else {
+            applicant1MediationRequired = caseData.getApplicant1ClaimMediationSpecRequired()
+                .getHasAgreedFreeMediation();
         }
+
+        YesOrNo applicant2MediationRequired;
+
+        if (caseData.getApplicantMPClaimMediationSpecRequired() == null
+            || caseData.getApplicantMPClaimMediationSpecRequired()
+            .getHasAgreedFreeMediation() == null
+        ) {
+            applicant2MediationRequired = NO;
+        } else {
+            applicant2MediationRequired = caseData.getApplicantMPClaimMediationSpecRequired()
+                .getHasAgreedFreeMediation();
+        }
+
+        YesOrNo respondent1MediationRequired;
+        YesOrNo respondent2MediationRequired;
+
+        String track = caseData.getResponseClaimTrack();
+
+        switch (getMultiPartyScenario(caseData)) {
+
+            case ONE_V_ONE:
+
+                respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+
+                if (claimType == SPEC_CLAIM
+                    && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                    && respondent1MediationRequired == YesOrNo.YES
+                    && applicant1MediationRequired == YesOrNo.YES
+                ) {
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                    builder.miscellaneous(miscText);
+                } else {
+                    List<String> applicantProceedsText = new ArrayList<>();
+                    applicantProceedsText.add("Claimant proceeds.");
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                    builder.miscellaneous(miscText);
+                }
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                proceedRespondent1 =
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                proceedRespondent2 =
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+
+                if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
+                    || (claimType == SPEC_CLAIM
+                    && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                    && respondent1MediationRequired == YesOrNo.YES
+                    && applicant1MediationRequired == YesOrNo.YES
+                    )
+                ) {
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                    builder.miscellaneous(miscText);
+                } else {
+                    List<String> applicantProceedsText = new ArrayList<>();
+                    applicantProceedsText.add("Claimant proceeds.");
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                    builder.miscellaneous(miscText);
+                }
+                break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+
+                proceedRespondent1 =
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                proceedRespondent2 =
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+                respondent2MediationRequired = caseData.getResponseClaimMediationSpec2Required();
+
+                if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
+                    || (claimType == SPEC_CLAIM
+                    && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                    && respondent1MediationRequired == YesOrNo.YES
+                    && respondent2MediationRequired == YesOrNo.YES
+                    && applicant1MediationRequired == YesOrNo.YES
+                    )
+                ) {
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                    builder.miscellaneous(miscText);
+                } else {
+                    List<String> applicantProceedsText = new ArrayList<>();
+                    applicantProceedsText.add("Claimant proceeds.");
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                    builder.miscellaneous(miscText);
+                }
+                break;
+            case TWO_V_ONE:
+
+                applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+                applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+                respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+
+                if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
+                    || (claimType == SPEC_CLAIM
+                    && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                    && respondent1MediationRequired == YesOrNo.YES
+                    && applicant1MediationRequired == YesOrNo.YES
+                    && applicant2MediationRequired == YesOrNo.YES
+                    )
+                ) {
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                    builder.miscellaneous(miscText);
+                } else {
+                    List<String> applicantProceedsText = new ArrayList<>();
+                    applicantProceedsText.add("Claimants proceed.");
+                    List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                    builder.miscellaneous(miscText);
+                }
+                break;
+            default:
+        }
+    }
 
     private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
         List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();
@@ -2100,23 +2104,23 @@ public class EventHistoryMapper {
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
 
-            String miscText = left(format(
-                "RPA Reason: Case proceeds offline. "
-                    + "Judge / Legal Advisor did not draw a Direction's Order: %s",
-                caseData.getReasonNotSuitableSDO().getInput()
-            ), 250);
+        String miscText = left(format(
+            "RPA Reason: Case proceeds offline. "
+                + "Judge / Legal Advisor did not draw a Direction's Order: %s",
+            caseData.getReasonNotSuitableSDO().getInput()
+        ), 250);
 
-            LocalDateTime eventDate = caseData.getUnsuitableSDODate();
+        LocalDateTime eventDate = caseData.getUnsuitableSDODate();
 
-            List<String> miscTextList = new ArrayList<>();
-            miscTextList.add(miscText);
+        List<String> miscTextList = new ArrayList<>();
+        miscTextList.add(miscText);
 
-            List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
-            builder.miscellaneous(miscTextEvent);
-        }
+        List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
+        builder.miscellaneous(miscTextEvent);
+    }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
-                                                             CaseData caseData) {
+                                                CaseData caseData) {
         String detailsText = "RPA Reason: Case Proceeds in Caseman.";
         builder.miscellaneous(
             Event.builder()
