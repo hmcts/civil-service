@@ -2506,6 +2506,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedAndReasponseDeadlinePassed1v1() {
+        atStateClaimNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = LocalDateTime.now().minusDays(1);
+        respondent2OrgRegistered = null;
+        respondent2Represented = null;
+        addRespondent2 = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantSolicitors();
@@ -3856,6 +3867,14 @@ public class CaseDataBuilder {
         respondent2TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
         respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atState1v2AndRespondentResponseDeadlinePassed() {
+        atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
+        LocalDateTime deadlinePassed = LocalDateTime.now().minusDays(1);
+        respondent1ResponseDeadline = deadlinePassed;
+        respondent2ResponseDeadline = deadlinePassed;
         return this;
     }
 
