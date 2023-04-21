@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -39,7 +40,8 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfHeader.class),
             Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfHeader.class),
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfHeader.class),
-            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class)
+            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class),
+            Pair.of(buildCaseWithMediation(), RejectWithMediationConfHeader.class)
         );
     }
 
