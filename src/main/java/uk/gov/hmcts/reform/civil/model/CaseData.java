@@ -910,12 +910,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public String setUpJudgementPermittedDate() {
-        if (nonNull(getRespondent1ResponseDate())
+    public boolean isJudgementDateNotPermitted() {
+        return nonNull(getRespondent1ResponseDate())
             && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
-            return formatLocalDateTime(getRespondent1ResponseDate().toLocalDate().plusDays(5)
-                    .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public String setUpJudgementFormattedPermittedDate() {
+        if (isJudgementDateNotPermitted()) {
+            return formatLocalDateTime(getRespondent1ResponseDate()
+                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
         }
         return null;
     }

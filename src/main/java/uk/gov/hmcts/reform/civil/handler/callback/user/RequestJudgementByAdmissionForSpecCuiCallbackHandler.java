@@ -55,9 +55,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        String formattedDeadline = caseData.setUpJudgementPermittedDate();
-        if (formattedDeadline != null) {
-            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, formattedDeadline));
+        if (caseData.isJudgementDateNotPermitted()) {
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate()));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
