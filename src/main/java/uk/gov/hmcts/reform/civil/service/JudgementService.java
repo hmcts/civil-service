@@ -66,7 +66,6 @@ public class JudgementService {
         return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
     }
 
-
     private BigDecimal ccjJudgmentInterest(CaseData caseData) {
         return caseData.getTotalInterest();
     }
