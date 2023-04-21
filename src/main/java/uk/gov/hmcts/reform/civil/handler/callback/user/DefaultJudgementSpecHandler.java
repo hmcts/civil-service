@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -152,16 +153,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.remove(BREATHING_SPACE);
         }
 
-        List<String> listData = new ArrayList<>();
-
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
-        if (nonNull(caseData.getRespondent2())) {
-            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
-            listData.add("Both Defendants");
-            caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
-        }
-
-        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
+        List<String> defendants = DefaultJudgmentUtils.getDefendants(caseData);
+        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(defendants));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.size() == 0

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -217,14 +218,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
-        List<String> listData = new ArrayList<>();
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
-        if (nonNull(caseData.getRespondent2())) {
-            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
-            listData.add("Both Defendants");
-            caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
-        }
-        caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
+        List<String> defendants = DefaultJudgmentUtils.getDefendants(caseData);
+        caseDataBuilder.defendantDetails(DynamicList.fromList(defendants));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
