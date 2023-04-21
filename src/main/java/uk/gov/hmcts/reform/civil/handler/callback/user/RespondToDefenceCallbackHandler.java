@@ -31,9 +31,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -75,9 +74,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private final LocationRefDataUtil locationRefDataUtil;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -230,12 +229,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
                 applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
+                String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
+                    caseData,
+                    CallbackParams.Params.BEARER_TOKEN.toString(), true
+                );
                 applicant1DQBuilder.applicant1DQRequestedCourt(
                     RequestedCourt.builder()
                         .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                        .responseCourtCode(locationRefDataUtil.getPreferredCourtData(
-                                caseData,
-                                CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                        .responseCourtCode(responseCourtCode)
                         .build());
 
                 builder.applicant1DQ(applicant1DQBuilder.build());
