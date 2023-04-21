@@ -234,6 +234,12 @@ public class NotificationsProperties {
     private String respondentSolicitorCcjNotificationTemplate;
 
     @NotEmpty
+    private String notifyClaimantLrTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLipTemplate;
+    
+    @NotEmpty
     private String bundleCreationTemplate;
 
 }
