@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -91,6 +92,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
     CaseDetailsConverter.class
 })
 class DirectionsQuestionnaireGeneratorTest {
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -400,7 +404,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .phoneNumber("1234567890")
                                                      .emailAddress("respondentLF@email.com").build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent1DQ(), caseData);
@@ -428,7 +432,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .emailAddress("respondentLF@email.com").build())
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -450,7 +454,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -489,7 +493,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .addApplicant2(YES)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -514,7 +518,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
-                    .applicant1DQ()
+                    .applicant1DQWithLocation()
                     .applicant1DQWithExperts()
                     .applicant1DQWithWitnesses()
                     .applicant1DQWithHearingSupport()
@@ -530,7 +534,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YES)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertEquals(applicant1ExpertsMock(), templateData.getExperts());
                 assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
@@ -553,7 +557,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol()
-                    .applicant1DQ()
+                    .applicant1DQWithLocation()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -565,7 +569,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2SameLegalRepresentative(NO)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
@@ -596,7 +600,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -624,7 +628,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .emailAddress("respondentLF@email.com").build())
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -653,7 +657,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .emailAddress("respondentLF@email.com").build())
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant2DQ(), caseData);
@@ -689,7 +693,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .build())
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 assertThatDqFieldsAreCorrect2v1(templateData, caseData.getRespondent1DQ(), caseData);
@@ -707,7 +711,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .respondToCourtLocation(null)
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             }
 
             @Test
@@ -720,7 +724,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .respondent1DQExperts(null)
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             }
 
             @Test
@@ -749,7 +753,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                  .build())
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 Expert extracted = templateData.getExperts().getDetails().get(0);
                 assertThat(extracted.getName()).isEqualTo(expert1.getName());
@@ -777,7 +781,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                           .build())
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 DisclosureReport extracted = templateData.getDisclosureReport();
                 assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
@@ -804,7 +808,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                                             .build())
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 FurtherInformation extracted = templateData.getFurtherInformation();
                 assertThat(extracted.getFutureApplications()).isEqualTo(YES);
@@ -822,7 +826,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .respondent1DQLanguage(null)
                                        .build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWelshLanguageRequirements()).isNotNull();
             }
@@ -842,7 +846,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(0);
@@ -863,7 +867,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
@@ -884,7 +888,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
@@ -915,7 +919,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
@@ -938,7 +942,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnesses())
                     .isEqualTo(applicant1WitnessesMock());
@@ -962,7 +966,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants()).isNull();
             }
@@ -994,7 +998,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants()).isNull();
             }
@@ -1239,6 +1243,8 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQWithLocation()
+                .respondent2DQWithLocation()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -1333,6 +1339,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicant1DQWithLocation()
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -1367,7 +1374,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent2DQ(), caseData);
             }
@@ -1393,7 +1400,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThatDqFieldsAreCorrect(templateData, caseData.getRespondent2DQ(), caseData);
             }
@@ -1428,7 +1435,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
                     .build();
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertEquals(templateData.getRespondents(), getRespondents(caseData));
             }
@@ -1816,7 +1823,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .emailAddress("respondent2LF@email.com").build())
                     .build();
 
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 verify(representativeService).getRespondent2Representative(caseData);
                 assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
@@ -2239,7 +2246,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 + "a false statement in a document verified by a statement of truth "
                 + "without an honest belief in its truth.";
 
-            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
             assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
         }
@@ -2261,7 +2268,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 + "a false statement in a document verified by a statement of truth "
                 + "without an honest belief in its truth.";
 
-            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
             assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
             assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
         }

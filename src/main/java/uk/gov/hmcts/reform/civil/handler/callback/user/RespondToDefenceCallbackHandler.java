@@ -31,10 +31,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -76,9 +76,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private final LocationRefDataUtil locationRefDataUtil;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -238,12 +238,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
 
+                    String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
+                        caseData,
+                        CallbackParams.Params.BEARER_TOKEN.toString(), true
+                    );
                     applicant1DQBuilder.applicant1DQRequestedCourt(
                         RequestedCourt.builder()
                             .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                            .responseCourtCode(locationRefDataUtil.getPreferredCourtData(
-                                    caseData,
-                                    CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                            .responseCourtCode(responseCourtCode)
                             .build());
                 }
 
