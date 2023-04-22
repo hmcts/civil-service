@@ -83,7 +83,6 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
     void setUp() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
-        when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
     }
 
     @Nested

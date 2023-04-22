@@ -2973,7 +2973,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
             .build();
         respondent1DQ();
-        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         return this;
     }
 
@@ -2992,7 +2992,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
-        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(3);
         return this;
     }
 
@@ -3112,9 +3112,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateBothRespondentsSameResponse(RespondentResponseType respondentResponseType) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondentResponseType;
-        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(3);
         respondent2Responds(respondentResponseType);
-        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(4);
         return this;
     }
 
@@ -3123,7 +3123,7 @@ public class CaseDataBuilder {
         respondent1ClaimResponseType = responseType;
         respondent2ClaimResponseType = responseType;
         respondentResponseIsSame(YES);
-        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(3);
         respondent2ResponseDate = respondent1ResponseDate;
         respondent2ClaimResponseIntentionType = respondent1ClaimResponseIntentionType;
         return this;
@@ -3134,7 +3134,7 @@ public class CaseDataBuilder {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
         respondent2Responds(respondent2Response);
-        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(3);
         respondentResponseIsSame(NO);
         if (caseAccessCategory != SPEC_CLAIM) {
             // at least in spec claims, respondent2 response date is null by front-end
@@ -3152,9 +3152,9 @@ public class CaseDataBuilder {
                                                        RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
-        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(3);
         respondent2Responds(respondent2Response);
-        respondent2ResponseDate = LocalDateTime.now().plusDays(2);
+        respondent2ResponseDate = LocalDateTime.now().plusDays(4);
         return this;
     }
 
@@ -3463,7 +3463,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
         applicant1DQ();
-        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(2);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
 
         switch (mpScenario) {
@@ -4176,13 +4176,13 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Responds(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
-        this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
+        this.respondent2ResponseDate = LocalDateTime.now().plusDays(3);
         return this;
     }
 
     public CaseDataBuilder respondent2Responds1v2SameSol(RespondentResponseType responseType) {
         this.respondent2ClaimResponseType = responseType;
-        this.respondent2ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        this.respondent2ResponseDate = respondent1ResponseDate;
         return this;
     }
 

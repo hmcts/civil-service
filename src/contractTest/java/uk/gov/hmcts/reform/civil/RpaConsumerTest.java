@@ -945,11 +945,6 @@ class RpaConsumerTest extends BaseRpaTest {
     @Nested
     class CreateClaimRpaContinuousFeed {
 
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
-        }
-
         @Test
         @SneakyThrows
         void shouldGeneratePact_whenClaimAgainstUnregisteredDefendant() {
