@@ -14,34 +14,32 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_FINAL_ORDER;
-
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 
 @Service
 @RequiredArgsConstructor
-public class FinalOrderNotificationHandler extends CallbackHandler implements NotificationData {
+public class GenerateOrderNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
     private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_FINAL_ORDER,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_FINAL_ORDER,
-        NOTIFY_RESPONDENT_SOLICITOR2_FOR_FINAL_ORDER
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER
     );
-    public static final String TASK_ID_APPLICANT = "FinalOrderNotifyApplicantSolicitor1";
-    public static final String TASK_ID_DEFENDANT1 = "FinalOrderNotifyRespondentSolicitor1";
-    public static final String TASK_ID_DEFENDANT2 = "FinalOrderNotifyRespondentSolicitor2";
+    public static final String TASK_ID_APPLICANT = "GenerateOrderNotifyApplicantSolicitor1";
+    public static final String TASK_ID_RESPONDENT1 = "GenerateOrderNotifyRespondentSolicitor1";
+    public static final String TASK_ID_RESPONDENT2 = "GenerateOrderNotifyRespondentSolicitor2";
 
     public String taskId = "";
 
@@ -54,12 +52,12 @@ public class FinalOrderNotificationHandler extends CallbackHandler implements No
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        if (callbackParams.getRequest().getEventId().equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_FINAL_ORDER.name())) {
+        if (callbackParams.getRequest().getEventId().equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
             return TASK_ID_APPLICANT;
-        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_FINAL_ORDER.name())) {
-            return TASK_ID_DEFENDANT1;
+        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name())) {
+            return TASK_ID_RESPONDENT1;
         } else {
-            return TASK_ID_DEFENDANT2;
+            return TASK_ID_RESPONDENT2;
         }
     }
 
@@ -74,7 +72,7 @@ public class FinalOrderNotificationHandler extends CallbackHandler implements No
         String template = getReferenceTemplateString();
         notificationService.sendMail(
             emailAddress,
-            notificationsProperties.getFinalOrderNotificationTemplate(),
+            notificationsProperties.getGenerateOrderNotificationTemplate(),
             addProperties(caseData),
             String.format(template, caseData.getLegacyCaseReference())
         );
@@ -82,12 +80,12 @@ public class FinalOrderNotificationHandler extends CallbackHandler implements No
     }
 
     private String getReferenceTemplateString() {
-            return "final-order-notification-%s";
+        return "generate-order-notification-%s";
     }
 
     private boolean getIsSameRespondentSolicitor(CaseData caseData) {
         boolean isSameRespondentSolicitor = false;
-        if (taskId.equals(TASK_ID_DEFENDANT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+        if (taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
             isSameRespondentSolicitor = true;
         }
         return isSameRespondentSolicitor;
@@ -96,7 +94,7 @@ public class FinalOrderNotificationHandler extends CallbackHandler implements No
     private String getReceipientEmail(CaseData caseData) {
         if (taskId.equals(TASK_ID_APPLICANT)) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
-        } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
+        } else if (taskId.equals(TASK_ID_RESPONDENT1)) {
             return caseData.getRespondentSolicitor1EmailAddress();
         } else {
             return caseData.getRespondentSolicitor2EmailAddress();
@@ -111,9 +109,9 @@ public class FinalOrderNotificationHandler extends CallbackHandler implements No
     public String getLegalOrganizationName(CaseData caseData) {
 
         String id = "";
-        if(taskId == "FinalOrderNotifyApplicantSolicitor1"){
+        if (taskId == "GenerateOrderNotifyApplicantSolicitor1") {
             id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        } else if(taskId == "FinalOrderNotifyRespondentSolicitor1") {
+        } else if (taskId == "GenerateOrderNotifyRespondentSolicitor1") {
             id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
         } else {
             id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
