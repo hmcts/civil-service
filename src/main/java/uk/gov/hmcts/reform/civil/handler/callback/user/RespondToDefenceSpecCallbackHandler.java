@@ -289,7 +289,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion())
+            if (v1
                 && featureToggleService.isCourtLocationDynamicListEnabled()) {
 
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
@@ -346,8 +346,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
+        if (V_2.equals(callbackParams.getVersion()) && caseData.hasApplicantRejectedRepaymentPlan()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        } else if (V_2.equals(callbackParams.getVersion()) && caseData.isSettlePartAdmitClaimYes()) {
+            response.state(CaseState.CASE_SETTLED.name());
         } else {
             if (v1 && featureToggleService.isSdoEnabled()) {
                 if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
@@ -361,12 +363,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                         }
                     }
                 }
-            }
-        }
-
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            if (caseData.isSettlePartAdmitClaimYes()) {
-                response.state(CaseState.CASE_SETTLED.name());
             }
         }
 
