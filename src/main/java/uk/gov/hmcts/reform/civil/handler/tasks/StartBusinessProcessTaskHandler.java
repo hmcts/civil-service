@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -54,17 +55,29 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
+
+        if (businessProcess.getStatus().equals(BusinessProcessStatus.FINISHED)
+            && externalTaskInput.getTriggeredViaScheduler() != null
+            && externalTaskInput.getTriggeredViaScheduler()) {
+            businessProcess = BusinessProcess.ready(caseEvent);
+        }
+
         switch (businessProcess.getStatusOrDefault()) {
             case READY:
             case DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
+                if(externalTaskInput.getTriggeredViaScheduler()) {
+                    log.error("Camunda Error - Another process is running for CaseId: {}", caseId);
+                    throw new BpmnError("ABORT");
+                }
                 if (businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
                     log.error("----------------CAMUNDA SAME PROCESS ID ERROR -START------------------");
                     log.error("CAMUNDAERROR CaseId ({}) CaseEvent ({}) LegacyCaseReference ({}) AllocatedTrack ({})"
-                              + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
+                                  + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
                               caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
-                              externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
+                              externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId()
+                    );
                     log.error("----------------CAMUNDA SAME PROCESS ID ERROR -END------------------");
                     throw new BpmnError("ABORT");
                 }

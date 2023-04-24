@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
@@ -1101,6 +1102,10 @@ public class FlowStateAllowedEventService {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
         if (caseEvent.equals(migrateCase)) {
+            return true;
+        }
+
+        if(caseEvent.equals(NOTIFY_HEARING_PARTIES)) {
             return true;
         }
 

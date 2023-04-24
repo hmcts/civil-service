@@ -10,5 +10,6 @@ public class ExternalTaskInput {
 
     String caseId;
     CaseEvent caseEvent;
+    Boolean triggeredViaScheduler;
     String generalAppParentCaseLink;
 }
