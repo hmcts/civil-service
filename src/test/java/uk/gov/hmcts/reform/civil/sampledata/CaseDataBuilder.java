@@ -4823,59 +4823,79 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withApplicant1Flags() {
+        return withApplicant1Flags(flagDetails());
+    }
+
+    public CaseDataBuilder withApplicant1Flags(List<Element<FlagDetail>> flags) {
         this.applicant1 = applicant1.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant1.getPartyName())
                        .roleOnCase("Applicant 1")
-                       .details(flagDetails())
+                       .details(flags)
                        .build())
             .build();
         return this;
     }
 
     public CaseDataBuilder withRespondent1LitigationFriendFlags() {
+        return withRespondent1LitigationFriendFlags(flagDetails());
+    }
+
+    public CaseDataBuilder withRespondent1LitigationFriendFlags(List<Element<FlagDetail>> flags) {
         this.respondent1LitigationFriend = respondent1LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent1LitigationFriend.getFullName())
                        .roleOnCase("Respondent 1 Litigation Friend")
-                       .details(flagDetails())
+                       .details(flags)
                        .build())
             .build();
         return this;
     }
 
     public CaseDataBuilder withRespondent1Flags() {
+        return withRespondent1Flags(flagDetails());
+    }
+
+    public CaseDataBuilder withRespondent1Flags(List<Element<FlagDetail>> flags) {
         this.respondent1 = respondent1.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent1.getPartyName())
                        .roleOnCase("Respondent 1")
-                       .details(flagDetails())
+                       .details(flags)
                        .build())
             .build();
         return this;
     }
 
     public CaseDataBuilder withRespondent1WitnessFlags() {
+        return withRespondent1WitnessFlags(flagDetails());
+    }
+
+    public CaseDataBuilder withRespondent1WitnessFlags(List<Element<FlagDetail>> flags) {
         this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
             .firstName("W first")
             .lastName("W last")
             .flags(Flags.builder()
                        .partyName("W First W Last")
                        .roleOnCase("Respondent 1 Witness")
-                       .details(flagDetails())
+                       .details(flags)
                        .build())
             .build());
         return this;
     }
 
     public CaseDataBuilder withRespondent1ExpertFlags() {
+        return withRespondent1ExpertFlags(flagDetails());
+    }
+
+    public CaseDataBuilder withRespondent1ExpertFlags(List<Element<FlagDetail>> flags) {
         this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
                                               .firstName("E first")
                                               .lastName("E last")
                                               .flags(Flags.builder()
                                                          .partyName("E First E Last")
                                                          .roleOnCase("Respondent 1 Expert")
-                                                         .details(flagDetails())
+                                                         .details(flags)
                                                          .build())
                                               .build());
         return this;

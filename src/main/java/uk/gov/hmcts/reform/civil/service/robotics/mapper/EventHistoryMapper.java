@@ -924,7 +924,7 @@ public class EventHistoryMapper {
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {
-        String detailsText = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+        String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1128,9 +1128,10 @@ public class EventHistoryMapper {
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
             String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
-                    caseData,
-                    CallbackParams.Params.BEARER_TOKEN.toString(), true
+                caseData,
+                CallbackParams.Params.BEARER_TOKEN.toString(), true
             );
+
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1145,7 +1146,7 @@ public class EventHistoryMapper {
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                          preferredCourtCode
+                                      preferredCourtCode
                                   ))
                                   .build())
                 .collect(Collectors.toList());
