@@ -133,7 +133,7 @@ public class CaseFlagsHearingsUtils {
     }
 
     public static boolean detainedIndividualFlagExist(CaseData caseData) {
-        List<Flags> flags = getAllActiveFlags(caseData);
+        List<PartyFlags> flags = getAllActiveFlags(caseData);
         return flags.stream()
             .flatMap(flag -> flag.getDetails().stream())
             .anyMatch(detail -> detail.getValue().getFlagCode().equals(DETAINED_INDIVIDUAL_FLAG_CODE));
