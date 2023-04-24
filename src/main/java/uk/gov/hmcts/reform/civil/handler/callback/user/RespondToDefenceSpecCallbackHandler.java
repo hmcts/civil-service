@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -71,8 +70,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -332,31 +329,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper));
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
         if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
-            response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                .build();
         } else {
-            if (featureToggleService.isSdoEnabled()) {
-                if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                        || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                        response.state(CaseState.JUDICIAL_REFERRAL.name());
-                    } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                        if (caseData.getRespondent2ClaimResponseTypeForSpec()
-                            .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                            response.state(CaseState.JUDICIAL_REFERRAL.name());
-                        }
-                    }
-                }
-            }
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .state(CaseState.JUDICIAL_REFERRAL.name())
+                .build();
         }
-
-        return response.build();
     }
 
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
