@@ -117,7 +117,7 @@ public class InitiateGeneralApplicationServiceHelper {
 
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
-
+        String applicantPartyName = null;
         /*
          * Set GA respondent solicitors' details
          * */
@@ -163,7 +163,8 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
                 respondentSols.add(element(gaSolicitorDetailsGAspec));
             });
-            applicationBuilder.applicantPartyName(getApplicantPartyName(userRoles, userDetails, caseData));
+            applicantPartyName = getApplicantPartyName(userRoles, userDetails, caseData);
+            applicationBuilder.applicantPartyName(applicantPartyName);
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
@@ -171,13 +172,20 @@ public class InitiateGeneralApplicationServiceHelper {
                                                                                       applicantBuilder.build()
                                                                                           .getOrganisationIdentifier());
 
+        String gaApplicantDisplayName;
+        if (isGAApplicantSameAsParentCaseClaimant) {
+            gaApplicantDisplayName = applicantPartyName + " - Claimant";
+        } else {
+            gaApplicantDisplayName = applicantPartyName + " - Defendant";
+        }
+        applicationBuilder.gaApplicantDisplayName(gaApplicantDisplayName);
         return applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
     }
 
-    private String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
+    public String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
                                          CaseData caseData) {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();

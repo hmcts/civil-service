@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -40,10 +41,15 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -103,6 +109,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -542,10 +549,26 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingDuration hearingDuration;
     private String information;
     private String hearingNoticeListOther;
-
     private LocalDateTime caseDismissedHearingFeeDueDate;
+
+    //Trial Readiness
     private YesOrNo trialReadyNotified;
     private YesOrNo trialReadyChecked;
+
+    private YesOrNo trialReadyApplicant;
+    private YesOrNo trialReadyRespondent1;
+    private YesOrNo trialReadyRespondent2;
+
+    private RevisedHearingRequirements applicantRevisedHearingRequirements;
+    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
+    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
+    private HearingOtherComments applicantHearingOtherComments;
+    private HearingOtherComments respondent1HearingOtherComments;
+    private HearingOtherComments respondent2HearingOtherComments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -845,7 +868,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isMediationAcceptedByDefendant() {
+    public boolean hasDefendantAgreedToFreeMediation() {
         return YES.equals(getResponseClaimMediationSpecRequired());
     }
 
@@ -860,5 +883,32 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return multiPartyScenario.equals(TWO_V_ONE)
             && YES.equals(getDefendantSingleResponseToBothClaimants())
             && YES.equals(getApplicant1ProceedWithClaimSpec2v1());
+    }
+
+    @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount() {
+        return getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
+    }
+     
+    @JsonIgnore
+    public boolean hasClaimantAgreedToFreeMediation() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+            .map(ClaimantMediationLip::getHasAgreedFreeMediation)
+            .filter(MediationDecision.Yes::equals).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantAcceptedRepaymentPlan() {
+        return YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantRejectedRepaymentPlan() {
+        return NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
     }
 }
