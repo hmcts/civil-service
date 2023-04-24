@@ -72,11 +72,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -346,26 +344,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.hasApplicantRejectedRepaymentPlan()) {
-            response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        } else if (V_2.equals(callbackParams.getVersion()) && caseData.isSettlePartAdmitClaimYes()) {
-            response.state(CaseState.CASE_SETTLED.name());
-        } else {
-            if (v1 && featureToggleService.isSdoEnabled()) {
-                if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                        || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                        response.state(CaseState.JUDICIAL_REFERRAL.name());
-                    } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                        if (caseData.getRespondent2ClaimResponseTypeForSpec()
-                            .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                            response.state(CaseState.JUDICIAL_REFERRAL.name());
-                        }
-                    }
-                }
-            }
+        if (v1 && featureToggleService.isSdoEnabled()) {
+            putCaseStateInJudicialReferral(caseData, response);
         }
 
+        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+            if (isOneVOne(caseData)
+                && caseData.hasClaimantAgreedToFreeMediation()) {
+//                response.state(CaseState.IN_MEDIATION.name());
+            } else if (caseData.isRejectDefendantPaymentPlanNo()) {
+                response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            } else if (caseData.isPartAdmitClaimSettled()) {
+                response.state(CaseState.CASE_SETTLED.name());
+            }
+        }
         return response.build();
     }
 
@@ -672,4 +664,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
+
+    private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
+        if (caseData.isRespondentResponseFullDefence()) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+    }
+
+
 }

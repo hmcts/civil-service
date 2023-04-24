@@ -125,6 +125,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -830,21 +831,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isSettlePartAdmitClaimYes() {
+    public boolean isPartAdmitClaimSettled() {
         return (
             getApplicant1ProceedsWithClaimSpec() == null
-                && PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
-                && YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
-                && YesOrNo.YES.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
+                && isPartAdmitClaimSpec()
+                && isClaimantIntentionSettlePartAdmit()
+                && isClaimantConfirmAmountPaidPartAdmit());
     }
 
     @JsonIgnore
-    public boolean isSettlePartAdmitClaimNo() {
+    public boolean isPartAdmitClaimNotSettled() {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
-                || !PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec())
-                || YesOrNo.NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec())
-                || YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec()));
+                || !isPartAdmitClaimSpec()
+                || isClaimantIntentionNotSettlePartAdmit()
+                || isClaimantConfirmAmountNotPaidPartAdmit());
     }
 
     @JsonIgnore
@@ -891,7 +892,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
     }
-     
+
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return Optional.ofNullable(getCaseDataLiP())
@@ -910,5 +911,38 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasApplicantRejectedRepaymentPlan() {
         return NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
             || NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isRespondentResponseFullDefence() {
+        return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && !isOneVTwoTwoLegalRep(this))
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent2ClaimResponseTypeForSpec()));
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitClaimSpec() {
+        return PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantIntentionSettlePartAdmit() {
+        return YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantIntentionNotSettlePartAdmit() {
+        return YesOrNo.NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantConfirmAmountPaidPartAdmit() {
+        return YesOrNo.YES.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantConfirmAmountNotPaidPartAdmit() {
+        return YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 }
