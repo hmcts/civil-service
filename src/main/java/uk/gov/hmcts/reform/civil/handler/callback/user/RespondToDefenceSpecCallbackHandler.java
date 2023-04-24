@@ -329,7 +329,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
+        if (V_2.equals(callbackParams.getVersion()) && caseData.hasApplicantRejectedRepaymentPlan()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
