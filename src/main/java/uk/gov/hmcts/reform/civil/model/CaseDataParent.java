@@ -357,7 +357,6 @@ public class CaseDataParent implements MappableObject {
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
-
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
