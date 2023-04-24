@@ -480,7 +480,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 "# You have decided to proceed with the claim%n## Claim number: %s",
                 claimNumber
             );
-        } else if(caseData.hasClaimantAgreedToFreeMediation()) {
+        } else if (caseData.hasClaimantAgreedToFreeMediation()) {
             return format(
                 "# You have rejected their response %n## Your Claim Number : %s",
                 caseData.getLegacyCaseReference()
