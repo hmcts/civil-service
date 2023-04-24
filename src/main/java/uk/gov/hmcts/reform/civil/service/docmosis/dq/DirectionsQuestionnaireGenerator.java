@@ -507,13 +507,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                 .getCourtLocationsByEpimmsId(authorisation,
                     rc.getCaseLocation().getBaseLocation()
                 ));
-            return RequestedCourt.builder()
+            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
-                .responseCourtName(courtLocations.isEmpty() ? null : courtLocations.stream()
-                    .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                    .collect(Collectors.toList()).get(0).getCourtName())
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
-                .build();
+                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .findFirst().ifPresent(court -> builder
+                    .responseCourtCode(court.getCourtLocationCode())
+                    .responseCourtName(court.getCourtName()));
+            return builder.build();
         } else {
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(NO)
