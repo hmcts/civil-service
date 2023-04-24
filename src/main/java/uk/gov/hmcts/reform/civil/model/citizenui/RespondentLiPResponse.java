@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.model.Address;
 @AllArgsConstructor
 public class RespondentLiPResponse {
 
+    private String timelineComment;
+    private String evidenceComment;
     private MediationLiP respondent1MediationLiPResponse;
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private String respondent1LiPContactPerson;
