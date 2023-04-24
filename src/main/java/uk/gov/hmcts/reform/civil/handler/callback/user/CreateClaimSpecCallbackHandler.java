@@ -100,7 +100,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
 
-    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
         + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
@@ -119,7 +119,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date that the defendants have to respond.";
 
-    public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+    public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date that the defendants have to " +
         "respond. <br/>[Pay your claim fee](%s)";
@@ -583,8 +583,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private String getConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return format(CONFIRMATION_SUMMARY_PBA_V3, format(caseDocLocation,
-                                                              caseData.getCcdCaseReference()),
+            return format(CONFIRMATION_SUMMARY_PBA_V3,
                           format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
             return format(CONFIRMATION_SUMMARY,
@@ -782,8 +781,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private String getSpecConfirmationSummary(CaseData caseData) {
         if (featureToggleService.isPbaV3Enabled()) {
-            return format(SPEC_CONFIRMATION_SUMMARY_PBA_V3, format(caseDocLocation,
-                                                              caseData.getCcdCaseReference()),
+            return format(SPEC_CONFIRMATION_SUMMARY_PBA_V3,
                           format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
             return format(SPEC_CONFIRMATION_SUMMARY,
