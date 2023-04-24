@@ -466,7 +466,10 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE)
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation))
-                .transitionTo(FULL_DEFENCE_PROCEED)
+            .set(flags -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+            })
+            .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()))
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
