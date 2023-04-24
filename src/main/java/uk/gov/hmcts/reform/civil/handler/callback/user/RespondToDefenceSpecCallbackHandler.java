@@ -351,7 +351,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             if (isOneVOne(caseData)
                 && caseData.hasClaimantAgreedToFreeMediation()) {
-//                response.state(CaseState.IN_MEDIATION.name());
+                // response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.isRejectDefendantPaymentPlanNo()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (caseData.isPartAdmitClaimSettled()) {
@@ -670,6 +670,5 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
-
 
 }
