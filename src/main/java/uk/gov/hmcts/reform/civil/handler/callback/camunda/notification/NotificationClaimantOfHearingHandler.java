@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_HEARING);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
 
