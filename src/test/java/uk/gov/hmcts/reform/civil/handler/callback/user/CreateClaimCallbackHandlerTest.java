@@ -1195,8 +1195,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName1v2_whenCaseIs1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1209,8 +1208,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName2v1_whenCaseIs2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1223,8 +1221,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName1v1_whenCaseIs1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(

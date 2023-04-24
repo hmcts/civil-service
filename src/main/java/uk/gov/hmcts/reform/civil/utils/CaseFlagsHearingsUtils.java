@@ -19,6 +19,7 @@ public class CaseFlagsHearingsUtils {
 
     private static final String SPECIAL_MEASURES_FLAG_CODE = "SM";
     private static final String REASONABLE_ADJUSTMENTS_FLAG_CODE = "RA";
+    private static final String DETAINED_INDIVIDUAL_FLAG_CODE = "PF0019";
 
     public static List<PartyFlags> getAllActiveFlags(CaseData caseData) {
         List<PartyFlags> nonEmptyFlags = new ArrayList<>();
@@ -129,5 +130,12 @@ public class CaseFlagsHearingsUtils {
                 REASONABLE_ADJUSTMENTS_FLAG_CODE)));
         }
         return flags;
+    }
+
+    public static boolean detainedIndividualFlagExist(CaseData caseData) {
+        List<Flags> flags = getAllActiveFlags(caseData);
+        return flags.stream()
+            .flatMap(flag -> flag.getDetails().stream())
+            .anyMatch(detail -> detail.getValue().getFlagCode().equals(DETAINED_INDIVIDUAL_FLAG_CODE));
     }
 }

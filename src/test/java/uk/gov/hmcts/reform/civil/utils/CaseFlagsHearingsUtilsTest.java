@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
@@ -121,10 +123,73 @@ public class CaseFlagsHearingsUtilsTest {
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
 
+    @Nested
+    class DetainedIndividualFlags {
+        List<Element<FlagDetail>> flags;
+
+        @BeforeEach
+        void setup() {
+            FlagDetail details = FlagDetail.builder()
+                .name("Detained individual")
+                .flagComment("comment")
+                .flagCode("PF0019")
+                .hearingRelevant(YES)
+                .status("Active")
+                .build();
+
+            flags = wrapElements(details);
+        }
+
+        @Test
+        void shouldReturnTrue_whenDetainedIndividualFlagExistsInAllUsers() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags(flags)
+                .withApplicant1Flags(flags)
+                .withRespondent1LitigationFriendFlags(flags)
+                .withRespondent1WitnessFlags(flags)
+                .withRespondent1ExpertFlags(flags)
+                .build();
+
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDetainedIndividualFlagExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags()
+                .withApplicant1Flags()
+                .withRespondent1LitigationFriendFlags(flags)
+                .withRespondent1WitnessFlags()
+                .withRespondent1ExpertFlags()
+                .build();
+
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenDetainedIndividualFlagDoesNotExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent1LitigationFriend()
+                .atStateRespondentFullDefence()
+                .withRespondent1Flags()
+                .withApplicant1Flags()
+                .withRespondent1LitigationFriendFlags()
+                .withRespondent1WitnessFlags()
+                .withRespondent1ExpertFlags()
+                .build();
+
+            assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isFalse();
+        }
+    }
+
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details, caseData.getRespondent1().getPartyID());
     }
-
+    
     private PartyFlags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details, caseData.getApplicant1().getPartyID());
     }
