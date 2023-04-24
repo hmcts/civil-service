@@ -28,4 +28,6 @@ public interface Claim {
 
     boolean claimantRequestedCountyCourtJudgement();
 
+    boolean isHearingFormGenerated();
+
 }

@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
-
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
     ),
@@ -16,6 +15,7 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),

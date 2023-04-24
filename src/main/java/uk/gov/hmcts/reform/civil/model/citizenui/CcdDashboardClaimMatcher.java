@@ -89,4 +89,9 @@ public class CcdDashboardClaimMatcher implements Claim {
         return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
     }
 
+    @Override
+    public boolean isHearingFormGenerated() {
+        return !caseData.getHearingDocuments().isEmpty();
+    }
+
 }

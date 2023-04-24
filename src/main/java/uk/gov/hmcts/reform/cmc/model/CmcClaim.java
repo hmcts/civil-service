@@ -163,6 +163,11 @@ public class CmcClaim implements Claim {
         return getClaimantResponse() != null && getCountyCourtJudgmentRequestedAt() != null;
     }
 
+    @Override
+    public boolean isHearingFormGenerated() {
+        return false;
+    }
+
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return claimantResponse != null
