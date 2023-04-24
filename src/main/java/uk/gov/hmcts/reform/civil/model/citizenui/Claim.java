@@ -16,7 +16,7 @@ public interface Claim {
 
     boolean defendantRespondedWithFullAdmitAndPayByInstallments();
 
-    boolean responseDeadlineHasBeenExtended();
+    boolean hasResponseDeadlineBeenExtended();
 
     boolean isEligibleForCCJ();
 
@@ -28,4 +28,27 @@ public interface Claim {
 
     boolean claimantRequestedCountyCourtJudgement();
 
+    boolean isWaitingForClaimantToRespond();
+
+    boolean isProceedOffline();
+
+    boolean isPaperResponse();
+
+    boolean hasChangeRequestFromDefendant();
+
+    boolean hasChangeRequestedFromClaimant();
+
+    boolean isPassedToCountyCourtBusinessCentre();
+
+    boolean hasClaimantAskedToSignSettlementAgreement();
+
+    boolean hasClaimantAcceptedPartialAdmissionAmount();
+
+    boolean haveBothPartiesSignedSettlementAgreement();
+
+    boolean hasCCJByRedetermination();
+
+    boolean hasDefendantStatedTheyPaid();
+
+    boolean defendantRespondedWithPartAdmit();
 }
