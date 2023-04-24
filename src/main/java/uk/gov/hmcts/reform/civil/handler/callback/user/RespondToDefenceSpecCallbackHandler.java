@@ -345,7 +345,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
+        if (V_2.equals(callbackParams.getVersion()) && caseData.hasApplicantRejectedRepaymentPlan()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         } else {
             if (v1 && featureToggleService.isSdoEnabled()) {
@@ -626,7 +626,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        if (caseData.isPaidSomeAmountMoreThanClaimAmount(caseData)) {
+        if (caseData.isPaidSomeAmountMoreThanClaimAmount()) {
             errors.add("The amount paid must be less than the full claim amount.");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -649,7 +649,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount, caseData);
+        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount);
         BigDecimal subTotal =  claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
         BigDecimal finalTotal = subTotal.subtract(paidAmount);
 
