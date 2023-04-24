@@ -81,8 +81,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 responseDate,
                 allocatedTrack
             ))
-            .respondent1GeneratedResponseDocument(dummyDocument)
-            .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .build();
         return updatedData;
     }
