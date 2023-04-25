@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -96,6 +96,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
+    private final JudgementService judgementService;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
@@ -328,7 +329,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (isOneVOne(caseData)
                 && caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.isRejectDefendantPaymentPlanNo()) {
+            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             }
         }
@@ -615,16 +616,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (caseData.isPaidSomeAmountMoreThanClaimAmount()) {
-            errors.add("The amount paid must be less than the full claim amount.");
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
-
+        List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .errors(errors)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
@@ -632,28 +627,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
-            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        }
-        BigDecimal claimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-        BigDecimal paidAmount = (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
-            ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
-        BigDecimal fixedCost = caseData.getUpFixedCostAmount(claimAmount);
-        BigDecimal subTotal = claimAmount.add(claimFee).add(caseData.getTotalInterest()).add(fixedCost);
-        BigDecimal finalTotal = subTotal.subtract(paidAmount);
-
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(claimAmount)
-            .ccjJudgmentAmountClaimFee(claimFee)
-            .ccjJudgmentSummarySubtotalAmount(subTotal)
-            .ccjJudgmentTotalStillOwed(finalTotal)
-            .ccjJudgmentAmountInterestToDate(caseData.getTotalInterest())
-            .ccjPaymentPaidSomeAmountInPounds(paidAmount)
-            .ccjJudgmentFixedCostAmount(fixedCost)
-            .build();
-
-        updatedCaseData.ccjPaymentDetails(ccjPaymentDetails);
+        updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
