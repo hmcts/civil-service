@@ -9,17 +9,16 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 @Component
-public class ProposePaymentPlanConfText implements RespondToResponseConfirmationTextGenerator {
+public class RejectWithMediationConfText implements RespondToResponseConfirmationTextGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isRejectDefendantPaymentPlanYes() || caseData.hasClaimantAgreedToFreeMediation()) {
-            return Optional.empty();
+        if (caseData.hasClaimantAgreedToFreeMediation()) {
+            return Optional.of(format(
+                "<br />You have agreed to try free mediation.<br>" +
+                    "<br>Your mediation appointment will be arranged within 28 days.<br>"
+            ));
         }
-
-        return Optional.of(format(
-            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                + "This case will now proceed offline. Any updates will be sent by post.<br><br>"
-        ));
+        return Optional.empty();
     }
 }
