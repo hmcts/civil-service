@@ -345,7 +345,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (V_2.equals(callbackParams.getVersion()) && caseData.isRejectDefendantPaymentPlanNo()) {
+        if (V_2.equals(callbackParams.getVersion()) && caseData.hasApplicantRejectedRepaymentPlan()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         } else {
             if (v1) {

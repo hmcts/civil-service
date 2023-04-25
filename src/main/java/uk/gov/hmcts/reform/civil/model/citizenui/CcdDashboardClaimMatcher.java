@@ -43,7 +43,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
         return hasResponseFullAdmit()
-            && RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+            && isPayImmediately();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean responseDeadlineHasBeenExtended() {
+    public boolean hasResponseDeadlineBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 
@@ -89,4 +89,69 @@ public class CcdDashboardClaimMatcher implements Claim {
         return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
     }
 
+    @Override
+    public boolean isWaitingForClaimantToRespond() {
+        return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
+            && caseData.getApplicant1ResponseDate() == null;
+    }
+
+    @Override
+    public boolean isProceedOffline() {
+        return false;
+    }
+
+    @Override
+    public boolean isPaperResponse() {
+        return false;
+    }
+
+    @Override
+    public boolean hasChangeRequestFromDefendant() {
+        return false;
+    }
+
+    @Override
+    public boolean hasChangeRequestedFromClaimant() {
+        return false;
+    }
+
+    @Override
+    public boolean isPassedToCountyCourtBusinessCentre() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimantAskedToSignSettlementAgreement() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimantAcceptedPartialAdmissionAmount() {
+        return hasDefendantStatedTheyPaid() && caseData.isResponseAcceptedByClaimant();
+    }
+
+    @Override
+    public boolean haveBothPartiesSignedSettlementAgreement() {
+        return false;
+    }
+
+    @Override
+    public boolean hasCCJByRedetermination() {
+        return false;
+    }
+
+    @Override
+    public boolean hasDefendantStatedTheyPaid() {
+        return defendantRespondedWithPartAdmit()
+            && isPayImmediately();
+    }
+
+    private boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY == caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+    }
+
+    @Override
+    public boolean defendantRespondedWithPartAdmit() {
+        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
+    }
 }
