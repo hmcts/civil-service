@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
@@ -170,6 +171,57 @@ public class CaseFlagsToHearingValueMapperTest {
         FlagDetail flagDetail4 = FlagDetail.builder()
             .status("Active")
             .hearingRelevant(YES)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        List<String> expected = List.of(
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
+        );
+
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2,
+                flagDetail3,
+                flagDetail4
+        ));
+
+        assertEquals(expected, actualReasonableAdjustments);
+    }
+
+    @Test
+    public void testDoesNotHaveReasonableAdjustments() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RE0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("SN0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail3 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("00RA26")
+            .name("Support worker or carer with me")
+            .build();
+
+        FlagDetail flagDetail4 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
             .flagCode("OT0001")
             .name("Other")
             .build();
@@ -177,7 +229,7 @@ public class CaseFlagsToHearingValueMapperTest {
         FlagDetail flagDetail5 = FlagDetail.builder()
             .status("Active")
             .hearingRelevant(YES)
-            .flagCode("RA0042")
+            .flagCode("R00A42")
             .name("Sign Language Interpreter")
             .flagComment("a sign language comment")
             .build();
@@ -196,8 +248,8 @@ public class CaseFlagsToHearingValueMapperTest {
                 flagDetail3,
                 flagDetail4,
                 flagDetail5
-        ));
+            ));
 
-        assertEquals(expected, actualReasonableAdjustments);
+        assertTrue(actualReasonableAdjustments.isEmpty());
     }
 }
