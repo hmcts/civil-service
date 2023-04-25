@@ -164,6 +164,32 @@ class CcdClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
 
+    @Test
+    void given_claimantAcceptedAdmission_whenGetStatus_thenReturnRelevantStatus() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT);
+    }
+
+    @Test
+    void given_defendantRespondedWithPartAdmit_whenGetStatus_thenReturnRelevantStatus() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_PART_ADMIT);
+    }
+
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))

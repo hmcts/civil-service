@@ -38,4 +38,20 @@ public enum MultiPartyScenario {
     public static boolean isMultiPartyScenario(CaseData caseData) {
         return caseData.getApplicant2() != null || caseData.getRespondent2() != null;
     }
+
+    public static boolean isOneVOne(CaseData caseData) {
+        return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
+
+    public static boolean isOneVTwoLegalRep(CaseData caseData) {
+        return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+    }
+
+    public static boolean isTwoVOne(CaseData caseData) {
+        return TWO_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
+
+    public static boolean isOneVTwoTwoLegalRep(CaseData caseData) {
+        return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+    }
 }
