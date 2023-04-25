@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.util.Lists.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -38,6 +41,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 
 public class HearingsPartyMapper {
 
@@ -198,7 +204,9 @@ public class HearingsPartyMapper {
                                        party.getPartyName(),
                                        partyRole,
                                        party.getPartyEmail(),
-                                       party.getPartyPhone());
+                                       party.getPartyPhone(),
+                                       party.getFlags()
+            );
         } else {
             return buildOrganisationPartyObject(party.getPartyName(), partyRole, null);
         }
@@ -211,7 +219,8 @@ public class HearingsPartyMapper {
                                                         litigationFriend.getLastName()),
                                           LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
                                           litigationFriend.getEmailAddress(),
-                                          litigationFriend.getPhoneNumber());
+                                          litigationFriend.getPhoneNumber(),
+                                          litigationFriend.getFlags());
     }
 
     private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
@@ -226,8 +235,9 @@ public class HearingsPartyMapper {
                                   partyFlagStructure.getLastName()),
                     partyRole.getPartyRoleValue(),
                     partyFlagStructure.getEmail(),
-                    partyFlagStructure.getPhone()
-                ));
+                    partyFlagStructure.getPhone(),
+                    partyFlagStructure.getFlags())
+                );
             }
         }
         return partyDetails;
@@ -244,20 +254,24 @@ public class HearingsPartyMapper {
 
     public static PartyDetailsModel buildIndividualPartyObject(String firstName, String lastName,
                                                                String partyName, String partyRole,
-                                                               String email, String phone) {
+                                                               String email, String phone, Flags flags) {
+
+        List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
+
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .interpreterLanguage(null) //todo civ-6888
-            .reasonableAdjustments(null)//todo civ-6888
-            .vulnerableFlag(false)//todo civ-6888
-            .vulnerabilityDetails(null) //todo civ-6888
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
-            .custodyStatus(null) // todo civ-688
+            .interpreterLanguage(getInterpreterLanguage(flagDetails))
+            .reasonableAdjustments(null)
+            .vulnerableFlag(hasVulnerableFlag(flagDetails))
+            .custodyStatus(getCustodyStatus(flagDetails))
             .build();
 
         return PartyDetailsModel.builder()
