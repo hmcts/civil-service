@@ -470,7 +470,7 @@ class UnavailableDateValidatorTest {
         }
 
         @Test
-        void shouldNotReturnError_whenPaymentDateOfPast() {
+        void shouldNotReturnError_whenPaymentDateIsToday() {
             assertThat(validator.validateFuturePaymentDate(LocalDate.now())).isEmpty();
         }
     }
