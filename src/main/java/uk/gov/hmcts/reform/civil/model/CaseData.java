@@ -736,6 +736,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
+    private final String respondent1Link;
+    private final String respondent2Link;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -872,7 +875,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
             .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
     }
-     
+
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         return Optional.ofNullable(getCaseDataLiP())
