@@ -917,14 +917,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRespondentResponseFullDefence() {
-        return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
-            && !isOneVTwoTwoLegalRep(this))
-            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
-            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent2ClaimResponseTypeForSpec()));
-    }
-
-    @JsonIgnore
     public boolean isPartAdmitClaimSpec() {
         return PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
     }

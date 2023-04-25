@@ -331,9 +331,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             putCaseStateInJudicialReferral(caseData, response);
         }
 
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            if (isOneVOne(caseData)
-                && caseData.hasClaimantAgreedToFreeMediation()) {
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)) {
+            if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.isRejectDefendantPaymentPlanNo()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
@@ -673,11 +674,4 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
-
-    private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
-        if (caseData.isRespondentResponseFullDefence()) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
-        }
-    }
-
 }
