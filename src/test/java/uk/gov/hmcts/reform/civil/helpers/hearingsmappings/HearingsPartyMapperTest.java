@@ -86,9 +86,16 @@ public class HearingsPartyMapperTest {
             .build();
     }
 
-    private CaseData rollUpUnavailableDate(CaseData caseData, boolean defendantResponse) {
+    private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, defendantResponse);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+        caseData = builder.build();
+        return caseData;
+    }
+
+    private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
         caseData = builder.build();
         return caseData;
     }
@@ -99,7 +106,7 @@ public class HearingsPartyMapperTest {
             .atStateClaimIssued()
             .applicant1DQWithUnavailableDate()
             .build();
-        caseData = rollUpUnavailableDate(caseData, false);
+        caseData = rollUpUnavailableDateApplicant(caseData);
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "John",
@@ -163,7 +170,7 @@ public class HearingsPartyMapperTest {
                              .build())
             .build();
 
-        caseData = rollUpUnavailableDate(caseData, true);
+        caseData = rollUpUnavailableDateRespondent(caseData);
 
         PartyDetailsModel applicantPartyDetails = buildExpectedOrganisationPartyObject(
             APPLICANT_COMPANY_NAME,

@@ -1444,7 +1444,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 

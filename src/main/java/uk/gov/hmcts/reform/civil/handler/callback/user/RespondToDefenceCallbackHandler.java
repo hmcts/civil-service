@@ -264,7 +264,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 

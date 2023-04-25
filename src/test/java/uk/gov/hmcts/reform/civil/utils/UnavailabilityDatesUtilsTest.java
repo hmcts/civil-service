@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 public class UnavailabilityDatesUtilsTest {
@@ -20,14 +21,14 @@ public class UnavailabilityDatesUtilsTest {
             .respondent1DQWithUnavailableDates()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
         UnavailableDate expected = UnavailableDate.builder()
             .date(LocalDate.now().plusDays(1))
             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
             .build();
         UnavailableDate result = unwrapElements(builder.build().getRespondent1().getUnavailableDates()).get(0);
-        assertThat(expected.getDate().isEqual(result.getDate())).isTrue();
-        assertThat(expected.getUnavailableDateType().equals(result.getUnavailableDateType())).isTrue();
+        assertEquals(expected.getDate(), result.getDate());
+        assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
     }
 
     @Test
@@ -37,7 +38,7 @@ public class UnavailabilityDatesUtilsTest {
             .respondent1DQWithUnavailableDates()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
         assertThat(builder.build().getRespondent1().getUnavailableDates() == null).isTrue();
     }
 
@@ -48,14 +49,14 @@ public class UnavailabilityDatesUtilsTest {
             .respondent1DQWithUnavailableDateRange()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
         UnavailableDate expected = UnavailableDate.builder()
             .fromDate(LocalDate.now().plusDays(1))
             .toDate(LocalDate.now().plusDays(2))
             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
             .build();
         UnavailableDate result = unwrapElements(builder.build().getRespondent1().getUnavailableDates()).get(0);
-        assertThat(result.getFromDate().isEqual(expected.getFromDate())).isTrue();
+        assertEquals(result.getFromDate(), expected.getFromDate());
     }
 
     @Test
@@ -65,14 +66,14 @@ public class UnavailabilityDatesUtilsTest {
             .applicant1DQWithUnavailableDateRange()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
         UnavailableDate expected = UnavailableDate.builder()
             .fromDate(LocalDate.now().plusDays(1))
             .toDate(LocalDate.now().plusDays(2))
             .unavailableDateType(UnavailableDateType.DATE_RANGE)
             .build();
         UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
-        assertThat(result.getFromDate().isEqual(expected.getFromDate())).isTrue();
+        assertEquals(result.getFromDate(), expected.getFromDate());
     }
 
     @Test
@@ -82,14 +83,14 @@ public class UnavailabilityDatesUtilsTest {
             .applicant1DQWithUnavailableDate()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(builder, false);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
         UnavailableDate expected = UnavailableDate.builder()
             .date(LocalDate.now().plusDays(1))
             .unavailableDateType(UnavailableDateType.SINGLE_DATE)
             .build();
         UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
-        assertThat(expected.getDate().isEqual(result.getDate())).isTrue();
-        assertThat(expected.getUnavailableDateType().equals(result.getUnavailableDateType())).isTrue();
+        assertEquals(expected.getDate(), result.getDate());
+        assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
     }
 
 }

@@ -535,7 +535,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         assembleResponseDocuments(caseData, updatedData);
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        UnavailabilityDatesUtils.rollUpExpertUnavailabilityDates(updatedData, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
