@@ -342,17 +342,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper));
 
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
         if (v1 && featureToggleService.isSdoEnabled()) {
             putCaseStateInJudicialReferral(caseData, response);
         }
 
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            if (isOneVOne(caseData)
-                && caseData.hasClaimantAgreedToFreeMediation()) {
-                // response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)) {
+            if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (caseData.isPartAdmitClaimSettled()) {
                 response.state(CaseState.CASE_SETTLED.name());
