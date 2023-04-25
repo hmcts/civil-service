@@ -375,7 +375,6 @@ class RoboticsDataMapperTest {
     void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
-
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("");

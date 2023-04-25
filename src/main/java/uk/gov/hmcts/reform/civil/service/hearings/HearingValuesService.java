@@ -81,7 +81,7 @@ public class HearingValuesService {
             .duration(getDuration())
             .hearingPriorityType(getHearingPriorityType())
             .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
-            .hearingInWelshFlag(getHearingInWelshFlag())
+            .hearingInWelshFlag(getHearingInWelshFlag(caseData))
             .hearingLocations(getHearingLocations(caseData))
             .facilitiesRequired(getFacilitiesRequired(caseData)) // todo civ-6888
             .listingComments(getListingComments(caseData)) // todo CIV-6855
