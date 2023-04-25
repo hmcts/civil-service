@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -78,10 +80,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateDirectionsQuestionnaireCallbackHandler.respondent1Link;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateDirectionsQuestionnaireCallbackHandler.respondent2Link;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -268,6 +273,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
+        // null/delete the document used for preview, otherwise it will show as duplicate within case file view
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            builder.respondent1GeneratedResponseDocument(null);
+        }
+
         if (v1) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
@@ -418,6 +428,29 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 caseData.getTotalClaimAmount(),
                 null
             ).name());
+        }
+
+        // add document from system generated documents, to placeholder field for preview during event.
+        if (respondent2Link == null) {
+            System.out.println("should not be called on 1v2 ");
+
+            System.out.println("respondent1GeneratedResponseDocument  testttxvfbfdb11" + respondent2Link);
+            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+                if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
+                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                }
+            });
+        } else {
+            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(respondent1Link)) {
+                    System.out.println("respondent1GeneratedResponseDocument  testtt11" + respondent1Link);
+                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                }
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(respondent2Link)) {
+                    System.out.println("respondent1GeneratedResponseDocument  testtt11" + respondent2Link);
+                    updatedCaseData.respondent2GeneratedResponseDocument(document.getValue());
+                }
+            });
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

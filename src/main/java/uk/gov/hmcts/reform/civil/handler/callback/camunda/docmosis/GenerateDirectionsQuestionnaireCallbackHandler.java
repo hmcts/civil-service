@@ -46,6 +46,10 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
+    public static String respondent1Link;
+    public static String respondent2Link;
+
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -74,7 +78,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+            //caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
 
@@ -125,7 +129,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "ONE"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                    //caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                    respondent1Link = document.getDocumentLink().getDocumentUrl();
+                    System.out.println("testtttttt  " + respondent1Link);
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
                 });
             }
@@ -143,7 +149,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent2GeneratedResponseDocument(document);
+                    //caseDataBuilder.respondent2GeneratedResponseDocument(document);
+                    respondent2Link = document.getDocumentLink().getDocumentUrl();
+                    System.out.println("testtttttt  " + respondent2Link);
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
                 });
             }
@@ -215,7 +223,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
             }
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+            //caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
 

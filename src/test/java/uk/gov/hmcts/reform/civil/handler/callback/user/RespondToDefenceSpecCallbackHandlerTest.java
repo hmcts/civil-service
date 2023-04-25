@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -86,6 +87,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
@@ -205,6 +208,42 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldPopulateRespondentGeneratedDocument_whenInvokedAndSystemGeneratedContainsDQ() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE)
+                                                               .build()))
+                .build();
+
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument")
+                .isNotNull();
+        }
+
+        @Test
+        void shouldNotPopulateRespondentGeneratedDocument_whenInvokedAndNoDQInSystemGenrated() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("test")
+                                                               .documentType(SEALED_CLAIM)
+                                                               .build()))
+                .build();
+
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument")
+                .isNull();
         }
     }
 
@@ -655,6 +694,22 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState())
                 .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
+
+        @Test
+        void shouldNullDocument_whenCaseFileEnabled() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE)
+                                                               .build()))
+                .build();
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();        }
     }
 
     @Nested
