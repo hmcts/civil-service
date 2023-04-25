@@ -277,8 +277,11 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
 
-task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:nightly-multiparty'
+task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
+  onlyIf {
+    return System.env.NIGHTLY_BUILD == 'true'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-nightly-prod'
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
@@ -302,7 +305,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
