@@ -774,6 +774,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+        // null/remove preview SDO document, otherwise it will show as duplicate within case file view
+        dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 

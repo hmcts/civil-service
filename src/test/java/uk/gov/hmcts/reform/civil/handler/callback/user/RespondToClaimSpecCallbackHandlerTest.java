@@ -23,6 +23,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -45,11 +47,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -103,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -883,6 +882,40 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isEqualTo("Reason123");
             }
         }
+
+    }
+
+    @Test
+    void ShouldNullDocuments_whenInvokedAndCaseFileEnabled() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1SpecDefenceResponseDocument")).isNull();
+        assertThat(response.getData().get("respondent2SpecDefenceResponseDocument")).isNull();
+
     }
 
     @Nested
