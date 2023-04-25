@@ -84,6 +84,19 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -575,6 +588,34 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
+
+    /* Final Orders */
+
+    private YesOrNo finalOrderMadeSelection;
+    private OrderMade finalOrderDateHeardComplex;
+    private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
+    private FinalOrderRepresentation finalOrderRepresentation;
+    private List<FinalOrderToggle> finalOrderRecitals;
+    private FinalOrderRecitalsRecorded finalOrderRecitalsRecorded;
+    private String finalOrderOrderedThatText;
+    private AssistedCostTypesList assistedOrderCostList;
+    private AssistedOrderCostDetails assistedOrderCostsReserved;
+    private AssistedOrderCostDetails assistedOrderCostsDefendantPaySub;
+    private AssistedOrderCostDetails assistedOrderCostsClaimantPaySub;
+    private AssistedOrderCostDetails assistedOrderCostsDefendantSum;
+    private AssistedOrderCostDetails assistedOrderCostsClaimantSum;
+    private AssistedOrderCostDetails assistedOrderCostsBespoke;
+    private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
+    private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
+    private HearingLengthFinalOrderList lengthList;
+    private List<FinalOrderToggle> finalOrderAppealToggle;
+    private FinalOrderAppeal finalOrderAppealComplex;
+    private OrderMadeOnTypes orderMadeOnDetailsList;
+    private OrderMadeOnDetails orderMadeOnDetailsOrderCourt;
+    private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
+    private YesOrNo finalOrderGiveReasonsYesNo;
+    private AssistedOrderReasons finalOrderGiveReasonsComplex;
+
     /**
      * RTJ = Refer To Judge.
      */
