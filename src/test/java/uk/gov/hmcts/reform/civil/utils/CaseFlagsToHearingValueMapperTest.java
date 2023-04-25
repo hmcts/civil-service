@@ -198,9 +198,9 @@ public class CaseFlagsToHearingValueMapperTest {
     public void testDoesNotHaveReasonableAdjustments() {
         FlagDetail flagDetail1 = FlagDetail.builder()
             .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0033")
-            .name("Private waiting area")
+            .hearingRelevant(NO)
+            .flagCode("SM0002")
+            .name("Screening witness from accused")
             .flagComment("this is a comment")
             .build();
 
