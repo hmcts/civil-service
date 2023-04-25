@@ -9,9 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -40,7 +44,14 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .builder()
                 .mediation(Mediation
                                .builder()
-                               .mediationSettlementAgreedAt(LocalDate.now())
+                               .mediationSuccessful(MediationSuccessful.builder()
+                                                        .mediationSettlementAgreedAt(LocalDate.now())
+                                                        .mediationAgreement(MediationAgreementDocument.builder()
+                                                                                .document(Document.builder().build())
+                                                                                .documentType(DocumentType.MEDIATION_AGREEMENT)
+                                                                                .name("Mediation Agreement")
+                                                                                .build())
+                                                        .build())
                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -48,6 +59,7 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("mediationSettlementAgreedAt").isNotNull();
+            assertThat(response.getData()).extracting("mediationAgreement").isNotNull();
 
         }
     }
