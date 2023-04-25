@@ -337,6 +337,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.isRejectDefendantPaymentPlanNo()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            } else if (!caseData.hasClaimantAgreedToFreeMediation()) {
+                response.state(CaseState.JUDICIAL_REFERRAL.name());
             }
         }
         return response.build();
