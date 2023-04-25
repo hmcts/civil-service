@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,10 @@ public class CaseDataLiP {
     private TranslatedDocument translatedDocument;
     @JsonProperty("applicant1ClaimMediationSpecRequiredLip")
     private ClaimantMediationLip applicant1ClaimMediationSpecRequiredLip;
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedToFreeMediation() {
+        return applicant1ClaimMediationSpecRequiredLip != null
+            && applicant1ClaimMediationSpecRequiredLip.hasClaimantAgreedToFreeMediation();
+    }
 }
