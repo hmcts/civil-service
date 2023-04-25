@@ -154,6 +154,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean defendantRespondedWithPartAdmit() {
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
     }
+
     @Override
     public boolean isHearingFormGenerated() {
         return !caseData.getHearingDocuments().isEmpty();
