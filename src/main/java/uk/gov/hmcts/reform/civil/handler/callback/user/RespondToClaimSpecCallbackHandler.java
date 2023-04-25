@@ -1572,7 +1572,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.respondent2SpecDefenceResponseDocument(null);
         }
 
-
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {

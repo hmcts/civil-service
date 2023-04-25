@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -79,13 +77,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateDirectionsQuestionnaireCallbackHandler.respondent1Link;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateDirectionsQuestionnaireCallbackHandler.respondent2Link;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -432,10 +427,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         // add document from system generated documents, to placeholder field for preview during event.
-        if (respondent2Link == null) {
-            System.out.println("should not be called on 1v2 ");
-
-            System.out.println("respondent1GeneratedResponseDocument  testttxvfbfdb11" + respondent2Link);
+        if (caseData.getRespondent2Link() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
                     updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
@@ -443,12 +435,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             });
         } else {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
-                if (document.getValue().getDocumentLink().getDocumentUrl().equals(respondent1Link)) {
-                    System.out.println("respondent1GeneratedResponseDocument  testtt11" + respondent1Link);
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent1Link())) {
                     updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
                 }
-                if (document.getValue().getDocumentLink().getDocumentUrl().equals(respondent2Link)) {
-                    System.out.println("respondent1GeneratedResponseDocument  testtt11" + respondent2Link);
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent2Link())) {
                     updatedCaseData.respondent2GeneratedResponseDocument(document.getValue());
                 }
             });

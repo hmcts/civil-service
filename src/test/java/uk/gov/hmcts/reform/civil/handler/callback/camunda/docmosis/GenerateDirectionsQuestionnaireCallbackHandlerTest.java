@@ -235,6 +235,11 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolRespondent1Spec() {
         for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
                                                                   RespondentResponseTypeSpec.PART_ADMISSION)) {
+
+            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class),
+                                                                                        anyString(), anyString()
+            )).thenReturn(Optional.of(DOCUMENT));
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .setClaimTypeToSpecClaim()
@@ -244,13 +249,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                 .systemGeneratedCaseDocuments(new ArrayList<>())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "ONE"
-            )).thenReturn(Optional.of(generatedDocument));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -290,6 +288,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolBothRespondents() {
+        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class),
+                                                                      anyString(), anyString()
+        )).thenReturn(Optional.of(DOCUMENT));
+
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent2(mock(Party.class))
@@ -301,20 +303,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .systemGeneratedCaseDocuments(new ArrayList<>())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        CaseDocument generatedDocument1 = mock(CaseDocument.class);
-        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-            caseData,
-            params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-            "ONE"
-        )).thenReturn(Optional.of(generatedDocument1));
-
-        CaseDocument generatedDocument2 = mock(CaseDocument.class);
-        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-            caseData,
-            params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-            "TWO"
-        )).thenReturn(Optional.of(generatedDocument2));
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

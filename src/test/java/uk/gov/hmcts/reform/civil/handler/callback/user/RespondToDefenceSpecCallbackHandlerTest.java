@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -69,6 +70,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -96,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -216,39 +219,76 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateRespondentGeneratedDocument_whenInvokedAndSystemGeneratedContainsDQ() {
+        void shouldPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedContainsDQ() {
             // Given
-            CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
-                                                               .documentType(DIRECTIONS_QUESTIONNAIRE)
-                                                               .build()))
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+                                                               .documentName("defendant_directions_questionnaire_form")
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE).build()))
+                .respondent1Link(null)
                 .build();
-
             // When
-            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //Then
-            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument")
-                .isNotNull();
+            // Given
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNotNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
         }
 
         @Test
-        void shouldNotPopulateRespondentGeneratedDocument_whenInvokedAndNoDQInSystemGenrated() {
+        void shouldNotPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedDoesNotContainDQ() {
             // Given
-            CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("test")
-                                                               .documentType(SEALED_CLAIM)
-                                                               .build()))
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+                                                               .documentName("banana")
+                                                               .documentType(SEALED_CLAIM).build()))
+                .respondent1Link(null)
+                .build();
+            // When
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Given
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
+        }
+
+        @Test
+        void shouldPopulateRespondent1AndRespondent2Docs_whenInvokedAndSystemGeneratedContainsDQ() {
+            // Given
+            var testDocument1 = CaseDocument.builder()
+                .documentName("defendant_directions_questionnaire_form")
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder()
+                                  .documentUrl("test-respondent1Doc-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build()).build();
+
+            var testDocument2 = CaseDocument.builder()
+                .documentName("defendant_directions_questionnaire_form")
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder()
+                                  .documentUrl("test-respondent2Doc-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build()).build();
+
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(testDocument1));
+            documentList.add(element(testDocument2));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(documentList)
+                .respondent1Link("test-respondent1Doc-url")
+                .respondent2Link("test-respondent2Doc-url")
                 .build();
 
             // When
             var params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument")
-                .isNull();
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNotNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNotNull();
         }
     }
 
