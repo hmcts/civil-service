@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
     private CallbackResponse submitUnsuccessfulMediation(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(callbackParams.getCaseData().toMap(objectMapper))
+            .state(CaseState.JUDICIAL_REFERRAL.name())
             .build();
     }
 }
