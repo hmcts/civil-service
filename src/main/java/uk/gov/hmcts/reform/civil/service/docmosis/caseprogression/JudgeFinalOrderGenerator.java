@@ -29,11 +29,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
         DocmosisTemplates docmosisTemplate = null;
-        if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
-            docmosisTemplate = FREE_FORM_ORDER_PDF;
-        }
+        docmosisTemplate = FREE_FORM_ORDER_PDF;
         // ASSISTED_ORDER will be added as part of civ-7569
-        //else docmosisTemplate = ASSISTED_ORDER_PDF;
+        //Add If-else  docmosisTemplate = FREE_FORM_ORDER_PDF and docmosisTemplate = ASSISTED_ORDER_PDF;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
         return documentManagementService.uploadDocument(
