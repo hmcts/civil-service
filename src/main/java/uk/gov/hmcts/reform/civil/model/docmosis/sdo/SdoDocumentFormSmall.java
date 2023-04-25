@@ -64,7 +64,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-
+    private final String hearingLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
 

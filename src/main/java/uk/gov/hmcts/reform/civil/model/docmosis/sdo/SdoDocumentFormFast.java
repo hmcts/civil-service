@@ -79,6 +79,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final DynamicList fastTrackMethodInPerson;
     private final String fastTrackMethodTelephoneHearing;
     private final String fastTrackMethodVideoConferenceHearing;
+    private final String hearingLocation;
 
     private final FastTrackBuildingDispute fastTrackBuildingDispute;
     private final FastTrackClinicalNegligence fastTrackClinicalNegligence;

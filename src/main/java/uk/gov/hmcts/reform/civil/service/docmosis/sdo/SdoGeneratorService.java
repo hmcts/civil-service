@@ -1,25 +1,30 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -33,8 +38,7 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
-    private final FeatureToggleService toggleService;
-
+    private final LocationRefDataService locationRefDataService;
     private final FeatureToggleService featuretoggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -46,13 +50,13 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-            templateData = getTemplateDataSmall(caseData, judgeName);
+            templateData = getTemplateDataSmall(caseData, judgeName, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_FAST;
-            templateData = getTemplateDataFast(caseData, judgeName);
+            templateData = getTemplateDataFast(caseData, judgeName, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
-            templateData = getTemplateDataDisposal(caseData, judgeName);
+            templateData = getTemplateDataDisposal(caseData, judgeName, authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -74,7 +78,7 @@ public class SdoGeneratorService {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName) {
+    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, String authorisation) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -156,11 +160,60 @@ public class SdoGeneratorService {
             .map(DisposalHearingHearingTime::getTime)
             .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
             .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
+        if (caseData.getDisposalHearingMethod() != null) {
+            switch (caseData.getDisposalHearingMethod()) {
+                case disposalHearingMethodInPerson -> sdoDocumentBuilder.hearingLocation(getHearingLocation(
+                    Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ));
+                case disposalHearingMethodTelephoneHearing -> sdoDocumentBuilder.hearingLocation(getHearingLocation(
+                    SdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData),
+                    caseData,
+                    authorisation
+                ));
+                case disposalHearingMethodVideoConferenceHearing -> sdoDocumentBuilder.hearingLocation(
+                    getHearingLocation(
+                        SdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData),
+                        caseData,
+                        authorisation
+                    ));
+            }
+        } else {
+            sdoDocumentBuilder.hearingLocation(getHearingLocation(
+                null,
+                caseData,
+                authorisation
+            ));
+        }
 
         return sdoDocumentBuilder.build();
     }
 
-    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
+    private String getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
+        if (StringUtils.isNotBlank(valueFromForm)) {
+            return valueFromForm;
+        }
+
+        return Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(CaseLocationCivil::getBaseLocation)
+            .map(baseLocation -> locationRefDataService.getCourtLocationsByEpimmsId(
+                authorisation,
+                baseLocation
+            )).flatMap(list -> list.stream()
+                .filter(location -> StringUtils.equals(
+                    location.getRegionId(),
+                    caseData.getCaseManagementLocation().getRegion()
+                ))
+                .findFirst())
+            .map(location -> location.getSiteName() + ", " + location.getCourtAddress() + " " + location.getPostcode())
+            .orElse(null);
+    }
+
+    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, String authorisation) {
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -263,11 +316,41 @@ public class SdoGeneratorService {
             .map(FastTrackHearingTimeEstimate::getLabel)
             .ifPresent(sdoDocumentFormBuilder::fastTrackHearingTimeEstimate);
 
+        if (caseData.getFastTrackMethod() != null) {
+            switch (caseData.getFastTrackMethod()) {
+                case fastTrackMethodInPerson -> sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                    Optional.ofNullable(caseData.getFastTrackMethodInPerson())
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ));
+                case fastTrackMethodTelephoneHearing -> sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                    SdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData),
+                    caseData,
+                    authorisation
+                ));
+                case fastTrackMethodVideoConferenceHearing -> sdoDocumentFormBuilder.hearingLocation(
+                    getHearingLocation(
+                        SdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData),
+                        caseData,
+                        authorisation
+                    ));
+            }
+        } else {
+            sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                null,
+                caseData,
+                authorisation
+            ));
+        }
+
         return sdoDocumentFormBuilder.build();
     }
 
-    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName) {
-        return SdoDocumentFormSmall.builder()
+    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, String authorisation) {
+        SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -326,7 +409,39 @@ public class SdoGeneratorService {
             )
             .smallClaimsWitnessStatementToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
-            )
+            );
+
+        if (caseData.getSmallClaimsMethod() != null) {
+            switch (caseData.getSmallClaimsMethod()) {
+                case smallClaimsMethodInPerson -> sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                    Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ));
+                case smallClaimsMethodTelephoneHearing -> sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                    SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData),
+                    caseData,
+                    authorisation
+                ));
+                case smallClaimsMethodVideoConferenceHearing -> sdoDocumentFormBuilder.hearingLocation(
+                    getHearingLocation(
+                        SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData),
+                        caseData,
+                        authorisation
+                    ));
+            }
+        } else {
+            sdoDocumentFormBuilder.hearingLocation(getHearingLocation(
+                null,
+                caseData,
+                authorisation
+            ));
+        }
+
+        return sdoDocumentFormBuilder
             .build();
     }
 }
