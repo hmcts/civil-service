@@ -124,7 +124,7 @@ public class HearingUtils {
     }
 
     public static LocalDate getHearingDateFrom(WorkingDayIndicator workingDayIndicator, long numberOfWeeksToHearing) {
-        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(16, 0));
+        boolean isOrderProcessedBefore4pm = LocalTime.now().isBefore(LocalTime.of(15, 0));
         LocalDate baseDate = isOrderProcessedBefore4pm ? LocalDate.now() : LocalDate.now().plusDays(1);
         LocalDate hearingDate = baseDate.plusWeeks(numberOfWeeksToHearing);
         if (!workingDayIndicator.isWorkingDay(hearingDate)) {
