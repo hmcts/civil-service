@@ -9,15 +9,28 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
     ),
-    SETTLED(
-        Claim::isSettled
+    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
+        Claim::hasClaimantAcceptedPartialAdmissionAmount
+    ),
+    SETTLEMENT_SIGNED(
+        Claim::haveBothPartiesSignedSettlementAgreement
+    ),
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
+        Claim::hasClaimantAskedToSignSettlementAgreement
     ),
     TRANSFERRED(
         Claim::isSentToCourt
     ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
+
+    REQUESTED_CCJ_BY_REDETERMINATION(
+        Claim::hasCCJByRedetermination
+    ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
+    ),
+    SETTLED(
+        Claim::isSettled
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
@@ -29,7 +42,7 @@ public enum DashboardClaimStatus {
         Claim::isEligibleForCCJ
     ),
     MORE_TIME_REQUESTED(
-        Claim::responseDeadlineHasBeenExtended
+        Claim::hasResponseDeadlineBeenExtended
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -40,8 +53,32 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
+    ),
     NO_RESPONSE(
         Claim::hasResponsePending
+    ),
+    PROCEED_OFFLINE(
+        Claim::isProceedOffline
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
+    CHANGE_BY_DEFENDANT(
+        Claim::hasChangeRequestFromDefendant
+    ),
+    CHANGE_BY_CLAIMANT(
+        Claim::hasChangeRequestedFromClaimant
+    ),
+    WAITING_FOR_CLAIMANT_TO_RESPOND(
+        Claim::isWaitingForClaimantToRespond
+    ),
+    PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
+        Claim::isPassedToCountyCourtBusinessCentre
     ),
     NO_STATUS(c -> false);
 

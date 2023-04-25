@@ -880,8 +880,8 @@ public class FlowPredicate {
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()) {
                 result = false;
-            } else if (!caseData.hasClaimantAgreedToFreeMediation()) {
-                result = false;
+            } else if (caseData.hasClaimantAgreedToFreeMediation()) {
+                result = true;
             } else {
                 result = true;
             }
