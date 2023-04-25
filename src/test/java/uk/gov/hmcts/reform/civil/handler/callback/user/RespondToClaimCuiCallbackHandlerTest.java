@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Nested
     class AboutToStartCallback {
@@ -96,6 +100,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         }
 
         @Test
