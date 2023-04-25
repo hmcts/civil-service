@@ -279,7 +279,7 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
-    return System.env.NIGHTLY_BUILD == 'true'
+    return System.env.NIGHTLY_RUN == 'true'
   }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-nightly-prod'
 }
