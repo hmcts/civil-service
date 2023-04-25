@@ -11,6 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
@@ -199,7 +200,7 @@ public class CaseFlagsToHearingValueMapperTest {
         FlagDetail flagDetail1 = FlagDetail.builder()
             .status("Active")
             .hearingRelevant(YES)
-            .flagCode("RE0033")
+            .flagCode("RA0033")
             .name("Private waiting area")
             .flagComment("this is a comment")
             .build();
@@ -234,6 +235,14 @@ public class CaseFlagsToHearingValueMapperTest {
             .flagComment("a sign language comment")
             .build();
 
+        FlagDetail flagDetail6 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
         List<String> expected = List.of(
             "RA0033",
             "SM0002",
@@ -248,6 +257,40 @@ public class CaseFlagsToHearingValueMapperTest {
                 flagDetail3,
                 flagDetail4,
                 flagDetail5
+            ));
+
+        assertTrue(actualReasonableAdjustments.isEmpty());
+    }
+
+    @Test
+    public void testWithNoHearingRelevant() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RE0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        List<String> expected = List.of(
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
+        );
+
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2
             ));
 
         assertTrue(actualReasonableAdjustments.isEmpty());
