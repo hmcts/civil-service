@@ -286,7 +286,7 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
 
 task runNightlyApiTests(description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
-    return System.env.NIGHTLY_RUN == 'false'
+    return System.env.NIGHTLY_RUN == 'true'
   }
   doFirst {
     tagGeneratedForApiTests += '|@api-nightly-prod'
