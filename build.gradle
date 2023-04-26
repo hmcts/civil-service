@@ -14,7 +14,7 @@ plugins {
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
-tagGeneratedForApiTests = ''
+def tagGeneratedForApiTests = '@dummytag'
 
 allprojects {
   java {
