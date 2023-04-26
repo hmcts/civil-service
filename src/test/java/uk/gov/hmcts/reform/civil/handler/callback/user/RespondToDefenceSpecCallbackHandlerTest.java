@@ -225,7 +225,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
                                                                .documentName("defendant_directions_questionnaire_form")
                                                                .documentType(DIRECTIONS_QUESTIONNAIRE).build()))
-                .respondent1Link(null)
+                .respondent1DocumentURL(null)
                 .build();
             // When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -242,7 +242,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
                                                                .documentName("banana")
                                                                .documentType(SEALED_CLAIM).build()))
-                .respondent1Link(null)
+                .respondent1DocumentURL(null)
                 .build();
             // When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -279,8 +279,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .systemGeneratedCaseDocuments(documentList)
-                .respondent1Link("test-respondent1Doc-url")
-                .respondent2Link("test-respondent2Doc-url")
+                .respondent1DocumentURL("test-respondent1Doc-url")
+                .respondent2DocumentURL("test-respondent2Doc-url")
                 .build();
 
             // When
@@ -759,6 +759,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
         }
     }
 

@@ -738,8 +738,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
-    private final String respondent1Link;
-    private final String respondent2Link;
+    private final String respondent1DocumentURL;
+    private final String respondent2DocumentURL;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

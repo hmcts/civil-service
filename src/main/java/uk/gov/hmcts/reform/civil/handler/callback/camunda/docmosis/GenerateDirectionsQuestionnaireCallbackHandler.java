@@ -119,7 +119,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "ONE"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent1Link(document.getDocumentLink().getDocumentUrl());
+                    caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
                 });
             }
@@ -137,7 +137,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent2Link(document.getDocumentLink().getDocumentUrl());
+                    caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
                 });
             }
