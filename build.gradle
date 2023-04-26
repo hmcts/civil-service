@@ -249,7 +249,7 @@ task runSdoApiTests(description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  doLast {
+  doFirst {
     tagGeneratedForApiTests += '|@api-sdo'
   }
 }
@@ -266,7 +266,7 @@ task runCosTests(description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  doLast {
+  doFirst {
     tagGeneratedForApiTests += '|@api-cos'
   }
 }
@@ -275,7 +275,7 @@ task runNoCTests(description: 'Runs Notice of change Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  doLast {
+  doFirst {
     tagGeneratedForApiTests += '|@api-noc'
   }
 }
@@ -286,9 +286,9 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
 
 task runNightlyApiTests(description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
-    return System.env.NIGHTLY_RUN == 'true'
+    return System.env.NIGHTLY_RUN == 'false'
   }
-  doLast {
+  doFirst {
     tagGeneratedForApiTests += '|@api-nightly-prod'
   }
 }
@@ -302,7 +302,10 @@ task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') 
 }
 
 task runAllTestsWithTagGenerated(type: Exec, description: 'Runs all api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj', '--grep', tagGeneratedForApiTests
+  doFirst {
+    println tagGeneratedForApiTests
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-tests', '--grep', tagGeneratedForApiTests
 }
 
 def inStrictOrder(Task... tasks) {
