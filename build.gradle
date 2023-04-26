@@ -241,33 +241,33 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
 }
 
-task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
+task runSpecApiTests(description: 'Runs Spec functional tests.') {
   tagGeneratedForApiTests += '|@api-specified'
 }
 
-task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
+task runSdoApiTests(description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
   tagGeneratedForApiTests += '|@api-sdo'
 }
 
-task runApiTests(type: Exec, description: 'Runs Api tests.') {
+task runApiTests(description: 'Runs Api tests.') {
   tagGeneratedForApiTests += '|@api-unspec'
 }
 
-task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
+task runDJTests(description: 'Runs DJ Api functional tests.') {
   tagGeneratedForApiTests += '|@api-dj'
 }
 
-task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
+task runCosTests(description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  tagGeneratedForApiTests += '@api-cos'
+  tagGeneratedForApiTests += '|@api-cos'
 }
 
-task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
+task runNoCTests(description: 'Runs Notice of change Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
@@ -278,7 +278,7 @@ task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
 }
 
-task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
+task runNightlyApiTests(description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
   }
@@ -309,7 +309,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity,
+  dependsOn(inStrictOrder(
     runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests, runAllTestsWithTagGenerated))
 }
 
