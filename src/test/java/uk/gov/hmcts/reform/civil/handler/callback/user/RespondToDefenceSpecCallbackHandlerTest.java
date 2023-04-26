@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -53,12 +54,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -68,12 +71,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -100,7 +105,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
-    LocationHelper.class
+    LocationHelper.class,
+    JudgementService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -109,6 +115,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JudgementService judgementService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -127,6 +136,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
+    @MockBean
+    private RespondentMediationService respondentMediationService;
 
     @Nested
     class AboutToStart {
@@ -627,6 +638,32 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
         }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();;
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
     }
 
     @Nested
@@ -967,17 +1004,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        return objectMapper.convertValue(response.getData(), CaseData.class);
-    }
-
     @Nested
     class MidEventCallbackValidateAmountPaidFlag {
 
         private static final String PAGE_ID = "validate-amount-paid";
 
         @Test
-        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+        void shouldCheckValidateAmountPaid_withErrorMessage() {
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(150000))
@@ -1105,5 +1138,65 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceedWithoutDefendantSolicitor() {
+            String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentFixedCostOption(YES)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .specRespondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
+
+            assertThat(judgementStatement).isEqualTo(expected);
+        }
+    }
+
+    @Nested
+    class MidEventCallbackSetMediationShowFlag {
+
+        private static final String PAGE_ID = "set-mediation-show-tag";
+
+        @Test
+        void shouldSetMediationShowFlag_whenGivenConditionMeets() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            given(respondentMediationService.setMediationRequired(any())).willReturn(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            Set<DefendantResponseShowTag> showConditionFlags = getCaseData(response).getShowConditionFlags();
+            assertThat(showConditionFlags).contains(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_ONE);
+        }
+
+        @Test
+        void shouldNotSetMediationShowFlag_whenGivenConditionNotMeet() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            given(respondentMediationService.setMediationRequired(any())).willReturn(null);
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("showConditionFlags").isNull();
+        }
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
     }
 }
