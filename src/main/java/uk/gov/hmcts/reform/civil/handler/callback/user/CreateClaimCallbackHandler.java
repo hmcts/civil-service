@@ -60,11 +60,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -654,7 +654,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams), courtLocations);
-        if (nonNull(courtLocation)) {
+        if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
                 .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
