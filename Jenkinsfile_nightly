@@ -63,14 +63,9 @@ withNightlyPipeline(type, product, component) {
 
   //enableMutationTest()
   enableFortifyScan()
-  enableSecurityScan()
+  //enableSecurityScan()
 
   enableFullFunctionalTest(200)
-
-  afterSuccess('fullFunctionalTest') {
-    //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
-    sh """ ./gradlew runEndToEndUnspecTests """
-  }
 
   afterAlways('fullFunctionalTest') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'

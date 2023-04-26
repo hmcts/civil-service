@@ -880,8 +880,8 @@ public class FlowPredicate {
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()) {
                 result = false;
-            } else if (!caseData.hasClaimantAgreedToFreeMediation()) {
-                result = false;
+            } else if (caseData.hasClaimantAgreedToFreeMediation()) {
+                result = true;
             } else {
                 result = true;
             }
@@ -893,6 +893,12 @@ public class FlowPredicate {
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
     public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        (YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()));
+        caseData.hasApplicantAcceptedRepaymentPlan();
+
+    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
+        caseData.hasApplicantRejectedRepaymentPlan();
+
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
+        caseData.isRespondentResponseBilingual();
+
 }
