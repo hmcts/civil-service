@@ -882,6 +882,8 @@ public class FlowPredicate {
                 result = false;
             } else if (caseData.hasClaimantAgreedToFreeMediation()) {
                 result = true;
+            } else if (caseData.hasClaimantNotAgreedToFreeMediation()) {
+                result = false;
             } else {
                 result = true;
             }
@@ -901,4 +903,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
         caseData.isRespondentResponseBilingual();
 
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = caseData ->
+        caseData.isClaimantNotSettlePartAdmitClaim();
 }
