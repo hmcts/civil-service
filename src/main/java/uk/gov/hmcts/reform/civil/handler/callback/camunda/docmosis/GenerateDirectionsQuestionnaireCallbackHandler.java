@@ -73,16 +73,10 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
-        }
     }
 
     /**
-     * Next version for prepareDirectionsQuestionnaire. The main difference is storing the generated document
-     * not only in the generated documents list but also in respondent1GeneratedResponseDocument, so we can use
-     * easily locate it in intention to proceed journey.
-     *
+     * Next version for prepareDirectionsQuestionnaire.
      * @param callbackParams parameters of the callback
      * @return response of the callback
      */
@@ -125,7 +119,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "ONE"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                    caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
                 });
             }
@@ -143,7 +137,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent2GeneratedResponseDocument(document);
+                    caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
                 });
             }
@@ -215,7 +209,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
             }
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
 

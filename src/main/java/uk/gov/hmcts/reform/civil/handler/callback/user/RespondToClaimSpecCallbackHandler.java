@@ -1565,6 +1565,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (toggleService.isCaseFileViewEnabled()) {
+            updatedCaseData.respondent1SpecDefenceResponseDocument(null);
+            updatedCaseData.respondent2SpecDefenceResponseDocument(null);
+        }
+
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {

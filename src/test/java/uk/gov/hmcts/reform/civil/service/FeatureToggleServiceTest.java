@@ -157,7 +157,7 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
     }
-    
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
