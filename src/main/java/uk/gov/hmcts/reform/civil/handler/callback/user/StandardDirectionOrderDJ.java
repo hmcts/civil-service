@@ -651,6 +651,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
         caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
