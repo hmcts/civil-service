@@ -157,15 +157,6 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
     }
-    
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
-        var caseFileKey = "case-file-view";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
-    }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
