@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagUtils;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 
 import java.time.LocalDate;
@@ -55,9 +56,8 @@ public class ServiceHearingsCaseLevelMapper {
         return slaStartDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
-    public static boolean getCaseAdditionalSecurityFlag() {
-        // todo civ-6888
-        return false;
+    public static boolean getCaseAdditionalSecurityFlag(CaseData caseData) {
+        return CaseFlagsToHearingValueMapper.getAdditionalSecurity(CaseFlagUtils.getAllCaseFlags(caseData));
     }
 
     public static List<CaseCategoryModel> getCaseCategories(CaseData caseData, CaseCategoriesService caseCategoriesService, String authToken) {
