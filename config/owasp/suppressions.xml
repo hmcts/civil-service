@@ -32,7 +32,6 @@
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2022-34305</cve>
     <cve>CVE-2022-42252</cve>
-    <cve>CVE-2023-28708</cve>
   </suppress>
   <suppress until="2023-05-26">
     <cve>CVE-2023-28708</cve>
@@ -41,8 +40,5 @@
   <suppress until="2024-04-04">
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
-  </suppress>
-  <suppress until="2024-04-04">
-    <cve>CVE-2023-20860</cve>
   </suppress>
 </suppressions>
