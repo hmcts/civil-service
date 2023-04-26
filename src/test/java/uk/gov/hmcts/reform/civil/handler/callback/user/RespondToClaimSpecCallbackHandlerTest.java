@@ -753,14 +753,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 RequestedCourt.builder()
                                     .responseCourtLocations(preferredCourt)
                                     .reasonForHearingAtSpecificCourt("Reason")
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .showConditionFlags(EnumSet.of(
-                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
-                    ))
-                    .build();
+                                    .build()).build())
+                    .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)).build();
+
                 CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
 
                 List<LocationRefData> locations = List.of(LocationRefData.builder().build());
@@ -771,15 +766,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .epimmsId("epimms")
                     .courtLocationCode("code")
                     .build();
-                when(courtLocationUtils.findPreferredLocationData(
-                    locations, preferredCourt
-                )).thenReturn(completePreferredLocation);
+                when(courtLocationUtils.findPreferredLocationData(locations, preferredCourt)).thenReturn(completePreferredLocation);
                 StateFlow flow = mock(StateFlow.class);
                 when(flow.isFlagSet(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
-                when(stateFlowEngine.evaluate(caseData))
-                    .thenReturn(flow);
-                when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
-                    .thenReturn(true);
+                when(stateFlowEngine.evaluate(caseData)).thenReturn(flow);
+                when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class))).thenReturn(true);
                 UserInfo userInfo = UserInfo.builder().uid("798").build();
                 when(userService.getUserInfo(anyString())).thenReturn(userInfo);
 
