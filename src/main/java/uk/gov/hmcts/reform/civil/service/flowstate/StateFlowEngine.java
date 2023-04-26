@@ -286,7 +286,8 @@ public class StateFlowEngine {
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }})
+                }
+            })
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
             .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .set(flags -> {
