@@ -758,7 +758,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();        }
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
+        }
     }
 
     @Nested
