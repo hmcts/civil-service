@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -193,9 +194,15 @@ public class SdoGeneratorService {
         return sdoDocumentBuilder.build();
     }
 
-    private String getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
+    private LocationRefData getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
         if (StringUtils.isNotBlank(valueFromForm)) {
-            return valueFromForm;
+            Optional<LocationRefData> fromForm = locationRefDataService.getLocationMatchingLabel(
+                valueFromForm,
+                authorisation
+            );
+            if (fromForm.isPresent()) {
+                return fromForm.get();
+            }
         }
 
         return Optional.ofNullable(caseData.getCaseManagementLocation())
@@ -209,7 +216,6 @@ public class SdoGeneratorService {
                     caseData.getCaseManagementLocation().getRegion()
                 ))
                 .findFirst())
-            .map(location -> location.getSiteName() + ", " + location.getCourtAddress() + " " + location.getPostcode())
             .orElse(null);
     }
 

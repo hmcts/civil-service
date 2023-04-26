@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -64,7 +65,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-    private final String hearingLocation;
+    private final LocationRefData hearingLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
 

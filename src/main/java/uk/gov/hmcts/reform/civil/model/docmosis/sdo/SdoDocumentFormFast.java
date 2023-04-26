@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -79,7 +80,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final DynamicList fastTrackMethodInPerson;
     private final String fastTrackMethodTelephoneHearing;
     private final String fastTrackMethodVideoConferenceHearing;
-    private final String hearingLocation;
+    private final LocationRefData hearingLocation;
 
     private final FastTrackBuildingDispute fastTrackBuildingDispute;
     private final FastTrackClinicalNegligence fastTrackClinicalNegligence;
