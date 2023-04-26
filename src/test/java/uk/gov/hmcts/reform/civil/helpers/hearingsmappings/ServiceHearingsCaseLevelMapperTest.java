@@ -94,7 +94,8 @@ public class ServiceHearingsCaseLevelMapperTest {
 
     @Test
     void shouldReturnFalse_whenCaseAdditionalSecurityFlagInvoked() {
-        assertThat(ServiceHearingsCaseLevelMapper.getCaseAdditionalSecurityFlag())
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(ServiceHearingsCaseLevelMapper.getCaseAdditionalSecurityFlag(caseData))
             .isEqualTo(false);
     }
 
