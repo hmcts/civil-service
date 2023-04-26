@@ -14,6 +14,7 @@ plugins {
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
+tagGeneratedForApiTests = ''
 
 allprojects {
   java {
@@ -241,36 +242,36 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
+  tagGeneratedForApiTests += '|@api-specified'
 }
 
 task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-sdo'
+  tagGeneratedForApiTests += '|@api-sdo'
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
+  tagGeneratedForApiTests += '|@api-unspec'
 }
 
 task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
+  tagGeneratedForApiTests += '|@api-dj'
 }
 
 task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
+  tagGeneratedForApiTests += '@api-cos'
 }
 
 task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-noc'
+  tagGeneratedForApiTests += '|@api-noc'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
@@ -281,7 +282,7 @@ task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nig
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-nightly-prod'
+  tagGeneratedForApiTests += '|@api-nightly-prod'
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
@@ -290,6 +291,10 @@ task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:crossbrowser'
+}
+
+task runAllTestsWithTagGenerated(type: Exec, description: 'Runs all api tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj', '--grep', tagGeneratedForApiTests
 }
 
 def inStrictOrder(Task... tasks) {
@@ -305,7 +310,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests, runAllTestsWithTagGenerated))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
