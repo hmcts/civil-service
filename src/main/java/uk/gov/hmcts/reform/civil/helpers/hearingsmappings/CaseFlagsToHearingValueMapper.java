@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagPredicates;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.filter;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.getAllCaseFlags;
@@ -53,5 +54,15 @@ public class CaseFlagsToHearingValueMapper {
             CaseFlagPredicates.isHearingRelevant(),
             CaseFlagPredicates.hasCaseInterpreterRequiredFlag()
         ).stream().count() > 0;
+    }
+
+    public static List<String> getReasonableAdjustments(List<FlagDetail> flagDetails) {
+        return filter(
+            flagDetails,
+            CaseFlagPredicates.isActive(),
+            CaseFlagPredicates.isHearingRelevant(),
+            CaseFlagPredicates.hasReasonableAdjustmentFlagCodes()
+        ).stream().map(FlagDetail::getFlagCode)
+            .collect(Collectors.toList());
     }
 }

@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyRole.WITNESS_ROLE;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -269,7 +270,7 @@ public class HearingsPartyMapper {
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
             .interpreterLanguage(getInterpreterLanguage(flagDetails))
-            .reasonableAdjustments(null)
+            .reasonableAdjustments(getReasonableAdjustments(flagDetails))
             .vulnerableFlag(hasVulnerableFlag(flagDetails))
             .custodyStatus(getCustodyStatus(flagDetails))
             .build();

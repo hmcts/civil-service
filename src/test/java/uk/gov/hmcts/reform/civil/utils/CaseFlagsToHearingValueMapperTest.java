@@ -10,10 +10,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -139,5 +142,157 @@ public class CaseFlagsToHearingValueMapperTest {
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
         assertEquals("C", getCustodyStatus(flagDetails));
+    }
+
+    @Test
+    public void testHasReasonableAdjustments() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("SM0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail3 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0026")
+            .name("Support worker or carer with me")
+            .build();
+
+        FlagDetail flagDetail4 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        List<String> expected = List.of(
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
+        );
+
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2,
+                flagDetail3,
+                flagDetail4
+        ));
+
+        assertEquals(expected, actualReasonableAdjustments);
+    }
+
+    @Test
+    public void testDoesNotHaveReasonableAdjustments() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("SM0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("SN0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail3 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("00RA26")
+            .name("Support worker or carer with me")
+            .build();
+
+        FlagDetail flagDetail4 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("OT0001")
+            .name("Other")
+            .build();
+
+        FlagDetail flagDetail5 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("R00A42")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        FlagDetail flagDetail6 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        List<String> expected = List.of(
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
+        );
+
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2,
+                flagDetail3,
+                flagDetail4,
+                flagDetail5
+            ));
+
+        assertTrue(actualReasonableAdjustments.isEmpty());
+    }
+
+    @Test
+    public void testWithNoHearingRelevant() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RE0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+        List<String> expected = List.of(
+            "RA0033",
+            "SM0002",
+            "RA0026",
+            "RA0042"
+        );
+
+        List<String> actualReasonableAdjustments = getReasonableAdjustments(
+            List.of(
+                flagDetail1,
+                flagDetail2
+            ));
+
+        assertTrue(actualReasonableAdjustments.isEmpty());
     }
 }
