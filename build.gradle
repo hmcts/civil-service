@@ -249,7 +249,9 @@ task runSdoApiTests(description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  tagGeneratedForApiTests += '|@api-sdo'
+  doLast {
+    tagGeneratedForApiTests += '|@api-sdo'
+  }
 }
 
 task runApiTests(description: 'Runs Api tests.') {
@@ -264,14 +266,18 @@ task runCosTests(description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  tagGeneratedForApiTests += '|@api-cos'
+  doLast {
+    tagGeneratedForApiTests += '|@api-cos'
+  }
 }
 
 task runNoCTests(description: 'Runs Notice of change Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  tagGeneratedForApiTests += '|@api-noc'
+  doLast {
+    tagGeneratedForApiTests += '|@api-noc'
+  }
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
@@ -282,7 +288,9 @@ task runNightlyApiTests(description: 'Runs additional multiparty nightly tests.'
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
   }
-  tagGeneratedForApiTests += '|@api-nightly-prod'
+  doLast {
+    tagGeneratedForApiTests += '|@api-nightly-prod'
+  }
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
