@@ -68,8 +68,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -96,9 +96,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DirectionsQuestionnaireForm templateData;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL;
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL;
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -116,23 +116,23 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = HNL_DQ_RESPONSE_1V1;
+        DocmosisTemplates templateId = DQ_RESPONSE_1V1;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS;
+                    templateId = DocmosisTemplates.DQ_RESPONSE_1V2_DS;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS;
+                    templateId = DocmosisTemplates.DQ_RESPONSE_1V2_SS;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
+                    templateId = DocmosisTemplates.DQ_RESPONSE_2V1;
                 }
                 break;
             default:
@@ -144,7 +144,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                               String authorisation,
                                                               String respondent) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : HNL_DQ_RESPONSE_2V1;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : DQ_RESPONSE_2V1;
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -156,7 +156,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, HNL_DQ_RESPONSE_1V1);
+            templateData, DQ_RESPONSE_1V1);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -171,7 +171,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                           String respondent) {
         // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : HNL_DQ_RESPONSE_2V1;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : DQ_RESPONSE_2V1;
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -201,7 +201,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, HNL_DQ_RESPONSE_1V1);
+            templateData, DQ_RESPONSE_1V1);
         CaseDocument document = documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
