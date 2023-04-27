@@ -292,11 +292,6 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnCaseInterpreterRequired_whenInvoked() {
-        assertThat(HearingDetailsMapper.getCaseInterpreterRequiredFlag()).isEqualTo(false);
-    }
-
-    @Test
     void shouldReturnPanelRequirements_whenInvoked() {
         PanelRequirementsModel expected = PanelRequirementsModel.builder().build();
         assertThat(HearingDetailsMapper.getPanelRequirements()).isEqualTo(expected);

@@ -32,6 +32,8 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -43,6 +45,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -83,6 +86,19 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -105,6 +121,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
@@ -119,11 +136,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -592,6 +613,34 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
+
+    /* Final Orders */
+
+    private YesOrNo finalOrderMadeSelection;
+    private OrderMade finalOrderDateHeardComplex;
+    private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
+    private FinalOrderRepresentation finalOrderRepresentation;
+    private List<FinalOrderToggle> finalOrderRecitals;
+    private FinalOrderRecitalsRecorded finalOrderRecitalsRecorded;
+    private String finalOrderOrderedThatText;
+    private AssistedCostTypesList assistedOrderCostList;
+    private AssistedOrderCostDetails assistedOrderCostsReserved;
+    private AssistedOrderCostDetails assistedOrderCostsDefendantPaySub;
+    private AssistedOrderCostDetails assistedOrderCostsClaimantPaySub;
+    private AssistedOrderCostDetails assistedOrderCostsDefendantSum;
+    private AssistedOrderCostDetails assistedOrderCostsClaimantSum;
+    private AssistedOrderCostDetails assistedOrderCostsBespoke;
+    private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
+    private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
+    private HearingLengthFinalOrderList lengthList;
+    private List<FinalOrderToggle> finalOrderAppealToggle;
+    private FinalOrderAppeal finalOrderAppealComplex;
+    private OrderMadeOnTypes orderMadeOnDetailsList;
+    private OrderMadeOnDetails orderMadeOnDetailsOrderCourt;
+    private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
+    private YesOrNo finalOrderGiveReasonsYesNo;
+    private AssistedOrderReasons finalOrderGiveReasonsComplex;
+
     /**
      * RTJ = Refer To Judge.
      */
@@ -732,6 +781,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
+
+    // judge final orders
+    private final FinalOrderSelection finalOrderSelection;
+    private final String freeFormRecitalTextArea;
+    private final String freeFormRecordedTextArea;
+    private final String freeFormOrderedTextArea;
+    private final FreeFormOrderValues orderOnCourtInitiative;
+    private final FreeFormOrderValues orderWithoutNotice;
+    private final OrderOnCourtsList orderOnCourtsList;
+
+    private Document freeFormOrderDocument;
+    private Document assistedOrderDocument;
+    @Builder.Default
+    private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -894,6 +957,33 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasApplicantRejectedRepaymentPlan() {
         return NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
             || NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isAcceptDefendantPaymentPlanForPartAdmitYes() {
+        return YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
+        return YesOrNo.NO.equals(getSpecRespondent1Represented())
+            && multiPartyScenario.equals(ONE_V_ONE);
+    }
+
+    @JsonIgnore
+    public boolean isJudgementDateNotPermitted() {
+        return nonNull(getRespondent1ResponseDate())
+            && getRespondent1ResponseDate()
+            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public String setUpJudgementFormattedPermittedDate() {
+        if (isJudgementDateNotPermitted()) {
+            return formatLocalDateTime(getRespondent1ResponseDate()
+                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+        }
+        return null;
     }
 
     @JsonIgnore
