@@ -96,7 +96,7 @@ public class HearingValuesService {
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
-            .caseFlags(getCaseFlags(caseData)) // todo civ-7029 for party id
+            .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
             .build();
     }
 

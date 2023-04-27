@@ -74,4 +74,13 @@ public class CaseFlagPredicatesTest {
         assertFalse(CaseFlagPredicates.isDetainedIndividual().test(nonDetainedIndividualFlagDetail));
         assertTrue(CaseFlagPredicates.isDetainedIndividual().test(detainedIndividualFlagDetail));
     }
+
+    @Test
+    void hasReasonableAdjustmentFlagCodes_shouldReturnExpectedReasonableAdjustmentFlagCodes() {
+        FlagDetail nonReasonableAdjustmentFlagCode = FlagDetail.builder().flagCode("PF0019").build();
+        FlagDetail reasonableAdjustmentFlagCode = FlagDetail.builder().flagCode("RA0033").build();
+
+        assertFalse(CaseFlagPredicates.hasReasonableAdjustmentFlagCodes().test(nonReasonableAdjustmentFlagCode));
+        assertTrue(CaseFlagPredicates.hasReasonableAdjustmentFlagCodes().test(reasonableAdjustmentFlagCode));
+    }
 }
