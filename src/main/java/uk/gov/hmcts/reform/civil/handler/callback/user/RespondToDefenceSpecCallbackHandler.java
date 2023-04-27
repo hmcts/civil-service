@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -27,7 +28,10 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -241,6 +245,32 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        boolean result = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
+            if (caseData.getRespondent2() != null
+                && caseData.getRespondent2SameLegalRepresentative().equals(NO)
+                && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
+                result = false;
+            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent()
+                || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent()) {
+                result = false;
+            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
+                .filter(MediationDecision.No::equals).isPresent()) {
+                result = false;
+            } else {
+                result = true;
+            }
+        }
+        System.out.println(result);
+
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // setting null here does not clear, need to overwrite with value.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
@@ -330,8 +360,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-            } else if (caseData.hasClaimantNotAgreedToFreeMediation()
-                || caseData.hasDefendantNotAgreedToFreeMediation()) {
+            } else if (
+                caseData.isClaimantNotSettlePartAdmitClaim()
+                    && (caseData.hasClaimantNotAgreedToFreeMediation()
+                    || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 response.state(CaseState.JUDICIAL_REFERRAL.name());
             }
         }

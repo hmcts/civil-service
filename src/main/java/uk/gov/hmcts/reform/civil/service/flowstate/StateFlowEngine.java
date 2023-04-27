@@ -511,7 +511,7 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(allAgreedToMediation.and(isClaimantNotSettlePartAdmitClaim))
+                .transitionTo(IN_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim.and(allAgreedToMediation))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
                                                                               .and(not(allAgreedToMediation)))
                 .set(flags -> {
