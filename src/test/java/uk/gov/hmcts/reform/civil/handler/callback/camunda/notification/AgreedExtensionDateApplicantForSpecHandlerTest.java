@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
@@ -242,6 +243,29 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
+            @Test
+            void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
+                caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledgedRespondent2TimeExtension()
+                    .atStateNotificationAcknowledgedRespondent1TimeExtension()
+                    .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
+                    .build();
+
+                expectedNotificationData = getNotificationDataMap(
+                    caseData.getRespondent2ResponseDeadline().toLocalDate()
+                );
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.empty());
+                invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    templateIdRespondent,
+                    expectedNotificationDataRespondent,
+                    reference
+                );
+            }
+
             @org.junit.jupiter.api.Test
             void shouldNotifyWithCorrectExtensionDate_when1v2SameSolicitorExtends() {
                 caseData = CaseDataBuilder.builder()
@@ -306,5 +330,12 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
             "NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC").build()).build()))
             .isEqualTo("AgreedExtensionDateNotifyRespondentSolicitor2CCForSpec");
 
+    }
+
+    @Test
+    void testHandledEvents() {
+        assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC);
+        assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC);
+        assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC);
     }
 }
