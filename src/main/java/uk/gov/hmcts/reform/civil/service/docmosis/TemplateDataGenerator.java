@@ -6,5 +6,7 @@ import java.io.IOException;
 
 public interface TemplateDataGenerator<T> {
 
-    T getTemplateData(CaseData caseData) throws IOException;
+    default T getTemplateData(CaseData caseData) throws IOException {
+        return null;
+    }
 }

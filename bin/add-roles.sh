@@ -26,6 +26,7 @@
 ./bin/utils/ccd-add-role.sh "hearing-viewer"
 ./bin/utils/ccd-add-role.sh "caseflags-admin"
 ./bin/utils/ccd-add-role.sh "caseflags-viewer"
+./bin/utils/ccd-add-role.sh "caseworker-wa-task-configuration"
 
 roles=("solicitor" "systemupdate" "admin" "staff")
 for role in "${roles[@]}"
