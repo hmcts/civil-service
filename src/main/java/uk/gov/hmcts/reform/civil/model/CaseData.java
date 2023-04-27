@@ -146,10 +146,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
-@SuperBuilder(toBuilder = true)
 @Jacksonized
+@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
+
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
