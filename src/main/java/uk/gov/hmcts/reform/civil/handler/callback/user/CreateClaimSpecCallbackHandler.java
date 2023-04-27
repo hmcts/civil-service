@@ -321,7 +321,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+        caseDataBuilder.claimFee(feesService
+            .getFeeDataByClaimValue(caseData.getClaimValue()))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
@@ -423,19 +424,16 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
         //assign case management category to the case and caseNameHMCTSinternal
-        if (toggleService.isGlobalSearchEnabled()) {
-            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
-            CaseManagementCategoryElement civil =
-                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
-            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
-            itemList.add(element(civil));
-            dataBuilder.caseManagementCategory(
-                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-            log.info("Case management equals: " + caseData.getCaseManagementCategory());
-            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
-
-        }
+        CaseManagementCategoryElement civil =
+            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        dataBuilder.caseManagementCategory(
+            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        log.info("Case management equals: " + caseData.getCaseManagementCategory());
+        log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
         if (featureToggleService.isNoticeOfChangeEnabled()) {
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
