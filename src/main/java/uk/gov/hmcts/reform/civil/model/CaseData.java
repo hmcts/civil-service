@@ -913,4 +913,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || isSettlementDeclinedByClaimant()
             || isClaimantRejectsClaimAmount();
     }
+
+    @JsonIgnore
+    public boolean hasDefendantNotAgreedToFreeMediation() {
+        return NO.equals(getResponseClaimMediationSpecRequired());
+    }
 }

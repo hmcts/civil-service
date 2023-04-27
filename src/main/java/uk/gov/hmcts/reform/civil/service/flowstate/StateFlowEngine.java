@@ -513,7 +513,7 @@ public class StateFlowEngine {
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(allAgreedToMediation.and(isClaimantNotSettlePartAdmitClaim))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
-                                                                              .and(allAgreedToMediation.negate()))
+                                                                              .and(not(allAgreedToMediation)))
                 .set(flags -> {
                     if (featureToggleService.isSdoEnabled()) {
                         flags.put(FlowFlag.SDO_ENABLED.name(), true);
