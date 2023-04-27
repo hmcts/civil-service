@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -885,7 +886,7 @@ public class FlowPredicate {
             } else if (Optional.ofNullable(caseData.getCaseDataLiP())
                 .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
                 .map(ClaimantMediationLip::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()) {
+                .filter(MediationDecision.No::equals).isPresent()) {
                 result = false;
             } else {
                 result = true;
