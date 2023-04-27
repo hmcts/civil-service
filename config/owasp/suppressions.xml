@@ -41,4 +41,8 @@
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
   </suppress>
+  <suppress until="2023-06-24">
+    <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
+    <cve>CVE-2023-20863</cve>
+  </suppress>
 </suppressions>
