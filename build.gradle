@@ -344,7 +344,6 @@ def versions = [
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.2.0',
-  springfoxSwagger   : '2.9.2',
   lombok             : '1.18.26',
   pact               : '3.5.24',
   springSecurity     : '5.7.5'
@@ -383,8 +382,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-  implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.37.1'

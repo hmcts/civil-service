@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +21,11 @@ import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
-@Api
+@Tag(name = "Testing Support Controller")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -75,7 +75,7 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/feature-toggle/{toggle}")
-    @ApiOperation("Check if a feature toggle is enabled")
+    @Operation(summary = "Check if a feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkFeatureToggle(
         @PathVariable("toggle") String toggle) {
         boolean featureEnabled = featureToggleService.isFeatureEnabled(toggle);
@@ -84,7 +84,7 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/feature-toggle/noc")
-    @ApiOperation("Check if noc feature toggle is enabled")
+    @Operation(summary = "Check if noc feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkNoCToggleEnabled() {
         boolean featureEnabled = featureToggleService.isNoticeOfChangeEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
@@ -92,7 +92,7 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/feature-toggle/court-locations")
-    @ApiOperation("Check if court location dynamic list feature toggle is enabled")
+    @Operation(summary = "Check if court location dynamic list feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkCourtLocationsDynamicListEnabled() {
         boolean featureEnabled = featureToggleService.isCourtLocationDynamicListEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
@@ -100,7 +100,7 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/feature-toggle/isCertificateOfServiceEnabled")
-    @ApiOperation("Check if access profiles feature toggle is enabled")
+    @Operation(summary = "Check if access profiles feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkCertificateOfServiceEnabled() {
         boolean featureEnabled = featureToggleService.isCertificateOfServiceEnabled();
         FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
