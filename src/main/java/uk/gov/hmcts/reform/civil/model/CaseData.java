@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -44,6 +46,8 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -75,8 +79,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -119,6 +121,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
@@ -132,7 +136,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -419,6 +431,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
+    @Valid
+    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
@@ -496,6 +510,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDatebox;
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
+    private final String caseNamePublic;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -551,10 +566,26 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingDuration hearingDuration;
     private String information;
     private String hearingNoticeListOther;
-
     private LocalDateTime caseDismissedHearingFeeDueDate;
+
+    //Trial Readiness
     private YesOrNo trialReadyNotified;
     private YesOrNo trialReadyChecked;
+
+    private YesOrNo trialReadyApplicant;
+    private YesOrNo trialReadyRespondent1;
+    private YesOrNo trialReadyRespondent2;
+
+    private RevisedHearingRequirements applicantRevisedHearingRequirements;
+    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
+    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
+
+    private HearingOtherComments applicantHearingOtherComments;
+    private HearingOtherComments respondent1HearingOtherComments;
+    private HearingOtherComments respondent2HearingOtherComments;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -760,7 +791,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
 
-    private Document finalOrderDocument;
+    private Document freeFormOrderDocument;
+    private Document assistedOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
@@ -854,5 +886,103 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantNotPaid() {
+        return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isSettlementDeclinedByClaimant() {
+        return NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantRejectsClaimAmount() {
+        return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefence() {
+        return YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantAgreedToFreeMediation() {
+        return YES.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyDefendant() {
+        return !YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaim());
+    }
+
+    @JsonIgnore
+    public boolean isMultiPartyClaimant(MultiPartyScenario multiPartyScenario) {
+        return multiPartyScenario.equals(TWO_V_ONE)
+            && YES.equals(getDefendantSingleResponseToBothClaimants())
+            && YES.equals(getApplicant1ProceedWithClaimSpec2v1());
+    }
+
+    @JsonIgnore
+    public boolean isPaidSomeAmountMoreThanClaimAmount() {
+        return getCcjPaymentDetails().getCcjPaymentPaidSomeAmount() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(getTotalClaimAmount()))) > 0;
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantProceededWithClaim() {
+        return YES == getApplicant1ProceedWithClaim()
+            || YES == getApplicant1ProceedWithClaimSpec2v1();
+    }
+
+    @JsonIgnore
+    public boolean isRespondentResponseFullDefence() {
+        return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && !isOneVTwoTwoLegalRep(this))
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent2ClaimResponseTypeForSpec()));
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantAcceptedRepaymentPlan() {
+        return YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantRejectedRepaymentPlan() {
+        return NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isAcceptDefendantPaymentPlanForPartAdmitYes() {
+        return YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
+        return YesOrNo.NO.equals(getSpecRespondent1Represented())
+            && multiPartyScenario.equals(ONE_V_ONE);
+    }
+
+    @JsonIgnore
+    public boolean isJudgementDateNotPermitted() {
+        return nonNull(getRespondent1ResponseDate())
+            && getRespondent1ResponseDate()
+            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public String setUpJudgementFormattedPermittedDate() {
+        if (isJudgementDateNotPermitted()) {
+            return formatLocalDateTime(getRespondent1ResponseDate()
+                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+        }
+        return null;
     }
 }

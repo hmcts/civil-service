@@ -18,8 +18,8 @@ public class FinalOrderFurtherHearing {
 
     private LocalDate listFromDate;
     private LocalDate dateToDate;
-    private CaseHearingLengthElement lengthListOther;
     private HearingLengthFinalOrderList lengthList;
+    private CaseHearingLengthElement lengthListOther;
     private DynamicList alternativeHearingList;
     private HearingChannel hearingMethodList;
     private String hearingNotesText;

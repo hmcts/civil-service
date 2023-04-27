@@ -198,7 +198,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
+            // Then    ** Modify when Assisted Order Document Generation is developed
             assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
@@ -207,7 +207,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now().minusDays(2)).build())
+                .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now().plusDays(2)).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -215,7 +215,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getErrors())
-                .containsExactly("The date in Order Made may not be earlier than the established date");
+                .containsExactly("The date in Order Made may not be later than the established date");
         }
     }
 

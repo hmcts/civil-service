@@ -63,7 +63,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "\n ### Defendant 1 \n %s";
     public static final String BODY_1v2 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s"
         + "\n ### Defendant 2 \n %s";
-    public static final String NOT_ALLOWED_DATE = "The date in %s may not be earlier than the established date";
+    public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -170,7 +170,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
         if (nonNull(caseData.getFinalOrderDateHeardComplex())
-            && caseData.getFinalOrderDateHeardComplex().getDate().isBefore(LocalDate.now())) {
+            && caseData.getFinalOrderDateHeardComplex().getDate().isAfter(LocalDate.now())) {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
         }
     }
@@ -192,7 +192,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
-        caseDataBuilder.finalOrderDocument(null);
+        caseDataBuilder.freeFormOrderDocument(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -223,5 +223,4 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             return format(BODY_1v1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
         }
     }
-
 }

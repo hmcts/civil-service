@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
@@ -97,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
@@ -197,7 +199,6 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                MEDIATION_UNSUCCESSFUL,
                 EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
@@ -514,6 +515,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
             )
         ),
@@ -564,7 +566,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN
+                CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
             )
         ),
         entry(
@@ -693,6 +696,13 @@ public class FlowStateAllowedEventService {
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 migrateCase
             )
+        ),
+        entry(
+            IN_MEDIATION.fullName(),
+            List.of(
+                MEDIATION_SUCCESSFUL,
+                MEDIATION_UNSUCCESSFUL
+            )
         )
     );
 
@@ -765,7 +775,6 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                MEDIATION_SUCCESSFUL,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
@@ -798,7 +807,6 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                MEDIATION_SUCCESSFUL,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -880,7 +888,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -899,7 +908,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
 
@@ -918,7 +929,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFAULT_JUDGEMENT_SPEC
             )
         ),
 
@@ -974,6 +986,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
             )
         ),
@@ -1069,6 +1082,13 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
                 migrateCase
+            )
+        ),
+        entry(
+            IN_MEDIATION.fullName(),
+            List.of(
+                MEDIATION_SUCCESSFUL,
+                MEDIATION_UNSUCCESSFUL
             )
         )
     );
