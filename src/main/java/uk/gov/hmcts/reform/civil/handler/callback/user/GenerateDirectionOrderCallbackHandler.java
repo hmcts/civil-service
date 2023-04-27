@@ -209,7 +209,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseState state = All_FINAL_ORDERS_ISSUED;
         if (caseData.getFinalOrderFurtherHearingToggle() != null) {
-            System.out.println("case progggggg");
             state = CASE_PROGRESSION;
         }
 
