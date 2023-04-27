@@ -18,11 +18,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
@@ -91,13 +95,22 @@ public class HearingValuesServiceTest {
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
     private static final String RESPONDENT_ONE_LR_ORG_NAME = "Respondent 1 LR Org name";
+    private static final String BASE_LOCATION_ID = "1234";
+    private static final String WELSH_REGION_ID = "7";
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1234").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
             .build();
         Long caseId = 1L;
         CaseDetails caseDetails = CaseDetails.builder()
@@ -124,7 +137,7 @@ public class HearingValuesServiceTest {
             .build();
 
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                       .locationId("1234")
+                                                       .locationId(BASE_LOCATION_ID)
                                                        .locationType(COURT)
                                                        .build());
 
@@ -139,7 +152,7 @@ public class HearingValuesServiceTest {
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
-            .caseManagementLocationCode("1234")
+            .caseManagementLocationCode(BASE_LOCATION_ID)
             .caseSLAStartDate("2023-01-30")
             .autoListFlag(false)
             .hearingType("")
@@ -147,7 +160,7 @@ public class HearingValuesServiceTest {
             .duration(0)
             .hearingPriorityType("Standard")
             .numberOfPhysicalAttendees(0)
-            .hearingInWelshFlag(false)
+            .hearingInWelshFlag(true)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
             .listingComments("")
@@ -248,7 +261,7 @@ public class HearingValuesServiceTest {
             .firstName(firstName)
             .lastName(lastName)
             .interpreterLanguage(null)
-            .reasonableAdjustments(null)
+            .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)

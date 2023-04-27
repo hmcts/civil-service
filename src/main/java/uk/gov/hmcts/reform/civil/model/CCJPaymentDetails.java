@@ -32,4 +32,5 @@ public class CCJPaymentDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal ccjJudgmentFixedCostAmount;
     private YesOrNo ccjJudgmentFixedCostOption;
+    private String ccjJudgmentStatement;
 }
