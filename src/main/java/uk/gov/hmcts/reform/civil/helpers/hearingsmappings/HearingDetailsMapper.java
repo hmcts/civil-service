@@ -113,11 +113,6 @@ public class HearingDetailsMapper {
         return false;
     }
 
-    public static boolean getCaseInterpreterRequiredFlag() {
-        return false;
-        // todo civ-6888
-    }
-
     public static PanelRequirementsModel getPanelRequirements() {
         return PanelRequirementsModel.builder().build();
     }
