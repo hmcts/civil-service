@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
-import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getCaseInterpreterRequiredFlag;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getDuration;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getFacilitiesRequired;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getHearingChannels;
@@ -68,7 +68,7 @@ public class HearingValuesService {
             .hmctsServiceID(getHmctsServiceID(caseData, paymentsConfiguration))
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
-            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag()) // todo civ-6888
+            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
             .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
             .caseRestrictedFlag(getCaseRestrictedFlag())
@@ -87,7 +87,7 @@ public class HearingValuesService {
             .listingComments(getListingComments(caseData)) // todo CIV-6855
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
-            .caseInterpreterRequiredFlag(getCaseInterpreterRequiredFlag()) // todo civ-6888
+            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
             .panelRequirements(getPanelRequirements())
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
@@ -96,7 +96,7 @@ public class HearingValuesService {
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
-            .caseFlags(getCaseFlags(caseData)) // todo civ-7029 for party id
+            .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
             .build();
     }
 
