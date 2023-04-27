@@ -58,6 +58,8 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
     @MockBean
     private NotificationService notificationService;
     @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
     NotificationsProperties notificationsProperties;
     @Autowired
     private DJCaseworkerReceivedNotificationHandler handler;
