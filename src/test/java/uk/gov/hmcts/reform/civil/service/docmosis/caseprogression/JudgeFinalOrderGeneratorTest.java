@@ -12,8 +12,21 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 
@@ -32,8 +45,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -502,9 +518,9 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                  .lengthListOther(CaseHearingLengthElement.builder()
-                                                                      .lengthListOtherDays(new BigDecimal(12))
-                                                                      .lengthListOtherHours(new BigDecimal(1))
-                                                                      .lengthListOtherMinutes(new BigDecimal(30)).build()).build()).build();
+                                                                      .lengthListOtherDays("12")
+                                                                      .lengthListOtherHours("1")
+                                                                      .lengthListOtherMinutes("30").build()).build()).build();
         String response = generator.getFurtherHearingLength(caseData);
         assertEquals("12 days 1 hours 30 minutes", response);
     }

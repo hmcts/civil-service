@@ -192,7 +192,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
-        caseDataBuilder.freeFormOrderDocument(null);
+        caseDataBuilder.finalOrderDocument(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
