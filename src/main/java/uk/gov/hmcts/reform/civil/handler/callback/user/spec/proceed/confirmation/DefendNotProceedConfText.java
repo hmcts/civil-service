@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -15,8 +14,9 @@ public class DefendNotProceedConfText implements RespondToResponseConfirmationTe
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedsWithClaimSpec())
-            || !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+        if (caseData.hasApplicantProceededWithClaim()
+            || !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || caseData.hasClaimantAgreedToFreeMediation()) {
             return Optional.empty();
         }
         return Optional.of(
