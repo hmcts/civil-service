@@ -303,6 +303,7 @@ task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') 
 
 task runAllTestsWithTagGenerated(type: Exec, description: 'Runs all api tests.') {
   doFirst {
+    tagGeneratedForApiTests = '(' + tagGeneratedForApiTests + ')'
     println tagGeneratedForApiTests
   }
   commandLine '/usr/bin/yarn', '--silent', 'test:api-tests', '--grep', tagGeneratedForApiTests
