@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,9 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -44,10 +43,8 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ObjectMapper objectMapper;
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsConfiguration paymentsConfiguration;
-    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -86,8 +83,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
+        String siteId = caseData.getCaseAccessCategory().equals(CaseCategory.UNSPEC_CLAIM)
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
