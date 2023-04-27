@@ -2,30 +2,37 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -149,10 +156,22 @@ public class SdoGeneratorServiceTest {
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
 
+        LocationRefData locationRefData = LocationRefData.builder().build();
+        Mockito.when(documentHearingLocationHelper.getHearingLocation(
+            nullable(String.class), eq(caseData), eq(BEARER_TOKEN)
+        )).thenReturn(locationRefData);
+
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject arg) ->
+                        arg instanceof SdoDocumentFormDisposal
+                            && locationRefData.equals(((SdoDocumentFormDisposal) arg).getHearingLocation())
+            ),
+            any(DocmosisTemplates.class)
+        );
     }
 }
