@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -68,6 +69,8 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
     private DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
     @MockBean
     private FeesApi feesApi;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {

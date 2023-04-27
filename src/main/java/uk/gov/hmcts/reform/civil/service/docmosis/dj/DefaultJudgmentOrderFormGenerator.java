@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -15,19 +14,16 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
@@ -45,7 +41,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
-    private final LocationRefDataService locationRefDataService;
+    private final DocumentHearingLocationHelper locationHelper;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -79,31 +75,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
             ? getDefaultJudgmentFormHearing(caseData, authorisation)
             : getDefaultJudgmentFormTrial(caseData, authorisation);
-    }
-
-    private LocationRefData getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
-        if (StringUtils.isNotBlank(valueFromForm)) {
-            Optional<LocationRefData> fromForm = locationRefDataService.getLocationMatchingLabel(
-                valueFromForm,
-                authorisation
-            );
-            if (fromForm.isPresent()) {
-                return fromForm.get();
-            }
-        }
-
-        return Optional.ofNullable(caseData.getCaseManagementLocation())
-            .map(CaseLocationCivil::getBaseLocation)
-            .map(baseLocation -> locationRefDataService.getCourtLocationsByEpimmsId(
-                authorisation,
-                baseLocation
-            )).flatMap(list -> list.stream()
-                .filter(location -> StringUtils.equals(
-                    location.getRegionId(),
-                    caseData.getCaseManagementLocation().getRegion()
-                ))
-                .findFirst())
-            .orElse(null);
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
@@ -157,11 +128,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingTimeEstimateDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ()
                                                .getTime().getLabel());
 
-        djOrderFormBuilder.hearingLocation(getHearingLocation(
-            courtLocation,
-            caseData,
-            authorisation
-        ));
+        djOrderFormBuilder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
 
         return djOrderFormBuilder.build();
     }
@@ -223,7 +190,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                 .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
         }
 
-        djTrialTemplateBuilder.hearingLocation(getHearingLocation(
+        djTrialTemplateBuilder.hearingLocation(locationHelper.getHearingLocation(
             trialHearingLocation,
             caseData,
             authorisation

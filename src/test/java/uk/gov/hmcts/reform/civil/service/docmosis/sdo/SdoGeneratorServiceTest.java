@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,6 +70,9 @@ public class SdoGeneratorServiceTest {
 
     @MockBean
     protected IdamClient idamClient;
+
+    @MockBean
+    private DocumentHearingLocationHelper documentHearingLocationHelper;
 
     @Autowired
     private SdoGeneratorService generator;
