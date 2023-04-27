@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -56,6 +57,8 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @MockBean
     NotificationsProperties notificationsProperties;
     @Autowired
