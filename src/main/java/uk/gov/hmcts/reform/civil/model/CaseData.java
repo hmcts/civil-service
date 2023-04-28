@@ -1030,4 +1030,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantConfirmAmountNotPaidPartAdmit() {
         return YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
+
+    @JsonIgnore
+    public boolean isClaimantNotSettlePartAdmitClaim() {
+        return hasDefendantNotPaid()
+            || isSettlementDeclinedByClaimant()
+            || isClaimantRejectsClaimAmount();
+    }
 }

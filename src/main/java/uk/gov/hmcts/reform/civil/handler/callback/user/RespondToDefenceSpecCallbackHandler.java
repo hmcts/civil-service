@@ -225,6 +225,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
+        if (V_1.equals(callbackParams.getVersion()) && shouldVulnerabilityAppear(caseData)) {
+            setVulnerabilityFlag(caseData, caseDataBuilder);
+        }
+
         setMediationConditionFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -243,7 +247,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && caseData.getApplicant1ProceedWithClaim() == YES)
-            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
+            || caseData.isClaimantNotSettlePartAdmitClaim();
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
