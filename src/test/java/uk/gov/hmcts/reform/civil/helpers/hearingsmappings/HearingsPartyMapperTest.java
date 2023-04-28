@@ -745,7 +745,7 @@ public class HearingsPartyMapperTest {
             .firstName(firstName)
             .lastName(lastName)
             .interpreterLanguage(null)
-            .reasonableAdjustments(null)
+            .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
