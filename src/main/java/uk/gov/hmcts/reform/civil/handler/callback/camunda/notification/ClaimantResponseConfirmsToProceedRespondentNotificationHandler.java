@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -72,6 +74,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String template = null;
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
@@ -79,6 +82,11 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
         if (isRespondentSolicitor2Notification(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
+        }
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) &&
+            caseData.isLRvLipOneVOne(multiPartyScenario)) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
         if ((isRespondentSolicitor2Notification(callbackParams)
