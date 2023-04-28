@@ -901,4 +901,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
         caseData.isRespondentResponseBilingual();
 
+    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
+        caseData.isPartAdmitClaimSettled();
 }
