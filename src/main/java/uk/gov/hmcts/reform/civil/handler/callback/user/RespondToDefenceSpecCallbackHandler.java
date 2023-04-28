@@ -245,32 +245,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        boolean result = false;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
-            if (caseData.getRespondent2() != null
-                && caseData.getRespondent2SameLegalRepresentative().equals(NO)
-                && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
-                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()
-                || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
-                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
-                .filter(MediationDecision.No::equals).isPresent()) {
-                result = false;
-            } else {
-                result = true;
-            }
-        }
-        System.out.println(result);
-
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // setting null here does not clear, need to overwrite with value.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.

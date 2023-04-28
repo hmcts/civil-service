@@ -21,7 +21,9 @@ public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmati
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isRejectDefendantPaymentPlanNo() || caseData.hasClaimantAgreedToFreeMediation()) {
+        if (caseData.isRejectDefendantPaymentPlanNo()
+            || caseData.hasClaimantAgreedToFreeMediation()
+            || caseData.isClaimantNotSettlePartAdmitClaim()) {
             return Optional.empty();
         }
 
