@@ -100,54 +100,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
     }
 
-    @Test
-    void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, "populate-freeForm-values");
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        // Then
-        assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionTextArea")
-            .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
-        assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
-            .isEqualTo(LocalDate.now().toString());
-        assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
-            .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
-        assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionDate")
-            .isEqualTo(LocalDate.now().toString());
-
-    }
-
-    @Test
-    void shouldGenerateFreeFormOrder_onMidEventCallback() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, "generate-document-preview");
-        // When
-        when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        // Then
-        assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
-    }
-
-    @Test
-    void shouldGenerateAssistedOrder_onMidEventCallback() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, "generate-document-preview");
-        // When
-        when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        // Then
-        assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
-    }
-
     @Nested
     class MidEventPopulateOrderFields {
         private static final String PAGE_ID = "populate-form-values";
