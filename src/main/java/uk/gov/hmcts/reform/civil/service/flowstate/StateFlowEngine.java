@@ -129,7 +129,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
@@ -514,22 +514,13 @@ public class StateFlowEngine {
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim.and(allAgreedToMediation))
-                .transitionTo(PART_ADMIT_NOT_SETTLED)
-                    .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToMediation)).and(isClaimSmallClaim))
+                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+                    .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToMediation)))
                         .set(flags -> {
                             if (featureToggleService.isSdoEnabled()) {
                                 flags.put(FlowFlag.SDO_ENABLED.name(), true);
                             }
                         })
-                .transitionTo(PART_ADMIT_NOT_SETTLED)
-                    .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToMediation)).and(isClaimFastTrackClaim))
-                    .set(flags -> {
-                        // reuse the flag that already in master
-                        flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                        if (featureToggleService.isSdoEnabled()) {
-                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                        }
-                    })
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
@@ -570,7 +561,7 @@ public class StateFlowEngine {
             .state(PART_ADMIT_REJECT_REPAYMENT)
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
-            .state(PART_ADMIT_NOT_SETTLED)
+            .state(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)

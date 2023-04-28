@@ -336,8 +336,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
-                    && (caseData.hasClaimantNotAgreedToFreeMediation()
-                    || caseData.hasDefendantNotAgreedToFreeMediation())) {
+                    && ((caseData.hasClaimantNotAgreedToFreeMediation()
+                    || caseData.hasDefendantNotAgreedToFreeMediation())
+                    || caseData.isFastTrackClaim())) {
                 response.state(CaseState.JUDICIAL_REFERRAL.name());
             }
         }
