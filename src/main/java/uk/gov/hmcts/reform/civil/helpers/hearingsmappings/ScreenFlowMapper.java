@@ -47,12 +47,12 @@ public class ScreenFlowMapper {
                                      .navigation(List.of(NavigationModel.builder()
                                                              .resultValue("hearing-welsh")
                                                              .conditionOperator("INCLUDE")
-                                                             .conditionValue("Wales")
+                                                             .conditionValue(HearingDetailsMapper.WELSH_REGION_ID)
                                                              .build(),
                                                          NavigationModel.builder()
                                                              .resultValue("hearing-judge")
                                                              .conditionOperator("NOT INCLUDE")
-                                                             .conditionValue("Wales")
+                                                             .conditionValue(HearingDetailsMapper.WELSH_REGION_ID)
                                                              .build()))
                                      .conditionKey("region")
                                      .build());
