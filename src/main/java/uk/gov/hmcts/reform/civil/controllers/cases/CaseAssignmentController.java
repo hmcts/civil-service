@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService
 
 import java.util.Optional;
 
-@Api
+@Tag(name = "Case Assignment Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -42,11 +42,11 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}"
     })
-    @ApiOperation("Validates case reference and pin")
+    @Operation(summary = "Validates case reference and pin")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized"),
-        @ApiResponse(code = 400, message = "Bad Request")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
     public ResponseEntity<CaseDetails> validateCaseAndPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
         log.info("case reference {}", caseReference);
@@ -56,7 +56,7 @@ public class CaseAssignmentController {
     }
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
-    @ApiOperation("Assigns case to defendant")
+    @Operation(summary = "Assigns case to defendant")
     public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                       @PathVariable("caseId") String caseId,
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole) {
