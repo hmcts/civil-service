@@ -296,6 +296,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000")
                                                    .region("2").build());
+        caseDataBuilder.locationName("locationOfRegion2");
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
