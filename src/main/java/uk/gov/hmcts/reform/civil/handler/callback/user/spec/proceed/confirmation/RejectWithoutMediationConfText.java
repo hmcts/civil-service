@@ -14,7 +14,8 @@ public class RejectWithoutMediationConfText implements RespondToResponseConfirma
     public Optional<String> generateTextFor(CaseData caseData) {
         if (!(caseData.isClaimantNotSettlePartAdmitClaim()
             && (caseData.hasClaimantNotAgreedToFreeMediation()
-            || caseData.hasDefendantNotAgreedToFreeMediation()))) {
+            || caseData.hasDefendantNotAgreedToFreeMediation())
+            || (caseData.isFastTrackClaim()))) {
             return Optional.empty();
         }
 
