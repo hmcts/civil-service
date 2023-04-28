@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
