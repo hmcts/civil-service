@@ -49,7 +49,7 @@ public class CaseDataToTextGeneratorTest {
             Collection used = testIntentionConfig(config, allGenerators);
             toCheck.removeAll(used);
         }
-        Assertions.assertTrue(toCheck.isEmpty(), "Some generators have not been checked");
+        Assertions.assertTrue(toCheck.isEmpty(), "Some generators have not been checked " + toCheck.toArray().toString());
     }
 
     /**
@@ -95,7 +95,8 @@ public class CaseDataToTextGeneratorTest {
         toBeUsed.removeIf(usedGenerators::contains);
         Assertions.assertTrue(
             toBeUsed.isEmpty(),
-            "Each generator should be used at least once. Please complete the case list."
+            "Each generator should be used at least once. Please complete the case list. " + toBeUsed
+                .stream().map(element -> element.getClass().getSimpleName()).collect(Collectors.joining("-", "{", "}"))
         );
         return generators;
     }

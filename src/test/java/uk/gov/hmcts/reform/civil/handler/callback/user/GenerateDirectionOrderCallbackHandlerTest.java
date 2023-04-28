@@ -18,14 +18,18 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,14 +66,15 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
-
-    private static final String ON_INITIATIVE_SELECTION_TEST = "As this order was made on the court's own initiative "
+    private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
     public static final CaseDocument finalOrder = CaseDocument.builder()
         .createdBy("Test")
         .documentName("document test name")
@@ -105,7 +110,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionTextArea")
-            .isEqualTo(ON_INITIATIVE_SELECTION_TEST);
+            .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
         assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
             .isEqualTo(LocalDate.now().toString());
         assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
@@ -141,6 +146,124 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+    }
+
+    @Nested
+    class MidEventPopulateOrderFields {
+        private static final String PAGE_ID = "populate-form-values";
+
+        @Test
+        void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting(
+                    "onInitiativeSelectionTextArea")
+                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
+                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionDate")
+                .isEqualTo(LocalDate.now().toString());
+
+        }
+
+        @Test
+        void shouldPopulateFields_whenIsCalled() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            String advancedDate = LocalDate.now().plusDays(14).toString();
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantPaySub")
+                .extracting("defendantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantPaySub")
+                .extracting("claimantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantSum")
+                .extracting("defendantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantSum")
+                .extracting("claimantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeText")
+                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeText")
+                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGranted")
+                .extracting("appealDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+        }
+    }
+
+    @Nested
+    class MidEventValidateAndGenerateOrderDocumentPreview {
+        private static final String PAGE_ID = "validate-and-generate-document";
+
+        @Test
+        void shouldGenerateFreeFormOrder_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAssistedOrder_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then    ** Modify when Assisted Order Document Generation is developed
+            //assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldValidateAssistedOrderDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now().plusDays(2)).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors())
+                .containsExactly("The date in Order Made may not be later than the established date");
+        }
     }
 
     @Nested
@@ -230,5 +353,4 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(GENERATE_DIRECTIONS_ORDER);
     }
-
 }
