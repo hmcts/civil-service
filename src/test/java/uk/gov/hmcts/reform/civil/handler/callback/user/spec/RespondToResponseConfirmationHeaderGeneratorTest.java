@@ -46,6 +46,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfHeader.class),
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfHeader.class),
             Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class),
+            Pair.of(buildProposePaymentPlanCaseData_PartAdmit(), ProposePaymentPlanConfHeader.class),
             Pair.of(buildCaseWithMediation(), RejectWithMediationConfHeader.class),
             Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class),
             Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfHeader.class),
@@ -184,6 +185,18 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                 ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
             .responseClaimTrack(SMALL_CLAIM.name())
+            .build();
+    }
+
+    public static CaseData buildProposePaymentPlanCaseData_PartAdmit() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .legacyCaseReference("claimNumber")
+            .applicant1ProceedWithClaim(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
     }
 }

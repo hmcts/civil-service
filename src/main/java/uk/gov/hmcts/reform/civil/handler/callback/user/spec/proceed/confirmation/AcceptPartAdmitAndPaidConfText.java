@@ -13,7 +13,8 @@ public class AcceptPartAdmitAndPaidConfText implements RespondToResponseConfirma
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isPartAdmitClaimNotSettled()) {
+        if (caseData.isPartAdmitClaimNotSettled()
+            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() != null) {
             return Optional.empty();
         }
         String respondentName = caseData.getRespondent1().getPartyName();
