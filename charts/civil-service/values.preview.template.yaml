@@ -139,9 +139,9 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 500m
-      devmemoryRequests: 2560Mi
-      devmemoryLimits: 4608Mi
+      devcpuRequests: 750m
+      devmemoryRequests: 3072Mi
+      devmemoryLimits: 5120Mi
       autoscaling:
         enabled: false
       environment:
