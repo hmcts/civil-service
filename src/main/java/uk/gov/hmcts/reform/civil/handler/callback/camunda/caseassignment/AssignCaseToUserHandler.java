@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,15 +25,13 @@ import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToUserHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
-        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
 
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
     public static final String TASK_ID_SPEC = "CaseAssignmentToApplicantSolicitor1ForSpec";
@@ -61,8 +58,6 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         switch (caseEvent) {
             case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1:
                 return TASK_ID;
-            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC:
-                return TASK_ID_SPEC;
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
         }
@@ -83,7 +78,8 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
-        String siteId = caseData.getCaseAccessCategory().equals(CaseCategory.UNSPEC_CLAIM)
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
