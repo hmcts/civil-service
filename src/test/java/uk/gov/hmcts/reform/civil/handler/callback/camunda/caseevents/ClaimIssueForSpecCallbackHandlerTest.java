@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE_SPEC;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -61,4 +62,18 @@ class ClaimIssueForSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
     }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("IssueClaimForSpec");
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(PROCESS_CLAIM_ISSUE_SPEC);
+    }
+
 }
