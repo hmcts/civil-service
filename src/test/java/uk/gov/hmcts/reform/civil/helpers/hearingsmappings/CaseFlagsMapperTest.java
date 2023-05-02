@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseFlags;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyFlagsModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.CaseFlags;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.PartyFlagsModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;

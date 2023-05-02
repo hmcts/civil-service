@@ -4,8 +4,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseFlags;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyFlagsModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.CaseFlags;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.PartyFlagsModel;
 
 import java.util.ArrayList;
 import java.util.List;

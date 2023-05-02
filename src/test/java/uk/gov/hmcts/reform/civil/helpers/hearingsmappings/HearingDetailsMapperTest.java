@@ -9,17 +9,17 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingLocationModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingWindowModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.JudiciaryModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.hearings.hearingrequest.model.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class HearingDetailsMapperTest {

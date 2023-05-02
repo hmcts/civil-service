@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagUtils;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;

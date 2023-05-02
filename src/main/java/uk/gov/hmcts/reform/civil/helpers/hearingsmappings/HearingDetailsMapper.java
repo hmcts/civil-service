@@ -2,17 +2,17 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingLocationModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingWindowModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.JudiciaryModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.hearings.hearingrequest.model.HMCLocationType.COURT;
 
 public class HearingDetailsMapper {
 

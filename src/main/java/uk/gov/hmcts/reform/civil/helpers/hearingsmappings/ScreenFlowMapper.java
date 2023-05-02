@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import uk.gov.hmcts.reform.civil.model.hearingvalues.NavigationModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.ScreenNavigationModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.NavigationModel;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.ScreenNavigationModel;
 
 import java.util.ArrayList;
 import java.util.List;
