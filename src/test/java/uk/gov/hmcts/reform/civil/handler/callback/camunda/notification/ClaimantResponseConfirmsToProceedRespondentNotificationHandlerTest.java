@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -26,6 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -228,6 +231,21 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .specRespondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
         @NotNull

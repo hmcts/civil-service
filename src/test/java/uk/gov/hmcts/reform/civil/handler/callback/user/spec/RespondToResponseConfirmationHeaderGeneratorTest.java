@@ -183,8 +183,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                 ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
-
-            .responseClaimTrack(FAST_CLAIM.name())
+            .responseClaimTrack(SMALL_CLAIM.name())
             .build();
     }
 }
