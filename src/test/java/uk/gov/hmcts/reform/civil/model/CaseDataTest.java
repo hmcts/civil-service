@@ -122,4 +122,64 @@ public class CaseDataTest {
         //Then
         assertThat(result).isTrue();
     }
+
+    @Test
+    public void applicant_partAdmitClaimSettled() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .build();
+        Assertions.assertTrue(caseData.isPartAdmitClaimSettled());
+    }
+
+    @Test
+    public void applicant_partAdmitClaimNotSettled() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .build();
+        Assertions.assertTrue(caseData.isPartAdmitClaimNotSettled());
+    }
+
+    @Test
+    public void applicant_isClaimPartAdmitSpec() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .build();
+        Assertions.assertTrue(caseData.isPartAdmitClaimSpec());
+    }
+
+    @Test
+    public void applicant_isPartAdmitIntentionToSettleClaim() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .build();
+        Assertions.assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
+    }
+
+    @Test
+    public void applicant_isPartAdmitIntentionNotToSettleClaim() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .build();
+        Assertions.assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
+    }
+
+    @Test
+    public void applicant_isPartAdmitConfirmAmountPaid() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .build();
+        Assertions.assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
+    }
+
+    @Test
+    public void applicant_isPartAdmitConfirmAmountNotPaid() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .build();
+        Assertions.assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+    }
 }

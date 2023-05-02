@@ -37,15 +37,15 @@ public class FeatureToggleService {
     }
 
     public boolean isHearingAndListingLegalRepEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
+        return true;
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return true;
     }
 
     public boolean isPinInPostEnabled() {
