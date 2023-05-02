@@ -267,7 +267,6 @@ public class CaseDataTest {
         Assertions.assertFalse(caseData.isFastTrackClaim());
     }
 
-
     @Test
     public void isSmallClaim_thenTrue() {
         CaseData caseData = CaseData.builder()
