@@ -7,10 +7,12 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimIssuedPaymentFailedTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimIssuedPaymentSuccessfulTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimSubmittedTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.InitialStateTransitions;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.grammar.Build;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateFlowNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.SetNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
@@ -150,9 +152,8 @@ public class StateFlowEngine {
 
     private final InitialStateTransitions initialStateTransitions;
     private final ClaimSubmittedTransitions claimSubmittedTransitions;
-
     private final ClaimIssuedPaymentFailedTransitions claimIssuedPaymentFailedTransitions;
-
+    private final ClaimIssuedPaymentSuccessfulTransitions claimIssuedPaymentSuccessfulTransitions;
 
     public StateFlow build(FlowState.Main initialState) {
         CreateFlowNext<FlowState.Main> flow = StateFlowBuilder.flow(FLOW_NAME);
@@ -164,61 +165,13 @@ public class StateFlowEngine {
         builder = next.state(CLAIM_SUBMITTED);
         next = claimSubmittedTransitions.defineTransitions(builder);
 
-        builder = next.state(CLAIM_ISSUED_PAYMENT_FAILED)
+        builder = next.state(CLAIM_ISSUED_PAYMENT_FAILED);
         next = claimIssuedPaymentFailedTransitions.defineTransitions(builder);
 
-        builder = next.state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
-                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-                // Unrepresented
-                // 1. Both def1 and def2 unrepresented
-                // 2. Def1 unrepresented, Def2 registered
-                // 3. Def1 registered, Def 2 unrepresented
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                    .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
-                                .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                                .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
-                                .and(not(specClaim)))
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-                    .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
-                .set(flags -> {
-                    if (featureToggleService.isPinInPostEnabled()) {
-                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                    }
-                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-                })
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                    .onlyIf(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                        .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                        .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-                        .and(specClaim))
-                .set(flags -> {
-                    if (featureToggleService.isPinInPostEnabled()) {
-                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                    }
-                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-                })
-                // Unregistered
-                // 1. Both def1 and def2 unregistered
-                // 2. Def1 unregistered, Def2 registered
-                // 3. Def1 registered, Def 2 unregistered
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
-                    ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                        .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                                .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                        .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                                .and(bothDefSameLegalRep.negate())
-                        )
-                )
-                // Unrepresented and Unregistered
-                // 1. Def1 unrepresented, Def2 unregistered
-                // 2. Def1 unregistered, Def 2 unrepresented
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
-                    (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                        .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
-                                .and(respondent2NotRepresented)))
-            .state(PENDING_CLAIM_ISSUED)
+        builder = next.state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL);
+        next = claimIssuedPaymentSuccessfulTransitions.defineTransitions(builder);
+
+        builder = next.state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued
@@ -459,7 +412,7 @@ public class StateFlowEngine {
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
             .state(IN_MEDIATION);
 
-        return next.build();
+        return ((Build)next).build();
     }
 
     public StateFlow evaluate(CaseDetails caseDetails) {
