@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDataToTextGeneratorTest
@@ -46,7 +48,9 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class),
             Pair.of(buildCaseWithMediation(), RejectWithMediationConfHeader.class),
             Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class),
-            Pair.of(buildCaseWithOutMediationData(), RejectWithoutMediationConfHeader.class)
+            Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfHeader.class),
+            Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfHeader.class),
+            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfHeader.class)
         );
     }
 
@@ -148,7 +152,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .build();
     }
 
-    public static CaseData buildCaseWithOutMediationData() {
+    public static CaseData buildCaseDefendantWithOutMediationData() {
         return CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1(PartyBuilder.builder().company().build())
@@ -156,6 +160,31 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .applicant1ProceedWithClaim(null)
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .build();
+    }
+
+    public static CaseData buildCaseWithOutMediationFastTrackData() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+    }
+
+    public static CaseData buildCaseClaimantWithOutMediationData() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
+
+            .responseClaimTrack(FAST_CLAIM.name())
             .build();
     }
 }

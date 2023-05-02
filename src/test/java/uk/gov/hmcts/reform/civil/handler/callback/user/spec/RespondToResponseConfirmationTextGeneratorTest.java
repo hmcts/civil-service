@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseWithMediation;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseWithOutMediationData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildAcceptPartAdmitAndPaidCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitNotProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitProceedCaseData;
@@ -25,6 +24,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitNotProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildProposePaymentPlanCaseData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseDefendantWithOutMediationData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseWithOutMediationFastTrackData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseClaimantWithOutMediationData;
 
 public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
@@ -49,7 +51,9 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
             Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class),
             Pair.of(buildCaseWithMediation(), RejectWithMediationConfText.class),
             Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class),
-            Pair.of(buildCaseWithOutMediationData(), RejectWithoutMediationConfText.class)
+            Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfText.class),
+            Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfText.class),
+            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class)
         );
     }
 }
