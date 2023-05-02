@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.transitions;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.State;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.contactDetailsChange;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
@@ -16,10 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -37,6 +40,78 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
 public class ClaimIssuedTransitions implements StateFlowEngineTransitions {
+
+    public static final Predicate<CaseData> claimNotified = caseData ->
+        !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.getClaimNotificationDate() != null
+            && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
+            || Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both"));
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = ClaimIssuedTransitions::getPredicateTakenOfflineByStaffAfterClaimIssue;
+
+    public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
+        caseData.getClaimNotificationDate() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && !Objects.equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel(), "Both");
+
+    public static final Predicate<CaseData> pastClaimNotificationDeadline = caseData ->
+        caseData.getClaimNotificationDeadline() != null
+            && caseData.getClaimNotificationDeadline().isBefore(LocalDateTime.now())
+            && caseData.getClaimNotificationDate() == null;
+
+    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec =
+        ClaimIssuedTransitions::getPredicateForAwaitingResponsesFullDefenceReceivedSpec;
+
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec =
+        ClaimIssuedTransitions::getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec;
+
+    private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(CaseData caseData) {
+        if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData
+                                                                       .getRespondent1ClaimResponseTypeForSpec()))
+                ||
+                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+        }
+        return false;
+    }
+
+    static boolean getPredicateForAwaitingResponsesFullDefenceReceivedSpec(CaseData caseData) {
+        if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                && RespondentResponseTypeSpec.FULL_DEFENCE
+                .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+                ||
+                (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+        }
+        return false;
+    }
+
+    static boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
+        // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
+        // In case of UNSPEC ClaimNotificationDate will be set only after notification step
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getClaimDetailsNotificationDate() == null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1ResponseDate() == null
+            && caseData.getClaimNotificationDeadline() != null
+            && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now());
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return basePredicate && caseData.getClaimNotificationDate() != null;
+        }
+
+        return basePredicate && caseData.getClaimNotificationDate() == null;
+    }
+
     @Override
     public State<FlowState.Main> defineTransitions(State<FlowState.Main> previousState) {
         return previousState.state(CLAIM_ISSUED)

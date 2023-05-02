@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.transitions;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -9,10 +13,11 @@ import uk.gov.hmcts.reform.civil.stateflow.grammar.State;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
@@ -28,6 +33,15 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 @Component
 @RequiredArgsConstructor
 public class ClaimIssuedPaymentSuccessfulTransitions implements StateFlowEngineTransitions {
+
+    public static final Predicate<CaseData> pendingClaimIssued = caseData ->
+        caseData.getIssueDate() != null
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == YES
+            && (caseData.getRespondent2() == null
+            || (caseData.getRespondent2Represented() == YES
+            && (caseData.getRespondent2OrgRegistered() == YES
+            || caseData.getRespondent2SameLegalRepresentative() == YES)));
 
     private final FeatureToggleService featureToggleService;
 
