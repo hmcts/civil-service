@@ -1185,7 +1185,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnPaymentFailed_whenCaseDataAtStatePaymentFailed() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

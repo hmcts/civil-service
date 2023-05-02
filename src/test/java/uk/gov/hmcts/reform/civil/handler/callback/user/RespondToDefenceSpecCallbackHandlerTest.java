@@ -1225,6 +1225,33 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class AboutToSubmitCallbackForLiP {
+        private final LocalDateTime localDateTime = now();
+
+        @BeforeEach
+        void setup() {
+            when(time.now()).thenReturn(localDateTime);
+        }
+
+        @Test
+        void shouldUpdateToCaseSettled_whenClaimantChooseToSettle() {
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
+        }
+    }
+
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
     }
