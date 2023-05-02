@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.controllers.hearings;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 
-@Api
+@Tag(name = "Hearing Values Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -29,11 +29,11 @@ public class HearingValuesController {
     @PostMapping(path = {
         "/serviceHearingValues"
     })
-    @ApiOperation("Builds and returns the hearing values for exui")
+    @Operation(summary = "Builds and returns the hearing values for exui")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Incorrect authorisation"),
-        @ApiResponse(code = 400, message = "Bad Request")
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Incorrect authorisation"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<ServiceHearingValuesModel> getHearingValues(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,

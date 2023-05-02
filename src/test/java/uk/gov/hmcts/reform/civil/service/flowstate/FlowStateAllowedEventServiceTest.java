@@ -137,7 +137,7 @@ class FlowStateAllowedEventServiceTest {
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
                 of(CaseDataBuilder.builder().atStateClaimDraft().build(), DRAFT),
-                of(CaseDataBuilder.builder().atStatePaymentFailed().build(), CLAIM_ISSUED_PAYMENT_FAILED),
+                of(CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build(), CLAIM_ISSUED_PAYMENT_FAILED),
                 of(CaseDataBuilder.builder().atStatePendingClaimIssued().build(), PENDING_CLAIM_ISSUED),
                 of(
                     CaseDataBuilder.builder().atStateClaimNotified_1v1().build(),
