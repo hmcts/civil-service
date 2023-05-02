@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.validation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 
@@ -31,6 +32,24 @@ public class PostcodeValidator {
                 || !(postcodeLookupService.validatePostCodeForDefendant(
                 postcode))) {
                 errors.add("Postcode must be in England or Wales");
+            }
+        } else {
+            errors.add("Please enter Postcode");
+        }
+        return errors;
+    }
+
+    /**
+     * validates that postcode belongs to UK
+     *
+     * @param postcode postcode, may be null or empty
+     * @return error message if the postcode is null, empty or not in UK
+     */
+    public List<String> validateUk(String postcode) {
+        List<String> errors = new ArrayList<>();
+        if (StringUtils.isNotBlank(postcode)) {
+            if (!postcodeLookupService.validatePostCodeUk(postcode)) {
+                errors.add("Postcode must be in UK");
             }
         } else {
             errors.add("Please enter Postcode");

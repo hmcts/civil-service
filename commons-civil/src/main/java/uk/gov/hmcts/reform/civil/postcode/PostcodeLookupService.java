@@ -16,8 +16,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -25,6 +28,11 @@ import java.util.Map;
 public class PostcodeLookupService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PostcodeLookupService.class);
+    private static final List<Pattern> POSTCODE_FORMATS = List.of(
+        Pattern.compile("[a-zA-Z]{1,2}\\d[a-zA-Z] \\d[a-zA-Z]{2}"),
+        Pattern.compile("[a-zA-Z]{1,2}\\d \\d[a-zA-Z]{2}"),
+        Pattern.compile("[a-zA-Z]{1,2}\\d{2} \\d[a-zA-Z]{2}")
+    );
 
     private final RestTemplate restTemplate;
     private final PostcodeLookupConfiguration configuration;
@@ -32,6 +40,34 @@ public class PostcodeLookupService {
     public PostcodeLookupService(RestTemplate restTemplate, PostcodeLookupConfiguration configuration) {
         this.restTemplate = restTemplate;
         this.configuration = configuration;
+    }
+
+    /**
+     * Valdiates that postcode belongs to UK
+     *
+     * @param postcode the postcode, not null
+     * @return true if the country of the postcode is england, wales, scotland or north ireland
+     */
+    public boolean validatePostCodeUk(String postcode) {
+        if (postcodeNorthernIreland(postcode)) {
+            return true;
+        }
+        String countryName = Optional.ofNullable(fetchCountryFromPostCode(postcode.toUpperCase(Locale.UK)))
+            .map(s -> s.toUpperCase(Locale.UK))
+            .orElse(null);
+        return (CountriesAllowed.ENGLAND.name().equals(countryName)
+            || CountriesAllowed.WALES.name().equals(countryName)
+            || CountriesAllowed.SCOTLAND.name().equals(countryName));
+    }
+
+    /*
+    Tried with api.os.uk but Northern Ireland postcodes returned no results, so I'm checking just format and
+    BT beginning until I have a better way
+     */
+    private boolean postcodeNorthernIreland(String postcode) {
+        return StringUtils.isNotBlank(postcode)
+            && postcode.toUpperCase().startsWith("BT")
+            && POSTCODE_FORMATS.stream().anyMatch(f -> f.matcher(postcode).matches());
     }
 
     public boolean validatePostCodeForDefendant(String postcode) {
