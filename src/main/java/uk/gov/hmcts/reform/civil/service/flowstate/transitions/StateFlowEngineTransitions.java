@@ -6,5 +6,5 @@ import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
 
 public interface StateFlowEngineTransitions {
 
-    State<FlowState.Main> defineTransitions(TransitionTo<FlowState.Main> builder);
+    State<FlowState.Main> defineTransitions(State<FlowState.Main> previousState);
 }

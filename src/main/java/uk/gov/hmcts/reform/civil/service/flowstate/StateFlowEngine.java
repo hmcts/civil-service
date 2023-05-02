@@ -6,10 +6,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimDetailsNotifiedTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimIssuedPaymentFailedTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimIssuedPaymentSuccessfulTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimIssuedTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimNotifiedTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ClaimSubmittedTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.ContactDetailsChangeTransitions;
 import uk.gov.hmcts.reform.civil.service.flowstate.transitions.InitialStateTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.PendingClaimIssuedTransitions;
+import uk.gov.hmcts.reform.civil.service.flowstate.transitions.RespondentResponseLanguageIsBilingualTransitions;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.Build;
@@ -154,114 +160,30 @@ public class StateFlowEngine {
     private final ClaimSubmittedTransitions claimSubmittedTransitions;
     private final ClaimIssuedPaymentFailedTransitions claimIssuedPaymentFailedTransitions;
     private final ClaimIssuedPaymentSuccessfulTransitions claimIssuedPaymentSuccessfulTransitions;
+    private final PendingClaimIssuedTransitions pendingClaimIssuedTransitions;
+    private final ClaimIssuedTransitions claimIssuedTransitions;
+    private final ContactDetailsChangeTransitions contactDetailsChangeTransitions;
+    private final RespondentResponseLanguageIsBilingualTransitions respondentResponseLanguageIsBilingualTransitions;
+    private final ClaimNotifiedTransitions claimNotifiedTransitions;
+    private final ClaimDetailsNotifiedTransitions claimDetailsNotifiedTransitions;
 
     public StateFlow build(FlowState.Main initialState) {
         CreateFlowNext<FlowState.Main> flow = StateFlowBuilder.flow(FLOW_NAME);
         uk.gov.hmcts.reform.civil.stateflow.grammar.State<FlowState.Main> next;
 
-        TransitionTo<FlowState.Main> builder = flow.initial(initialState);
-        next = initialStateTransitions.defineTransitions(builder);
+        next = initialStateTransitions.defineTransitions(flow, initialState);
 
-        builder = next.state(CLAIM_SUBMITTED);
-        next = claimSubmittedTransitions.defineTransitions(builder);
+        next = claimSubmittedTransitions.defineTransitions(next);
+        next = claimIssuedPaymentFailedTransitions.defineTransitions(next);
+        next = claimIssuedPaymentSuccessfulTransitions.defineTransitions(next);
+        next = pendingClaimIssuedTransitions.defineTransitions(next);
+        next = claimIssuedTransitions.defineTransitions(next);
+        next = contactDetailsChangeTransitions.defineTransitions(next);
+        next = respondentResponseLanguageIsBilingualTransitions.defineTransitions(next);
+        next = claimNotifiedTransitions.defineTransitions(next);
+        next = claimDetailsNotifiedTransitions.defineTransitions(next);
 
-        builder = next.state(CLAIM_ISSUED_PAYMENT_FAILED);
-        next = claimIssuedPaymentFailedTransitions.defineTransitions(builder);
-
-        builder = next.state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL);
-        next = claimIssuedPaymentSuccessfulTransitions.defineTransitions(builder);
-
-        builder = next.state(PENDING_CLAIM_ISSUED)
-                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued
-                                                       .and(not(specClaim))
-                                                       .and(certificateOfServiceEnabled))
-                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem
-                                                                                .and(noticeOfChangeEnabled.negate()))
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-                .transitionTo(CLAIM_ISSUED)
-                    .onlyIf(claimIssued.and(pinInPostEnabledAndLiP))
-                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
-                    .onlyIf(takenOfflineBySystem.and(not(pinInPostEnabledAndLiP)))
-            .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
-                .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
-            .state(CLAIM_ISSUED)
-                .transitionTo(CLAIM_NOTIFIED).onlyIf(claimNotified)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimIssue)
-                .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
-                .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
-                .transitionTo(CONTACT_DETAILS_CHANGE).onlyIf(contactDetailsChange)
-                    .set(flags -> {
-                        flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true);
-                    })
-                .transitionTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyIf(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)))
-                   .set(flags -> {
-                       flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
-                   })
-                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesFullDefenceReceivedSpec.and(specClaim))
-                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim))
-                .transitionTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE)
-                    .onlyIf(divergentRespondWithDQAndGoOfflineSpec.and(specClaim))
-                .transitionTo(DIVERGENT_RESPOND_GO_OFFLINE)
-                    .onlyIf(divergentRespondGoOfflineSpec.and(specClaim))
-            .state(CONTACT_DETAILS_CHANGE)
-                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(isRespondentResponseLangIsBilingual)))
-                .transitionTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL).onlyIf(isRespondentResponseLangIsBilingual)
-                    .set(flags -> {
-                        flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
-                    })
-            .state(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL)
-                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)))
-                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)))
-                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)))
-                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(contactDetailsChange)))
-            .state(CLAIM_NOTIFIED)
-                .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
-                .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimNotified)
-                .transitionTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(pastClaimDetailsNotificationDeadline)
-            .state(CLAIM_DETAILS_NOTIFIED)
-                .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-                    .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)))
-                //Acknowledging Claim First
-                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-                //Direct Response, without Acknowledging
-                .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
-                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesFullDefenceReceived
-                        .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
-                        .and(not(caseDismissedAfterDetailNotified)))
-                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf(awaitingResponsesNonFullDefenceReceived
-                        .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
-                .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(caseDismissedAfterDetailNotified)
-            .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
-                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
-                .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf((respondentTimeExtension).and(allResponsesReceived))
-                .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
-                    .onlyIf((awaitingResponsesFullDefenceReceived).and(respondentTimeExtension)
-                        .and(not(caseDismissedAfterDetailNotifiedExtension)))
-                .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
-                    .onlyIf((awaitingResponsesNonFullDefenceReceived).and(respondentTimeExtension))
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotifiedExtension)
-                .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
-                    .onlyIf(caseDismissedAfterDetailNotifiedExtension)
+        next = next
             .state(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)

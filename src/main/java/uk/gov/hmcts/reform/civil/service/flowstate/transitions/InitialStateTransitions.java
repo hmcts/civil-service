@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.stateflow.grammar.CreateFlowNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.SetNext;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.State;
 import uk.gov.hmcts.reform.civil.stateflow.grammar.TransitionTo;
@@ -26,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_S
 
 @Component
 @RequiredArgsConstructor
-public class InitialStateTransitions implements StateFlowEngineTransitions {
+public class InitialStateTransitions {
 
     private final FeatureToggleService featureToggleService;
 
@@ -155,7 +156,8 @@ public class InitialStateTransitions implements StateFlowEngineTransitions {
                 )));
     }
 
-    public State<FlowState.Main> defineTransitions(TransitionTo<FlowState.Main> builder) {
+    public State<FlowState.Main> defineTransitions(CreateFlowNext<FlowState.Main> flow, FlowState.Main initialState) {
+        TransitionTo<FlowState.Main> builder = flow.initial(initialState);
         SetNext<FlowState.Main> next = toClaimSubmittedOneRespondentRepresentative(builder);
         next = toClaimSubmittedTwoRegisteredRespondentRepresentatives(next);
         next = toClaimSubmittedOnNoticeOfChangeDisabled(next);

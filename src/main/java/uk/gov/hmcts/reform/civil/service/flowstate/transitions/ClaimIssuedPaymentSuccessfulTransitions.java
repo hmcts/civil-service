@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
@@ -30,7 +31,9 @@ public class ClaimIssuedPaymentSuccessfulTransitions implements StateFlowEngineT
 
     private final FeatureToggleService featureToggleService;
 
-    public State<FlowState.Main> defineTransitions(TransitionTo<FlowState.Main> builder) {
+    @Override
+    public State<FlowState.Main> defineTransitions(State<FlowState.Main> previousState) {
+        TransitionTo<FlowState.Main> builder = previousState.state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL);
         return builder.transitionTo(PENDING_CLAIM_ISSUED)
                 .onlyIf(pendingClaimIssued)
             // Unrepresented
