@@ -148,11 +148,18 @@ public class InitiateGeneralApplicationService {
             caseType = CaseCategory.UNSPEC_CLAIM;
         }
 
-        if (caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
-            applicationBuilder
-                .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-                .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+        if (caseData.getGeneralAppRespondentAgreement() != null) {
+            if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+                applicationBuilder
+                        .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                        .generalAppConsentOrder(NO)
+                        .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+            } else {
+                applicationBuilder
+                        .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                        .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+            }
         } else {
             applicationBuilder
                 .generalAppInformOtherParty(GAInformOtherParty.builder().build())
