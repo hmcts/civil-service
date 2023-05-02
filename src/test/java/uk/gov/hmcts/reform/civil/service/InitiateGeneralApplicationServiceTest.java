@@ -430,7 +430,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
+    void shouldNotPopulateStatementOfTruthAndSetNoticeIfConsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
         when(locationRefDataService.getCcmccLocation(any()))
@@ -441,7 +441,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-            .isNull();
+            .isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
                        .getReasonsForWithoutNotice()).isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
