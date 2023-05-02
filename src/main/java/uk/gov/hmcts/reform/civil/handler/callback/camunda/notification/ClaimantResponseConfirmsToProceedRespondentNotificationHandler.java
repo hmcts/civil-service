@@ -84,8 +84,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) &&
-            caseData.isLRvLipOneVOne(multiPartyScenario)) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.isLRvLipOneVOne(multiPartyScenario)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 

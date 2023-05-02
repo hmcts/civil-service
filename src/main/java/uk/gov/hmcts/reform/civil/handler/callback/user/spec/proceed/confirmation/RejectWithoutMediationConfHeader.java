@@ -10,6 +10,7 @@ import static java.lang.String.format;
 
 @Component
 public class RejectWithoutMediationConfHeader implements RespondToResponseConfirmationHeaderGenerator {
+
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (!(caseData.isClaimantNotSettlePartAdmitClaim()
