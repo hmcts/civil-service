@@ -753,7 +753,7 @@ class CaseEventTaskHandlerTest {
                         .respondent2Represented(null);
                     break;
                 case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails()
+                    caseDataBuilder.atStateRespondent1CounterClaimAfterNotifyDetails()
                         .addRespondent2(NO)
                         .respondent2OrgRegistered(null)
                         .respondent2Represented(null);
