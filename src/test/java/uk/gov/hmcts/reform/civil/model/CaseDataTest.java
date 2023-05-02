@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.model;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -181,5 +183,104 @@ public class CaseDataTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
         Assertions.assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+    }
+
+    @Test
+    public void isClaimantNotSettlePartAdmitClaim_thenTrue() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .build();
+        Assertions.assertTrue(caseData.isClaimantNotSettlePartAdmitClaim());
+    }
+
+    @Test
+    public void isClaimantNotSettlePartAdmitClaim_thenFalse() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .build();
+        Assertions.assertFalse(caseData.isClaimantNotSettlePartAdmitClaim());
+    }
+
+    @Test
+    public void doesPartPaymentRejectedOrItsFullDefenceResponse_fullDefence() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+            .build();
+        Assertions.assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    public void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectYes() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .build();
+        Assertions.assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    public void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectNo() {
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .build();
+        Assertions.assertEquals(YesOrNo.NO, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    public void hasDefendantNotAgreedToFreeMediation_Yes() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .build();
+        Assertions.assertFalse(caseData.hasDefendantNotAgreedToFreeMediation());
+    }
+
+    @Test
+    public void hasDefendantNotAgreedToFreeMediation_No() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .build();
+        Assertions.assertTrue(caseData.hasDefendantNotAgreedToFreeMediation());
+    }
+
+    @Test
+    public void isFastTrackClaim_thenTrue() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .build();
+        Assertions.assertTrue(caseData.isFastTrackClaim());
+    }
+
+    @Test
+    public void isFastTrackClaim_thenFalse() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .build();
+        Assertions.assertFalse(caseData.isFastTrackClaim());
+    }
+
+
+    @Test
+    public void isSmallClaim_thenTrue() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .build();
+        Assertions.assertTrue(caseData.isSmallClaim());
+    }
+
+    @Test
+    public void isSmallClaim_thenFalse() {
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .build();
+        Assertions.assertFalse(caseData.isSmallClaim());
     }
 }
