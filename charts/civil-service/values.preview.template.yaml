@@ -140,8 +140,8 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 500m
-      devmemoryRequests: 2048Mi
-      devmemoryLimits: 4096Mi
+      devmemoryRequests: 2560Mi
+      devmemoryLimits: 4608Mi
       autoscaling:
         enabled: false
       environment:
