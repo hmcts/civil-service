@@ -121,7 +121,6 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .applicant1ProceedWithClaim(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .caseDataLiP(null)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
     }

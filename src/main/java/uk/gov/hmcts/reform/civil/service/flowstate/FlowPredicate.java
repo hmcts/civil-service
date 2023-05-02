@@ -864,10 +864,4 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = caseData ->
         caseData.isClaimantNotSettlePartAdmitClaim();
-
-    public static final Predicate<CaseData> isClaimFastTrackClaim = caseData ->
-        caseData.isFastTrackClaim();
-
-    public static final Predicate<CaseData> isClaimSmallClaim = caseData ->
-        caseData.isSmallClaim();
 }
