@@ -5,14 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AcceptPartAdmitAndPaidConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -44,7 +37,8 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfHeader.class),
             Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class),
             Pair.of(buildCaseWithMediation(), RejectWithMediationConfHeader.class),
-            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class)
+            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class),
+            Pair.of(buildCaseWithOutMediationData(), RejectWithoutMediationConfHeader.class)
         );
     }
 
@@ -142,6 +136,17 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1ProceedWithClaim(null)
+            .build();
+    }
+
+    public static CaseData buildCaseWithOutMediationData() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
             .applicant1ProceedWithClaim(null)
             .build();
     }
