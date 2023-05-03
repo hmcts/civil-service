@@ -21,6 +21,8 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
+
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
