@@ -1057,23 +1057,30 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
-        if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            List<String> userRoles = getUserRoles(callbackParams);
-            boolean isRespondent2 = userRoles.contains(RESPONDENTSOLICITORTWO.getFormattedName());
-            if (isRespondent2) {
-                List<String> errors =
-                    ofNullable(callbackParams.getCaseData().getSpecAoSRespondent2HomeAddressDetails())
-                    .map(Address::getPostCode)
-                    .map(postcodeValidator::validate)
-                    .orElse(Collections.emptyList());
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            } else {
-                return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
-            }
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
+
+        if ((ONE_V_TWO_TWO_LEGAL_REP.equals(mpScenario)
+            && getUserRoles(callbackParams).contains(RESPONDENTSOLICITORTWO.getFormattedName()))
+            || ONE_V_TWO_ONE_LEGAL_REP.equals(mpScenario)) {
+            ofNullable(callbackParams.getCaseData().getSpecAoSRespondent2HomeAddressDetails())
+                .map(Address::getPostCode)
+                .map(postcodeValidator::validate)
+                .ifPresent(errors::addAll);
+        }
+        if (ONE_V_ONE.equals(mpScenario)
+            || ONE_V_TWO_ONE_LEGAL_REP.equals(mpScenario)
+            || TWO_V_ONE.equals(mpScenario)
+            || (ONE_V_TWO_TWO_LEGAL_REP.equals(mpScenario)
+            && getUserRoles(callbackParams).contains(RESPONDENTSOLICITORONE.getFormattedName()))) {
+            ofNullable(callbackParams.getCaseData().getSpecAoSApplicantCorrespondenceAddressdetails())
+                .map(Address::getPostCode)
+                .map(postcodeValidator::validate)
+                .ifPresent(errors::addAll);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 
@@ -1282,10 +1289,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             respondent = caseData.getRespondent2();
         }
         List<String> errors = dateOfBirthValidator.validate(respondent);
-        List<String> userRoles = getUserRoles(callbackParams);
-        boolean isRespondent2 = userRoles.contains(RESPONDENTSOLICITORTWO.getFormattedName());
+        MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
         Optional<Address> addressToCheck;
-        if (isRespondent2) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(mpScenario)
+            && getUserRoles(callbackParams).contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
             addressToCheck = Optional.ofNullable(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         } else {
             addressToCheck = Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
@@ -1294,8 +1301,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .map(postcodeValidator::validate)
             .ifPresent(errors::addAll);
 
-        Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
-            .map(Address::getPostCode);
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {

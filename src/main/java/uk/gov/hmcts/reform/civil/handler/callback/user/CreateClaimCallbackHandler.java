@@ -255,45 +255,30 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse validateDefendant(CallbackParams callbackParams) {
-        return validateDefendant(callbackParams.getCaseData().getRespondent1());
+        return validateDefendantAddress(callbackParams.getCaseData().getRespondent1().getPrimaryAddress());
     }
 
     private CallbackResponse validateDefendant2(CallbackParams callbackParams) {
-        return validateDefendant(callbackParams.getCaseData().getRespondent2());
+        return validateDefendantAddress(callbackParams.getCaseData().getRespondent2().getPrimaryAddress());
+    }
+
+    private CallbackResponse validateDefendantAddress(Address address) {
+        List<String> errors = Optional.ofNullable(address)
+            .map(Address::getPostCode)
+            .map(postcodeValidator::validate)
+            .orElse(Collections.emptyList());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateDefendantCorrespondence(CallbackParams callbackParams) {
-        Address address = callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress();
-
-        List<String> errors = address == null ? Collections.emptyList() :
-            postcodeValidator.validate(address.getPostCode());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return validateDefendantAddress(callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress());
     }
 
     private CallbackResponse validateDefendant2Correspondence(CallbackParams callbackParams) {
-        Address address = callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress();
-
-        List<String> errors = address == null ? Collections.emptyList() :
-            postcodeValidator.validate(address.getPostCode());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse validateDefendant(Party defendant) {
-        List<String> errors = ofNullable(defendant.getPrimaryAddress())
-            .map(Address::getPostCode)
-            .filter(StringUtils::isNotBlank)
-            .map(postcodeValidator::validate)
-            .orElseGet(Collections::emptyList);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return validateDefendantAddress(callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress());
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
