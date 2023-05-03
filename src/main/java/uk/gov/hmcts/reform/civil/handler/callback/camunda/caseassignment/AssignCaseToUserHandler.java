@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -87,7 +88,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
+        String siteId = caseData.getCaseAccessCategory().equals(CaseCategory.UNSPEC_CLAIM)
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
