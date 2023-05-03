@@ -32,6 +32,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class FlowPredicate {
 
+    private FlowPredicate() {
+        //Utility classes require a private constructor for checkstyle
+    }
+
     public static final Predicate<CaseData> hasNotifiedClaimDetailsToBoth = caseData ->
         Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
             .map(DynamicList::getValue)
@@ -212,10 +216,6 @@ public class FlowPredicate {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 
-    public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
-        caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null;
-
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
@@ -351,58 +351,14 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> fullDefenceAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
-
-    public static final Predicate<CaseData> fullDefenceAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
-
     public static final Predicate<CaseData> fullAdmission = caseData ->
         getPredicateForResponseType(caseData, FULL_ADMISSION);
-
-    public static final Predicate<CaseData> fullAdmissionAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
-
-    public static final Predicate<CaseData> fullAdmissionAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
 
     public static final Predicate<CaseData> partAdmission = caseData ->
         getPredicateForResponseType(caseData, PART_ADMISSION);
 
-    public static final Predicate<CaseData> partAdmissionAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
-
-    public static final Predicate<CaseData> partAdmissionAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
-
     public static final Predicate<CaseData> counterClaim = caseData ->
         getPredicateForResponseType(caseData, COUNTER_CLAIM);
-
-    public static final Predicate<CaseData> counterClaimAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
-
-    public static final Predicate<CaseData> counterClaimAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
 
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
@@ -770,10 +726,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> specClaim = caseData ->
         SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
-    private FlowPredicate() {
-        //Utility class
-    }
-
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -901,4 +853,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
         caseData.isRespondentResponseBilingual();
 
+    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
+        caseData.isPartAdmitClaimSettled();
 }

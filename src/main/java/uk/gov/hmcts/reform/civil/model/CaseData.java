@@ -141,6 +141,8 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -889,6 +891,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPartAdmitClaimSettled() {
+        return (
+            getApplicant1ProceedsWithClaimSpec() == null
+                && isPartAdmitClaimSpec()
+                && isClaimantIntentionSettlePartAdmit()
+                && isClaimantConfirmAmountPaidPartAdmit());
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitClaimNotSettled() {
+        return (
+            getApplicant1ProceedsWithClaimSpec() != null
+                || !isPartAdmitClaimSpec()
+                || isClaimantIntentionNotSettlePartAdmit()
+                || isClaimantConfirmAmountNotPaidPartAdmit());
+    }
+
+    @JsonIgnore
     public boolean hasDefendantNotPaid() {
         return NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
@@ -984,5 +1004,30 @@ public class CaseData extends CaseDataParent implements MappableObject {
                                            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
         }
         return null;
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitClaimSpec() {
+        return PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantIntentionSettlePartAdmit() {
+        return YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantIntentionNotSettlePartAdmit() {
+        return YesOrNo.NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantConfirmAmountPaidPartAdmit() {
+        return YesOrNo.YES.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean isClaimantConfirmAmountNotPaidPartAdmit() {
+        return YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 }
