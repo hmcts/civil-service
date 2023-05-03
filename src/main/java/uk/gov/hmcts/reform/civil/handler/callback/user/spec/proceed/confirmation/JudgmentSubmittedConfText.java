@@ -14,11 +14,6 @@ import static java.lang.String.format;
 @Component
 public class JudgmentSubmittedConfText implements RespondToResponseConfirmationTextGenerator {
 
-    private static final Set<RespondentResponsePartAdmissionPaymentTimeLRspec> PAYMENT_PLAN = EnumSet.of(
-        RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
-        RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
-    );
-
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (caseData.isRejectDefendantPaymentPlanNo()

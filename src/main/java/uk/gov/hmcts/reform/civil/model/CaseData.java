@@ -905,6 +905,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isPartAdmitClaimNotSettled() {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
+                || getApplicant1AcceptAdmitAmountPaidSpec() != null
                 || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());

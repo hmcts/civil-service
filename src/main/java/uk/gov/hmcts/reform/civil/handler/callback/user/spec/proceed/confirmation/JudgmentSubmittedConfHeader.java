@@ -12,12 +12,7 @@ import java.util.Set;
 import static java.lang.String.format;
 
 @Component
-public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmationHeaderGenerator {
-
-    private static final Set<RespondentResponsePartAdmissionPaymentTimeLRspec> PAYMENT_PLAN = EnumSet.of(
-        RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
-        RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
-    );
+public class JudgmentSubmittedConfHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {

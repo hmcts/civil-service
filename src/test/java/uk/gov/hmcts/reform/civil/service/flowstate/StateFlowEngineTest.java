@@ -4582,11 +4582,13 @@ class StateFlowEngineTest {
 
             // Then
             Assertions.assertEquals(fullState.getState().getName(), PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName());
+            assertThat(fullState.getFlags()).doesNotContain(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
 
         @Test
         void partAdmitNoMediationSpec() {
             // Given
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 // spec claim
                 .caseAccessCategory(SPEC_CLAIM)
@@ -4614,6 +4616,7 @@ class StateFlowEngineTest {
 
             // Then
             Assertions.assertEquals(fullState.getState().getName(), PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName());
+            assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
 }
