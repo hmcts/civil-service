@@ -83,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -122,6 +123,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     @Autowired
     private ObjectMapper objMapper;
@@ -170,6 +172,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CREATE_CLAIM);
+    }
 
     @Nested
     class AboutToStartCallbackV0 {
@@ -890,6 +897,53 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidPopulateClaimantSolicitor {
+
+        @Test
+        void shouldSetOrganisation_WhenPopulated() {
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            Organisation organisation = Organisation.builder()
+                                                    .organisationIdentifier("1")
+                .companyNumber("1")
+                .name("Organisation1")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "populateClaimantSolicitor");
+
+            when(organisationService.findOrganisation(CallbackParams.Params.BEARER_TOKEN.toString()))
+                .thenReturn(Optional.ofNullable(organisation));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1OrganisationPolicy")
+                .extracting("Organisation")
+                .extracting("OrganisationID")
+                .isEqualTo(organisation.getOrganisationIdentifier());
+        }
+
+    }
+
+    @Nested
+    class MidSetRespondent2SameLegalRepToNo {
+
+        @Test
+        void shouldsetRespondent2SameLegalRepToNo_WhenRespondent1NotRepresented() {
+
+            CaseData caseData = CaseDataBuilder.builder().respondent1Represented(YesOrNo.NO).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "setRespondent2SameLegalRepresentativeToNo");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent2SameLegalRepresentative")
+                .isEqualTo("No");
+        }
+
+    }
+
+    @Nested
     class ValidateEmails {
 
         @Nested
@@ -997,6 +1051,38 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
         }
+    }
+
+    @Test
+    void shouldThrowNoError_whenCourtLocationPopulatedAndCourtLocationDynamicListDisabled() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        String email = "Email";
+        String userId = UUID.randomUUID().toString();
+
+        given(idamClient.getUserDetails(any()))
+            .willReturn(UserDetails.builder().email(email).id(userId).build());
+
+        when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenCourtLocationPopulatedAndCourtLocationDynamicListDisabled() {
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).hasSize(1);
     }
 
     @Nested
