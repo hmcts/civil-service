@@ -862,6 +862,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
         caseData.isPartAdmitClaimSettled();
 
-    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = caseData ->
-        caseData.isClaimantNotSettlePartAdmitClaim();
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
+        CaseData::isClaimantNotSettlePartAdmitClaim;
 }
