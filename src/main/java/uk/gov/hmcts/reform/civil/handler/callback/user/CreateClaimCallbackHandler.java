@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -140,7 +139,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
-    private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
@@ -170,10 +168,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
+            .put(callbackKey(MID, "applicantLrCorrespondence"), this::validateApplicantCorrespondence)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
+            .put(callbackKey(MID, "defendant1LrCorrespondence"), this::validateDefendantCorrespondence)
+            .put(callbackKey(MID, "defendant2LrCorrespondence"), this::validateDefendant2Correspondence)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
+            .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)    // , defendant2LrCorrespondence, applicant1LrCorrespondence
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -229,6 +230,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return validateApplicant(callbackParams.getCaseData().getApplicant2());
     }
 
+    private CallbackResponse validateApplicantCorrespondence(CallbackParams callbackParams) {
+        Address address = callbackParams.getCaseData().getApplicantSolicitor1ServiceAddress();
+        List<String> errors = address == null ? Collections.emptyList() :
+            postcodeValidator.validateUk(address.getPostCode());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
     private CallbackResponse validateApplicant(Party applicant) {
         List<String> errors = dateOfBirthValidator.validate(applicant);
 
@@ -249,6 +260,28 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse validateDefendant2(CallbackParams callbackParams) {
         return validateDefendant(callbackParams.getCaseData().getRespondent2());
+    }
+
+    private CallbackResponse validateDefendantCorrespondence(CallbackParams callbackParams) {
+        Address address = callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress();
+
+        List<String> errors = address == null ? Collections.emptyList() :
+            postcodeValidator.validate(address.getPostCode());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateDefendant2Correspondence(CallbackParams callbackParams) {
+        Address address = callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress();
+
+        List<String> errors = address == null ? Collections.emptyList() :
+            postcodeValidator.validate(address.getPostCode());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateDefendant(Party defendant) {
@@ -589,15 +622,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
-    }
-
-    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
-        return caseData.getRespondent1Represented() == NO
-            ||  isSecondRespondentLitigantInPerson(caseData);
-    }
-
-    private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
-        return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
     private String getBody(CaseData caseData) {

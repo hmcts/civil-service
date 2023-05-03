@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,7 +27,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -36,8 +38,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -46,13 +46,14 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -1047,9 +1048,30 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         );
     }
 
+    private List<String> getUserRoles(CallbackParams callbackParams) {
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        return coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
+    }
+
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
+            List<String> userRoles = getUserRoles(callbackParams);
+            boolean isRespondent2 = userRoles.contains(RESPONDENTSOLICITORTWO.getFormattedName());
+            if (isRespondent2) {
+                List<String> errors =
+                    ofNullable(callbackParams.getCaseData().getSpecAoSRespondent2HomeAddressDetails())
+                    .map(Address::getPostCode)
+                    .map(postcodeValidator::validate)
+                    .orElse(Collections.emptyList());
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
@@ -1254,13 +1276,26 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
-            respondent = callbackParams.getCaseData().getRespondent2();
+        CaseData caseData = callbackParams.getCaseData();
+        Party respondent = caseData.getRespondent1();
+        if (respondent == null && caseData.getRespondent2() != null) {
+            respondent = caseData.getRespondent2();
         }
         List<String> errors = dateOfBirthValidator.validate(respondent);
+        List<String> userRoles = getUserRoles(callbackParams);
+        boolean isRespondent2 = userRoles.contains(RESPONDENTSOLICITORTWO.getFormattedName());
+        Optional<Address> addressToCheck;
+        if (isRespondent2) {
+            addressToCheck = Optional.ofNullable(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
+        } else {
+            addressToCheck = Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
+        }
+        addressToCheck.map(Address::getPostCode)
+            .map(postcodeValidator::validate)
+            .ifPresent(errors::addAll);
 
-        CaseData caseData = callbackParams.getCaseData();
+        Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            .map(Address::getPostCode);
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {

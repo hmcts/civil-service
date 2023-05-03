@@ -226,7 +226,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         Party applicant = getApplicant.apply(caseData);
         List<String> errors = dateOfBirthValidator.validate(applicant);
         if (errors.size() == 0 && callbackParams.getRequest().getEventId() != null) {
-            errors = postcodeValidator.validate(
+            errors = postcodeValidator.validateUk(
                 applicant.getPrimaryAddress().getPostCode());
         }
 
