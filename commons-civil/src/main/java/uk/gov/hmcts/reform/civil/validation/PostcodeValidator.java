@@ -40,7 +40,7 @@ public class PostcodeValidator {
     }
 
     /**
-     * validates that postcode belongs to UK
+     * validates that postcode belongs to UK.
      *
      * @param postcode postcode, may be null or empty
      * @return error message if the postcode is null, empty or not in UK

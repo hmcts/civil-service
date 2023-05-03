@@ -43,7 +43,7 @@ public class PostcodeLookupService {
     }
 
     /**
-     * Valdiates that postcode belongs to UK
+     * Validates that postcode belongs to UK.
      *
      * @param postcode the postcode, not null
      * @return true if the country of the postcode is england, wales, scotland or north ireland
