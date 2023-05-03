@@ -13,9 +13,8 @@ public class ProposePaymentPlanConfHeader implements RespondToResponseConfirmati
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isRejectDefendantPaymentPlanYes()
-            || caseData.hasClaimantAgreedToFreeMediation()
-            || caseData.isClaimantNotSettlePartAdmitClaim()) {
+        if (caseData.isNotProposePaymentPlan()
+            || caseData.hasClaimantAgreedToFreeMediation()) {
             return Optional.empty();
         }
 

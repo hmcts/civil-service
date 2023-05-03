@@ -869,7 +869,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanYes() {
+    public boolean isNotProposePaymentPlan() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
@@ -877,11 +877,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
         return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
+            || isClaimantNotSettlePartAdmitClaim();
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanNo() {
+    public boolean isNotDefaultJudgement() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
@@ -889,7 +890,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
         return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
+            || isClaimantNotSettlePartAdmitClaim();
     }
 
     @JsonIgnore
@@ -1065,6 +1067,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isSmallClaim() {
         return SMALL_CLAIM.name().equals(getResponseClaimTrack());
+    }
+
+    @JsonIgnore
+    public boolean isRejectWithNoMediation() {
+        return isClaimantNotSettlePartAdmitClaim()
+            && ((hasClaimantNotAgreedToFreeMediation()
+            || hasDefendantNotAgreedToFreeMediation())
+            || isFastTrackClaim());
     }
 
 }

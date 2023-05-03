@@ -13,10 +13,7 @@ public class RejectWithoutMediationConfHeader implements RespondToResponseConfir
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (!(caseData.isClaimantNotSettlePartAdmitClaim()
-            && ((caseData.hasClaimantNotAgreedToFreeMediation()
-            || caseData.hasDefendantNotAgreedToFreeMediation())
-            || caseData.isFastTrackClaim()))) {
+        if (!caseData.isRejectWithNoMediation()) {
             return Optional.empty();
         }
 

@@ -336,4 +336,28 @@ public class CaseDataTest {
         //Then
         Assertions.assertFalse(caseData.isSmallClaim());
     }
+
+    @Test
+    void isRejectWithMediation_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        Assertions.assertFalse(caseData.isRejectWithNoMediation());
+    }
+
+    @Test
+    void isRejectWithMediation_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        Assertions.assertTrue(caseData.isRejectWithNoMediation());
+    }
 }

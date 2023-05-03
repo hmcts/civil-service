@@ -13,9 +13,8 @@ public class JudgmentSubmittedConfText implements RespondToResponseConfirmationT
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isRejectDefendantPaymentPlanNo()
+        if (caseData.isNotDefaultJudgement()
             || caseData.hasClaimantAgreedToFreeMediation()
-            || caseData.isClaimantNotSettlePartAdmitClaim()
         ) {
             return Optional.empty();
         }
