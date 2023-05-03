@@ -92,7 +92,7 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.3'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
@@ -319,7 +319,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java, **/EventHistoryMapper*.java, **/*Spec*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -348,10 +348,9 @@ def versions = [
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.2.0',
-  springfoxSwagger   : '2.9.2',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.7.5'
+  springSecurity     : '5.8.3'
 ]
 
 ext.libraries = [
@@ -387,8 +386,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-  implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.37.1'
