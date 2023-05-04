@@ -39,6 +39,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
@@ -86,19 +90,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
-import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -140,7 +140,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -695,43 +694,44 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
-    /*
-    * Create duplicate in casefile view as document in present in civil -> Application
-    * and GA -> generalAppEvidenceDocument
-    *
-    *
-    * we can't change the permission for generalAppEvidenceDocument in GeneralApplication.java
-    * as it should be available to solictor role to initiate GA
-    *
-    * */
     @Builder.Default
     private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
 
-    private final List<Element<Document>> gaEvidenceDocCaseFileStaff;
-    private final List<Element<Document>> gaEvidenceDocCaseFileClaimant;
-    private final List<Element<Document>> gaEvidenceDocCaseFileRespSol;
-    private final List<Element<Document>> gaEvidenceDocCaseFileRespSolTwo;
+    private final List<Element<Document>> gaEvidenceDocStaff;
+    private final List<Element<Document>> gaEvidenceDocClaimant;
+    private final List<Element<Document>> gaEvidenceDocRespondentSol;
+    private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> hearingOrderDocument = new ArrayList<>();
+
+    private final List<Element<CaseDocument>> hearingOrderStaff;
+    private final List<Element<CaseDocument>> hearingOrderClaimant;
+    private final List<Element<CaseDocument>> hearingOrderRespondentSol;
+    private final List<Element<CaseDocument>> hearingOrderRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> requestForInformationDocument = new ArrayList<>();
+
+    private final List<Element<CaseDocument>> requestForInfoDocStaff;
+    private final List<Element<CaseDocument>> requestForInfoDocClaimant;
+    private final List<Element<CaseDocument>> requestForInfoDocRespondentSol;
+    private final List<Element<CaseDocument>> requestForInfoDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> writtenRepSequentialDocument = new ArrayList<>();
+
+    private final List<Element<CaseDocument>> writtenRepSeqDocStaff;
+    private final List<Element<CaseDocument>> writtenRepSeqDocClaimant;
+    private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSol;
+    private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> writtenRepConcurrentDocument = new ArrayList<>();
+
+    private final List<Element<CaseDocument>> writtenRepConDocStaff;
+    private final List<Element<CaseDocument>> writtenRepConDocClaimant;
+    private final List<Element<CaseDocument>> writtenRepConDocRespondentSol;
+    private final List<Element<CaseDocument>> writtenRepConDocRespondentSolTwo;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
-
-    private final List<Element<Document>> gaAddlnInfoList;
-    private final List<Element<Document>> gaAddlnInfoListStaff;
-    private final List<Element<Document>> gaAddlnInfoListClaimant;
-    private final List<Element<Document>> gaAddlnInfoListRespondentSol;
-    private final List<Element<Document>> gaAddlnInfoListRespondentSolTwo;
-
-    private final List<Element<Document>> gaWrittenRepDocList;
-    private final List<Element<Document>> gaWrittenRepDocListStaff;
-    private final List<Element<Document>> gaWrittenRepDocListClaimant;
-    private final List<Element<Document>> gaWrittenRepDocListRespondentSol;
-    private final List<Element<Document>> gaWrittenRepDocListRespondentSolTwo;
-
-    private final List<Element<Document>> gaDirectionDocList;
-    private final List<Element<Document>> gaDirectionDocListStaff;
-    private final List<Element<Document>> gaDirectionDocListClaimant;
-    private final List<Element<Document>> gaDirectionDocListRespondentSol;
-    private final List<Element<Document>> gaDirectionDocListRespondentSolTwo;
 
     //case progression
     private final List<Element<DocumentWithName>> documentOnly;

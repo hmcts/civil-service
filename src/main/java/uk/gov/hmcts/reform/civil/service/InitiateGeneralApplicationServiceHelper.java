@@ -191,24 +191,24 @@ public class InitiateGeneralApplicationServiceHelper {
 
         if (caseData.getGeneralAppEvidenceDocument() != null) {
 
-            List<Element<Document>> staffDocument = ofNullable(caseData.getGaEvidenceDocCaseFileStaff())
+            List<Element<Document>> staffDocument = ofNullable(caseData.getGaEvidenceDocStaff())
                 .orElse(newArrayList());
             staffDocument.addAll(caseData.getGeneralAppEvidenceDocument());
-            dataBuilder.gaEvidenceDocCaseFileStaff(staffDocument);
+            dataBuilder.gaEvidenceDocStaff(staffDocument);
 
             if ((isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).equals(YES)) {
-                List<Element<Document>> claimantDocument = ofNullable(caseData.getGaEvidenceDocCaseFileClaimant())
+                List<Element<Document>> claimantDocument = ofNullable(caseData.getGaEvidenceDocClaimant())
                     .orElse(newArrayList());
                 claimantDocument.addAll(caseData.getGeneralAppEvidenceDocument());
-                dataBuilder.gaEvidenceDocCaseFileClaimant(claimantDocument);
+                dataBuilder.gaEvidenceDocClaimant(claimantDocument);
             }
 
             // TODO
-            List<Element<Document>> respOneDocument = ofNullable(caseData.getGaEvidenceDocCaseFileRespSol())
+            /*List<Element<Document>> respOneDocument = ofNullable(caseData.getGaEvidenceDocRespondentSol())
                 .orElse(newArrayList());
 
-            List<Element<Document>> respTwoDocument = ofNullable(caseData.getGaEvidenceDocCaseFileRespSolTwo())
-                .orElse(newArrayList());
+            List<Element<Document>> respTwoDocument = ofNullable(caseData.getGaEvidenceDocRespondentSol())
+                .orElse(newArrayList());*/
 
         }
 
