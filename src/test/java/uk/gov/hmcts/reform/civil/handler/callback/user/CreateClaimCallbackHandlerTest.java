@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -57,6 +58,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -604,6 +606,51 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
+    @Nested
+    class MidEventApplicant1CorrespondenceAddress {
+
+        private static final String PAGE_ID = "applicantLrCorrespondence";
+
+        @Test
+        void shouldReturnError_whenPostcodeNoUk() {
+            String postCode = "postCode";
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicantSolicitor1ServiceAddress(Address.builder()
+                                                       .postCode(postCode)
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            List<String> error = Collections.singletonList("ERROR");
+            when(postcodeValidator.validateUk(postCode)).thenReturn(error);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEqualTo(error);
+        }
+
+
+    }
+
+    @Nested
+    class MidEventDefendant {
+
+        private static final String PAGE_ID = "defendant";
+
+        @Test
+        void shouldReturnError_whenPostcodeNoUk() {
+            String postCode = "postCode";
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            List<String> error = Collections.singletonList("ERROR");
+            when(postcodeValidator.validate(caseData.getRespondent1().getPrimaryAddress().getPostCode()))
+                .thenReturn(error);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEqualTo(error);
         }
 
     }

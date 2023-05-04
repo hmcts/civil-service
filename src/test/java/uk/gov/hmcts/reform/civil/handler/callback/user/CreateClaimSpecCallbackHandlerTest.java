@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
@@ -64,6 +65,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -379,6 +381,27 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenPostCodeNoUk() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(PartyBuilder.builder().individual()
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID, CREATE_CLAIM_SPEC.name());
+
+            // When
+            List<String> postcodeError = Collections.singletonList("POSTCODE_ERROR");
+            when(postcodeValidator.validateUk(
+                caseData.getApplicant1().getPrimaryAddress().getPostCode()
+            )).thenReturn(postcodeError);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEqualTo(postcodeError);
         }
     }
 

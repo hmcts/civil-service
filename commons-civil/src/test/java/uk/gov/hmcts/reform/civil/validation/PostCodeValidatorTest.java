@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.validation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestExecutionListeners;
 import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 
 import java.util.List;
@@ -58,4 +60,29 @@ public class PostCodeValidatorTest {
         }
     }
 
+    @Nested
+    class ValidatePostCodeUk {
+
+        @Test
+        void returnError_whenEmptyInput() {
+            Assertions.assertFalse(postcodeValidator.validateUk("").isEmpty());
+            Assertions.assertFalse(postcodeValidator.validateUk(null).isEmpty());
+        }
+
+        @Test
+        void returnError_whenInputNoUk() {
+            String postcode = "postcode";
+            when(postcodeLookupService.validatePostCodeUk(postcode))
+                .thenReturn(false);
+            Assertions.assertFalse(postcodeValidator.validateUk(postcode).isEmpty());
+        }
+
+        @Test
+        void returnEmpty_whenInputUk() {
+            String postcode = "postcode";
+            when(postcodeLookupService.validatePostCodeUk(postcode))
+                .thenReturn(true);
+            Assertions.assertTrue(postcodeValidator.validateUk(postcode).isEmpty());
+        }
+    }
 }

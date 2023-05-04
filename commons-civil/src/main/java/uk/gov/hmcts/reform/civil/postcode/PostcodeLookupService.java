@@ -49,6 +49,9 @@ public class PostcodeLookupService {
      * @return true if the country of the postcode is england, wales, scotland or north ireland
      */
     public boolean validatePostCodeUk(String postcode) {
+        if (StringUtils.isBlank(postcode)) {
+            return false;
+        }
         if (postcodeNorthernIreland(postcode)) {
             return true;
         }
@@ -65,8 +68,7 @@ public class PostcodeLookupService {
     BT beginning until I have a better way
      */
     private boolean postcodeNorthernIreland(String postcode) {
-        return StringUtils.isNotBlank(postcode)
-            && postcode.toUpperCase().startsWith("BT")
+        return postcode.toUpperCase().startsWith("BT")
             && POSTCODE_FORMATS.stream().anyMatch(f -> f.matcher(postcode).matches());
     }
 
