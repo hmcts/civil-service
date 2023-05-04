@@ -223,7 +223,7 @@ task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
 }
 
 task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine '/usr/bin/yarn', '--mutex', 'network', '--immutable', '--silent', 'install'
+  commandLine '/usr/bin/yarn', 'network', '--immutable', '--silent', 'install'
 }
 
 task checkDependenciesIntegrity(type: Exec, description: 'Checks integrity of Yarn dependencies.') {
