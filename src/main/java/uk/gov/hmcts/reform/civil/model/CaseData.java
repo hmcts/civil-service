@@ -181,9 +181,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
 
     @Builder.Default
-    private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
-
-    @Builder.Default
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
@@ -698,8 +695,44 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
+    /*
+    * Create duplicate in casefile view as document in present in civil -> Application
+    * and GA -> generalAppEvidenceDocument
+    *
+    *
+    * we can't change the permission for generalAppEvidenceDocument in GeneralApplication.java
+    * as it should be available to solictor role to initiate GA
+    *
+    * */
+    @Builder.Default
+    private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
+
+    private final List<Element<Document>> gaEvidenceDocCaseFileStaff;
+    private final List<Element<Document>> gaEvidenceDocCaseFileClaimant;
+    private final List<Element<Document>> gaEvidenceDocCaseFileRespSol;
+    private final List<Element<Document>> gaEvidenceDocCaseFileRespSolTwo;
+
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
+
+    private final List<Element<Document>> gaAddlnInfoList;
+    private final List<Element<Document>> gaAddlnInfoListStaff;
+    private final List<Element<Document>> gaAddlnInfoListClaimant;
+    private final List<Element<Document>> gaAddlnInfoListRespondentSol;
+    private final List<Element<Document>> gaAddlnInfoListRespondentSolTwo;
+
+    private final List<Element<Document>> gaWrittenRepDocList;
+    private final List<Element<Document>> gaWrittenRepDocListStaff;
+    private final List<Element<Document>> gaWrittenRepDocListClaimant;
+    private final List<Element<Document>> gaWrittenRepDocListRespondentSol;
+    private final List<Element<Document>> gaWrittenRepDocListRespondentSolTwo;
+
+    private final List<Element<Document>> gaDirectionDocList;
+    private final List<Element<Document>> gaDirectionDocListStaff;
+    private final List<Element<Document>> gaDirectionDocListClaimant;
+    private final List<Element<Document>> gaDirectionDocListRespondentSol;
+    private final List<Element<Document>> gaDirectionDocListRespondentSolTwo;
+
     //case progression
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;

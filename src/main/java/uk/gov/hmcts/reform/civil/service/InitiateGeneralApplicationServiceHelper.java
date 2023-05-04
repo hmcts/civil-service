@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Optional.ofNullable;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
@@ -29,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAccessDataStoreApi caseAccessDataStoreApi;
@@ -44,7 +48,8 @@ public class InitiateGeneralApplicationServiceHelper {
             .equals(organisationIdentifier);
     }
 
-    public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
+    public GeneralApplication setRespondentDetailsIfPresent(CaseData.CaseDataBuilder dataBuilder,
+                                                            GeneralApplication generalApplication,
                                                             CaseData caseData, UserDetails userDetails) {
         if (caseData.getApplicant1OrganisationPolicy() == null
                 || caseData.getRespondent1OrganisationPolicy() == null
@@ -179,10 +184,35 @@ public class InitiateGeneralApplicationServiceHelper {
             gaApplicantDisplayName = applicantPartyName + " - Defendant";
         }
         applicationBuilder.gaApplicantDisplayName(gaApplicantDisplayName);
-        return applicationBuilder
+        applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
+
+        if (caseData.getGeneralAppEvidenceDocument() != null) {
+
+            List<Element<Document>> staffDocument = ofNullable(caseData.getGaEvidenceDocCaseFileStaff())
+                .orElse(newArrayList());
+            staffDocument.addAll(caseData.getGeneralAppEvidenceDocument());
+            dataBuilder.gaEvidenceDocCaseFileStaff(staffDocument);
+
+            if ((isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).equals(YES)) {
+                List<Element<Document>> claimantDocument = ofNullable(caseData.getGaEvidenceDocCaseFileClaimant())
+                    .orElse(newArrayList());
+                claimantDocument.addAll(caseData.getGeneralAppEvidenceDocument());
+                dataBuilder.gaEvidenceDocCaseFileClaimant(claimantDocument);
+            }
+
+            // TODO
+            List<Element<Document>> respOneDocument = ofNullable(caseData.getGaEvidenceDocCaseFileRespSol())
+                .orElse(newArrayList());
+
+            List<Element<Document>> respTwoDocument = ofNullable(caseData.getGaEvidenceDocCaseFileRespSolTwo())
+                .orElse(newArrayList());
+
+        }
+
+        return applicationBuilder.build();
     }
 
     public String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
