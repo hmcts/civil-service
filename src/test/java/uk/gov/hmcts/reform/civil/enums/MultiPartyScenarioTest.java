@@ -188,7 +188,6 @@ class MultiPartyScenarioTest {
         assertTrue(isOneVOneNoLegalRep(caseData));
     }
 
-
     private static CaseData get1V1CaseDataWithNoLR() {
         CaseData caseData = CaseData.builder()
             .respondent1(PartyBuilder.builder().build())
