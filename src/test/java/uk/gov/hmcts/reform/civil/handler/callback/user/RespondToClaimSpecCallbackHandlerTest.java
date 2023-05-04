@@ -95,6 +95,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -102,6 +104,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -1530,6 +1533,121 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("list_items").asList()
                 .extracting("label")
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
+        }
+    }
+
+    @Nested
+    class MidEventCorrespondenceAddressCallback {
+
+        private static final String PAGE_ID = "specCorrespondenceAddress";
+
+        @Test
+        void when1v2ss_thenCheckRespondent1and2() {
+            // Given
+            String postCode1 = "postCode1";
+            String postCode2 = "postCode2";
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder()
+                .specAoSApplicantCorrespondenceAddressdetails(
+                    Address.builder()
+                        .postCode(postCode1)
+                        .build()
+                )
+                .specAoSRespondent2HomeAddressDetails(
+                    Address.builder()
+                        .postCode(postCode2)
+                        .build()
+                )
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            verify(postcodeValidator).validate(postCode1);
+            verify(postcodeValidator).validate(postCode2);
+        }
+
+        @Test
+        void when1v2dsLR1_thenCheckRespondent1() {
+            // Given
+            String postCode1 = "postCode1";
+            String postCode2 = "postCode2";
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(NO)
+                .build().toBuilder()
+                .ccdCaseReference(5L)
+                .specAoSApplicantCorrespondenceAddressdetails(
+                    Address.builder()
+                        .postCode(postCode1)
+                        .build()
+                )
+                .specAoSRespondent2HomeAddressDetails(
+                    Address.builder()
+                        .postCode(postCode2)
+                        .build()
+                )
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            UserInfo userInfo = UserInfo.builder().uid("uid").build();
+            Mockito.when(userService.getUserInfo(anyString()))
+                .thenReturn(userInfo);
+            Mockito.when(coreCaseUserService.getUserCaseRoles(
+                anyString(), eq(userInfo.getUid())
+            )).thenReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            verify(postcodeValidator).validate(postCode1);
+            verifyNoMoreInteractions(postcodeValidator);
+        }
+
+        @Test
+        void when1v2dsLR2_thenCheckRespondent2() {
+            // Given
+            String postCode1 = "postCode1";
+            String postCode2 = "postCode2";
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(NO)
+                .build().toBuilder()
+                .ccdCaseReference(5L)
+                .specAoSApplicantCorrespondenceAddressdetails(
+                    Address.builder()
+                        .postCode(postCode1)
+                        .build()
+                )
+                .specAoSRespondent2HomeAddressDetails(
+                    Address.builder()
+                        .postCode(postCode2)
+                        .build()
+                )
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            UserInfo userInfo = UserInfo.builder().uid("uid").build();
+            Mockito.when(userService.getUserInfo(anyString()))
+                .thenReturn(userInfo);
+            Mockito.when(coreCaseUserService.getUserCaseRoles(
+                anyString(), eq(userInfo.getUid())
+            )).thenReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            verify(postcodeValidator).validate(postCode2);
+            verifyNoMoreInteractions(postcodeValidator);
         }
     }
 }
