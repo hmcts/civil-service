@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -34,16 +33,18 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -53,7 +54,6 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -630,8 +630,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEqualTo(error);
         }
-
-
     }
 
     @Nested
@@ -641,7 +639,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenPostcodeNoUk() {
-            String postCode = "postCode";
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -744,7 +741,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).containsExactly(
                 "The legal representative details for the claimant and defendant are the same.  "
-                     + "Please amend accordingly.");
+                    + "Please amend accordingly.");
         }
 
         @Test
@@ -859,7 +856,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).containsExactly(
                 "The legal representative details for the claimant and defendant are the same.  "
-                     + "Please amend accordingly.");
+                    + "Please amend accordingly.");
         }
 
         @Test
@@ -882,7 +879,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).containsExactly(
                 "The legal representative details for the claimant and defendant are the same.  "
-                     + "Please amend accordingly.");
+                    + "Please amend accordingly.");
         }
 
         @Test
@@ -937,7 +934,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().build();
 
             Organisation organisation = Organisation.builder()
-                                                    .organisationIdentifier("1")
+                .organisationIdentifier("1")
                 .companyNumber("1")
                 .name("Organisation1")
                 .build();
@@ -1603,8 +1600,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
-                .containsEntry("unassignedCaseListDisplayOrganisationReferences",
-                               "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");
+                .containsEntry(
+                    "unassignedCaseListDisplayOrganisationReferences",
+                    "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2"
+                );
             assertThat(response.getData())
                 .containsEntry("caseListDisplayDefendantSolicitorReferences", "6789, 01234");
         }
@@ -1737,7 +1736,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                        LIP_CONFIRMATION_BODY_COS,
+                    LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -1846,7 +1845,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                        LIP_CONFIRMATION_BODY_COS,
+                    LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -1900,10 +1899,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
-                                                   REFERENCE_NUMBER))
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
                         .confirmationBody(format(
-                                LIP_CONFIRMATION_BODY_COS,
+                            LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
@@ -1950,7 +1951,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                        LIP_CONFIRMATION_BODY_COS,
+                    LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -2004,10 +2005,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
-                                                   REFERENCE_NUMBER))
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
                         .confirmationBody(format(
-                                LIP_CONFIRMATION_BODY_COS,
+                            LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
