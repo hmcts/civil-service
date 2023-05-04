@@ -15,5 +15,6 @@ public enum CaseState {
     DECISION_OUTCOME,
     IN_MEDIATION,
     All_FINAL_ORDERS_ISSUED
+    CASE_SETTLED
 }
 
