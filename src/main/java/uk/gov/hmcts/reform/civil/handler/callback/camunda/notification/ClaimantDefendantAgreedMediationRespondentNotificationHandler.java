@@ -29,9 +29,10 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_RESPONDENT_MEDIATION_AGREEMENT);
-    private static final String REFERENCE_TEMPLATE = "mediation-agreement-respondent-notification-%s-%s";
+    private static final String REFERENCE_TEMPLATE = "mediation-agreement-respondent-notification-%s";
     public static final String TASK_ID_LIP = "ClaimantDefendantAgreedMediationNotifyRespondent";
     private final OrganisationService organisationService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -69,7 +70,7 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
-        }else{
+        } else {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
@@ -81,7 +82,7 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
     private String addEmail(CaseData caseData) {
         if (isRespondentNotRepresented(caseData)) {
             return caseData.getRespondent1().getPartyEmail();
-        }else{
+        } else {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
     }
@@ -89,7 +90,7 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
     private String addTemplate(CaseData caseData) {
         if (isRespondentNotRepresented(caseData)) {
             return notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate();
-        }else{
+        } else {
             return notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate();
         }
     }

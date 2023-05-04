@@ -29,7 +29,7 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_AGREEMENT);
     private static final String REFERENCE_TEMPLATE = "mediation-agreement-applicant-notification-%s";
-    public static final String TASK_ID_LIP = "ClaimantDefendantAgreedMediationNotifyApplicant";
+    public static final String TASK_ID = "ClaimantDefendantAgreedMediationNotifyApplicant";
     private final OrganisationService organisationService;
 
     @Override
@@ -41,14 +41,14 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID_LIP;
+        return TASK_ID;
     }
 
     private CallbackResponse notifyApplicantLR(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
             addEmail(caseData),
-            addTemplate(caseData),
+            notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -72,10 +72,6 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
 
     private String addEmail(CaseData caseData) {
         return caseData.getApplicantSolicitor1UserDetails().getEmail();
-    }
-
-    private String addTemplate(CaseData caseData) {
-        return notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate();
     }
 
     private String getApplicantLegalOrganizationName(CaseData caseData) {
