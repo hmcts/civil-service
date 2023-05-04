@@ -43,7 +43,9 @@ public class HearingsPartyMapperTest {
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String RESPONDENT_TWO_ORG_ID = "QWERTY R2";
 
+    private static final String APPLICANT_PARTY_ID = "app1-party-id";
     private static final String APPLICANT_COMPANY_NAME = "Applicant Company";
+    private static final String RESPONDENT_ONE_PARTY_ID = "res1-party-id";
     private static final String RESPONDENT_ONE_ORG_NAME = "Respondent 1 Organisation";
 
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
@@ -127,16 +129,19 @@ public class HearingsPartyMapperTest {
             .build()
             .toBuilder()
             .applicant1(Party.builder()
+                            .partyID(APPLICANT_PARTY_ID)
                             .companyName(APPLICANT_COMPANY_NAME)
                             .type(COMPANY)
                             .build())
             .respondent1(Party.builder()
+                             .partyID(RESPONDENT_ONE_PARTY_ID)
                              .organisationName(RESPONDENT_ONE_ORG_NAME)
                              .type(ORGANISATION)
                              .build())
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedOrganisationPartyObject(
+            APPLICANT_PARTY_ID,
             APPLICANT_COMPANY_NAME,
             CLAIMANT_ROLE,
             null
@@ -149,6 +154,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedOrganisationPartyObject(
+            RESPONDENT_ONE_PARTY_ID,
             RESPONDENT_ONE_ORG_NAME,
             DEFENDANT_ROLE,
             null
@@ -767,9 +773,10 @@ public class HearingsPartyMapperTest {
             .build();
     }
 
-    private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
-                                                                 String partyRole,
-                                                                 String cftOrganisationID) {
+    private PartyDetailsModel buildExpectedOrganisationPartyObject(String partyId,
+                                                                   String name,
+                                                                   String partyRole,
+                                                                   String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
             .organisationType(null)
@@ -777,7 +784,7 @@ public class HearingsPartyMapperTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(partyId)
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)
@@ -787,5 +794,11 @@ public class HearingsPartyMapperTest {
             .unavailabilityRange(null)
             .hearingSubChannel(null)
             .build();
+    }
+
+    private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
+                                                                   String partyRole,
+                                                                   String cftOrganisationID) {
+        return buildExpectedOrganisationPartyObject(null, name, partyRole, cftOrganisationID);
     }
 }

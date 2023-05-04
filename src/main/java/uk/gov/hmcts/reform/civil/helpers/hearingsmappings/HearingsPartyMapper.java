@@ -211,7 +211,7 @@ public class HearingsPartyMapper {
                 party.getFlags()
             );
         } else {
-            return buildOrganisationPartyObject(party.getPartyName(), partyRole, null);
+            return buildOrganisationPartyObject(party.getPartyID(), party.getPartyName(), partyRole, null);
         }
     }
 
@@ -254,7 +254,7 @@ public class HearingsPartyMapper {
         String orgName = organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
             .orElse("");
-        return buildOrganisationPartyObject(orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID);
+        return buildOrganisationPartyObject(null, orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID);
     }
 
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
@@ -292,7 +292,7 @@ public class HearingsPartyMapper {
             .build();
     }
 
-    public static PartyDetailsModel buildOrganisationPartyObject(String name,
+    public static PartyDetailsModel buildOrganisationPartyObject(String partyId, String name,
                                                                  String partyRole,
                                                                  String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
@@ -302,7 +302,7 @@ public class HearingsPartyMapper {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("") //todo civ-7690
+            .partyID(partyId)
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)

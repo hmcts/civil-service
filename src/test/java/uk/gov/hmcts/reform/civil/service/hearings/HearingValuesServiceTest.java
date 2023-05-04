@@ -294,7 +294,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(null)
             .partyType(ORG)
             .partyName(name)
             .partyRole("LGRP")
