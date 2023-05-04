@@ -54,4 +54,9 @@ public enum MultiPartyScenario {
     public static boolean isOneVTwoTwoLegalRep(CaseData caseData) {
         return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
+
+    public static boolean isOneVOneNoLegalRep(CaseData caseData) {
+        return ONE_V_ONE.equals(getMultiPartyScenario(caseData))
+            && YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
+    }
 }
