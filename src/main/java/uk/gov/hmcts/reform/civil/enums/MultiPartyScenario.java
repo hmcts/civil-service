@@ -18,11 +18,7 @@ public enum MultiPartyScenario {
     /**
      * one claimant vs two defendants with one LR for each defendant.
      */
-    ONE_V_TWO_TWO_LEGAL_REP,
-    /**
-     * one claimant vs one defendant with no LR for defendant.
-     */
-    ONE_V_ONE_NO_LEGAL_REP;
+    ONE_V_TWO_TWO_LEGAL_REP;
 
     public static MultiPartyScenario getMultiPartyScenario(CaseData caseData) {
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
@@ -36,9 +32,6 @@ public enum MultiPartyScenario {
                 : ONE_V_TWO_ONE_LEGAL_REP;
         }
 
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
-            return ONE_V_ONE_NO_LEGAL_REP;
-        }
         return ONE_V_ONE;
     }
 
@@ -60,9 +53,5 @@ public enum MultiPartyScenario {
 
     public static boolean isOneVTwoTwoLegalRep(CaseData caseData) {
         return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
-    }
-
-    public static boolean isOneVOneNoLegalRep(CaseData caseData) {
-        return ONE_V_ONE_NO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 }
