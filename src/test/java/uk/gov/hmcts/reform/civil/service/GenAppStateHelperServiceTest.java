@@ -403,7 +403,7 @@ class GenAppStateHelperServiceTest {
 
             Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
                                                          .region("2")
-                                                         .baseLocation("00000")
+                                                         .baseLocation("00000").siteName("locationOfRegion2")
                                                          .build(), false);
             CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData);
 

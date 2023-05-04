@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,7 @@ import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 
 import java.math.BigDecimal;
 
-@Api
+@Tag(name = "Fees Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -35,39 +33,30 @@ public class FeesController {
     private final FeesService feesService;
 
     @GetMapping("/ranges")
-    @ApiOperation("Gets a group of claim amount ranges and associated fees for those ranges")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header") })
+    @Operation(summary = "Gets a group of claim amount ranges and associated fees for those ranges")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee2Dto[]> getFeeRanges() {
         Fee2Dto[] feeRanges = feesService.getFeeRange();
         return new ResponseEntity<>(feeRanges, HttpStatus.OK);
     }
 
     @GetMapping("/claim/{claimAmount}")
-    @ApiOperation("Gets the claim fee associated with an amount")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header") })
+    @Operation(summary = "Gets the claim fee associated with an amount")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee> getClaimFee(@PathVariable("claimAmount") BigDecimal claimAmount) {
         Fee fee = feesService.getFeeDataByTotalClaimAmount(claimAmount);
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 
     @GetMapping("/hearing/{claimAmount}")
-    @ApiOperation("Gets the hearing fee associated with an amount")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header") })
+    @Operation(summary = "Gets the hearing fee associated with an amount")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee> getHearingFee(@PathVariable("claimAmount") BigDecimal claimAmount) {
         Fee fee = feesService.getHearingFeeDataByTotalClaimAmount(claimAmount);
         return new ResponseEntity<>(fee, HttpStatus.OK);

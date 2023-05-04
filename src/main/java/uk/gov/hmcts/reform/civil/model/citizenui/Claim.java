@@ -51,4 +51,7 @@ public interface Claim {
     boolean hasDefendantStatedTheyPaid();
 
     boolean defendantRespondedWithPartAdmit();
+
+    boolean isHearingFormGenerated();
+
 }
