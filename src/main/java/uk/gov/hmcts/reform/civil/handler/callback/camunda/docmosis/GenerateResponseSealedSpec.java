@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -26,9 +27,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpecCallbackHandler.defendantFlagSpec;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService toggleService;
+    private final AssignCategoryId assignCategoryId;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -66,6 +70,11 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
+        if (nonNull(defendantFlagSpec) && defendantFlagSpec.equals("userRespondent2")) {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
+        }
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);

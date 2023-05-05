@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
@@ -46,7 +49,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SpringBootTest(classes = {
     GenerateDirectionsQuestionnaireCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -71,6 +75,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -228,6 +235,11 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolRespondent1Spec() {
         for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
                                                                   RespondentResponseTypeSpec.PART_ADMISSION)) {
+
+            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class),
+                                                                                        anyString(), anyString()
+            )).thenReturn(Optional.of(DOCUMENT));
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .setClaimTypeToSpecClaim()
@@ -237,13 +249,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                 .systemGeneratedCaseDocuments(new ArrayList<>())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "ONE"
-            )).thenReturn(Optional.of(generatedDocument));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -283,6 +288,10 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolBothRespondents() {
+        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class),
+                                                                      anyString(), anyString()
+        )).thenReturn(Optional.of(DOCUMENT));
+
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent2(mock(Party.class))
@@ -295,24 +304,199 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        CaseDocument generatedDocument1 = mock(CaseDocument.class);
-        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-            caseData,
-            params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-            "ONE"
-        )).thenReturn(Optional.of(generatedDocument1));
-
-        CaseDocument generatedDocument2 = mock(CaseDocument.class);
-        when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-            caseData,
-            params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-            "TWO"
-        )).thenReturn(Optional.of(generatedDocument2));
-
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(2);
     }
+
+    @Test
+    void shouldAssignDefendantCategoryId_whenInvokedUnspecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseDocument defendantDocument = CaseDocument.builder()
+            .createdBy("John")
+            .documentName("defendant")
+            .documentSize(0L)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(defendantDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(defendantDocument))
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant1DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        RespondToClaimCallbackHandler.defendantFlag = "test";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "directionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignDefendantCategoryId_when1v1or1v2SameSolicitorUnspecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseDocument defendantDocument = CaseDocument.builder()
+            .createdBy("John")
+            .documentName("defendant")
+            .documentSize(0L)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+        RespondToClaimCallbackHandler.defendantFlag = null;
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(defendantDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant1DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignDefendantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        RespondToClaimCallbackHandler.defendantFlag = "userRespondent2";
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant2DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignClaimantCategoryId_whenFlagNotUserRespondent2Unspecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        RespondToClaimCallbackHandler.defendantFlag = null;
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "directionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignClaimantCategoryId_whenInvokedAndClaimantSpecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .caseAccessCategory(SPEC_CLAIM)
+            .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "directionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignDefendantCategoryId_whenInvokedSpecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseDocument defendantDocument = CaseDocument.builder()
+            .createdBy("John")
+            .documentName("defendant")
+            .documentSize(0L)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(defendantDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(defendantDocument))
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant1DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
+    void shouldAssignDefendantCategoryId_1v2SameSolicitorNotSameResponseSpecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent2(mock(Party.class))
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondentResponseIsSame(YesOrNo.NO)
+            .build();
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "defendant1DefenseDirectionsQuestionnaire");
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).containsOnly(GENERATE_DIRECTIONS_QUESTIONNAIRE);
+    }
+
 }
+

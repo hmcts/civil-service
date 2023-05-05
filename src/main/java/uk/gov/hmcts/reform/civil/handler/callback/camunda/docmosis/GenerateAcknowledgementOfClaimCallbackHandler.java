@@ -13,13 +13,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.aos.AcknowledgementOfClaimGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.AcknowledgeClaimCallbackHandler.defendantFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -32,6 +35,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
 
     private final AcknowledgementOfClaimGenerator acknowledgementOfClaimGenerator;
     private final ObjectMapper objectMapper;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -60,6 +64,11 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+
+        assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
+        if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+            assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

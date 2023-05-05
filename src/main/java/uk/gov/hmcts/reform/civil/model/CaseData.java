@@ -817,6 +817,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
+    private final String respondent1DocumentURL;
+    private final String respondent2DocumentURL;
+
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
     private final String freeFormRecitalTextArea;
