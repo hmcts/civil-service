@@ -178,18 +178,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
-            && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
-            return YES;
-        }
-        return NO;
-    }
-
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {

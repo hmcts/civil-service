@@ -1037,4 +1037,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || isSettlementDeclinedByClaimant()
             || isClaimantRejectsClaimAmount();
     }
+
+    @JsonIgnore
+    public YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse() {
+        if (NO.equals(getApplicant1AcceptAdmitAmountPaidSpec())
+            || NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec())
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && !(NO.equals(getApplicant1ProceedWithClaim()))
+            && !(NO.equals(getApplicant1ProceedWithClaimSpec2v1())))) {
+            return YES;
+        }
+        return NO;
+    }
 }
