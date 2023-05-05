@@ -46,7 +46,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLIC
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID_SPEC;
 
 @SpringBootTest(classes = {
     AssignCaseToUserHandler.class,
@@ -311,7 +310,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnSpecCamundaTask_whenSpecEvent() {
         assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
                                                                  .request(CallbackRequest.builder().eventId(
-            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID_SPEC);
+            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
     }
 
     @ParameterizedTest
