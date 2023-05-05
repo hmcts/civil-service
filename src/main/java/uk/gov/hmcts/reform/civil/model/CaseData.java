@@ -989,13 +989,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRespondent1Represented() {
+    public boolean isDefendant1Represented() {
         return YES.equals(getRespondent1Represented());
     }
 
     @JsonIgnore
     public boolean isLrVLipOneVOne() {
-        return !isRespondent1Represented()
+        return !isDefendant1Represented()
             && isOneVOne(this);
     }
 
