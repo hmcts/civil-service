@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOneNoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOneNoLegalRepSpec;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isTwoVOne;
@@ -171,13 +171,13 @@ class MultiPartyScenarioTest {
     @Test
     void shouldReturnFalseWhenNotOneVOneNoLegalRep() {
         CaseData caseData = get1V2CaseData();
-        assertFalse(isOneVOneNoLegalRep(caseData));
+        assertFalse(isOneVOneNoLegalRepSpec(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenOneVOneNoLegalRep() {
         CaseData caseData = get1V1NoLegalRepCaseData();
-        assertTrue(isOneVOneNoLegalRep(caseData));
+        assertTrue(isOneVOneNoLegalRepSpec(caseData));
     }
 
     private static CaseData get1V1NoLegalRepCaseData() {

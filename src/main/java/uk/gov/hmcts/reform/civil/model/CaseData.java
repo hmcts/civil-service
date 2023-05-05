@@ -990,12 +990,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
-        return YesOrNo.NO.equals(getSpecRespondent1Represented())
-            && multiPartyScenario.equals(ONE_V_ONE);
-    }
-
-    @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
         return nonNull(getRespondent1ResponseDate())
             && getRespondent1ResponseDate()
