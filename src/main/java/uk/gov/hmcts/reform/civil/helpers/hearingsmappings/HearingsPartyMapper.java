@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -265,7 +266,7 @@ public class HearingsPartyMapper {
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .vulnerabilityDetails(null)
+            .vulnerabilityDetails(getVulnerabilityDetails(flagDetails))
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
@@ -293,7 +294,7 @@ public class HearingsPartyMapper {
                                                                  String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(null)
+            .organisationType(String.valueOf(ORG))
             .cftOrganisationID(cftOrganisationID)
             .build();
 

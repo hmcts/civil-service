@@ -24,6 +24,18 @@ public class CaseFlagsToHearingValueMapper {
         ).stream().count() > 0;
     }
 
+    public static List<String> getVulnerabilityDetails(List<FlagDetail> flagDetails) {
+        return filter(
+            flagDetails,
+            CaseFlagPredicates.isActive(),
+            CaseFlagPredicates.isHearingRelevant(),
+            CaseFlagPredicates.hasVulnerableFlag()
+        ).stream().map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s;" : "%s;",
+                                           flagDetail.getName(),
+                                           flagDetail.getFlagComment()))
+            .collect(Collectors.toList());
+    }
+
     public static boolean getAdditionalSecurity(List<FlagDetail> flagDetails) {
         return filter(
             flagDetails,
