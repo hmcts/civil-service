@@ -59,16 +59,11 @@ public class UploadTranslatedDocumentHandler extends CallbackHandler {
 
     private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        TranslatedDocument translatedDocument = Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getTranslatedDocument)
-            .orElse(null);
-        if (translatedDocument != null) {
-            return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                translatedDocument.getFile(),
-                translatedDocument.getCorrespondingDocumentType(),
-                callbackParams
-            );
-        }
-        return caseData.getSystemGeneratedCaseDocuments();
+        Optional<TranslatedDocument> translatedDocument = caseData.getTranslatedDocument();
+        return translatedDocument.map(document -> systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            document.getFile(),
+            document.getCorrespondingDocumentType(),
+            callbackParams
+        )).orElse(caseData.getSystemGeneratedCaseDocuments());
     }
 }
