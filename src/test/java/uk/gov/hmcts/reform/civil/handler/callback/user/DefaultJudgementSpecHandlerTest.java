@@ -46,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_HEADER;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_LIP_CASE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -951,6 +953,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                           .confirmationHeader(
                                                                               "# Default Judgment Granted ")
                                                                           .confirmationBody(String.format(body))
+                                                                          .build());
+        }
+
+        @Test
+        void shouldReturnJudgementRequestedResponse_whenLrVLip(){
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1(PartyBuilder.builder().build())
+                .respondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(caseData.isLRvLipOneVOne()).isTrue();
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(
+                                                                              JUDGMENT_REQUESTED_HEADER)
+                                                                          .confirmationBody(String.format(JUDGMENT_REQUESTED_LIP_CASE))
                                                                           .build());
         }
 
