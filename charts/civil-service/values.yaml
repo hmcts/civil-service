@@ -59,6 +59,10 @@ java:
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     RD_COMMONDATA_API_URL: http://rd-commondata-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-civil-subscription-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
     SOME_ENV_VARIABLE: true
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
@@ -88,4 +92,6 @@ java:
         - robotics-notification-recipient-spec
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
+        - name: hmc-servicebus-shared-access-key-tf
+            alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
 

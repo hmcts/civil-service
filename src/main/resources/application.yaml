@@ -291,6 +291,19 @@ exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
   respondent-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Defendant/
 
+azure:
+  service-bus:
+    amqp-connection-string-template : ${AMQP_CONNECTION_STRING:amqps://%1s?amqp.idleTimeout=%2d}
+    connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
+    hmc-to-hearings-api:
+      namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:}
+      topicName: ${HMC_HEARINGS_TOPIC_NAME:}
+      subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
+      receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
+      idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+      username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
+      password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+
 ---
 
 spring:

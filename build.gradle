@@ -381,6 +381,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
 
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
@@ -455,6 +456,8 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
+
+  implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
