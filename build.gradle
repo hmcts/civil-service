@@ -92,7 +92,7 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.3'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
@@ -222,71 +222,65 @@ task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task installDependencies(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine '/usr/bin/yarn', '--mutex', 'network', '--immutable', '--silent', 'install'
-}
-
-task checkDependenciesIntegrity(type: Exec, description: 'Checks integrity of Yarn dependencies.') {
-  commandLine '/usr/bin/yarn', '--mutex', 'network', '--immutable', '--silent', 'check', '--integrity'
-}
-
-
 task awaitApplicationReadiness(type: Exec, description: 'Awaits until application is ready.') {
   commandLine './bin/wait-for.sh'
   commandLine './bin/wait-for.sh', 'manage-case'
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:smoke'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
 }
 
 task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-spec'
 }
 
 task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-sdo'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-sdo'
 }
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-unspec'
 }
 
 task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-dj'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-dj'
 }
 
 task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-cos'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-cos'
 }
 
 task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'test:api-noc'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-noc'
 }
 
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:rpa'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:rpa'
 }
 
-task runNightlyMultipartyTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:nightly-multiparty'
+task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
+  onlyIf {
+    return System.env.NIGHTLY_RUN == 'true'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nightly-prod'
 }
 
 task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:AATFunctional'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:AATFunctional'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'test:crossbrowser'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:crossbrowser'
 }
 
 def inStrictOrder(Task... tasks) {
@@ -297,16 +291,16 @@ def inStrictOrder(Task... tasks) {
 }
 
 task smoke(description: 'Runs the smoke tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity, runSmokeTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, runSmokeTests))
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, installDependencies, checkDependenciesIntegrity,
-    runCosTests, runSpecApiTests, runApiTests, runNoCTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness,
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runCrossBrowserTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, runCrossBrowserTests))
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
@@ -316,7 +310,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/CivilDocumentStitchingService.java, **/CountriesAllowed.java, **/FeesService.java, **/UnavailableDateValidator.java, **/AcknowledgeOfServiceCallbackHandler.java, **/FlowPredicate.java, **/CreateClaimCallbackHandler.java, **/CaseProceedsInCasemanRespondentNotificationHandler.java, **/PostcodeValidator.java, **/BundleRequestExecutor.java, **/InformAgreedExtensionDateCallbackHandler.java, **/EventHistoryMapper*.java, **/*Spec*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -345,10 +339,9 @@ def versions = [
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.2.0',
-  springfoxSwagger   : '2.9.2',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.7.5'
+  springSecurity     : '5.8.3'
 ]
 
 ext.libraries = [
@@ -384,8 +377,7 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-  implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.37.1'

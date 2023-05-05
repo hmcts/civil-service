@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -104,7 +105,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
-    LocationHelper.class
+    LocationHelper.class,
+    JudgementService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -113,6 +115,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JudgementService judgementService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -636,6 +641,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();;
@@ -648,6 +654,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecNoAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1003,7 +1010,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "validate-amount-paid";
 
         @Test
-        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+        void shouldCheckValidateAmountPaid_withErrorMessage() {
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(150000))
@@ -1131,6 +1138,35 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceedWithoutDefendantSolicitor() {
+            String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentFixedCostOption(YES)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .specRespondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
+
+            assertThat(judgementStatement).isEqualTo(expected);
+        }
     }
 
     @Nested
@@ -1157,6 +1193,33 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("showConditionFlags").isNull();
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackForLiP {
+        private final LocalDateTime localDateTime = now();
+
+        @BeforeEach
+        void setup() {
+            when(time.now()).thenReturn(localDateTime);
+        }
+
+        @Test
+        void shouldUpdateToCaseSettled_whenClaimantChooseToSettle() {
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
     }
 
