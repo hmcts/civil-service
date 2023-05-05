@@ -62,7 +62,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
         + "The claim will now progress offline (on paper)";
     public static final String JUDGMENT_REQUESTED_LIP_CASE = "A request for default judgement has been sent to the court for review." +
-        "<br>The claim will now progress offline";
+        "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
