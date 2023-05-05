@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -100,7 +101,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
             when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
@@ -296,8 +297,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
-                                                                     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     }
 
     @Test

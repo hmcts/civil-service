@@ -25,6 +25,7 @@ import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -53,14 +54,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-
-        switch (caseEvent) {
-            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1:
                 return TASK_ID;
-            default:
-                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
-        }
     }
 
     @Override
@@ -79,7 +73,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
+        String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
