@@ -362,7 +362,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void LrVLipOneVOne_thenTrue() {
+    void isLrVLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant2(null)
@@ -374,7 +374,7 @@ public class CaseDataTest {
     }
 
     @Test
-    void LrVLipOneVOne_thenFalse() {
+    void isLrVLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant2(null)
