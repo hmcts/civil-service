@@ -301,10 +301,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+        if (caseData.isLrVLipOneVOne()
             && toggleService.isPinInPostEnabled()
-            && V_1.equals(callbackParams.getVersion())
-            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append("The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
             if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {

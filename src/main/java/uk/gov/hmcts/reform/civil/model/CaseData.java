@@ -141,6 +141,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -985,6 +986,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isAcceptDefendantPaymentPlanForPartAdmitYes() {
         return YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec());
+    }
+
+    @JsonIgnore
+    public boolean isRespondent1Represented() {
+        return YES.equals(getRespondent1Represented());
+    }
+
+    @JsonIgnore
+    public boolean isLrVLipOneVOne() {
+        return !isRespondent1Represented()
+            && isOneVOne(this);
     }
 
     @JsonIgnore

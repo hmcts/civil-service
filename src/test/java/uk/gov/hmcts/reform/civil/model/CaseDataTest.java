@@ -360,4 +360,28 @@ public class CaseDataTest {
         //Then
         Assertions.assertTrue(caseData.isRejectWithNoMediation());
     }
+
+    @Test
+    void LrVLipOneVOne_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant2(null)
+            .specRespondent1Represented(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        Assertions.assertTrue(caseData.isLrVLipOneVOne());
+    }
+
+    @Test
+    void LrVLipOneVOne_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant2(null)
+            .specRespondent1Represented(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        Assertions.assertFalse(caseData.isLrVLipOneVOne());
+    }
 }

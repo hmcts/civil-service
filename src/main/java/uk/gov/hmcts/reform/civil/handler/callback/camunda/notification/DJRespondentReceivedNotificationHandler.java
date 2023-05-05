@@ -87,10 +87,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+        if (caseData.isLrVLipOneVOne()
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())
-            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)
         ) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }

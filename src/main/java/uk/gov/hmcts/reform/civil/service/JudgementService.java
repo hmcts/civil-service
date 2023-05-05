@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOneNoLegalRepSpec;
 
 @Service
 @RequiredArgsConstructor
@@ -82,7 +81,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (isOneVOneNoLegalRepSpec(caseData)
+        if (caseData.isLrVLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
             return JUDGEMENT_BY_COURT;
         } else {
