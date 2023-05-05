@@ -10,6 +10,8 @@ def product = "civil"
 def component = "service"
 def ccdBranch = "feat/CIV-5486_case_file_view"
 def camundaBranch = "master"
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
+
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -93,6 +95,8 @@ withPipeline(type, product, component) {
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    yarnBuilder.yarn('yarn-update')
+    yarnBuilder.yarn('install-dependencies')
   }
 
   afterAlways('smoketest:preview') {
@@ -127,6 +131,8 @@ withPipeline(type, product, component) {
     """
     env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
+    yarnBuilder.yarn('yarn-update')
+    yarnBuilder.yarn('install-dependencies')
   }
 
   afterAlways('smoketest:aat') {
