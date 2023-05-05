@@ -957,7 +957,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnJudgementRequestedResponse_whenLrVLip(){
+        void shouldReturnJudgementRequestedResponse_whenLrVLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .applicant1(PartyBuilder.builder().build())
                 .respondent1(PartyBuilder.builder().build())
@@ -969,10 +969,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(
                                                                               JUDGMENT_REQUESTED_HEADER)
-                                                                          .confirmationBody(String.format(JUDGMENT_REQUESTED_LIP_CASE))
+                                                                          .confirmationBody(String.format(
+                                                                              JUDGMENT_REQUESTED_LIP_CASE))
                                                                           .build());
         }
-
     }
 
 }
