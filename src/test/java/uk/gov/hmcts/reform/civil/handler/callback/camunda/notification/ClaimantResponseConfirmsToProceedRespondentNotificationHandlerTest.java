@@ -236,6 +236,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1Represented(null)
                 .specRespondent1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
