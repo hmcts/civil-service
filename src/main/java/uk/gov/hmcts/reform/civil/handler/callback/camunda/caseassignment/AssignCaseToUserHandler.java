@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -37,8 +36,6 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
     public static final String TASK_ID_SPEC = "CaseAssignmentToApplicantSolicitor1ForSpec";
 
-    private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
-
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
@@ -54,7 +51,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-                return TASK_ID;
+        return TASK_ID;
     }
 
     @Override
