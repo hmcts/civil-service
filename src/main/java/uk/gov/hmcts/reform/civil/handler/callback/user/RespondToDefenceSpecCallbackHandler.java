@@ -73,7 +73,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
