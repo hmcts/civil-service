@@ -502,23 +502,20 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
-        if (null != rc && null != rc.getCaseLocation()) {
+        if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsId(
-                    authorisation,
+                .getCourtLocationsByEpimmsId(authorisation,
                     rc.getCaseLocation().getBaseLocation()
                 ));
-            Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .findFirst();
-            String hearingCourtLocation = optionalCourtLocation
-                .map(LocationRefData::getCourtName)
-                .orElse(null);
-            return RequestedCourt.builder()
+            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
-                .responseCourtName(hearingCourtLocation)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
-                .build();
+                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .findFirst().ifPresent(court -> builder
+                    .responseCourtCode(court.getCourtLocationCode())
+                    .responseCourtName(court.getCourtName()));
+            return builder.build();
         } else {
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(NO)
