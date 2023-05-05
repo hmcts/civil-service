@@ -165,10 +165,17 @@ public class HearingScheduledHandler extends CallbackHandler {
             caseDataBuilder.hearingLocation(locationList);
         }
         CaseState caseState = HEARING_READINESS;
+
+        var allocatedTrack = caseData.getAllocatedTrack();
+        if (isNull(caseData.getAllocatedTrack())) {
+            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+            caseDataBuilder.allocatedTrack(allocatedTrack);
+        }
+
         if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(
                 calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
-            caseDataBuilder.hearingFee(calculateAndApplyFee(caseData));
+            caseDataBuilder.hearingFee(calculateAndApplyFee(caseData, allocatedTrack));
         } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
@@ -179,11 +186,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
     }
 
-    private Fee calculateAndApplyFee(CaseData caseData) {
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        if (isNull(caseData.getAllocatedTrack())) {
-            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
-        }
+    private Fee calculateAndApplyFee(CaseData caseData, AllocatedTrack allocatedTrack) {
+
         BigDecimal claimAmount;
         if (nonNull(caseData.getClaimValue())) {
             claimAmount = caseData.getClaimValue().toPounds();
