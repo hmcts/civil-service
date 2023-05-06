@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -132,7 +133,7 @@ public class InitiateGeneralApplicationServiceHelper {
                     /*test the logic*/
                     if (caseData.getGeneralAppEvidenceDocument() != null) {
                         respondentDocTwo.addAll(caseData.getGeneralAppEvidenceDocument());
-                        dataBuilder.gaEvidenceDocRespondentSol(respondentDocTwo);
+                        dataBuilder.gaEvidenceDocRespondentSolTwo(respondentDocTwo);
                     }
 
                 } else {
