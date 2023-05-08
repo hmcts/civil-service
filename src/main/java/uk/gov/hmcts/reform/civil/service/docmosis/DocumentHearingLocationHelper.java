@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentHearingLocationHelper {
 
     private final LocationRefDataService locationRefDataService;
@@ -23,11 +25,13 @@ public class DocumentHearingLocationHelper {
                 authorisation
             );
             if (fromForm.isPresent()) {
+                log.info("Case location for " + caseData.getLegacyCaseReference()
+                             + " determined from " + valueFromForm + " as " + fromForm.get().getSiteName());
                 return fromForm.get();
             }
         }
 
-        return Optional.ofNullable(caseData.getCaseManagementLocation())
+        LocationRefData locationRefData = Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(CaseLocationCivil::getBaseLocation)
             .map(baseLocation -> locationRefDataService.getCourtLocationsByEpimmsId(
                 authorisation,
@@ -39,6 +43,18 @@ public class DocumentHearingLocationHelper {
                 ))
                 .findFirst())
             .orElse(null);
+        if (locationRefData == null) {
+            if (caseData.getCaseManagementLocation() == null) {
+                log.info("Case management location is empty for " + caseData.getLegacyCaseReference());
+            } else {
+                log.info("Case management location for " + caseData.getLegacyCaseReference()
+                             + " couldn't be found in court service");
+            }
+        } else {
+            log.info("Case location for " + caseData.getLegacyCaseReference()
+                         + " found in CaseManagementLocation, is " + locationRefData.getSiteName());
+        }
+        return locationRefData;
     }
 
 }
