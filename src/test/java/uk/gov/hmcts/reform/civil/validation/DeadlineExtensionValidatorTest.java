@@ -66,10 +66,22 @@ class DeadlineExtensionValidatorTest {
         void shouldReturnNoErrors_whenValidExtension() {
             LocalDate agreedExtension = NOW.plusDays(14);
             LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenNotWorkingDay() {
+            LocalDate agreedExtension = NOW.plusDays(14);
+            LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
+
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
+
+            assertThat(errors).isNotEmpty();
         }
 
         @Test
