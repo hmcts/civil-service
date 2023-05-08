@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.validation;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,37 @@ class DeadlineExtensionValidatorTest {
     class ValidateProposedDeadLine {
 
         @Test
+        public void shouldBeAfterCurrentDeadline() {
+            LocalDate dateToValidate = NOW.plusDays(10);
+            LocalDateTime responseDeadLine = LocalDateTime.now().plusDays(14);
+            LocalDateTime detailsNotificationDate = LocalDateTime.now().minusDays(7);
+
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            Assertions.assertThat(validator.validateProposedDeadline(
+                dateToValidate, responseDeadLine, detailsNotificationDate
+            )).contains("The agreed extension date must be after the current deadline");
+        }
+
+        @Test
+        public void shouldBeBefore56Days() {
+            LocalDate dateToValidate = NOW.plusDays(50);
+            LocalDateTime responseDeadLine = LocalDateTime.now().plusDays(14);
+            LocalDateTime detailsNotificationDate = LocalDateTime.now().minusDays(7);
+
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            Assertions.assertThat(validator.validateProposedDeadline(
+                dateToValidate, responseDeadLine, detailsNotificationDate
+            )).contains("The agreed extension date cannot be more than 56 days after the details notification date");
+        }
+
+        @Test
         void shouldReturnNoErrors_whenValidExtension() {
             LocalDate agreedExtension = NOW.plusDays(14);
             LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
 
-            List<String> errors = validator.validateProposedDeadline(agreedExtension, currentResponseDeadline);
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors).isEmpty();
         }
@@ -50,7 +77,7 @@ class DeadlineExtensionValidatorTest {
             LocalDate agreedExtension = NOW.plusDays(29);
             LocalDateTime currentResponseDeadline = NOW.atTime(16, 0);
 
-            List<String> errors = validator.validateProposedDeadline(agreedExtension, currentResponseDeadline);
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors)
                 .containsOnly("The agreed extension date cannot be more than 28 days after the current deadline");
@@ -61,7 +88,7 @@ class DeadlineExtensionValidatorTest {
             LocalDate agreedExtension = NOW.minusDays(10);
             LocalDateTime currentResponseDeadline = NOW.atTime(16, 0);
 
-            List<String> errors = validator.validateProposedDeadline(agreedExtension, currentResponseDeadline);
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors).containsOnly("The agreed extension date must be a date in the future");
         }
@@ -71,7 +98,7 @@ class DeadlineExtensionValidatorTest {
             LocalDate agreedExtension = NOW.plusDays(5);
             LocalDateTime currentResponseDeadline = NOW.plusDays(5).atTime(16, 0);
 
-            List<String> errors = validator.validateProposedDeadline(agreedExtension, currentResponseDeadline);
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors).containsOnly("The agreed extension date must be after the current deadline");
         }
@@ -81,7 +108,7 @@ class DeadlineExtensionValidatorTest {
             LocalDate agreedExtension = NOW.plusDays(4);
             LocalDateTime currentResponseDeadline = NOW.plusDays(5).atTime(16, 0);
 
-            List<String> errors = validator.validateProposedDeadline(agreedExtension, currentResponseDeadline);
+            List<String> errors = validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline);
 
             assertThat(errors).containsOnly("The agreed extension date must be after the current deadline");
         }

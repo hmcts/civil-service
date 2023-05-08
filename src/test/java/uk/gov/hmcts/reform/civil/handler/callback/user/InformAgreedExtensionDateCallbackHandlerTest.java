@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -146,6 +147,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent2Represented(YES)
                 .respondent2OrgRegistered(YES)
                 .respondent2SameLegalRepresentative(NO)
+                .respondent2ResponseDeadline(LocalDateTime.of(LocalDate.now().plusDays(14), END_OF_BUSINESS_DAY))
                 .build();
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
@@ -158,6 +160,28 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             // Then
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("isRespondent1").isEqualTo("No");
+        }
+
+        @Test
+        void shouldFailAfterDeadline() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YES)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2ResponseDeadline(LocalDateTime.of(LocalDate.now().minusDays(1), END_OF_BUSINESS_DAY))
+                .build();
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
         }
 
         @Test
@@ -285,14 +309,16 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             // Then
             assertThat(response.getErrors())
-                .containsOnly("The agreed extension date must be a date in the future");
+                .contains("The agreed extension date must be a date in the future");
         }
 
         @Test
         void shouldReturnNoError_whenValuesAreValid() {
             // Given
+            LocalDate extensionDate = RESPONSE_DEADLINE.toLocalDate().plusDays(14);
+            Mockito.when(workingDayIndicator.isWorkingDay(extensionDate)).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
-                .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
+                .extensionDate(extensionDate)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -334,6 +360,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             // Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
             LocalDate extensionDateRespondent2 = now().minusDays(2);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .extensionDate(now().minusDays(1))

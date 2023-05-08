@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -66,10 +66,11 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final StateFlowEngine stateFlowEngine;
     private final UserService userService;
-    private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
     public static final String ERROR_EXTENSION_DATE_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
+    private static final String ERROR_DEADLINE_PAST =
+        "This action cannot be performed because it is past its deadline";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,10 +89,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var isRespondent1 = YES;
-        if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
-            isRespondent1 = NO;
-        }
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
@@ -103,9 +100,23 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         // Show error message if defendant tries to extend date again ONE_V_TWO_TWO_LEGAL_REP
         if ((!solicitorRepresentsOnlyRespondent2(callbackParams) && caseData.getRespondent1TimeExtensionDate() != null)
             || (solicitorRepresentsOnlyRespondent2(callbackParams)
-                && caseData.getRespondent2TimeExtensionDate() != null)) {
+            && caseData.getRespondent2TimeExtensionDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))
+                .build();
+        }
+        YesOrNo isRespondent1;
+        LocalDate deadLineToExtend;
+        if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            isRespondent1 = NO;
+            deadLineToExtend = caseData.getRespondent2ResponseDeadline().toLocalDate();
+        } else {
+            isRespondent1 = YES;
+            deadLineToExtend = caseData.getRespondent1ResponseDeadline().toLocalDate();
+        }
+        if (LocalDate.now().isAfter(deadLineToExtend)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEADLINE_PAST))
                 .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -133,7 +144,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 .build();
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
+                .errors(validator.validateProposedDeadline(
+                    agreedExtension, currentResponseDeadline,
+                    caseData.getClaimDetailsNotificationDate()))
                 .build();
         }
     }

@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -18,7 +19,27 @@ public class DeadlineExtensionValidator {
 
     private final WorkingDayIndicator workingDayIndicator;
 
-    public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
+    public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline,
+                                                 LocalDateTime detailsNotificationDate) {
+        List<String> errors = new ArrayList<>();
+        if (!dateToValidate.isAfter(now())) {
+            errors.add("The agreed extension date must be a date in the future");
+        } else if (!dateToValidate.isAfter(responseDeadline.toLocalDate())) {
+            errors.add("The agreed extension date must be after the current deadline");
+        }
+
+        if (dateToValidate.isAfter(detailsNotificationDate.plusDays(56).toLocalDate())) {
+            errors.add("The agreed extension date cannot be more than 56 days after the details notification date");
+        }
+
+        if (!workingDayIndicator.isWorkingDay(dateToValidate)) {
+            errors.add("Date must be a working weekday");
+        }
+
+        return errors;
+    }
+
+    public List<String> specValidateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
         if (!dateToValidate.isAfter(now())) {
             return List.of("The agreed extension date must be a date in the future");
         }

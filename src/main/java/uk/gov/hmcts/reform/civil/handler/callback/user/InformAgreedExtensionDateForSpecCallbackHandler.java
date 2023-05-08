@@ -161,7 +161,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
 
         LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
+            .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline))
             .build();
     }
 
