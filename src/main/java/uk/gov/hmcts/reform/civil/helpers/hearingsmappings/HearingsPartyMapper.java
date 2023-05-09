@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
@@ -41,9 +43,13 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 
 public class HearingsPartyMapper {
 
@@ -204,7 +210,9 @@ public class HearingsPartyMapper {
                                        party.getPartyName(),
                                        partyRole,
                                        party.getPartyEmail(),
-                                       party.getPartyPhone(), party.getUnavailableDates());
+                                       party.getPartyPhone(),
+                                       party.getFlags(), party.getUnavailableDates()
+            );
         } else {
             return buildOrganisationPartyObject(party.getPartyName(), partyRole, null, party.getUnavailableDates());
         }
@@ -217,7 +225,9 @@ public class HearingsPartyMapper {
                                                         litigationFriend.getLastName()),
                                           LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
                                           litigationFriend.getEmailAddress(),
-                                          litigationFriend.getPhoneNumber(), null);
+                                          litigationFriend.getPhoneNumber(),
+                                          litigationFriend.getFlags(),
+                                          null);
     }
 
     private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
@@ -233,6 +243,7 @@ public class HearingsPartyMapper {
                     partyRole.getPartyRoleValue(),
                     partyFlagStructure.getEmail(),
                     partyFlagStructure.getPhone(),
+                    partyFlagStructure.getFlags(),
                     null
                 ));
             }
@@ -251,20 +262,24 @@ public class HearingsPartyMapper {
 
     public static PartyDetailsModel buildIndividualPartyObject(String firstName, String lastName,
                                                                String partyName, String partyRole,
-                                                               String email, String phone, List<Element<UnavailableDate>> unavailableDates) {
+                                                               String email, String phone,
+                                                               Flags flags, List<Element<UnavailableDate>> unavailableDates) {
+
+        List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
-            .interpreterLanguage(null) //todo civ-6888
-            .reasonableAdjustments(null)//todo civ-6888
-            .vulnerableFlag(false)//todo civ-6888
-            .vulnerabilityDetails(null) //todo civ-6888
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
-            .custodyStatus(null) // todo civ-688
+            .interpreterLanguage(getInterpreterLanguage(flagDetails))
+            .reasonableAdjustments(getReasonableAdjustments(flagDetails))
+            .vulnerableFlag(hasVulnerableFlag(flagDetails))
+            .custodyStatus(getCustodyStatus(flagDetails))
             .build();
 
         return PartyDetailsModel.builder()

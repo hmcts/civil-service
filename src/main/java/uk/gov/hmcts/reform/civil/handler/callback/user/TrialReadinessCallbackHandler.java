@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 
 @Service
@@ -45,6 +46,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(TRIAL_READINESS);
     private static final String TOO_LATE = "Trial arrangements had to be confirmed more than 3 weeks before the trial.";
+    private static final String NO_SMALL_CLAIMS = "This event is not available for small claims cases.";
     public static final String READY_HEADER = "## You have said this case is ready for trial or hearing";
     public static final String READY_BODY = "### What happens next \n\n"
         + "You can view your and other party's trial arrangements in documents in the case details.\n\n "
@@ -98,6 +100,10 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         if (nonNull(caseData.getHearingDate())
             && caseData.getHearingDate().minusWeeks(3).isBefore(LocalDate.now())) {
             errors.add(format(TOO_LATE));
+        }
+
+        if (SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
+            errors.add(format(NO_SMALL_CLAIMS));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
