@@ -114,7 +114,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
-            if (isRespondentNotRepresented(caseData)) {
+            if (caseData.isRespondent1NotRepresented()) {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
@@ -129,9 +129,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             }
         }
 
-        public boolean isRespondentNotRepresented(CaseData caseData) {
-            return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
-        }
+
 
         public String getRespondentLegalOrganizationName(CaseData caseData) {
             String id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
