@@ -15,10 +15,10 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
-@Scope(value="prototype", proxyMode= ScopedProxyMode.TARGET_CLASS)
+@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SystemGeneratedDocumentService {
 
-    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(Document document, DocumentType documentType, CallbackParams callbackParams){
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(Document document, DocumentType documentType, CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         CaseDocument caseDocument = CaseDocument.toCaseDocument(document, documentType);

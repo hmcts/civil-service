@@ -89,5 +89,4 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData()).extracting("systemGeneratedCaseDocuments")
             .isNull();
     }
-
 }

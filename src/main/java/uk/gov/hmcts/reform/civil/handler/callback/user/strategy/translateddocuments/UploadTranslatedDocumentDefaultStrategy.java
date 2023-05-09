@@ -19,9 +19,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 
 @Component
 @RequiredArgsConstructor
-public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy{
+public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
+
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
+
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocument(
