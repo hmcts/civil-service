@@ -121,6 +121,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 sealedClaim.getDocumentName(),
                 caseData
             );
+            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "detailsOfClaim");
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));

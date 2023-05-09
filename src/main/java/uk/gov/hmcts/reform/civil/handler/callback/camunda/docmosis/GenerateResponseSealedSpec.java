@@ -86,6 +86,10 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData
             );
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant1DefenseDirectionsQuestionnaire");
+                if (nonNull(defendantFlagSpec) && defendantFlagSpec.equals("userRespondent2")) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant2DefenseDirectionsQuestionnaire");
+                }
                 builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
