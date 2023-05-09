@@ -16,10 +16,10 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 
 public class HearingDetailsMapper {
 
-    private static String EMPTY_STRING = "";
-    private static final String WELSH_REGION_ID = "7";
-    public static String STANDARD_PRIORITY = "Standard";
+    public static final String WELSH_REGION_ID = "7";
+    public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
+    private static String EMPTY_STRING = "";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -111,11 +111,6 @@ public class HearingDetailsMapper {
 
     public static boolean getPrivateHearingRequiredFlag() {
         return false;
-    }
-
-    public static boolean getCaseInterpreterRequiredFlag() {
-        return false;
-        // todo civ-6888
     }
 
     public static PanelRequirementsModel getPanelRequirements() {

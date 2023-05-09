@@ -2,13 +2,17 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -164,5 +168,57 @@ public class CaseFlagUtils {
             updatedData.applicantWitnesses(getTopLevelFieldForWitnessesWithFlagsStructure(applicant1Witnesses, APPLICANT_SOLICITOR_WITNESS));
             updatedData.applicantExperts(getTopLevelFieldForExpertsWithFlagsStructure(applicant1Experts, APPLICANT_SOLICITOR_EXPERT));
         }
+    }
+
+    public static List<FlagDetail> getAllCaseFlags(CaseData caseData) {
+        var flagCollection = new ArrayList<FlagDetail>();
+        flagCollection.addAll(getFlagDetails(caseData.getCaseFlags()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant1()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant2()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant1LitigationFriend()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant2LitigationFriend()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1LitigationFriend()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2LitigationFriend()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicantExperts()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicantWitnesses()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1Experts()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
+        return flagCollection.stream().filter(flags -> flags != null).collect(Collectors.toList());
+    }
+
+    public static List<FlagDetail> getFlagDetails(Flags flags) {
+        return flags != null && flags.getDetails() != null
+            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : Collections.emptyList();
+    }
+
+    public static List<FlagDetail> getFlagDetails(Party party) {
+        return party != null ? getFlagDetails(party.getFlags()) : Collections.emptyList();
+    }
+
+    public static List<FlagDetail> getFlagDetails(LitigationFriend litigationFriend) {
+        return litigationFriend != null ? getFlagDetails(litigationFriend.getFlags()) : Collections.emptyList();
+    }
+
+    public static List<FlagDetail> getFlagDetails(PartyFlagStructure partyStructure) {
+        return partyStructure != null ? getFlagDetails(partyStructure.getFlags()) : Collections.emptyList();
+    }
+
+    public static List<FlagDetail> getFlagDetails(List<Element<PartyFlagStructure>> partyStructures) {
+        return partyStructures != null
+            ? partyStructures.stream()
+                .map(party -> getFlagDetails(party.getValue().getFlags()))
+                .flatMap(List::stream)
+                .collect(Collectors.toList()) : Collections.emptyList();
+    }
+
+    @SafeVarargs
+    public static List<FlagDetail> filter(List<FlagDetail> flagDetails, Predicate<FlagDetail>... predicates) {
+        return flagDetails.stream()
+            .filter(List.of(predicates).stream().reduce(Predicate::and).orElse(x -> true))
+            .collect(Collectors.toList());
     }
 }
