@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -37,5 +36,4 @@ class SystemGeneratedDocumentServiceTest {
         assertThat(result.get(0)).isNotNull();
         assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME);
     }
-
 }
