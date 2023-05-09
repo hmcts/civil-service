@@ -353,14 +353,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                      .input2("Any request to inspect a document, or for a copy of a "
                                                                  + "document, shall be made directly to the other"
                                                                  + " party by 4pm on")
-                                                     .date2(LocalDate.now().plusWeeks(8))
+                                                     .date2(LocalDate.now().plusWeeks(6))
                                                      .input3("Requests will be complied with within 7 days of the"
                                                                  + " receipt of the request")
                                                      .input4("Each party must upload to the Digital Portal"
                                                                  + " copies of those documents on which they wish to rely"
                                                                  + " at trial")
                                                      .input5("by 4pm on")
-                                                     .date3(LocalDate.now().plusWeeks(4))
+                                                     .date3(LocalDate.now().plusWeeks(8))
                                                      .build());
 
         caseDataBuilder

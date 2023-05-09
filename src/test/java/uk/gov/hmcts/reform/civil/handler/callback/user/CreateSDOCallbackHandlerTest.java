@@ -624,14 +624,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                                + "the other party by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request.");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
                 .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
                                + "wish to rely at trial by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
 
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
