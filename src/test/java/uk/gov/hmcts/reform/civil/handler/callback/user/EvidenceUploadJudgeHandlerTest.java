@@ -57,11 +57,28 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void aboutToSubmitCallback_placeholder() {
-            CaseData caseData = CaseDataBuilder.builder().build();
+        void shouldPopulateNoteDateTime_whenNoteIsAddedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteTypeNoteTA("test note")
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("noteAdditionDateTime")).isNotNull();
+
+        }
+
+        @Test
+        void shouldNotPopulateNoteDateTime_whenNoteIsAddedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteTypeNoteTA(null)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("noteAdditionDateTime")).isNull();
 
         }
     }
