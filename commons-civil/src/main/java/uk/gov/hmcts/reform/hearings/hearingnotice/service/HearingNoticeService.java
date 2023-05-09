@@ -22,11 +22,10 @@ public class HearingNoticeService {
     public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId) {
         log.debug("Requesting Get Parties Notified with Hearing ID {}", hearingId);
         try {
-            PartiesNotifiedResponses hearingResponse = hearingNoticeApi.getPartiesNotifiedRequest(
+            return hearingNoticeApi.getPartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
                 hearingId);
-            return hearingResponse;
         } catch (FeignException e) {
             log.error("Failed to retrieve hearing with Id: %s from HMC", hearingId);
             throw new HearingNoticeException(e);
@@ -38,13 +37,12 @@ public class HearingNoticeService {
                                                                    LocalDateTime hearingStartDateTo) {
         log.debug("Requesting UnNotified Hearings");
         try {
-            UnNotifiedPartiesResponse hearingResponse = hearingNoticeApi.getUnNotifiedHearingRequest(
+            return hearingNoticeApi.getUnNotifiedHearingRequest(
                 authToken,
                 authTokenGenerator.generate(),
                 hmctsServiceCode,
                 hearingStartDateFrom,
                 hearingStartDateTo);
-            return hearingResponse;
         } catch (Exception e) {
             log.error("Failed to retrieve unnotified hearings");
             throw new HearingNoticeException(e);
