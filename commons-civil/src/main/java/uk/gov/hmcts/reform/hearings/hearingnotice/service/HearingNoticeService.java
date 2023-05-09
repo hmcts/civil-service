@@ -43,7 +43,7 @@ public class HearingNoticeService {
                 hmctsServiceCode,
                 hearingStartDateFrom,
                 hearingStartDateTo);
-        } catch (Exception e) {
+        } catch (FeignException e) {
             log.error("Failed to retrieve unnotified hearings");
             throw new HearingNoticeException(e);
         }
