@@ -20,7 +20,7 @@ public class CaseDocument {
     private final String createdBy;
 
     @JsonIgnore
-    public static CaseDocument toCaseDocument(Document document, DocumentType documentType){
+    public static CaseDocument toCaseDocument(Document document, DocumentType documentType) {
         return CaseDocument.builder()
             .documentLink(document)
             .documentName(document.documentFileName)
