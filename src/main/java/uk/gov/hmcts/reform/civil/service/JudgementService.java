@@ -83,8 +83,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (caseData.isLRvLipOneVOne(multiPartyScenario)
+        if (caseData.isLrVLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
             return JUDGEMENT_BY_COURT;
         } else {
