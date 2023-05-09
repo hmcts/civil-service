@@ -131,10 +131,10 @@ nonworking-days:
   datafile: /data/non-working_days.dat
 
 civil:
-  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
-  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
-  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
-  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
+  response-pack-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772450/n9-eng.pdf
+  n9a-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/867255/n9a-eng.pdf
+  n9b-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/866787/N9B_web_0818_save.pdf
+  n215-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/952023/n215-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
