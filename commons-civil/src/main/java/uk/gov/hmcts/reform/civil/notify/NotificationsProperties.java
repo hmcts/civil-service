@@ -240,6 +240,6 @@ public class NotificationsProperties {
     private String bundleCreationTemplate;
 
     @NotEmpty
-    private String respondentLipPArtAdmitSettleClaimTemplate;
+    private String respondentLipPartAdmitSettleClaimTemplate;
 
 }
