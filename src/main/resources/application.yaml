@@ -247,6 +247,8 @@ notifications:
   notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
 
+  respondentLipPArtAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
+
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
