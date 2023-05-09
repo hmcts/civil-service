@@ -31,6 +31,7 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
                                                                             .atTime(LocalTime.MIN).plusWeeks(3)
                                                                             .toString()))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                            .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
                             .mustNot(matchQuery("data.trialReadyChecked", "Yes"))),
             List.of("reference"),
             startIndex

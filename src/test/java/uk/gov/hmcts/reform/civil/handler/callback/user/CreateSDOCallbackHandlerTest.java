@@ -609,7 +609,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
                 .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must upload to the Digital Portal");
+                               + "the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"

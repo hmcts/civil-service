@@ -277,7 +277,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
+            .input("At least 7 days before the disposal hearing, the claimant must file and serve")
             .build();
 
         updatedData.disposalHearingBundle(tempDisposalHearingBundle).build();
