@@ -32,10 +32,9 @@ public class UnavailabilityDatesUtilsTest {
     }
 
     @Test
-    public void shouldReturnEmptyWhenDefendantResponseIsFalse() {
+    public void shouldReturnEmptyWhenDefendantResponseNoUnavailableDates() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
-            .respondent1DQWithUnavailableDates()
             .build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
