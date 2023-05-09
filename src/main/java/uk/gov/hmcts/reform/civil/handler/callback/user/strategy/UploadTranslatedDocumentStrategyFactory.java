@@ -11,9 +11,9 @@ public class UploadTranslatedDocumentStrategyFactory {
     private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
 
     public UploadTranslatedDocumentStrategy getUploadTranslatedDocumentStrategy(CallbackVersion version) {
-        if(CallbackVersion.V_1.equals(version)){
-            return uploadTranslatedDocumentV1Strategy;
+        if (version == null) {
+            return uploadTranslatedDocumentDefaultStrategy;
         }
-      return uploadTranslatedDocumentDefaultStrategy;
+        return uploadTranslatedDocumentV1Strategy;
     }
 }

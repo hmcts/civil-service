@@ -26,7 +26,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocument(
             callbackParams);
-        CaseData updatedCaseData = callbackParams.getCaseData().builder().systemGeneratedCaseDocuments(
+        CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
             updatedDocumentList).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(AWAITING_APPLICANT_INTENTION.name())

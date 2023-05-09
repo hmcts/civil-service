@@ -22,7 +22,7 @@ public class UploadTranslatedDocumentHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(UPLOAD_TRANSLATED_DOCUMENT);
     private final UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
 
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument);
 
     @Override
     protected Map<String, Callback> callbacks() {
