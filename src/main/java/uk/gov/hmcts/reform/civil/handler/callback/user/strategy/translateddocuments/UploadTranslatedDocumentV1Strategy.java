@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.strategy;
+package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;

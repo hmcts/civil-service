@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.strategy;
+package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -7,15 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.UploadTranslatedDocumentDefaultStrategy;
-import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.UploadTranslatedDocumentStrategyFactory;
-import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.UploadTranslatedDocumentV1Strategy;
+import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentDefaultStrategy;
+import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
+import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentV1Strategy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -40,6 +39,7 @@ import java.util.ArrayList;
     JacksonAutoConfiguration.class,
 })
 class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
+
 
     @Autowired
     private UploadTranslatedDocumentHandler handler;
@@ -82,7 +82,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             assertThat(response.getData()).extracting("translatedDocument").isNotNull();
-            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION);
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
     }
 
