@@ -235,8 +235,11 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLipTemplate;
-    
+
     @NotEmpty
     private String bundleCreationTemplate;
+
+    @NotEmpty
+    private String hearingNotificationLipDefendantTemplate;
 
 }
