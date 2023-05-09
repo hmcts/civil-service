@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -206,6 +207,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             authToken, HEARING_CHANNEL, serviceId
         );
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+            .getListItems()
+            .stream()
+            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+            .collect(Collectors.toList());
+        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+
         caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
         caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
