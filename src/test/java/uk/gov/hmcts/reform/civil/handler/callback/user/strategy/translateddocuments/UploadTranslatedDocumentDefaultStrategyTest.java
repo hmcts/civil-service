@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     JacksonAutoConfiguration.class,
 })
 class UploadTranslatedDocumentDefaultStrategyTest {
+
     private static final String FILE_NAME = "Some file";
 
     @Autowired

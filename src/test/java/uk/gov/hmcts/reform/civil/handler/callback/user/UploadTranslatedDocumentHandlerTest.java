@@ -40,7 +40,6 @@ import java.util.ArrayList;
 })
 class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
-
     @Autowired
     private UploadTranslatedDocumentHandler handler;
 
