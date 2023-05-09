@@ -553,7 +553,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     "The parties must upload to the Digital Portal copies of those documents which they wish the "
                         + "court to consider when deciding the amount of damages, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal copies of the witness statements"
