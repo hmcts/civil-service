@@ -21,9 +21,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler
-    extends CallbackHandler
-    implements NotificationData {
+public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED);
     public static final String TASK_ID = "ClaimantAgreedSettledPartAdmitNotifyLip";
@@ -65,7 +63,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         notificationService.sendMail(
             caseData.getRespondent1().getPartyEmail(),
-            notificationsProperties.getRespondentLipPArtAdmitSettleClaimTemplate(),
+            notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
