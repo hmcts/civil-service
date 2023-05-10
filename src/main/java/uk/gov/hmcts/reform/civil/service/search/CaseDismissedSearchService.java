@@ -34,7 +34,11 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                             .must(beState(CASE_ISSUED)))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                .should(boolQuery()
+                        .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
+                        .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                        .must(isSpecClaim()),
             List.of("reference"),
             startIndex
         );
@@ -44,4 +48,10 @@ public class CaseDismissedSearchService extends ElasticSearchService {
         return boolQuery()
             .must(matchQuery("state", state.toString()));
     }
+
+    public BoolQueryBuilder isSpecClaim() {
+        return boolQuery()
+            .must(matchQuery("data.CaseAccessCategory", "SPEC_CLAIM"));
+    }
+
 }
