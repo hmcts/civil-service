@@ -47,14 +47,14 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?,?> dataBuilder = getSharedData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?,?> getSharedData(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return caseData.toBuilder();
     }
