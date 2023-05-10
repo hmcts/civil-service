@@ -117,18 +117,6 @@ public class CasesController {
     }
 
     @GetMapping(path = "/defendant/{submitterId}?page={pageNumber}")
-    @ApiOperation("Gets basic claim information for defendant")
-    public ResponseEntity<List<DashboardClaimInfo>>
-        getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
-                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(
-            authorization,
-            submitterId
-        );
-        return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/defendant/{submitterId}?page={pageNumber}")
     @ApiOperation("Gets basic claim information for defendant with pagination")
     public ResponseEntity<Map<String, Object>>
     getClaimsForDefendantWithPagination(@PathVariable("submitterId") String submitterId, @QueryParam("pageNumber") String pageNumber,
