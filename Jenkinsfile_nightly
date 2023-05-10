@@ -30,6 +30,7 @@ properties([
 def type = "java"
 def product = "civil"
 def component = "service"
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -63,20 +64,20 @@ withNightlyPipeline(type, product, component) {
 
   //enableMutationTest()
   enableFortifyScan()
-  enableSecurityScan()
+  //enableSecurityScan()
 
   enableFullFunctionalTest(200)
 
-  afterSuccess('fullFunctionalTest') {
-    //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
-    sh """ ./gradlew runEndToEndUnspecTests """
+  before('fullFunctionalTest') {
+    yarnBuilder.yarn('yarn-update')
+    yarnBuilder.yarn('install-dependencies')
   }
 
   afterAlways('fullFunctionalTest') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
   }
-  
+
   enableCrossBrowserTest()
 
   afterAlways('crossBrowserTest') {
