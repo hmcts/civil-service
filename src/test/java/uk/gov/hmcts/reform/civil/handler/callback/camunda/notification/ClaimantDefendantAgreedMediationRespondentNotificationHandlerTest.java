@@ -69,6 +69,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                 .respondent1(respondent1)
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -97,6 +98,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                 .respondent1(respondent1)
                 .setClaimTypeToSpecClaim()
                 .specRespondent1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_AGREEMENT")
