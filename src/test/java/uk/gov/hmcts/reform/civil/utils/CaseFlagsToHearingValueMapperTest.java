@@ -296,6 +296,7 @@ public class CaseFlagsToHearingValueMapperTest {
 
         assertTrue(actualReasonableAdjustments.isEmpty());
     }
+
     @Test
     public void testGetVulnerabilityDetails() {
         FlagDetail flagDetail1 = FlagDetail.builder()
@@ -363,13 +364,6 @@ public class CaseFlagsToHearingValueMapperTest {
             .name("Sign Language Interpreter")
             .flagComment("a sign language comment")
             .build();
-
-//        List<String> expected = List.of(
-//            "RA0033",
-//            "SM0002",
-//            "RA0026",
-//            "RA0042"
-//        );
 
         List<String> actualVulnerabilityDetails = getVulnerabilityDetails(
             List.of(
