@@ -201,11 +201,11 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         if (SMALL_CLAIM.equals(allocatedTrack)) {
-            return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
+            return new Fee().builder().calculatedAmountInPence(new BigDecimal(500)).build();
         } else if (FAST_CLAIM.equals(allocatedTrack)) {
-            return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
+            return new Fee().builder().calculatedAmountInPence(new BigDecimal(1000)).build();
         } else {
-            return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
+            return new Fee().builder().calculatedAmountInPence(new BigDecimal(1500)).build();
         }
     }
 

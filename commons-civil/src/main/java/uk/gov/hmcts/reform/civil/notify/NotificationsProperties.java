@@ -225,6 +225,9 @@ public class NotificationsProperties {
     private String evidenceUploadTemplate;
 
     @NotEmpty
+    private String evidenceUploadLipTemplate;
+
+    @NotEmpty
     private String respondentCcjNotificationTemplate;
 
     @NotEmpty
@@ -235,7 +238,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLipTemplate;
-    
+
     @NotEmpty
     private String bundleCreationTemplate;
 
