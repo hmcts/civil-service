@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
@@ -49,6 +51,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
+    private final RuntimeService runtimeService;
 
     private CaseData data;
 
@@ -73,6 +76,28 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
+        }
+    }
+
+    @Override
+    public void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+        reportFailedTaskToCamunda(externalTask, externalTaskService, e);
+
+        var failureEventString = externalTask.getVariable("failureCaseEvent");
+        var triggeredFailureEvent = externalTask.getVariable("triggeredFailureEvent");
+
+        if (failureEventString != null && triggeredFailureEvent == null) {
+            var failureEvent = CaseEvent.valueOf(failureEventString.toString());
+            log.info("Triggering failure event: [{}]", failureEventString);
+            try {
+                var caseId = Long.parseLong(externalTask.getVariable("caseId").toString());
+                coreCaseDataService.triggerEvent(caseId, failureEvent);
+                runtimeService.setVariable(
+                    externalTask.getProcessInstanceId(), "triggeredFailureEvent", true);
+            } catch (Exception ex) {
+                log.error("There was a problem triggering the failure event [{}] - {}",
+                                        failureEventString, ex.getMessage());
+            }
         }
     }
 

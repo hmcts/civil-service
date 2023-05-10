@@ -73,14 +73,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         }
     }
 
-    /**
-     * Called when an exception arises from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
-     *
-     * @param externalTask        the external task to be handled.
-     * @param externalTaskService to interact with fetched and locked tasks.
-     * @param e                   the exception thrown by business logic.
-     */
-    default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+    default void reportFailedTaskToCamunda(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
 
@@ -91,6 +84,17 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             remainingRetries - 1,
             calculateExponentialRetryTimeout(500, maxRetries, remainingRetries)
         );
+    }
+
+    /**
+     * Called when an exception arises from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
+     *
+     * @param externalTask        the external task to be handled.
+     * @param externalTaskService to interact with fetched and locked tasks.
+     * @param e                   the exception thrown by business logic.
+     */
+    default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+        reportFailedTaskToCamunda(externalTask, externalTaskService, e);
     }
 
     private String getStackTrace(Throwable throwable) {
