@@ -81,6 +81,7 @@ public class InitiateGeneralApplicationService {
     private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
+    public static final String GA_DOC_CATEGORY_ID = "applications";
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
     public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
         + "provided for a non-urgent application.";
@@ -183,7 +184,14 @@ public class InitiateGeneralApplicationService {
 
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
             && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
+            if (Objects.isNull(caseData.getGeneralAppN245FormUpload().getCategoryID())) {
+                caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID);
+            }
             applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
+            List<Element<Document>> gaEvidenceDoc = ofNullable(caseData.getGeneralAppEvidenceDocument())
+                    .orElse(newArrayList());
+            gaEvidenceDoc.add(element(caseData.getGeneralAppN245FormUpload()));
+            applicationBuilder.generalAppEvidenceDocument(gaEvidenceDoc);
         }
 
         GeneralApplication generalApplication = applicationBuilder
