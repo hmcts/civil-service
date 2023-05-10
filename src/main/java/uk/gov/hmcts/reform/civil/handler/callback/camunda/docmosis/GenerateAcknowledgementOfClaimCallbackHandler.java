@@ -22,7 +22,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ACKNOWLEDGEMENT_OF_CLAIM;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.AcknowledgeClaimCallbackHandler.defendantFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -66,7 +65,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
-        if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+        if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
         }
 

@@ -71,7 +71,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UserService userService;
-    public static String defendantFlag;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -97,14 +96,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData.respondent2Copy(caseData.getRespondent2());
-        }
-
-        if (featureToggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            assignDefendantFlag(caseData, userInfo);
         }
 
         // Show error message if defendant tries to submit response again ONE_V_TWO_TWO_LEGAL_REP
@@ -187,6 +178,21 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .build();
 
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when document is generated in GenerateAcknowledgementOfClaimCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            caseDataUpdated.respondent2DocumentGeneration(null);
+            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                caseDataUpdated.respondent2DocumentGeneration("userRespondent2");
+            }
+        }
+
         var respondent1Check = YES;
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             respondent1Check = NO;
@@ -320,15 +326,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private boolean isRespondent1(CallbackParams callbackParams) {
         return !solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
-    }
-
-    public void assignDefendantFlag(CaseData caseData, UserInfo userInfo) {
-        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            defendantFlag = "userRespondent2";
-        }
     }
 
 }

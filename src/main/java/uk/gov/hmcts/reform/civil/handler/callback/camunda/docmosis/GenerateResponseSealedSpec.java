@@ -31,8 +31,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimSpecCallbackHandler.defendantFlagSpec;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
@@ -71,9 +69,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
-        if (nonNull(defendantFlagSpec) && defendantFlagSpec.equals("userRespondent2")) {
+        if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
         }
 
@@ -86,10 +83,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
-            log.info("should assign def1:       defendant1DefenseDirectionsQuestionnaire");
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant1DefenseDirectionsQuestionnaire");
-            if (nonNull(defendantFlagSpec) && defendantFlagSpec.equals("userRespondent2")) {
-                log.info("should assign def222:       defendant2222DefenseDirectionsQuestionnaire");
+            if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant2DefenseDirectionsQuestionnaire");
             }
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {

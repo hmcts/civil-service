@@ -343,7 +343,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        RespondToClaimCallbackHandler.defendantFlag = "test";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
@@ -374,7 +373,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                               .documentBinaryUrl("binary-url")
                               .build())
             .build();
-        RespondToClaimCallbackHandler.defendantFlag = null;
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(defendantDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
@@ -392,9 +390,9 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAssignDefendantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
         // Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        RespondToClaimCallbackHandler.defendantFlag = "userRespondent2";
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+            .respondent2DocumentGeneration("userRespondent2")
             .build();
         // When
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -409,7 +407,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAssignClaimantCategoryId_whenFlagNotUserRespondent2Unspecified() {
         // Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        RespondToClaimCallbackHandler.defendantFlag = null;
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))

@@ -30,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimCallbackHandler.defendantFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -196,7 +195,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
             }
-            if (nonNull(defendantFlag) && defendantFlag.equals("userRespondent2")) {
+            if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
             }
         }

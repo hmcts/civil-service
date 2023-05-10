@@ -97,9 +97,10 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     void shouldAssignCategoryId_whenInvokedAnd1v2DifferentSol() {
         //Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        AcknowledgeClaimCallbackHandler.defendantFlag = "userRespondent2";
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
+        //AcknowledgeClaimCallbackHandler.defendantFlag = "userRespondent2";
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .respondent2DocumentGeneration("userRespondent2")
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -115,7 +116,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DifferentSolButWrongFlag() {
         //Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        AcknowledgeClaimCallbackHandler.defendantFlag = "test";
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
@@ -133,7 +133,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     void shouldAssignCategoryId_whenInvokedAnd1v1Or1v2SameSol() {
         //Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        AcknowledgeClaimCallbackHandler.defendantFlag = null;
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();

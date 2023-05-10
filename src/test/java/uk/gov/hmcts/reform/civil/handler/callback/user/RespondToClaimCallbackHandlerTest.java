@@ -385,79 +385,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     }
 
-    @Test
-    void shouldPopulateRespondent2Flag_WhenInvoked() {
-        // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimDetailsNotified()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        // When
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
-        var result = RespondToClaimCallbackHandler.defendantFlag;
-        // Given
-        assertThat(result).isEqualTo("userRespondent2");
-    }
-
-    @Test
-    void shouldNotPopulateRespondent2Flag_WhenInvokedAndNoUser() {
-        // Given
-        RespondToClaimCallbackHandler.defendantFlag = null;
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimDetailsNotified()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        // When
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
-        var result = RespondToClaimCallbackHandler.defendantFlag;
-        // Then
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void shouldNotPopulateRespondent2Flag_WhenInvoked() {
-        // Given
-        RespondToClaimCallbackHandler.defendantFlag = null;
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimDetailsNotified()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        // When
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
-        var result = RespondToClaimCallbackHandler.defendantFlag;
-        // Then
-        assertThat(result).isNull();
-    }
-
     @Nested
     class MidEventConfirmDetailsCallback {
 
@@ -925,6 +852,66 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        }
+
+        @Test
+        void shouldPopulateRespondent2Flag_WhenInvoked() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Given
+            assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+        }
+
+        @Test
+        void shouldNotPopulateRespondent2Flag_WhenInvokedAndNoUser() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
+        }
+
+        @Test
+        void shouldNotPopulateRespondent2Flag_WhenInvoked() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
         }
 
         @Test

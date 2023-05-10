@@ -154,7 +154,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
-    public static String defendantFlagSpec;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1137,14 +1136,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (toggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            assignDefendantFlagSpec(caseData, userInfo);
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -1455,6 +1446,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
+
+        if (toggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            updatedData.respondent2DocumentGeneration(null);
+            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                updatedData.respondent2DocumentGeneration("userRespondent2");
+            }
+        }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
@@ -1815,12 +1820,4 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return false;
     }
 
-    private void assignDefendantFlagSpec(CaseData caseData, UserInfo userInfo) {
-        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            defendantFlagSpec = "userRespondent2";
-        }
-    }
 }

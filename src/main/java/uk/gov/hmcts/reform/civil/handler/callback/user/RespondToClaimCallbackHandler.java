@@ -110,7 +110,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
-    public static String defendantFlag;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -218,15 +217,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .respondent2Copy(caseData.getRespondent2())
                 .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
-
-        if (toggleService.isCaseFileViewEnabled()) {
-            // casefileview changes need to assign documents into specific folders, this is help determine
-            // which user is "creating" the document and therefore which folder to move the documents
-            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            assignDefendantFlag(caseData, userInfo);
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -545,6 +535,20 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
+        if (toggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            updatedData.respondent2DocumentGeneration(null);
+            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                updatedData.respondent2DocumentGeneration("userRespondent2");
+            }
+        }
+
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -849,15 +853,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
         return Optional.ofNullable(courtLocation).map(LocationHelper::buildCaseLocation);
-    }
-
-    private void assignDefendantFlag(CaseData caseData, UserInfo userInfo) {
-        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-            defendantFlag = "userRespondent2";
-        }
     }
 
 }
