@@ -70,7 +70,7 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
     }
 
     private String addTemplate(CaseData caseData) {
-     if(caseData.hasDefendantSelectResponseLanguageBilingual()){
+     if(caseData.isRespondentResponseBilingual()){
          return notificationsProperties.getRespondentLipResponseSubmissionBilingualTemplate();
      } else {
          return notificationsProperties.getRespondentLipResponseSubmissionTemplate();
