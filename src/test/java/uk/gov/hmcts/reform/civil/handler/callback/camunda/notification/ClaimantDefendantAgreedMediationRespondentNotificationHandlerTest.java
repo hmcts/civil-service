@@ -129,8 +129,6 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             }
         }
 
-
-
         public String getRespondentLegalOrganizationName(CaseData caseData) {
             String id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             Optional<Organisation> organisation = organisationService.findOrganisationById(id);
