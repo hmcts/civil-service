@@ -11,10 +11,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -54,8 +55,6 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
     private OrganisationService organisationService;
     @Autowired
     private ClaimantResponseAgreedRepaymentRespondentNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -63,6 +62,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentCcjNotificationTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getRespondentCcjNotificationWelshTemplate()).thenReturn("template-welsh-id");
             when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn("template-id");
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("test.url");
             when(organisationService.findOrganisationById(anyString()))
@@ -89,6 +89,33 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
+                getNotificationDataMapSpec(caseData),
+                "claimant-agree-repayment-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentPartyInWelsh_whenInvoked() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-welsh-id",
                 getNotificationDataMapSpec(caseData),
                 "claimant-agree-repayment-respondent-notification-000DC001"
             );
