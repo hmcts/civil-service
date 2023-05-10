@@ -694,36 +694,35 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
-    @Builder.Default
-    private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
+    private final List<Element<Document>> generalAppEvidenceDocument;
 
     private final List<Element<Document>> gaEvidenceDocStaff;
     private final List<Element<Document>> gaEvidenceDocClaimant;
     private final List<Element<Document>> gaEvidenceDocRespondentSol;
     private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> hearingOrderDocument = new ArrayList<>();
+    private final List<Element<CaseDocument>> hearingOrderDocument;
 
-    private final List<Element<CaseDocument>> hearingOrderStaff;
-    private final List<Element<CaseDocument>> hearingOrderClaimant;
-    private final List<Element<CaseDocument>> hearingOrderRespondentSol;
-    private final List<Element<CaseDocument>> hearingOrderRespondentSolTwo;
+    private final List<Element<CaseDocument>> hearingOrderDocStaff;
+    private final List<Element<CaseDocument>> hearingOrderDocClaimant;
+    private final List<Element<CaseDocument>> hearingOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> hearingOrderDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> requestForInformationDocument = new ArrayList<>();
+    private final List<Element<CaseDocument>> requestForInformationDocument;
 
     private final List<Element<CaseDocument>> requestForInfoDocStaff;
     private final List<Element<CaseDocument>> requestForInfoDocClaimant;
     private final List<Element<CaseDocument>> requestForInfoDocRespondentSol;
     private final List<Element<CaseDocument>> requestForInfoDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> writtenRepSequentialDocument = new ArrayList<>();
+    private final List<Element<CaseDocument>> writtenRepSequentialDocument;
 
     private final List<Element<CaseDocument>> writtenRepSeqDocStaff;
     private final List<Element<CaseDocument>> writtenRepSeqDocClaimant;
     private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSol;
     private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> writtenRepConcurrentDocument = new ArrayList<>();
+    private final List<Element<CaseDocument>> writtenRepConcurrentDocument;
 
     private final List<Element<CaseDocument>> writtenRepConDocStaff;
     private final List<Element<CaseDocument>> writtenRepConDocClaimant;

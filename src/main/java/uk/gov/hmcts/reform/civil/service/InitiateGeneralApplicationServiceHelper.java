@@ -132,7 +132,7 @@ public class InitiateGeneralApplicationServiceHelper {
                     /*test the logic*/
                     if (caseData.getGeneralAppEvidenceDocument() != null) {
                         respondentDocTwo.addAll(caseData.getGeneralAppEvidenceDocument());
-                        dataBuilder.gaEvidenceDocRespondentSol(respondentDocTwo);
+                        dataBuilder.gaEvidenceDocRespondentSolTwo(respondentDocTwo);
                     }
 
                 } else {
