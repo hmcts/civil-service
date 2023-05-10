@@ -53,6 +53,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             handleFailure(externalTask, externalTaskService, e);
             log.error("External task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
+            performFailureAction(externalTask);
         }
     }
 
@@ -126,4 +127,13 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
      * @param externalTask the external task to be handled.
      */
     void handleTask(ExternalTask externalTask);
+
+    /**
+     * Executed after camunda failure has been reported to camunda.
+     *
+     * @param externalTask the external task to be handled.
+     */
+    default void performFailureAction(ExternalTask externalTask) {
+        //NO OP
+    }
 }
