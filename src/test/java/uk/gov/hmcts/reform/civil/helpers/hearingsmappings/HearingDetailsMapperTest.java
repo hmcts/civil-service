@@ -24,12 +24,12 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnNull_whenHearingTypeInvoked() {
-        assertThat(HearingDetailsMapper.getHearingType()).isEqualTo(null);
+        assertThat(HearingDetailsMapper.getHearingType()).isNull();
     }
 
     @Test
     void shouldReturnNull_whenHearingWindowInvoked() {
-        assertThat(HearingDetailsMapper.getHearingWindow()).isEqualTo(null);
+        assertThat(HearingDetailsMapper.getHearingWindow()).isNull();
     }
 
     @Test
@@ -290,7 +290,7 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnNull_whenPanelRequirementsInvoked() {
-        assertThat(HearingDetailsMapper.getPanelRequirements()).isEqualTo(null);
+        assertThat(HearingDetailsMapper.getPanelRequirements()).isNull();
     }
 
     @Test

@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHear
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasVulnerableFlag;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -294,5 +295,88 @@ public class CaseFlagsToHearingValueMapperTest {
             ));
 
         assertTrue(actualReasonableAdjustments.isEmpty());
+    }
+    @Test
+    public void testGetVulnerabilityDetails() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("SM0002")
+            .name("Screening witness from accused")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail3 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0026")
+            .name("Support worker or carer with me")
+            .build();
+
+        FlagDetail flagDetail4 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("PF0002")
+            .name("Vulnerable user")
+            .flagComment("this is a comment")
+            .build();
+
+        List<String> expected = List.of(
+            "Private waiting area - this is a comment",
+            "Support worker or carer with me",
+            "Vulnerable user - this is a comment"
+        );
+
+        List<String> actualVulnerabilityDetails = getVulnerabilityDetails(
+            List.of(
+                flagDetail1,
+                flagDetail2,
+                flagDetail3,
+                flagDetail4
+            ));
+
+        assertEquals(expected, actualVulnerabilityDetails);
+    }
+
+    @Test
+    public void testNoVulnerabilityDetails() {
+        FlagDetail flagDetail1 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RE0033")
+            .name("Private waiting area")
+            .flagComment("this is a comment")
+            .build();
+
+        FlagDetail flagDetail2 = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(NO)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .flagComment("a sign language comment")
+            .build();
+
+//        List<String> expected = List.of(
+//            "RA0033",
+//            "SM0002",
+//            "RA0026",
+//            "RA0042"
+//        );
+
+        List<String> actualVulnerabilityDetails = getVulnerabilityDetails(
+            List.of(
+                flagDetail1,
+                flagDetail2
+            ));
+
+        assertTrue(actualVulnerabilityDetails.isEmpty());
     }
 }

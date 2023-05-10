@@ -32,7 +32,7 @@ public class CaseFlagsToHearingValueMapper {
         ).stream().map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s" : "%s",
                                            flagDetail.getName(),
                                            flagDetail.getFlagComment()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public static boolean getAdditionalSecurity(List<FlagDetail> flagDetails) {
