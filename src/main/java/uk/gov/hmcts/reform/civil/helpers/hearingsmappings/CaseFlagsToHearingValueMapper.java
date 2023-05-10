@@ -28,9 +28,8 @@ public class CaseFlagsToHearingValueMapper {
         return filter(
             flagDetails,
             CaseFlagPredicates.isActive(),
-            CaseFlagPredicates.isHearingRelevant(),
             CaseFlagPredicates.hasVulnerableFlag()
-        ).stream().map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s;" : "%s;",
+        ).stream().map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s" : "%s",
                                            flagDetail.getName(),
                                            flagDetail.getFlagComment()))
             .collect(Collectors.toList());

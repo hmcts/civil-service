@@ -282,7 +282,6 @@ public class HearingsPartyMapper {
             .partyName(partyName)
             .partyRole(partyRole)
             .individualDetails(individualDetails)
-            .organisationDetails(null)
             .unavailabilityDOW(null)
             .unavailabilityRange(null)
             .hearingSubChannel(null)
@@ -294,7 +293,7 @@ public class HearingsPartyMapper {
                                                                  String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(String.valueOf(ORG))
+            .organisationType(ORG.getLabel())
             .cftOrganisationID(cftOrganisationID)
             .build();
 
@@ -303,7 +302,6 @@ public class HearingsPartyMapper {
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)
-            .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
             .unavailabilityRange(null)
