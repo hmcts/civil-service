@@ -66,7 +66,7 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
 
     @Override
     protected void sendNotifications(CallbackParams callbackParams, CaseData caseData, boolean multiPartyScenario) {
-        if(toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
+        if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
             roboticsNotificationService.notifyDefaultJudgementLip(caseData);
         } else {
             roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
