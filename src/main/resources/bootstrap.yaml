@@ -22,6 +22,7 @@ spring:
         robotics-notification-recipient: robotics.notification.recipient
         robotics-notification-multipartyrecipient: robotics.notification.multipartyrecipient
         robotics-notification-recipient-spec: robotics.notification.specRecipient
+        robotics-notification-recipient-lipdj: robotics.notitfication.lipDJRecipient
         launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
         ordnance-survey-api-key: OS_POSTCODE_LOOKUP_API_KEY
         notification-caseworker-spec-receiver: notification.caseworker.spec.receiver
