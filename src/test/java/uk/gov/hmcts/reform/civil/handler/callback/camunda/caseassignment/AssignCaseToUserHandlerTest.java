@@ -300,14 +300,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldReturnUnSpecCamundaTask_whenUnSpecEvent() {
-        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
-                                                                 .request(CallbackRequest.builder().eventId(
-            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
-    }
-
-    @Test
-    void shouldReturnSpecCamundaTask_whenSpecEvent() {
+    void shouldReturnCorrectCamundaTaskID() {
         assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
                                                                  .request(CallbackRequest.builder().eventId(
             "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
