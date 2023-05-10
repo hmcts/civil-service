@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,6 +42,18 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).collect(Collectors.toList());
+    }
+
+    public Map<String, Object> getClaimsForDefendantWithPagination(String authorisation, String defendantId, String pageNumber) {
+        List<DashboardClaimInfo> allCases = getClaimsForDefendant(authorisation, defendantId);
+        final int totalPages = (int) Math.ceil((double)allCases.size() / 10);
+
+        allCases.sort(Comparator.comparing(DashboardClaimInfo::getCreatedDate));
+        List<DashboardClaimInfo> filteredList = allCases.subList(
+            (Integer.parseInt(pageNumber) - 1) * 10,
+            (Integer.parseInt(pageNumber) * 10) - 1
+        );
+        return Map.of("defendantCaselist", filteredList, "totalPages", totalPages);
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {

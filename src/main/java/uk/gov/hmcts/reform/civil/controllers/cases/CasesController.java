@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
+import feign.QueryMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,8 +36,10 @@ import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 
+import javax.ws.rs.QueryParam;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
@@ -113,7 +116,7 @@ public class CasesController {
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/defendant/{submitterId}")
+    @GetMapping(path = "/defendant/{submitterId}?page={pageNumber}")
     @ApiOperation("Gets basic claim information for defendant")
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
@@ -123,6 +126,19 @@ public class CasesController {
             submitterId
         );
         return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/defendant/{submitterId}?page={pageNumber}")
+    @ApiOperation("Gets basic claim information for defendant with pagination")
+    public ResponseEntity<Map<String, Object>>
+    getClaimsForDefendantWithPagination(@PathVariable("submitterId") String submitterId, @QueryParam("pageNumber") String pageNumber,
+                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        Map<String, Object> defendantClaimsWithPagination = dashboardClaimInfoService.getClaimsForDefendantWithPagination(
+            authorization,
+            submitterId,
+            pageNumber
+        );
+        return new ResponseEntity<>(defendantClaimsWithPagination, HttpStatus.OK);
     }
 
     @PostMapping(path = "/{caseId}/citizen/{submitterId}/event")

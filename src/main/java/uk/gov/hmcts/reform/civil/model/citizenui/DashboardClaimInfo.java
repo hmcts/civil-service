@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORM
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DashboardClaimInfo {
 
+    private LocalDateTime createdDate;
     private String claimId;
     private String claimNumber;
     private String claimantName;
