@@ -106,7 +106,11 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
         if (isRespondentNotRepresented(caseData)) {
-            return notificationsProperties.getRespondentCcjNotificationTemplate();
+            if(caseData.isRespondentResponseBilingual()){
+                return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
+            }else{
+                return notificationsProperties.getRespondentCcjNotificationTemplate();
+            }
         }
         return null;
     }

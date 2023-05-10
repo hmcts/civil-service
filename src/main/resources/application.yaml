@@ -237,6 +237,7 @@ notifications:
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
   respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
+  respondentCcjNotificationWelshTemplate: "8ad1530a-70fe-407c-8f8b-81264a055c82"
   respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"

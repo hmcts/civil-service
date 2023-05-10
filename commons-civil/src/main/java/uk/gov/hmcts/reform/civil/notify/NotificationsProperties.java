@@ -228,6 +228,9 @@ public class NotificationsProperties {
     private String respondentCcjNotificationTemplate;
 
     @NotEmpty
+    private String respondentCcjNotificationWelshTemplate;
+
+    @NotEmpty
     private String respondentSolicitorCcjNotificationTemplate;
 
     @NotEmpty
@@ -235,7 +238,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLipTemplate;
-    
+
     @NotEmpty
     private String bundleCreationTemplate;
 
