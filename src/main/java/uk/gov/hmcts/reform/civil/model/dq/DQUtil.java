@@ -44,7 +44,12 @@ public class DQUtil {
         if (lrSpec.getDate() != null) {
             builder.date(lrSpec.getDate());
         } else {
-            builder.fromDate(lrSpec.getFromDate()).toDate(lrSpec.getToDate());
+            builder
+                .who(lrSpec.getWho())
+                .date(lrSpec.getDate())
+                .unavailableDateType(lrSpec.getUnavailableDateType())
+                .fromDate(lrSpec.getFromDate())
+                .toDate(lrSpec.getToDate());
         }
         return builder.build();
     }
