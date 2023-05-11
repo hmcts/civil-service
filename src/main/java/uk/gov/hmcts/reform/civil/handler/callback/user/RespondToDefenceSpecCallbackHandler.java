@@ -161,7 +161,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
 
@@ -170,7 +170,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void setApplicant1ProceedFlagToYes(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void setApplicant1ProceedFlagToYes(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
 
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
@@ -188,13 +188,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return NO;
     }
 
-    private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
         setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
@@ -223,7 +223,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setMediationConditionFlag(caseData, caseDataBuilder);
 
@@ -369,7 +369,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder,
+    private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
                                          Applicant1DQ.Applicant1DQBuilder dq,
                                          CallbackParams callbackParams) {
         RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
@@ -586,7 +586,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
@@ -614,8 +614,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             errors.add("Enter a valid amount for equal instalments");
         }
 
-        LocalDate eligibleDate = LocalDate.now().plusDays(30);
-        formatLocalDate(eligibleDate, DATE);
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
         if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
             1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));

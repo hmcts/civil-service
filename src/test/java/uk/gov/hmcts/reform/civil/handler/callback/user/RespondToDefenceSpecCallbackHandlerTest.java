@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -881,6 +882,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
+        @ParameterizedTest
+        @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
+        void shouldGetOneVOnePartAdmitImmediatelyFlagV2(RespondentResponsePartAdmissionPaymentTimeLRspec type) {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(type)
+                .specDefenceAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isNotNull();
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
+        }
+
         @Test
         void shouldGetOneVOneFullAdmitFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -917,6 +940,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
+        void shouldGetOneVOneFullAdmitBySetDateFlagV2Parameterized(
+            RespondentResponsePartAdmissionPaymentTimeLRspec type) {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(type)
+                .specDefenceFullAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isNotNull();
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 

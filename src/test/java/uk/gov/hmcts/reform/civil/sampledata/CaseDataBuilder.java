@@ -421,6 +421,7 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
     private CaseDataLiP caseDataLiP;
+    private YesOrNo claimant2ResponseFlag;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5238,6 +5239,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder enableRespondent2ResponseFlag() {
+        this.claimant2ResponseFlag = YES;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5489,6 +5495,7 @@ public class CaseDataBuilder {
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .caseDataLiP(caseDataLiP)
+            .claimant2ResponseFlag(claimant2ResponseFlag)
             .build();
     }
 
