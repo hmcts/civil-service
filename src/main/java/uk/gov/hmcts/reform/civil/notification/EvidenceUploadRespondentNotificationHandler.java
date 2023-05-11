@@ -44,8 +44,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         if (null != email) {
             notificationService.sendMail(
                 email,
-                isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                                : notificationsProperties.getEvidenceUploadTemplate(),
+                getTemplate(isRespondentLip),
                 addProperties(caseData),
                 String.format(
                     REFERENCE_TEMPLATE,
@@ -53,6 +52,12 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
                 )
             );
         }
+    }
+
+    public String getTemplate(boolean isRespondentLip)
+    {
+     return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
+                                : notificationsProperties.getEvidenceUploadTemplate();
     }
 
     @Override

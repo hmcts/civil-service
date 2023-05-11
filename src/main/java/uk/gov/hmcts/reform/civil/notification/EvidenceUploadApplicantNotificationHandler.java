@@ -21,27 +21,41 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
 
     public void notifyApplicantEvidenceUpload(CaseData caseData) throws NotificationException {
 
-        boolean isApplicantLip = false;
-
-        if (YesOrNo.NO.equals(caseData.getApplicant1Represented())) {
-            isApplicantLip = true;
-        }
+        boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant
         notificationService.sendMail(
-            isApplicantLip ? caseData.getApplicant1().getPartyEmail()
-                            : caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            isApplicantLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                            : notificationsProperties.getEvidenceUploadTemplate(),
+            getEmail(caseData, isApplicantLip),
+            getTemplate(caseData, isApplicantLip),
             addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            getReference(caseData)
         );
+    }
+
+    private static String getReference(CaseData caseData) {
+        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    }
+
+    private String getTemplate(CaseData caseData, boolean isApplicantLip){
+        return isApplicantLip ? notificationsProperties.getEvidenceUploadLipTemplate()
+            : notificationsProperties.getEvidenceUploadTemplate();
+    }
+    private String getEmail(CaseData caseData, boolean isApplicantLip){
+        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+    }
+
+    private boolean isApplicantLip(CaseData caseData) {
+        if (YesOrNo.NO.equals(caseData.getApplicant1Represented())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-            );
+        );
     }
 }
