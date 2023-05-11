@@ -221,6 +221,10 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_AFTER_SDO:
                         buildClaimTakenOfflineAfterSDO(builder, caseData);
                         break;
+                    case PART_ADMIT_REJECT_REPAYMENT:
+                    case FULL_ADMIT_REJECT_REPAYMENT:
+                        buildSpecAdmitRejectRepayment(builder, caseData);
+                        break;
                     default:
                         break;
                 }
@@ -257,6 +261,7 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
+//        buildSpecAdmitRejectRepayment(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -2241,4 +2246,22 @@ public class EventHistoryMapper {
 
     }
 
+    private void buildSpecAdmitRejectRepayment(EventHistory.EventHistoryBuilder builder,
+                                               CaseData caseData) {
+
+        if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            String detailsText = "RPA Reason: Manual Determination Required.";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .litigiousPartyID(APPLICANT_ID)
+                    .eventDetailsText(detailsText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(detailsText)
+                                      .build())
+                    .build());
+        }
+    }
 }

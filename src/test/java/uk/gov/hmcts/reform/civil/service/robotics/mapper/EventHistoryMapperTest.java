@@ -7639,4 +7639,49 @@ class EventHistoryMapperTest {
         }
 
     }
+
+    @Nested
+    class RejectPaymentPlan {
+
+        @Test
+        public void shouldGenerateRPA_PartAdmitRejectPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .addRespondent2(NO)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .build();
+
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains("RPA Reason: Manual Determination Required.");
+
+
+        }
+
+        @Test
+        public void shouldGenerateRPA_FullAdmitRejectPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .addRespondent2(NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                .build();
+
+            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains("RPA Reason: Manual Determination Required.");
+
+
+        }
+    }
 }
