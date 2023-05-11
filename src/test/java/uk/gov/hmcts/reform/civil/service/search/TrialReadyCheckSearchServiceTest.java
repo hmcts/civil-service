@@ -27,6 +27,7 @@ class TrialReadyCheckSearchServiceTest extends ElasticSearchServiceTest {
                 .must(rangeQuery("data.hearingDate").lt(LocalDate.now().atTime(LocalTime.MIN).plusWeeks(3)
                                                             .toString()))
                 .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
+                .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
                 .mustNot(matchQuery("data.trialReadyChecked", "Yes")));
 
         return new Query(query, List.of("reference"), fromValue);

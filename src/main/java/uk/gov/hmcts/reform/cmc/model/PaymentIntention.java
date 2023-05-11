@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+
 import java.time.LocalDate;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
@@ -40,6 +41,10 @@ public class PaymentIntention {
     @JsonIgnore
     public boolean isPayByInstallments() {
         return paymentOption == PaymentOption.INSTALMENTS;
+    }
+
+    public boolean hasAlreadyPaid() {
+        return paymentDate != null && paymentDate.isBefore(LocalDate.now());
     }
 
 }

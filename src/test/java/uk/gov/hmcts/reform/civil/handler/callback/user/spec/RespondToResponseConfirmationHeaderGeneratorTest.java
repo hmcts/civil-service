@@ -1,18 +1,23 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AcceptPartAdmitAndPaidConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmidietelyHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
-
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
@@ -43,7 +48,9 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfHeader.class),
             Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfHeader.class),
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfHeader.class),
-            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class)
+            Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfHeader.class),
+            Pair.of(buildCaseWithMediation(), RejectWithMediationConfHeader.class),
+            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfHeader.class)
         );
     }
 
@@ -137,6 +144,22 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .build();
+    }
+
+    public static CaseData buildCaseWithMediation() {
+        return CaseData.builder().caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+            ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build()).build();
+    }
+
+    public static CaseData buildAcceptPartAdmitAndPaidCaseData() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1ProceedWithClaim(null)
             .build();
     }
 }

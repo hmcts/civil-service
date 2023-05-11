@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -39,11 +41,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    private RespondentLiPResponse respondentLiPResponse;
-
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Nested
     class AboutToStartCallback {
@@ -81,9 +83,9 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcessAndClaimStatus_whenDefendantResponseLangIsEnglish() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
                 .build();
 
-            given(respondentLiPResponse.isRespondentResponseBilingual(any())).willReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -96,14 +98,15 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         }
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenDefendantResponseLangIsBilingual() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
-            given(respondentLiPResponse.isRespondentResponseBilingual(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

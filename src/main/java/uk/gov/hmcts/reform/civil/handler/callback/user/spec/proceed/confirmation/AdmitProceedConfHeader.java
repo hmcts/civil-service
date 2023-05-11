@@ -25,7 +25,8 @@ public class AdmitProceedConfHeader implements RespondToResponseConfirmationHead
         String claimNumber = caseData.getLegacyCaseReference();
         if (caseData.getApplicant1ProceedsWithClaimSpec() == null
             || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
-            || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || (caseData.hasClaimantAgreedToFreeMediation())) {
             return Optional.empty();
         }
         return Optional.of(format(
