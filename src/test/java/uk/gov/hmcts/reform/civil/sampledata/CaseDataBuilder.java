@@ -178,6 +178,7 @@ public class CaseDataBuilder {
     protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
+    protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
@@ -1174,6 +1175,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
+        this.applicant1Represented = isRepresented;
         return this;
     }
 
@@ -5488,6 +5494,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .applicant1Represented(applicant1Represented)
             .caseDataLiP(caseDataLiP)
             .build();
     }
