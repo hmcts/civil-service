@@ -51,7 +51,7 @@ cmc-claim-store:
 
 hmc:
   api:
-    url: ${HMC_API_URL}
+    url: ${HMC_API_URL:http://localhost:8765}
 
 serviceRequest:
   api:

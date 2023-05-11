@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.hearings.hearingnotice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -10,7 +11,8 @@ import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingGetResponse;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi.SERVICE_AUTHORIZATION;
 
-@FeignClient(name = "hmc-api", url = "${hmc.api.url}")
+@FeignClient(name = "hmc-api", url = "${hmc.api.url}",
+    configuration = FeignClientProperties.FeignClientConfiguration.class)
 public interface HearingNoticeApi {
 
     String HEARING_ENDPOINT = "/hearing";
