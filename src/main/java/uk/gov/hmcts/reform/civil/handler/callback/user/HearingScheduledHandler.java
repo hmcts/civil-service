@@ -182,7 +182,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-    
+
     private List<String> checkTrueOrElseAddError(boolean condition, String error) {
         if (!condition) {
             return List.of(error);
