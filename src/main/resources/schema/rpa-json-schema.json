@@ -607,7 +607,7 @@
     },
     "litigiousPartyIDType": {
       "$id": "#/definitions/litigiousPartyIDType",
-      "type": "string",
+      "type": ["string", "null"],
       "description": "Identifies the litigant object in the json document.",
       "default": ""
     },
@@ -845,7 +845,8 @@
           },
           "litigiousPartyID": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/litigiousPartyID",
-            "type": "null"
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
           },
           "eventDetails": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails",
