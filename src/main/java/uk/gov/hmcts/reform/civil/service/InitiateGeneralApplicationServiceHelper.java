@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -251,9 +250,7 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public static boolean isWithNotice(CaseData caseData) {
-        return caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-            && caseData.getGeneralAppInformOtherParty() != null
+        return caseData.getGeneralAppInformOtherParty() != null
             && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
