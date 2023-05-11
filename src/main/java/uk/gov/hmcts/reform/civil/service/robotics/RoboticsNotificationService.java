@@ -148,13 +148,7 @@ public class RoboticsNotificationService {
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
-                                                   caseData.getLegacyCaseReference(),
-                                                   caseData.getCcdState(), triggerEvent
-            ) : String.format(
-                "LR v LR Case Data for %s",
-                caseData.getLegacyCaseReference()
-            );
+            subject = getSubjectForSpec(caseData, triggerEvent, isMultiParty);
         } else {
             subject = isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
                                                    caseData.getLegacyCaseReference(),
@@ -165,6 +159,27 @@ public class RoboticsNotificationService {
             );
         }
         log.info(String.format("Subject-------- %s", subject));
+        return subject;
+    }
+
+    private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
+        String subject = null;
+        if (caseData.isRespondent1NotRepresented()) {
+            subject = String.format(
+                "LR v LiP Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        } else if (isMultiParty) {
+            subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
+                                    caseData.getLegacyCaseReference(),
+                                    caseData.getCcdState(), triggerEvent
+            );
+        } else {
+            String.format(
+                "LR v LR Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
         return subject;
     }
 
