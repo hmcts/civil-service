@@ -23,12 +23,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -83,10 +78,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,6 +95,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -330,6 +323,75 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
             assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
                 .isEqualTo(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.name());
+        }
+    }
+
+    @Nested
+    class MidSpecHandleResponseType {
+
+        @Test
+        public void testHandleRespondentResponseTypeForSpec() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "specHandleResponseType");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("specDefenceFullAdmittedRequired", "No");
+        }
+    }
+
+    @Nested
+    class MidSetUploadTimelineTypeFlag {
+
+        @Test
+        public void testSetUploadTimelineTypeFlag() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .isRespondent1(YES)
+                .isRespondent2(YES)
+                .setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
+                .setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec.UPLOAD)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "set-upload-timeline-type-flag");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("showConditionFlags")).isNotNull();
+        }
+
+        @Test
+        public void testSetManualTimelineTypeFlag() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .isRespondent1(YES)
+                .isRespondent2(YES)
+                .setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL)
+                .setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec.MANUAL)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "set-upload-timeline-type-flag");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            Set<DefendantResponseShowTag> updatedShowConditions = new HashSet<>(caseData.getShowConditionFlags());
+            updatedShowConditions.add(DefendantResponseShowTag.TIMELINE_MANUALLY);
+            assertThat(response.getData().get("showConditionFlags")).isEqualTo(updatedShowConditions);
         }
     }
 
@@ -1136,7 +1198,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.NO)
                 .defenceAdmitPartPaymentTimeRouteRequired(
                     RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -1180,7 +1242,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.YES)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
@@ -1203,7 +1265,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .defenceAdmitPartPaymentTimeRouteRequired(
@@ -1258,7 +1320,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.FULL_DEFENCE,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -1303,7 +1365,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.PART_ADMISSION,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -1348,7 +1410,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.COUNTER_CLAIM,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
