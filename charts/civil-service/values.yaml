@@ -86,6 +86,7 @@ java:
         - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipdj
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
 
