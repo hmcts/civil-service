@@ -41,6 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
@@ -237,6 +238,56 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
         }
+
+        @Test
+        void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondentAndSpecClaimDocumentFilesNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build().toBuilder()
+                .specRespondent1Represented(YES)
+                .specClaimTemplateDocumentFiles(new Document("fake-url",
+                                                             "binary-url",
+                                                             "file-name",
+                                                             null, null))
+                .build();
+            List<DocumentMetaData> list = new ArrayList<>();
+            list.add(specClaimTimelineDocuments.get(0));
+            list.add(specClaimTimelineDocuments.get(1));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
+            verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+
+            verify(civilDocumentStitchingService).bundle(eq(list), anyString(), anyString(),
+                                                         anyString(), eq(caseData));
+        }
+
+        @Test
+        void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondentAndSpecClaimTemplateDocumentFilesNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build().toBuilder()
+                .specRespondent1Represented(YES)
+                .specClaimDetailsDocumentFiles(new Document("fake-url",
+                                                            "binary-url",
+                                                            "file-name",
+                                                            null, null))
+                .build();
+            List<DocumentMetaData> list = new ArrayList<>();
+            list.add(specClaimTimelineDocuments.get(0));
+            list.add(specClaimTimelineDocuments.get(2));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
+            verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+
+            verify(civilDocumentStitchingService).bundle(eq(list), anyString(), anyString(),
+                                                         anyString(), eq(caseData));
+        }
     }
 
     @Nested
@@ -334,5 +385,10 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimFormForSpec");
+    }
+
+    @Test
+    void testHandledEvents() {
+        assertThat(handler.handledEvents()).contains(GENERATE_CLAIM_FORM_SPEC);
     }
 }
