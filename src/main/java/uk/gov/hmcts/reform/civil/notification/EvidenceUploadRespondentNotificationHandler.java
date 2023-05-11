@@ -54,10 +54,9 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    public String getTemplate(boolean isRespondentLip)
-    {
-     return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                                : notificationsProperties.getEvidenceUploadTemplate();
+    public String getTemplate(boolean isRespondentLip) {
+        return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
+                                    : notificationsProperties.getEvidenceUploadTemplate();
     }
 
     @Override
