@@ -79,23 +79,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
-import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
-import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
-import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
-import uk.gov.hmcts.reform.civil.model.dq.Hearing;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
-import uk.gov.hmcts.reform.civil.model.dq.Witness;
-import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.dq.*;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -939,6 +923,42 @@ public class CaseDataBuilder {
         ).build();
 
         applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQSmallCalimExperts() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+
+        applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
+                                                    .expertName("Mr Expert Defendant")
+                                                    .firstName("Expert")
+                                                    .lastName("Defendant")
+                                                    .phoneNumber("07123456789")
+                                                    .emailAddress("test@email.com")
+                                                    .fieldofExpertise("Roofing")
+                                                    .estimatedCost(new BigDecimal(434))
+                                                    .build()).build();
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQSmallCalimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+
+        applicant2DQBuilder.applicant2RespondToClaimExperts(ExpertDetails.builder()
+                                                                .expertName("Mr Expert Defendant")
+                                                                .firstName("Expert")
+                                                                .lastName("Defendant")
+                                                                .phoneNumber("07123456789")
+                                                                .emailAddress("test@email.com")
+                                                                .fieldofExpertise("Roofing")
+                                                                .estimatedCost(new BigDecimal(434))
+                                                                .build()).build();
+
+        applicant2DQ = applicant2DQBuilder.build();
         return this;
     }
 
