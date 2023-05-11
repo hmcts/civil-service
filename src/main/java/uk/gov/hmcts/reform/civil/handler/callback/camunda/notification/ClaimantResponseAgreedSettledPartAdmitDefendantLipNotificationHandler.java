@@ -50,7 +50,8 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
