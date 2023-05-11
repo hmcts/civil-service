@@ -86,9 +86,9 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
 
     private String addTemplate(CaseData caseData) {
         if(caseData.isRespondentResponseBilingual()) {
-            return notificationsProperties.getRespondentDeadlineExtension();
-        } else {
             return notificationsProperties.getRespondentDeadlineExtensionWelsh();
+        } else {
+            return notificationsProperties.getRespondentDeadlineExtension();
         }
     }
 
