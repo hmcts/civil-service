@@ -36,11 +36,12 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getTemplate(CaseData caseData, boolean isApplicantLip){
+    private String getTemplate(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip ? notificationsProperties.getEvidenceUploadLipTemplate()
             : notificationsProperties.getEvidenceUploadTemplate();
     }
-    private String getEmail(CaseData caseData, boolean isApplicantLip){
+
+    private String getEmail(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
