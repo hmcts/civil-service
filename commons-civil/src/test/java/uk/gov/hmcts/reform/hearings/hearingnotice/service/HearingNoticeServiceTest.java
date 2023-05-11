@@ -3,36 +3,46 @@ package uk.gov.hmcts.reform.hearings.hearingnotice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
 import feign.Request;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hearings.hearingnotice.client.HearingNoticeApi;
 import uk.gov.hmcts.reform.hearings.hearingnotice.exception.HearingNoticeException;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.CaseDetailsHearing;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingDetails;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingGetResponse;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingRequestDetails;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingResponse;
 import uk.gov.hmcts.reform.hearings.hearingnotice.model.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hearings.hearingnotice.model.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hearings.hearingnotice.model.UnNotifiedPartiesResponse;
+import uk.gov.hmcts.reform.hearings.hearingrequest.model.PartyDetailsModel;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
 import static feign.Request.HttpMethod.GET;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {HearingNoticeApi.class})
+@ExtendWith(SpringExtension.class)
 class HearingNoticeServiceTest {
 
     @Mock
-    private AuthTokenGenerator authTokenGenerator;
+    private HearingNoticeApi hearingNoticeApi;
 
     @Mock
-    private HearingNoticeApi hearingNoticeApi;
+    private AuthTokenGenerator authTokenGenerator;
 
     @InjectMocks
     private HearingNoticeService hearingNoticeService;
@@ -43,9 +53,56 @@ class HearingNoticeServiceTest {
     private static final String HEARING_ID_2 = "hearing_id-2";
     private static final String HMCTS_SERVICE_CODE = "hmcts-service-code";
 
+    private final FeignException notFoundFeignException = new FeignException.NotFound(
+        "not found message",
+        Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+        "not found response body".getBytes(UTF_8));
+
     @BeforeEach
     void setUp() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+    }
+
+    @Nested
+    class HearingGetResponses {
+        @Test
+        void shouldGetHearingRequest() throws HearingNoticeException {
+            HearingGetResponse response = HearingGetResponse.builder()
+                .requestDetails(HearingRequestDetails.builder().build())
+                .hearingDetails(HearingDetails.builder().build())
+                .caseDetails(CaseDetailsHearing.builder().build())
+                .partyDetails(List.of(PartyDetailsModel.builder().build()))
+                .hearingResponse(HearingResponse.builder().build())
+                .build();
+
+            when(hearingNoticeApi.getHearingRequest(
+                USER_TOKEN, SERVICE_TOKEN,
+                HEARING_ID, null))
+                .thenReturn(response);
+
+            HearingGetResponse actualResponse =
+                hearingNoticeService.getHearingResponse(USER_TOKEN, HEARING_ID);
+
+            assertThat(actualResponse).isEqualTo(response);
+        }
+
+        @Test
+        void shouldThrowException_whenGetHearingRequestIsNull() {
+            when(hearingNoticeApi.getHearingRequest(
+                USER_TOKEN, SERVICE_TOKEN,
+                HEARING_ID, null))
+                .thenThrow(notFoundFeignException);
+
+            Exception exception = assertThrows(
+                HearingNoticeException.class,
+                () -> hearingNoticeService.getHearingResponse(USER_TOKEN, HEARING_ID)
+            );
+
+            String expectedMessage = "Failed to retrieve data from HMC";
+            String actualMessage = exception.getMessage();
+
+            assertTrue(actualMessage.contains(expectedMessage));
+        }
     }
 
     @Nested
@@ -72,17 +129,14 @@ class HearingNoticeServiceTest {
             PartiesNotifiedResponses result = hearingNoticeService
                 .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID);
 
-            assertThat(result.getHearingID()).isEqualTo(HEARING_ID);
-            assertThat(result.getResponses()).isEqualTo(listOfPartiesNotifiedResponses);
+            Assertions.assertThat(result.getHearingID()).isEqualTo(HEARING_ID);
+            Assertions.assertThat(result.getResponses()).isEqualTo(listOfPartiesNotifiedResponses);
         }
 
         @Test
         void shouldThrowException_whenExceptionError() {
             when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
-                .thenThrow(new FeignException.Forbidden(
-                    "forbidden message",
-                    Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-                    "forbidden response body".getBytes(UTF_8)));
+                .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(HearingNoticeException.class, () -> {
                 hearingNoticeService
@@ -114,17 +168,14 @@ class HearingNoticeServiceTest {
             UnNotifiedPartiesResponse result = hearingNoticeService
                 .getUnNotifiedHearingResponses(USER_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo);
 
-            assertThat(result.getTotalFound()).isEqualTo(2L);
-            assertThat(result.getHearingIds()).isEqualTo(listOfIds);
+            Assertions.assertThat(result.getTotalFound()).isEqualTo(2L);
+            Assertions.assertThat(result.getHearingIds()).isEqualTo(listOfIds);
         }
 
         @Test
         void shouldThrowException_whenExceptionError() {
             when(hearingNoticeApi.getUnNotifiedHearingRequest(USER_TOKEN, SERVICE_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo))
-                .thenThrow(new FeignException.Forbidden(
-                    "forbidden message",
-                    Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-                    "forbidden response body".getBytes(UTF_8)));
+                .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(HearingNoticeException.class, () -> {
                 hearingNoticeService.getUnNotifiedHearingResponses(USER_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo);

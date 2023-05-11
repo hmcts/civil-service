@@ -33,6 +33,7 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
                                                                         .atTime(LocalTime.MIN)
                                                                         .plusWeeks(6).toString()))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING)))
+                            .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
                             .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                             .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES)),
             List.of("reference"),

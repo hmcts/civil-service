@@ -54,7 +54,7 @@ public class ScreenFlowMapper {
                                                              .conditionOperator("NOT INCLUDE")
                                                              .conditionValue(HearingDetailsMapper.WELSH_REGION_ID)
                                                              .build()))
-                                     .conditionKey("region")
+                                     .conditionKey("regionId")
                                      .build());
 
         screenNavigationList.add(ScreenNavigationModel.builder()

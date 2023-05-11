@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.hearings.hearingnotice.exception.HearingNoticeExcepti
 import uk.gov.hmcts.reform.hearings.hearingnotice.model.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hearings.hearingnotice.model.UnNotifiedPartiesResponse;
 import java.time.LocalDateTime;
+import uk.gov.hmcts.reform.hearings.hearingnotice.model.HearingGetResponse;
 
 @Slf4j
 @Service
@@ -19,6 +20,20 @@ public class HearingNoticeService {
     private final HearingNoticeApi hearingNoticeApi;
     private final AuthTokenGenerator authTokenGenerator;
 
+    public HearingGetResponse getHearingResponse(String authToken, String hearingId) throws HearingNoticeException {
+        log.debug("Sending Get Hearings with Hearing ID {}", hearingId);
+        try {
+            return hearingNoticeApi.getHearingRequest(
+                authToken,
+                authTokenGenerator.generate(),
+                hearingId,
+                null);
+        } catch (FeignException ex)  {
+            log.error("Failed to retrieve hearing with Id: {} from HMC", hearingId);
+            throw new HearingNoticeException(ex);
+        }
+    }
+
     public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId) {
         log.debug("Requesting Get Parties Notified with Hearing ID {}", hearingId);
         try {
@@ -27,7 +42,7 @@ public class HearingNoticeService {
                 authTokenGenerator.generate(),
                 hearingId);
         } catch (FeignException e) {
-            log.error("Failed to retrieve hearing with Id: %s from HMC", hearingId);
+            log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
             throw new HearingNoticeException(e);
         }
     }
