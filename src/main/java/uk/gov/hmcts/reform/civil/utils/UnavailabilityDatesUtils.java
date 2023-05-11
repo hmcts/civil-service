@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+
 public class UnavailabilityDatesUtils {
 
     private UnavailabilityDatesUtils() {
@@ -17,6 +20,13 @@ public class UnavailabilityDatesUtils {
                 .unavailableDates(caseData.getRespondent1DQ().getHearing()
                                       .getUnavailableDates());
             builder.respondent1(resp1.build());
+
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
+                    .unavailableDates(caseData.getRespondent1DQ().getHearing()
+                                          .getUnavailableDates());
+                builder.respondent2(resp2.build());
+            }
 
         }
         if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null) {
