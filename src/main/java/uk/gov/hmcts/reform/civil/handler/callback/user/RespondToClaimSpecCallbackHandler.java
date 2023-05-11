@@ -764,34 +764,34 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         Set<DefendantResponseShowTag> tags = EnumSet.noneOf(DefendantResponseShowTag.class);
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
         switch (mpScenario) {
-            case ONE_V_ONE:
+            case ONE_V_ONE -> {
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
-                break;
-            case TWO_V_ONE:
+            }
+            case TWO_V_ONE -> {
                 if ((caseData.getDefendantSingleResponseToBothClaimants() == YES
                     && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
                     || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                     || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    if (caseData.getRespondentResponseIsSame() == YES
-                        || caseData.getRespondent2ClaimResponseTypeForSpec()
-                        == RespondentResponseTypeSpec.PART_ADMISSION) {
-                        tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
-                    } else {
-                        tags.add(ONLY_RESPONDENT_1_DISPUTES);
-                    }
-                } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
+            }
+            case ONE_V_TWO_ONE_LEGAL_REP -> {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                if (caseData.getRespondentResponseIsSame() == YES
+                    || caseData.getRespondent2ClaimResponseTypeForSpec()
                     == RespondentResponseTypeSpec.PART_ADMISSION) {
-                    tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
+                    tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
+                } else {
+                    tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
+                == RespondentResponseTypeSpec.PART_ADMISSION) {
+                tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
+            }
+        }
+            case ONE_V_TWO_TWO_LEGAL_REP -> {
                 if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                     && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
@@ -799,8 +799,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
                 }
-                break;
-            default:
+            }
+            default ->
                 throw new UnsupportedOperationException("Unknown mp scenario");
         }
         return tags;
@@ -1149,15 +1149,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
         Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
         switch (mpScenario) {
-            case ONE_V_ONE:
-            case TWO_V_ONE:
+            case ONE_V_ONE,TWO_V_ONE ->
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP -> {
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            }
+            case ONE_V_TWO_TWO_LEGAL_REP -> {
                 UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
                 List<String> roles = coreCaseUserService.getUserCaseRoles(
                     callbackParams.getCaseData().getCcdCaseReference().toString(),
@@ -1169,30 +1167,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
                     set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
                 }
-                break;
-            default:
+            }
+            default ->
                 throw new UnsupportedOperationException("Unknown mp scenario");
         }
         return set;
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateR1Witnesses(caseData);
-            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-            } else if (respondent2HasSameLegalRep(caseData)) {
-                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                    if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
-                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-                    }
-                }
-            }
-        }
-        return validateR1Witnesses(caseData);
+        return validateRespondentExpertsAndWitnesses(callbackParams, "witness");
     }
 
     private CallbackResponse validateR1Witnesses(CaseData caseData) {
@@ -1207,22 +1190,38 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
+        return validateRespondentExpertsAndWitnesses(callbackParams, "experts");
+    }
+
+    private CallbackResponse validateRespondentExpertsAndWitnesses(CallbackParams callbackParams, String respondantType) {
         CaseData caseData = callbackParams.getCaseData();
         if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+                if(respondantType.equals("witness"))
+                    return validateR1Witnesses(caseData);
+                else if(respondantType.equals("experts"))
+                    return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                if(respondantType.equals("witness"))
+                    return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                else if(respondantType.equals("experts"))
+                    return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
             } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                     if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
-                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                        if(respondantType.equals("witness"))
+                            return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                        else if(respondantType.equals("experts"))
+                            return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
                     }
                 }
             }
         }
-        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+        if(respondantType.equals("witness"))
+            return validateR1Witnesses(caseData);
+        else
+            return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {

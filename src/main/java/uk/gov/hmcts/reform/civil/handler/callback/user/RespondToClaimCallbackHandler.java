@@ -170,7 +170,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
-        DynamicList courtLocationList = DynamicList.builder().build();
         RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder();
 
         var updatedCaseData = caseData.toBuilder()
@@ -180,7 +179,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if ((V_1.equals(callbackParams.getVersion()) || V_2.equals(callbackParams.getVersion()))
             && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
-            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
+            DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(locations);
             requestedCourt1.responseCourtLocations(courtLocationList);
 
             if (V_2.equals(callbackParams.getVersion())) {
@@ -701,9 +700,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
             && (caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE))) {
+            RespondentResponseType.FULL_DEFENCE)))
             return true;
-        }
         return false;
     }
 

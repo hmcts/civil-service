@@ -91,6 +91,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -201,6 +202,29 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWascorrect() {
+        // Given
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.YES)
+            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
+                                                              .postCode(postCode)
+                                                              .build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        assertNull(((AboutToStartOrSubmitCallbackResponse) response).getErrors());
     }
 
     @Nested
