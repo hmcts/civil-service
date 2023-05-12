@@ -696,13 +696,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean isFullDefenceForBothDefendants(CaseData caseData) {
-        if ((caseData.getRespondent1ClaimResponseType() != null
+        return (caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE))
             && (caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(
-            RespondentResponseType.FULL_DEFENCE)))
-            return true;
-        return false;
+            RespondentResponseType.FULL_DEFENCE));
+
     }
 
     private boolean isResponseMatchingType(CaseData caseData, YesOrNo isRespondent1,
