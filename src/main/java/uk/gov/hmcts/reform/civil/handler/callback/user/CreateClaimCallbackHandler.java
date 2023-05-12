@@ -84,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.ge
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
 @Service
@@ -494,6 +495,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
+
+        if (toggleService.isHmcEnabled()) {
+            populateWithPartyIds(dataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

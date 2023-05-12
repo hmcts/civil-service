@@ -129,6 +129,7 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -1459,6 +1460,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                            .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
                 updatedData.respondent2DocumentGeneration("userRespondent2");
             }
+        }
+
+        if (toggleService.isHmcEnabled()) {
+            populateWithPartyIds(updatedData);
+
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP

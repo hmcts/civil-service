@@ -61,6 +61,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -912,6 +913,47 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             // Then
             assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
+        }
+      
+        @Test
+        void shouldAddPartyIdsToPartyFields_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondentResponseIsSame(YES)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
+            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
+            assertThat(response.getData()).extracting("respondent2").hasFieldOrProperty("partyID");
+        }
+
+        @Test
+        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondentResponseIsSame(YES)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            when(featureToggleService.isHmcEnabled()).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1")
+                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
+            assertThat(response.getData()).extracting("respondent1")
+                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
+            assertThat(response.getData()).extracting("respondent2")
+                .isEqualTo(objectMapper.convertValue(caseData.getRespondent2(), HashMap.class));
         }
 
         @Test
