@@ -29,6 +29,7 @@ public class GeneralApplication implements MappableObject {
     private final String generalAppDetailsOfOrder;
     private final String generalAppReasonsOfOrder;
     private final GAInformOtherParty generalAppInformOtherParty;
+    private final YesOrNo generalAppConsentOrder;
     private final GAUrgencyRequirement generalAppUrgencyRequirement;
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
@@ -69,6 +70,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
                        @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
                        @JsonProperty("generalAppInformOtherParty") GAInformOtherParty generalAppInformOtherParty,
+                       @JsonProperty("generalAppConsentOrder") YesOrNo generalAppConsentOrder,
                        @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
                        @JsonProperty("generalAppStatementOfTruth") GAStatementOfTruth generalAppStatementOfTruth,
                        @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
@@ -108,6 +110,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
         this.generalAppReasonsOfOrder = generalAppReasonsOfOrder;
         this.generalAppInformOtherParty = generalAppInformOtherParty;
+        this.generalAppConsentOrder = generalAppConsentOrder;
         this.generalAppUrgencyRequirement = generalAppUrgencyRequirement;
         this.generalAppStatementOfTruth = generalAppStatementOfTruth;
         this.generalAppHearingDetails = generalAppHearingDetails;

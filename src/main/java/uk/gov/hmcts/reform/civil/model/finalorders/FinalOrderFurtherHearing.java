@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingChannel;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDate;

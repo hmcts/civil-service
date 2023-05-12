@@ -39,10 +39,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingChannel;
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingDuration;
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.HearingNoticeList;
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
@@ -824,6 +824,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .findFirst().orElse(null);
     }
 
+    @JsonIgnore
+    public boolean isRespondent1LiP() {
+        return YesOrNo.NO == getRespondent1Represented();
+    }
+
     public YesOrNo getRespondent2Represented() {
         return Stream.of(
                 respondent2Represented,
@@ -831,6 +836,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isRespondent2LiP() {
+        return YesOrNo.NO == getRespondent2Represented();
     }
 
     @JsonIgnore
