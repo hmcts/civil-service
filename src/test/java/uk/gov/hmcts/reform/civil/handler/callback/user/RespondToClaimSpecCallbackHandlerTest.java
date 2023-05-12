@@ -796,6 +796,90 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
+            void oneVTwo_SecondDefendantRepliesSameLegalRep() {
+                // Given
+                DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+                DynamicList preferredCourt = DynamicList.builder()
+                    .listItems(locationValues.getListItems())
+                    .value(locationValues.getListItems().get(0))
+                    .build();
+                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+                Party defendant1 = Party.builder()
+                    .type(Party.Type.COMPANY)
+                    .companyName("company")
+                    .build();
+                CaseData caseData = CaseData.builder()
+                    .respondent2SameLegalRepresentative(YES)
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .ccdCaseReference(354L)
+                    .respondent1(defendant1)
+                    .respondent1Copy(defendant1)
+                    .respondent1DQ(
+                        Respondent1DQ.builder()
+                            .respondToCourtLocation(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .respondent2DQ(
+                        Respondent2DQ.builder()
+                            .respondToCourtLocation2(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason123")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .showConditionFlags(EnumSet.of(
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1,
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+                    ))
+                    .build();
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+
+                List<LocationRefData> locations = List.of(LocationRefData.builder().build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .thenReturn(locations);
+                LocationRefData completePreferredLocation = LocationRefData.builder()
+                    .regionId("regionId")
+                    .epimmsId("epimms")
+                    .courtLocationCode("code")
+                    .build();
+                when(courtLocationUtils.findPreferredLocationData(
+                    locations, preferredCourt
+                )).thenReturn(completePreferredLocation);
+                StateFlow flow = mock(StateFlow.class);
+                when(flow.isFlagSet(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
+                when(stateFlowEngine.evaluate(caseData)).thenReturn(flow);
+                when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                    .thenReturn(true);
+                UserInfo userInfo = UserInfo.builder().uid("798").build();
+                when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
+                    .extracting("respondent2DQRequestedCourt");
+                sent2.extracting("caseLocation")
+                    .extracting("region")
+                    .isEqualTo(completePreferredLocation.getRegionId());
+                sent2.extracting("caseLocation")
+                    .extracting("baseLocation")
+                    .isEqualTo(completePreferredLocation.getEpimmsId());
+                sent2.extracting("responseCourtCode")
+                    .isEqualTo(completePreferredLocation.getCourtLocationCode());
+                sent2.extracting("reasonForHearingAtSpecificCourt")
+                    .isEqualTo("Reason123");
+            }
+
+            @Test
             void oneVTwo_SecondDefendantReplies() {
                 // Given
                 DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
