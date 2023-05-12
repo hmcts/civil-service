@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -153,11 +154,26 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
             .appealReason(getAppealReason(caseData))
             .orderWithoutNotice(caseData.getOrderMadeOnDetailsList().name())
+            .orderInitiativeOrWithoutNoticeDate(getOrderInitiativeOrWithoutNoticeDate(caseData))
             .isReason(caseData.getFinalOrderGiveReasonsYesNo())
             .reasonText(nonNull(caseData.getFinalOrderGiveReasonsComplex())
                             ? caseData.getFinalOrderGiveReasonsComplex().getReasonsText() : "");
 
         return assistedFormOrderBuilder.build();
+    }
+
+    private LocalDate getOrderInitiativeOrWithoutNoticeDate(CaseData caseData) {
+        if (caseData.getOrderMadeOnDetailsList() != null) {
+            if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.COURTS_INITIATIVE.name())) {
+                return caseData.getOrderMadeOnDetailsOrderCourt().getOwnInitiativeDate();
+            } else if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.WITHOUT_NOTICE.name())) {
+                return caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate();
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public String getAppealFor(CaseData caseData) {
