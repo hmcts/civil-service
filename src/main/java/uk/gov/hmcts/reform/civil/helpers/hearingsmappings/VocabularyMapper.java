@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import uk.gov.hmcts.reform.hearings.hearingrequest.model.VocabularyModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 
 import java.util.List;
 
