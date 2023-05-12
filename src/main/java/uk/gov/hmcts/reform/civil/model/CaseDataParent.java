@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -427,5 +428,10 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public Optional<TranslatedDocument> getTranslatedDocument() {
+        return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
     }
 }
