@@ -25,6 +25,8 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @Slf4j
 @Service
@@ -61,6 +63,18 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             if (isHearingFeeServiceRequest(caseData)) {
+                System.out.println("standand service request");
+                log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
+                SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
+                    .fee(caseData.getHearingFee());
+                caseData = caseData.toBuilder().hearingFeePBADetails(paymentDetails.build()).build();
+            }
+            /** If hearing notice is submitted service request is made. Upon a NOC being submitted for
+              a change of claimant representative we do want  to clear any existing service request, and generate
+              a new service request, for the new representative, in order to pay.
+             */
+            if (isHearingFeeServiceRequestAfterNoticeOfChange(caseData)) {
+                System.out.println("NOC service request");
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
@@ -91,8 +105,17 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     }
 
     private boolean isHearingFeeServiceRequest(CaseData caseData) {
+        System.out.println("standard service request");
         return nonNull(caseData.getHearingDueDate())
-            && isServiceRequestNotRequested(caseData.getHearingFeePBADetails());
+            && isServiceRequestNotRequested(caseData.getHearingFeePBADetails())
+            && caseData.getChangeOfRepresentation() == null;
+    }
+
+    private boolean isHearingFeeServiceRequestAfterNoticeOfChange(CaseData caseData) {
+        System.out.println("NOC service request2");
+        return nonNull(caseData.getHearingDueDate())
+            && caseData.getChangeOfRepresentation() != null
+            && caseData.getChangeOfRepresentation().getCaseRole().equals("[RESPONDENTSOLICITORONE]");
     }
 
     private boolean isClaimFeeServiceRequest(CaseData caseData) {
