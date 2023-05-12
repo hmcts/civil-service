@@ -278,23 +278,21 @@ public class StateFlowEngine {
             // 2. Def1 unrepresented, Def2 registered
             // 3. Def1 registered, Def 2 unrepresented
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
-                            .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                            .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
-                            .and(not(specClaim)))
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-                .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
+            .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
+                        .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                        .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
+                        .and(not(specClaim))
+                        .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
+                                                   .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                                                   .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
+                                .and(specClaim)))
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
-                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-                .onlyIf(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                    .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                    .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-                    .and(specClaim))
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
+            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
