@@ -403,7 +403,6 @@ class RoboticsNotificationServiceTest {
         String message = format("Robotics case data JSON is attached for %s", reference);
         String subject = format("LR v LiP Case Data for %s", reference);
 
-
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
