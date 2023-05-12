@@ -84,6 +84,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -188,6 +189,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             authToken, HEARING_CHANNEL, serviceId
         );
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+            .getListItems()
+            .stream()
+            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+            .collect(Collectors.toList());
+        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
