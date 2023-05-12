@@ -202,7 +202,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(roboticsEmailConfiguration.getLipDJRecipient())
+                                   .to(roboticsEmailConfiguration.getLipJRecipient())
                                    .attachments(of(json(roboticsCaseDataDTO.getJsonRawData(), getFileName(params.getCaseData()))))
                                    .build());
         } catch (JsonProcessingException e) {
