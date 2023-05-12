@@ -167,7 +167,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.COURTS_INITIATIVE.name())) {
                 return caseData.getOrderMadeOnDetailsOrderCourt().getOwnInitiativeDate();
             } else if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.WITHOUT_NOTICE.name())) {
-                return caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate();
+                return caseData.getOrderMadeOnDetailsOrderWithoutNotice().getWithOutNoticeDate();
             } else {
                 return null;
             }
