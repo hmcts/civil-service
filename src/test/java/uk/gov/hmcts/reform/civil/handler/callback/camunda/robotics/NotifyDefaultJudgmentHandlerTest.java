@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -128,6 +129,22 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             verify(roboticsNotificationService, times(0)).notifyRobotics(caseData, multiPartyScenario,
                                                                          params.getParams().get(BEARER_TOKEN).toString()
             );
+        }
+
+        @Test
+        void shouldNotifyLiPJudgmentEmail_whenLiPDefendantAndPinEnabled() {
+            //Given
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
+                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            //When
+            handler.handle(params);
+
+            //Then
+            verify(roboticsNotificationService).notifyJudgementLip(caseData);
         }
     }
 

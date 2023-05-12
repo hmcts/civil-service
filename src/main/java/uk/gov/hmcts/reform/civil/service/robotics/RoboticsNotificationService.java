@@ -55,8 +55,8 @@ public class RoboticsNotificationService {
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
-    public void notifyDefaultJudgementLip(@NotNull CaseData caseData) {
-        Optional<EmailData> emailData = prepareDJLipEmail(RoboticsEmailParams.builder()
+    public void notifyJudgementLip(@NotNull CaseData caseData) {
+        Optional<EmailData> emailData = prepareJudgementLipEmail(RoboticsEmailParams.builder()
                                                               .caseData(caseData)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
@@ -194,7 +194,7 @@ public class RoboticsNotificationService {
         return recipient;
     }
 
-    private Optional<EmailData> prepareDJLipEmail(RoboticsEmailParams params) {
+    private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
         try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData());
             String triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
