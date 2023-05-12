@@ -14,26 +14,26 @@
     <notes>Temporarily suppressing it as the latest camunda connector 1.5.6 seem to have the vulnerability.</notes>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until="2023-05-26">
+  <suppress until="2023-06-05">
     <cve>CVE-2021-4277</cve>
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2021-4235</cve>
   </suppress>
-  <suppress until="2023-05-26">
+  <suppress until="2023-06-05">
     <notes>Temporarily suppressing as the latest snakeyaml 1.33 also has these vulnerabilities.</notes>
     <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2021-4235</cve>
     <cve>CVE-2022-1471</cve>
   </suppress>
-  <suppress until="2023-05-26">
+  <suppress until="2023-06-05">
     <cve>CVE-2022-45143</cve>
     <cve>CVE-2021-4235</cve>
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2022-34305</cve>
     <cve>CVE-2022-42252</cve>
   </suppress>
-  <suppress until="2023-05-26">
+  <suppress until="2023-07-26">
     <cve>CVE-2023-28708</cve>
     <cve>CVE-2023-20861</cve>
   </suppress>
@@ -41,7 +41,7 @@
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
   </suppress>
-  <suppress until="2023-06-24">
+  <suppress until="2023-07-24">
     <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
     <cve>CVE-2023-20863</cve>
   </suppress>
