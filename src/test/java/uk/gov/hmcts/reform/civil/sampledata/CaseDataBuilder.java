@@ -1456,7 +1456,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
@@ -1495,7 +1495,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssued1v2UnrepresentedDefendant() {
         atStateClaimIssuedUnrepresentedDefendants();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
         respondent2OrganisationPolicy = null;
@@ -1525,7 +1525,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
@@ -1545,7 +1545,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnregisteredDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
@@ -1612,7 +1612,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant2() {
         atStatePendingClaimIssuedUnregisteredDefendant();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
@@ -1636,7 +1636,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineSameUnregisteredDefendant() {
         atStatePendingClaimIssuedUnregisteredDefendant();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = NO;
@@ -1684,7 +1684,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent2Represented = YES;
@@ -1713,7 +1713,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -1854,8 +1854,8 @@ public class CaseDataBuilder {
             .code("CODE")
             .calculatedAmountInPence(BigDecimal.valueOf(100))
             .build();
-        applicant1 = PartyBuilder.builder().individual().build();
-        respondent1 = PartyBuilder.builder().soleTrader().build();
+        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
+        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
@@ -1995,7 +1995,7 @@ public class CaseDataBuilder {
         respondent2SameLegalRepresentative = NO;
         respondent1Represented = NO;
         respondent2Represented = NO;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         return this;
     }
 
@@ -2015,7 +2015,7 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         return this;
     }
 
@@ -2026,7 +2026,7 @@ public class CaseDataBuilder {
         respondent1Represented = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         return this;
     }
 
@@ -2462,7 +2462,7 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = NO;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
@@ -2750,14 +2750,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension() {
         atStateClaimDetailsNotifiedTimeExtension();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent2SameLegalRepresentative = NO;
         return this;
     }
 
     public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension() {
         atStateClaimDetailsNotified();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent2SameLegalRepresentative = NO;
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
         respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
@@ -2767,7 +2767,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension() {
         atStateClaimDetailsNotifiedTimeExtension();
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent2SameLegalRepresentative = YES;
         return this;
     }
@@ -3016,7 +3016,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
         atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
@@ -4087,7 +4087,7 @@ public class CaseDataBuilder {
         atStateNotificationAcknowledged();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         respondent2TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
         respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
@@ -4241,6 +4241,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addApplicant1LitigationFriend() {
         this.applicant1LitigationFriend = LitigationFriend.builder()
+            .partyID("app-1-litfriend-party-id")
             .fullName("Mr Applicant Litigation Friend")
             .firstName("Applicant")
             .lastName("Litigation Friend")
@@ -4254,6 +4255,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addApplicant2LitigationFriend() {
         this.applicant2LitigationFriend = LitigationFriend.builder()
+            .partyID("app-2-litfriend-party-id")
             .fullName("Mr Applicant Litigation Friend")
             .firstName("Applicant Two")
             .lastName("Litigation Friend")
@@ -4267,6 +4269,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addRespondent1LitigationFriend() {
         this.respondent1LitigationFriend = LitigationFriend.builder()
+            .partyID("res-1-litfriend-party-id")
             .fullName("Mr Litigation Friend")
             .firstName("Litigation")
             .lastName("Friend")
@@ -4289,6 +4292,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addRespondent2LitigationFriend() {
         this.respondent2LitigationFriend = LitigationFriend.builder()
+            .partyID("res-2-litfriend-party-id")
             .fullName("Mr Litigation Friend")
             .firstName("Litigation")
             .lastName("Friend")
@@ -4314,7 +4318,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         return this;
@@ -4322,7 +4326,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantsLiP() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2Represented = NO;
         this.respondent1Represented = NO;
         return this;
@@ -4330,7 +4334,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -4339,14 +4343,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2SameLegalRepresentative = YES;
         return this;
     }
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsSpec() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         this.specRespondent1Represented = YES;
@@ -4376,7 +4380,8 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
-        this.applicant2 = PartyBuilder.builder().individual("Jason").build();
+        this.applicant2 = PartyBuilder.builder().individual("Jason").build()
+            .toBuilder().partyID("app-2-party-id").build();
         return this;
     }
 
@@ -4590,14 +4595,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lip_1Lr() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendant1Lip1Lr();
-        respondent2 = PartyBuilder.builder().soleTrader().build();
+        respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lr_1Lip() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendant1Lr1Lip();
-        respondent2 = PartyBuilder.builder().soleTrader().build();
+        respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
         return this;
     }
 
@@ -4969,10 +4974,12 @@ public class CaseDataBuilder {
                                        .build())
             .build();
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                   .partyID("app-1-expert-party-id")
                                                    .firstName("Applicant")
                                                    .lastName("Expert")
                                                    .build());
         this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                   .partyID("app-1-witness-party-id")
                                                    .firstName("Applicant")
                                                    .lastName("Witness")
                                                    .build());
@@ -4999,10 +5006,12 @@ public class CaseDataBuilder {
                                        .build())
             .build();
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
+                                                 .partyID("app-2-expert-party-id")
                                                  .firstName("Applicant Two")
                                                  .lastName("Expert")
                                                  .build());
         this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
+                                                   .partyID("app-2-witness-party-id")
                                                    .firstName("Applicant Two")
                                                    .lastName("Witness")
                                                    .build());
@@ -5029,10 +5038,12 @@ public class CaseDataBuilder {
                                         .build())
             .build();
         this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
+                                                   .partyID("res-1-expert-party-id")
                                                  .firstName("Respondent")
                                                  .lastName("Expert")
                                                  .build());
         this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
+                                                     .partyID("res-1-witness-party-id")
                                                    .firstName("Respondent")
                                                    .lastName("Witness")
                                                    .build());
@@ -5059,10 +5070,12 @@ public class CaseDataBuilder {
                                         .build())
             .build();
         this.respondent2Experts = wrapElements(PartyFlagStructure.builder()
+                                                   .partyID("res-2-expert-party-id")
                                                    .firstName("Respondent Two")
                                                    .lastName("Expert")
                                                    .build());
         this.respondent2Witnesses = wrapElements(PartyFlagStructure.builder()
+                                                     .partyID("res-2-witness-party-id")
                                                      .firstName("Respondent Two")
                                                      .lastName("Witness")
                                                      .build());
@@ -5075,6 +5088,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withApplicant1Flags(List<Element<FlagDetail>> flags) {
         this.applicant1 = applicant1.toBuilder()
+            .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(applicant1.getPartyName())
                        .roleOnCase("Applicant 1")
@@ -5175,6 +5189,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withRespondent1LitigationFriendFlags(List<Element<FlagDetail>> flags) {
         this.respondent1LitigationFriend = respondent1LitigationFriend.toBuilder()
+            .partyID("res-1-litfriend-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1LitigationFriend.getFullName())
                        .roleOnCase("Respondent 1 Litigation Friend")
@@ -5190,6 +5205,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withRespondent1Flags(List<Element<FlagDetail>> flags) {
         this.respondent1 = respondent1.toBuilder()
+            .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1.getPartyName())
                        .roleOnCase("Respondent 1")
@@ -5200,36 +5216,32 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withRespondent1WitnessFlags() {
-        return withRespondent1WitnessFlags(flagDetails());
-    }
-
-    public CaseDataBuilder withRespondent1WitnessFlags(List<Element<FlagDetail>> flags) {
-        this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
-            .firstName("W first")
-            .lastName("W last")
-            .flags(Flags.builder()
-                       .partyName("W First W Last")
-                       .roleOnCase("Respondent 1 Witness")
-                       .details(flags)
-                       .build())
-            .build());
+        this.respondent1Witnesses = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-witness-party-id")
+                .firstName("W first")
+                .lastName("W last")
+                .flags(Flags.builder()
+                           .partyName("W First W Last")
+                           .roleOnCase("Respondent 1 Witness")
+                           .details(flagDetails())
+                           .build())
+                .build());
         return this;
     }
 
     public CaseDataBuilder withRespondent1ExpertFlags() {
-        return withRespondent1ExpertFlags(flagDetails());
-    }
-
-    public CaseDataBuilder withRespondent1ExpertFlags(List<Element<FlagDetail>> flags) {
-        this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
-                                              .firstName("E first")
-                                              .lastName("E last")
-                                              .flags(Flags.builder()
-                                                         .partyName("E First E Last")
-                                                         .roleOnCase("Respondent 1 Expert")
-                                                         .details(flags)
-                                                         .build())
-                                              .build());
+        this.respondent1Experts = wrapElements(
+            PartyFlagStructure.builder()
+                .partyID("res-1-expert-party-id")
+                .firstName("E first")
+                .lastName("E last")
+                .flags(Flags.builder()
+                           .partyName("E First E Last")
+                           .roleOnCase("Respondent 1 Expert")
+                           .details(flagDetails())
+                           .build())
+                .build());
         return this;
     }
 

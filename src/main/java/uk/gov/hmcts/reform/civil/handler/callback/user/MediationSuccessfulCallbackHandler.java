@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
     private CallbackResponse submitSuccessfulMediation(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(callbackParams.getCaseData().toMap(objectMapper))
+            .state(CASE_STAYED.name())
             .build();
     }
 }

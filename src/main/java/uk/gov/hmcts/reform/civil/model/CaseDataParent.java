@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -378,13 +379,6 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
-    private final List<Element<PartyFlagStructure>> applicantExperts;
-    private final List<Element<PartyFlagStructure>> respondent1Experts;
-    private final List<Element<PartyFlagStructure>> respondent2Experts;
-    private final List<Element<PartyFlagStructure>> applicantWitnesses;
-    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
-    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -430,5 +424,10 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public Optional<TranslatedDocument> getTranslatedDocument() {
+        return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
     }
 }

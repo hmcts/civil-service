@@ -39,6 +39,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
@@ -86,19 +90,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
-import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -141,7 +141,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -179,9 +178,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
-
-    @Builder.Default
-    private final List<Element<Document>> generalAppEvidenceDocument = new ArrayList<>();
 
     @Builder.Default
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
@@ -700,8 +696,44 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
+    private final List<Element<Document>> generalAppEvidenceDocument;
+
+    private final List<Element<Document>> gaEvidenceDocStaff;
+    private final List<Element<Document>> gaEvidenceDocClaimant;
+    private final List<Element<Document>> gaEvidenceDocRespondentSol;
+    private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> hearingOrderDocument;
+
+    private final List<Element<CaseDocument>> hearingOrderDocStaff;
+    private final List<Element<CaseDocument>> hearingOrderDocClaimant;
+    private final List<Element<CaseDocument>> hearingOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> hearingOrderDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> requestForInformationDocument;
+
+    private final List<Element<CaseDocument>> requestForInfoDocStaff;
+    private final List<Element<CaseDocument>> requestForInfoDocClaimant;
+    private final List<Element<CaseDocument>> requestForInfoDocRespondentSol;
+    private final List<Element<CaseDocument>> requestForInfoDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> writtenRepSequentialDocument;
+
+    private final List<Element<CaseDocument>> writtenRepSeqDocStaff;
+    private final List<Element<CaseDocument>> writtenRepSeqDocClaimant;
+    private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSol;
+    private final List<Element<CaseDocument>> writtenRepSeqDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> writtenRepConcurrentDocument;
+
+    private final List<Element<CaseDocument>> writtenRepConDocStaff;
+    private final List<Element<CaseDocument>> writtenRepConDocClaimant;
+    private final List<Element<CaseDocument>> writtenRepConDocRespondentSol;
+    private final List<Element<CaseDocument>> writtenRepConDocRespondentSolTwo;
+
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
+
     //case progression
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
@@ -780,6 +812,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
     private final Flags caseFlags;
+    private final List<Element<PartyFlagStructure>> applicantExperts;
+    private final List<Element<PartyFlagStructure>> respondent1Experts;
+    private final List<Element<PartyFlagStructure>> respondent2Experts;
+    private final List<Element<PartyFlagStructure>> applicantWitnesses;
+    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
+    private final List<Element<PartyFlagStructure>> applicantSolOrgIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1SolOrgIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant1SolOrgIndividuals;
     private final YesOrNo urgentFlag;
     private final String caseProgAllocatedTrack;
 

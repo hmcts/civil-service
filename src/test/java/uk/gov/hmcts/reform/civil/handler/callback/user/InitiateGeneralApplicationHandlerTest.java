@@ -816,7 +816,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                                                                 any(CaseData.class), any(UserDetails.class)))
                 .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
@@ -840,7 +840,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                     any(CaseData.class), any(UserDetails.class)))
                     .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
@@ -939,7 +939,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     }
             );
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                     any(CaseData.class), any(UserDetails.class)))
                     .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
