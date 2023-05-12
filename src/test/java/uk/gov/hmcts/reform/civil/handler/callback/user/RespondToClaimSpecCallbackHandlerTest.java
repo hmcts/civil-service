@@ -103,6 +103,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -812,6 +814,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(YES)
                     .caseAccessCategory(SPEC_CLAIM)
                     .ccdCaseReference(354L)
+                    .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                    .respondent2ClaimResponseTypeForSpec(FULL_ADMISSION)
                     .respondent1(defendant1)
                     .respondent1Copy(defendant1)
                     .respondent1DQ(
@@ -1202,7 +1206,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                    .whenWillThisAmountBePaid(whenWillPay).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                 .respondToAdmittedClaimOwingAmountPounds(admitted)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -1221,7 +1225,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.NO)
                 .defenceAdmitPartPaymentTimeRouteRequired(
                     RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -1265,7 +1269,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.YES)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
@@ -1288,7 +1292,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .defenceAdmitPartPaymentTimeRouteRequired(
@@ -1343,7 +1347,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.FULL_DEFENCE,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -1388,7 +1392,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.PART_ADMISSION,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -1433,7 +1437,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
                     RespondentResponseTypeSpec.COUNTER_CLAIM,
-                    RespondentResponseTypeSpec.FULL_ADMISSION
+                    FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
