@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -33,16 +35,30 @@ public class DocumentHearingLocationHelper {
 
         LocationRefData locationRefData = Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(CaseLocationCivil::getBaseLocation)
-            .map(baseLocation -> locationRefDataService.getCourtLocationsByEpimmsId(
-                authorisation,
-                baseLocation
-            )).flatMap(list -> list.stream()
-                .filter(location -> StringUtils.equals(
+            .map(baseLocation -> {
+                List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsId(
+                    authorisation,
+                    baseLocation
+                ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()
-                ))
-                .findFirst())
-            .orElse(null);
+                )).collect(Collectors.toList());
+                if (sameLocation.isEmpty()) {
+                    return null;
+                } else if (sameLocation.size() == 1) {
+                    log.info("Claim " + caseData.getLegacyCaseReference()
+                                 + " found one matching location: " + LocationRefDataService.getDisplayEntry(
+                        sameLocation.get(0)));
+                    return sameLocation.get(0);
+                } else {
+                    log.info("Claim " + caseData.getLegacyCaseReference() +
+                                 "found " + sameLocation.size() + " locations with same epimmsId and region "
+                                 + baseLocation + "/" + caseData.getCaseManagementLocation().getRegion()
+                                 + ": " + sameLocation.stream().map(LocationRefDataService::getDisplayEntry)
+                        .collect(Collectors.joining(", ")));
+                    return sameLocation.get(0);
+                }
+            }).orElse(null);
         if (locationRefData == null) {
             if (caseData.getCaseManagementLocation() == null) {
                 log.info("Case management location is empty for " + caseData.getLegacyCaseReference());
