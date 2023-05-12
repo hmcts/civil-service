@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -266,6 +267,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         assembleResponseDocuments(caseData, builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(builder);
+        }
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
