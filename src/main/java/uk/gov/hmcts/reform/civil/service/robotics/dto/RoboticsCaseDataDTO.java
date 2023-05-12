@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
