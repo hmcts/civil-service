@@ -105,7 +105,6 @@ public class InitiateGeneralApplicationServiceHelper {
                     applicantBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                 .getOrganisation().getOrganisationID());
 
-                    /*test the logic*/
                     if (caseData.getGeneralAppEvidenceDocument() != null) {
 
                         claimantDocument.addAll(caseData.getGeneralAppEvidenceDocument());
@@ -116,7 +115,6 @@ public class InitiateGeneralApplicationServiceHelper {
 
                     applicantBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
-                    /*test the logic*/
                     if (caseData.getGeneralAppEvidenceDocument() != null) {
                         respondentDoc.addAll(caseData.getGeneralAppEvidenceDocument());
                         dataBuilder.gaEvidenceDocRespondentSol(respondentDoc);
@@ -128,7 +126,6 @@ public class InitiateGeneralApplicationServiceHelper {
 
                     applicantBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
 
-                    /*test the logic*/
                     if (caseData.getGeneralAppEvidenceDocument() != null) {
                         respondentDocTwo.addAll(caseData.getGeneralAppEvidenceDocument());
                         dataBuilder.gaEvidenceDocRespondentSolTwo(respondentDocTwo);
@@ -172,7 +169,6 @@ public class InitiateGeneralApplicationServiceHelper {
                             specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                    .getOrganisation().getOrganisationID());
 
-                            /*test the logic*/
                             if (caseData.getGeneralAppEvidenceDocument() != null && isWithNotice(caseData)) {
                                 claimantDocument.addAll(caseData.getGeneralAppEvidenceDocument());
                                 dataBuilder.gaEvidenceDocClaimant(claimantDocument);
@@ -184,7 +180,6 @@ public class InitiateGeneralApplicationServiceHelper {
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
-                        /*test the logic*/
                         if (caseData.getGeneralAppEvidenceDocument() != null && isWithNotice(caseData)) {
                             respondentDoc.addAll(caseData.getGeneralAppEvidenceDocument());
                             dataBuilder.gaEvidenceDocRespondentSol(respondentDoc);
@@ -196,7 +191,6 @@ public class InitiateGeneralApplicationServiceHelper {
                         specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
 
-                        /*test the logic*/
                         if (caseData.getGeneralAppEvidenceDocument() != null && isWithNotice(caseData)) {
                             respondentDocTwo.addAll(caseData.getGeneralAppEvidenceDocument());
                             dataBuilder.gaEvidenceDocRespondentSolTwo(respondentDocTwo);
