@@ -7660,8 +7660,6 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains("RPA Reason: Manual Determination Required.");
-
-
         }
 
         @Test
@@ -7680,8 +7678,6 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains("RPA Reason: Manual Determination Required.");
-
-
         }
     }
 }

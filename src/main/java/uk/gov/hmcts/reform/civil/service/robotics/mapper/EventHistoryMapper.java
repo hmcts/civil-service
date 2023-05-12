@@ -261,7 +261,6 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
-//        buildSpecAdmitRejectRepayment(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
