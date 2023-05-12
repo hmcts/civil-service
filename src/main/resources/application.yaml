@@ -389,7 +389,7 @@ robotics:
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
     specRecipient: hmcts.civil.multiparty.robotics@gmail.com
-    lipDJRecipient: civilmoneyclaimsdemo@gmail.com
+    lipJRecipient: civilmoneyclaimsdemo@gmail.com
 
 notification:
   caseworker:
