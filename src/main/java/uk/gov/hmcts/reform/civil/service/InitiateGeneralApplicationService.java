@@ -94,6 +94,9 @@ public class InitiateGeneralApplicationService {
         + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
+    public static final String INVALID_SETTLE_OR_DISCONTINUE_CONSENT = "Settle or Discontinue by consent " +
+            "must have been agreed with the respondent " +
+            "before raising the application";
 
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
@@ -148,11 +151,18 @@ public class InitiateGeneralApplicationService {
             caseType = CaseCategory.UNSPEC_CLAIM;
         }
 
-        if (caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
-            applicationBuilder
-                .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-                .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+        if (caseData.getGeneralAppRespondentAgreement() != null) {
+            if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+                applicationBuilder
+                        .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                        .generalAppConsentOrder(NO)
+                        .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+            } else {
+                applicationBuilder
+                        .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                        .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+            }
         } else {
             applicationBuilder
                 .generalAppInformOtherParty(GAInformOtherParty.builder().build())
