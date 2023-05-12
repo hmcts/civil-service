@@ -135,7 +135,6 @@ public class RoboticsNotificationService {
         return roboticsCaseDataDTO;
     }
 
-
     private String getMessage(CaseData caseData, boolean isMultiParty) {
         return isMultiParty ? String.format("Multiparty claim data for %s - %s", caseData.getLegacyCaseReference(),
                                             caseData.getCcdState()
@@ -175,7 +174,7 @@ public class RoboticsNotificationService {
                                     caseData.getCcdState(), triggerEvent
             );
         } else {
-           subject = String.format(
+            subject = String.format(
                 "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
@@ -196,14 +195,17 @@ public class RoboticsNotificationService {
     }
 
     private Optional<EmailData> prepareDJLipEmail(RoboticsEmailParams params) {
-        try{
+        try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData());
             String triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
                                    .to(roboticsEmailConfiguration.getLipJRecipient())
-                                   .attachments(of(json(roboticsCaseDataDTO.getJsonRawData(), getFileName(params.getCaseData()))))
+                                   .attachments(of(json(
+                                       roboticsCaseDataDTO.getJsonRawData(),
+                                       getFileName(params.getCaseData())
+                                   )))
                                    .build());
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);

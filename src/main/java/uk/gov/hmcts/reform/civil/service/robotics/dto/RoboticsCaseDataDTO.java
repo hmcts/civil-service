@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 @Getter
 @Builder
 public class RoboticsCaseDataDTO {
+
     byte [] jsonRawData;
     private EventHistory events;
 }
