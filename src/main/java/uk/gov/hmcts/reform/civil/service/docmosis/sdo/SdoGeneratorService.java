@@ -46,16 +46,18 @@ public class SdoGeneratorService {
 
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
+        boolean isJudge = userDetails.getRoles().stream()
+            .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-            templateData = getTemplateDataSmall(caseData, judgeName, authorisation);
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_FAST;
-            templateData = getTemplateDataFast(caseData, judgeName, authorisation);
+            templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
-            templateData = getTemplateDataDisposal(caseData, judgeName, authorisation);
+            templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -77,8 +79,9 @@ public class SdoGeneratorService {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, String authorisation) {
+    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
+            .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -180,8 +183,9 @@ public class SdoGeneratorService {
         return sdoDocumentBuilder.build();
     }
 
-    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, String authorisation) {
+    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
+            .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -304,8 +308,9 @@ public class SdoGeneratorService {
         return sdoDocumentFormBuilder.build();
     }
 
-    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, String authorisation) {
+    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
+            .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())

@@ -55,6 +55,7 @@ public class SdoDocumentFormSmall implements MappableObject {
 
     private final boolean hasCreditHire;
     private final boolean hasRoadTrafficAccident;
+    private final boolean writtenByJudge;
 
     private final SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private final SmallClaimsHearing smallClaimsHearing;

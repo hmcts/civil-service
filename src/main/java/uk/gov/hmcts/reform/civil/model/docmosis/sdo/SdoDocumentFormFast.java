@@ -66,6 +66,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean hasHousingDisrepair;
     private final boolean hasPersonalInjury;
     private final boolean hasRoadTrafficAccident;
+    private final boolean writtenByJudge;
 
     private final FastTrackJudgesRecital fastTrackJudgesRecital;
     private final FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
