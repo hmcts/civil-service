@@ -175,7 +175,7 @@ public class RoboticsNotificationService {
                                     caseData.getCcdState(), triggerEvent
             );
         } else {
-            String.format(
+           subject = String.format(
                 "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
