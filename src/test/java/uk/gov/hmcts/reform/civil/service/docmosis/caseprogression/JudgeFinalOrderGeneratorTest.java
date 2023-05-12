@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.TrialNoticeProcedure;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
@@ -180,6 +181,7 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -204,6 +206,7 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -233,6 +236,7 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
             .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now()).build())
             .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList)
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
