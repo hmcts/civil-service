@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -148,6 +149,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper
             .setRespondentDetailsIfPresent(
+                CaseData.builder(),
                 GeneralApplication.builder().build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
@@ -177,7 +179,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignedUserRoles(getCaseUsersWithEmptyRole()).build());
 
         assertThrows(IllegalArgumentException.class, () -> helper
-            .setRespondentDetailsIfPresent(
+            .setRespondentDetailsIfPresent(CaseData.builder(),
                 GeneralApplication.builder().build(),
                 getTestCaseData(CaseData.builder().build(), true),
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
@@ -191,7 +193,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> helper
-                .setRespondentDetailsIfPresent(
+                .setRespondentDetailsIfPresent(CaseData.builder(),
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L).build(),
                     getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
@@ -207,6 +209,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             IllegalArgumentException.class,
             () -> helper
                 .setRespondentDetailsIfPresent(
+                    CaseData.builder(),
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
@@ -225,6 +228,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             IllegalArgumentException.class,
             () -> helper
                 .setRespondentDetailsIfPresent(
+                    CaseData.builder(),
                     GeneralApplication.builder().build(),
                     CaseData.builder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
@@ -245,6 +249,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            CaseData.builder(),
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -283,6 +288,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            CaseData.builder(),
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -323,6 +329,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            CaseData.builder(),
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -373,8 +380,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsers()).build());
-
+        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            cdBuilder,
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -388,7 +396,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                   .organisation(Organisation.builder().organisationID("123").build())
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE
                                                                                  .getFormattedName())
-                                                  .build()).build(),
+                                                  .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .build(),
             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
         );
 
@@ -411,7 +421,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
-
+        CaseData updateData = cdBuilder.build();
+        assertThat(updateData.getGaEvidenceDocClaimant().size()).isEqualTo(1);
+        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -420,8 +432,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
-
+        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            cdBuilder,
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -438,6 +451,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .build())
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
                 .build(),
             getUserDetails("1", RESPONDENT_EMAIL_ID_CONSTANT)
         );
@@ -462,6 +476,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
+        CaseData updateData = cdBuilder.build();
+        assertThat(updateData.getGaEvidenceDocRespondentSol().size()).isEqualTo(1);
+        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -470,8 +487,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
-
+        CaseData.CaseDataBuilder cdBuilder = CaseData.builder();
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            cdBuilder,
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
                 .addRespondent2(YesOrNo.NO)
@@ -497,7 +515,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder().organisationID("6789").build())
                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                        .build()).build(),
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                .build(),
             getUserDetails("2", TEST_USER_EMAILID)
         );
 
@@ -524,6 +544,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
+        CaseData updateData = cdBuilder.build();
+        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
