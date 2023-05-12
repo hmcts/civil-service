@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @AllArgsConstructor
 public class Party {
 
+    private String partyID;
     private Type type;
     private String individualTitle;
     private String individualFirstName;
