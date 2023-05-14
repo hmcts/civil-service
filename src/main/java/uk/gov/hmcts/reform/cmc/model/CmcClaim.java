@@ -248,6 +248,11 @@ public class CmcClaim implements Claim {
         return hasResponse() && response.isPartAdmit();
     }
 
+    @Override
+    public boolean isHearingFormGenerated() {
+        return false;
+    }
+
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return hasClaimantResponse()

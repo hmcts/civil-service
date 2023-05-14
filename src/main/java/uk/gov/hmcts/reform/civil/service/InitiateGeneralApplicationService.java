@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
@@ -32,10 +32,10 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -81,6 +81,7 @@ public class InitiateGeneralApplicationService {
     private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
+    public static final String GA_DOC_CATEGORY_ID = "applications";
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
     public static final String URGENCY_DATE_SHOULD_NOT_BE_PROVIDED = "Urgency consideration date should not be "
         + "provided for a non-urgent application.";
@@ -94,6 +95,9 @@ public class InitiateGeneralApplicationService {
         + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
+    public static final String INVALID_SETTLE_OR_DISCONTINUE_CONSENT = "Settle or Discontinue by consent " +
+            "must have been agreed with the respondent " +
+            "before raising the application";
 
     private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
             AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
@@ -102,7 +106,7 @@ public class InitiateGeneralApplicationService {
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         List<Element<GeneralApplication>> applications =
-            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
+            addApplication(buildApplication(dataBuilder, caseData, userDetails, authToken), caseData.getGeneralApplications());
 
         return dataBuilder
             .generalApplications(applications)
@@ -122,7 +126,8 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
+    private GeneralApplication buildApplication(CaseData.CaseDataBuilder dataBuilder,
+                                                CaseData caseData, UserDetails userDetails, String authToken) {
         CaseCategory caseType;
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
@@ -148,11 +153,18 @@ public class InitiateGeneralApplicationService {
             caseType = CaseCategory.UNSPEC_CLAIM;
         }
 
-        if (caseData.getGeneralAppRespondentAgreement() != null
-            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
-            applicationBuilder
-                .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-                .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+        if (caseData.getGeneralAppRespondentAgreement() != null) {
+            if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+                applicationBuilder
+                        .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                        .generalAppConsentOrder(NO)
+                        .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+            } else {
+                applicationBuilder
+                        .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                        .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+            }
         } else {
             applicationBuilder
                 .generalAppInformOtherParty(GAInformOtherParty.builder().build())
@@ -179,7 +191,14 @@ public class InitiateGeneralApplicationService {
 
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
             && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
+            if (Objects.isNull(caseData.getGeneralAppN245FormUpload().getCategoryID())) {
+                caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID);
+            }
             applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
+            List<Element<Document>> gaEvidenceDoc = ofNullable(caseData.getGeneralAppEvidenceDocument())
+                    .orElse(newArrayList());
+            gaEvidenceDoc.add(element(caseData.getGeneralAppN245FormUpload()));
+            applicationBuilder.generalAppEvidenceDocument(gaEvidenceDoc);
         }
 
         GeneralApplication generalApplication = applicationBuilder
@@ -200,7 +219,7 @@ public class InitiateGeneralApplicationService {
                                        .build())
             .build();
 
-        return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(dataBuilder, generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
