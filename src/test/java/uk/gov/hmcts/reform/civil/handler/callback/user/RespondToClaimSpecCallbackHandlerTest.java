@@ -213,7 +213,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void midSpecCorrespondenceAddress_checkAddressIfWascorrect() {
+    void midSpecCorrespondenceAddress_checkAddressWhencorrect() {
         // Given
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
