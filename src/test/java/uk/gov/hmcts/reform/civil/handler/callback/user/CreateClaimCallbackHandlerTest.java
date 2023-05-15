@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,19 +21,22 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -43,6 +49,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -57,15 +64,18 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -86,6 +96,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbac
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -107,7 +118,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     StateFlowEngine.class,
     ValidationAutoConfiguration.class,
     ValidateEmailService.class,
-    OrganisationService.class},
+    OrganisationService.class,
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -155,6 +167,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -1668,6 +1683,98 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("Organisation")
                     .isNull();
             }
+        }
+
+        static Stream<Arguments> caseDataStream() {
+            DocumentWithRegex documentRegex = new DocumentWithRegex(Document.builder()
+                                                                        .documentUrl("fake-url")
+                                                                        .documentFileName("file-name")
+                                                                        .documentBinaryUrl("binary-url")
+                                                                        .build());
+            List<Element<DocumentWithRegex>> documentList = new ArrayList<>();
+            List<Element<Document>> documentList2 = new ArrayList<>();
+            documentList.add(element(documentRegex));
+            documentList2.add(element(Document.builder()
+                                          .documentUrl("fake-url")
+                                          .documentFileName("file-name")
+                                          .documentBinaryUrl("binary-url")
+                                          .build()));
+
+            var documentToUpload = ServedDocumentFiles.builder()
+                .particularsOfClaimDocument(documentList2)
+                .medicalReport(documentList)
+                .scheduleOfLoss(documentList)
+                .certificateOfSuitability(documentList)
+                .other(documentList).build();
+
+            return Stream.of(
+                arguments(CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .uploadParticularsOfClaim(YES)
+                    .servedDocumentFiles(documentToUpload)
+                    .build())
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("caseDataStream")
+        void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            // When
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getMedicalReport().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getOther().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+
+        }
+
+        @Test
+        void shouldNotAssignCategoryIds_whenDocumentNotExist() {
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .uploadParticularsOfClaim(NO)
+                .build();
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            // Then
+            assertThat(response.getData()).extracting("servedDocumentFiles").isNull();
+        }
+
+        @Test
+        void shouldNotAssignCategoryIds_whenDocumentNotExistAndParticularOfClaimTextExists() {
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
+                .particularsOfClaimText("Some string").build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .uploadParticularsOfClaim(YES)
+                .servedDocumentFiles(servedDocumentFiles)
+                .build();
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getMedicalReport()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getOther()).isNull();
         }
     }
 
