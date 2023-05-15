@@ -4278,7 +4278,6 @@ class StateFlowEngineTest {
         void fullDefenceAllMediationSpec_WithLrVLipFlag() {
             // Given
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 // spec claim
@@ -4444,8 +4443,6 @@ class StateFlowEngineTest {
 
         @Test
         void partAdmitNoMediationSpec() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 // spec claim
                 .caseAccessCategory(SPEC_CLAIM)
@@ -4481,8 +4478,6 @@ class StateFlowEngineTest {
     class FromPartAdmitNotSettledNoMediation {
         @Test
         void partAdmitNoMediationSpec() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 // spec claim
                 .caseAccessCategory(SPEC_CLAIM)
