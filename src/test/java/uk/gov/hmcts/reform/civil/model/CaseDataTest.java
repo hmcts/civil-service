@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
@@ -130,7 +131,7 @@ public class CaseDataTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimSettled());
+        assertTrue(caseData.isPartAdmitClaimSettled());
     }
 
     @Test
@@ -140,7 +141,7 @@ public class CaseDataTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimNotSettled());
+        assertTrue(caseData.isPartAdmitClaimNotSettled());
     }
 
     @Test
@@ -148,7 +149,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimSpec());
+        assertTrue(caseData.isPartAdmitClaimSpec());
     }
 
     @Test
@@ -156,7 +157,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
+        assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
     }
 
     @Test
@@ -164,7 +165,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
+        assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
     }
 
     @Test
@@ -172,7 +173,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
+        assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
     }
 
     @Test
@@ -180,6 +181,18 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+        assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+    }
+
+    @Test
+    public void givenRespondentUnrepresentedAndOnvOne_whenIsLRvLipOneVOne_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().build())
+            .applicant1(Party.builder().build())
+            .build();
+        //Then
+        assertTrue(caseData.isLRvLipOneVOne());
     }
 }
