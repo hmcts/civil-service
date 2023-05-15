@@ -64,6 +64,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -159,6 +160,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @Autowired
+    private ObjectMapper objMapper;
 
     @MockBean
     private PostcodeValidator postcodeValidator;
@@ -1388,6 +1392,28 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
+        }
+
+        @Test
+        void shouldAddPartyIdsToPartyFields_whenInvoked() {
+            when(toggleService.isHmcEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
+            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
+        }
+
+        @Test
+        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
+            when(toggleService.isHmcEnabled()).thenReturn(false);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1")
+                .isEqualTo(objMapper.convertValue(caseData.getApplicant1(), HashMap.class));
+            assertThat(response.getData()).extracting("respondent1")
+                .isEqualTo(objMapper.convertValue(caseData.getRespondent1(), HashMap.class));
         }
 
         @Test
