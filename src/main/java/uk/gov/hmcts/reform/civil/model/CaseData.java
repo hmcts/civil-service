@@ -138,9 +138,10 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -922,26 +923,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanYes() {
+    public boolean isDefendantPaymentPlanYes() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
-        return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+        return hasApplicantAcceptedRepaymentPlan()
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanNo() {
+    public boolean isDefendantPaymentPlanNo() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
-        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
+        return hasApplicantRejectedRepaymentPlan()
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
@@ -1040,9 +1039,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
-        return YesOrNo.NO.equals(getSpecRespondent1Represented())
-            && multiPartyScenario.equals(ONE_V_ONE);
+    public boolean isRespondent1NotRepresented() {
+        return NO.equals(getRespondent1Represented());
+    }
+
+    @JsonIgnore
+    public boolean isLRvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isOneVOne(this);
     }
 
     @JsonIgnore
