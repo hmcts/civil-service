@@ -28,7 +28,7 @@ public class ClaimStoreService {
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim -> DashboardClaimInfo.builder()
-            .createdDate(cmcClaim.getCreatedAt().atTime(LocalTime.of(0,0,0)))
+            .createdDate(cmcClaim.getCreatedAt().atTime(LocalTime.of(0, 0, 0)))
             .claimId(cmcClaim.getExternalId())
             .claimNumber(cmcClaim.getReferenceNumber())
             .claimantName(cmcClaim.getClaimantName())

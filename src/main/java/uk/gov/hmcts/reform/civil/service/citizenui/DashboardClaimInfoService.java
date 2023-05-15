@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +40,9 @@ public class DashboardClaimInfoService {
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-        return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate, Comparator.reverseOrder())).collect(Collectors.toList());
+        return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
+            .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate, Comparator.reverseOrder()))
+            .collect(Collectors.toList());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
