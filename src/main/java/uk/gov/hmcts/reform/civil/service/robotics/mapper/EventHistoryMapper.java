@@ -793,14 +793,8 @@ public class EventHistoryMapper {
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
-                buildMiscellaneousCaseNotesEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
-                buildMiscellaneousCaseNotesEvent(builder, caseData);
-            }
+        if (isNotEmpty(caseData.getCaseNotes())) {
+            buildMiscellaneousCaseNotesEvent(builder, caseData);
         }
 
     }
@@ -829,16 +823,8 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
-                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled()
-                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
-            }
+        if (caseData.getRespondent1LitigationFriendCreatedDate() != null) {
+            buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
         }
     }
 
@@ -858,16 +844,8 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
-            }
+        if (caseData.getRespondent2LitigationFriendCreatedDate() != null) {
+            buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
         }
     }
 
@@ -887,43 +865,32 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()) {
-            String miscText = "Claim details notified.";
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getClaimDetailsNotificationDate())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
-        }
-    }
+        String miscText = "Claim details notified.";
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getClaimDetailsNotificationDate())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
 
-    private boolean rpaEnabledForClaim(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return featureToggleService.isSpecRpaContinuousFeedEnabled();
-        } else {
-            return featureToggleService.isRpaContinuousFeedEnabled();
-        }
     }
 
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (rpaEnabledForClaim(caseData)) {
-            String miscText = "Claim issued in CCD.";
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getIssueDate().atStartOfDay())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
-        }
+        String miscText = "Claim issued in CCD.";
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,

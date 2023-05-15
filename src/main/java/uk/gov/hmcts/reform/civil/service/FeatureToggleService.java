@@ -16,14 +16,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
-    }
-
-    public boolean isSpecRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
-    }
-
     public boolean isGeneralApplicationsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
