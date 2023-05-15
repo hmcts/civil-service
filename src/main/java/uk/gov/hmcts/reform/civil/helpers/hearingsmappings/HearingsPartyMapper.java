@@ -218,7 +218,7 @@ public class HearingsPartyMapper {
             );
         } else {
             return buildOrganisationPartyObject(party.getPartyID(), party.getPartyName(),
-                                                partyRole, null,party.getUnavailableDates());
+                                                partyRole, null, party.getUnavailableDates());
         }
     }
 
