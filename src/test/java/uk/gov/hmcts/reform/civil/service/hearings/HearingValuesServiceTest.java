@@ -224,6 +224,7 @@ public class HearingValuesServiceTest {
 
     private List<PartyDetailsModel> getExpectedPartyModel() {
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -237,6 +238,7 @@ public class HearingValuesServiceTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -253,7 +255,7 @@ public class HearingValuesServiceTest {
                        respondentPartyDetails, respondentSolicitorParty);
     }
 
-    private PartyDetailsModel buildExpectedIndividualPartyDetails(String firstName, String lastName,
+    private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
                                                                   String partyName, String partyRole,
                                                                   String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
@@ -271,7 +273,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(partyId)
             .partyType(IND)
             .partyName(partyName)
             .partyRole(partyRole)
@@ -292,7 +294,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(null)
             .partyType(ORG)
             .partyName(name)
             .partyRole("LGRP")
