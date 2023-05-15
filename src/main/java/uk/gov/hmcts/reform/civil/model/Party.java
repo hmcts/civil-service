@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @AllArgsConstructor
 public class Party {
 
-    private List<Element<UnavailableDate>> unavailableDates;
+    private String partyID;
     private Type type;
     private String individualTitle;
     private String individualFirstName;
@@ -47,6 +47,8 @@ public class Party {
 
     private String partyEmail;
     private String partyPhone;
+
+    private List<Element<UnavailableDate>> unavailableDates;
 
     private Flags flags;
 

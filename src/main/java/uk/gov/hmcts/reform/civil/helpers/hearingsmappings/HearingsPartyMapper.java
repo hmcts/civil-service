@@ -205,21 +205,26 @@ public class HearingsPartyMapper {
             String lastName = party.getIndividualLastName() == null
                 ? party.getSoleTraderLastName() : party.getIndividualLastName();
 
-            return buildIndividualPartyObject(firstName,
-                                       lastName,
-                                       party.getPartyName(),
-                                       partyRole,
-                                       party.getPartyEmail(),
-                                       party.getPartyPhone(),
-                                       party.getFlags(), party.getUnavailableDates()
+            return buildIndividualPartyObject(
+                party.getPartyID(),
+                firstName,
+                lastName,
+                party.getPartyName(),
+                partyRole,
+                party.getPartyEmail(),
+                party.getPartyPhone(),
+                party.getFlags(),
+                party.getUnavailableDates()
             );
         } else {
-            return buildOrganisationPartyObject(party.getPartyName(), partyRole, null, party.getUnavailableDates());
+            return buildOrganisationPartyObject(party.getPartyID(), party.getPartyName(),
+                                                partyRole, null,party.getUnavailableDates());
         }
     }
 
     private static PartyDetailsModel getDetailsForLitigationFriendObject(LitigationFriend litigationFriend) {
-        return buildIndividualPartyObject(litigationFriend.getFirstName(),
+        return buildIndividualPartyObject(litigationFriend.getPartyID(),
+                                          litigationFriend.getFirstName(),
                                           litigationFriend.getLastName(),
                                           String.format(FULL_NAME, litigationFriend.getFirstName(),
                                                         litigationFriend.getLastName()),
@@ -236,6 +241,7 @@ public class HearingsPartyMapper {
         if (!filteredList.isEmpty()) {
             for (PartyFlagStructure partyFlagStructure : filteredList) {
                 partyDetails.add(buildIndividualPartyObject(
+                    partyFlagStructure.getPartyID(),
                     partyFlagStructure.getFirstName(),
                     partyFlagStructure.getLastName(),
                     String.format(FULL_NAME, partyFlagStructure.getFirstName(),
@@ -257,10 +263,10 @@ public class HearingsPartyMapper {
         String orgName = organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
             .orElse("");
-        return buildOrganisationPartyObject(orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID, null);
+        return buildOrganisationPartyObject(null, orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID, null);
     }
 
-    public static PartyDetailsModel buildIndividualPartyObject(String firstName, String lastName,
+    public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
                                                                String partyName, String partyRole,
                                                                String email, String phone,
                                                                Flags flags, List<Element<UnavailableDate>> unavailableDates) {
@@ -272,18 +278,18 @@ public class HearingsPartyMapper {
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
             .firstName(firstName)
             .lastName(lastName)
+            .interpreterLanguage(getInterpreterLanguage(flagDetails))
+            .reasonableAdjustments(getReasonableAdjustments(flagDetails))
+            .vulnerableFlag(hasVulnerableFlag(flagDetails))
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
-            .interpreterLanguage(getInterpreterLanguage(flagDetails))
-            .reasonableAdjustments(getReasonableAdjustments(flagDetails))
-            .vulnerableFlag(hasVulnerableFlag(flagDetails))
             .custodyStatus(getCustodyStatus(flagDetails))
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("") //todo civ-7690
+            .partyID(partyId)
             .partyType(IND)
             .partyName(partyName)
             .partyRole(partyRole)
@@ -296,9 +302,10 @@ public class HearingsPartyMapper {
             .build();
     }
 
-    public static PartyDetailsModel buildOrganisationPartyObject(String name,
+    public static PartyDetailsModel buildOrganisationPartyObject(String partyId, String name,
                                                                  String partyRole,
-                                                                 String cftOrganisationID, List<Element<UnavailableDate>> unavailableDates) {
+                                                                 String cftOrganisationID,
+                                                                 List<Element<UnavailableDate>> unavailableDates) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
             .organisationType(null)
@@ -306,7 +313,7 @@ public class HearingsPartyMapper {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("") //todo civ-7690
+            .partyID(partyId)
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)
