@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class ClaimStoreService {
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim -> DashboardClaimInfo.builder()
-            .createdDate(cmcClaim.getCreatedAt())
+            .createdDate(cmcClaim.getCreatedAt().atTime(LocalTime.of(0,0,0)))
             .claimId(cmcClaim.getExternalId())
             .claimNumber(cmcClaim.getReferenceNumber())
             .claimantName(cmcClaim.getClaimantName())

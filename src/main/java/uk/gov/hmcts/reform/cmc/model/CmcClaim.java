@@ -61,10 +61,10 @@ public class CmcClaim implements Claim {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime countyCourtJudgmentRequestedAt;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate createdAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

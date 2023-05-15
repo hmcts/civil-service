@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,28 +41,20 @@ public class DashboardClaimInfoService {
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-        return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).collect(Collectors.toList());
-    }
-
-    public Map<String, Object> getClaimsForDefendantWithPagination(String authorisation, String defendantId, String pageNumber) {
-        List<DashboardClaimInfo> allCases = getClaimsForDefendant(authorisation, defendantId);
-        final int totalPages = (int) Math.ceil((double)allCases.size() / 10);
-
-        allCases.sort(Comparator.comparing(DashboardClaimInfo::getCreatedDate));
-        List<DashboardClaimInfo> filteredList = allCases.subList(
-            (Integer.parseInt(pageNumber) - 1) * 10,
-            (Integer.parseInt(pageNumber) * 10) - 1
-        );
-        return Map.of("defendantCaselist", filteredList, "totalPages", totalPages);
+        return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate, Comparator.reverseOrder())).collect(Collectors.toList());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
-        SearchResult claims = coreCaseDataService.searchCases(query, authorisation);
-        if (claims.getTotal() == 0) {
-            return Collections.emptyList();
-        }
-        return translateSearchResultToDashboardItems(claims);
+        List<DashboardClaimInfo> dashboardClaimItems = new ArrayList<>();
+        int totalCases = 0;
+        SearchResult claims;
+        do {
+            Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases);
+            claims = coreCaseDataService.searchCases(query, authorisation);
+            dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
+            totalCases += claims.getCases().size();
+        } while (totalCases < claims.getTotal());
+        return dashboardClaimItems;
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
@@ -72,8 +64,8 @@ public class DashboardClaimInfoService {
 
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
         DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
+            .createdDate(caseData.getSubmittedDate())
             .claimNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
