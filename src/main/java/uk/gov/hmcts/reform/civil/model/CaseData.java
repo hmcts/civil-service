@@ -925,32 +925,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isDefendantPaymentPlanYes() {
-    public boolean isNotProposePaymentPlan() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
         return hasApplicantAcceptedRepaymentPlan()
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
-        return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
             || isClaimantNotSettlePartAdmitClaim();
     }
 
     @JsonIgnore
     public boolean isDefendantPaymentPlanNo() {
-    public boolean isNotDefaultJudgement() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
         return hasApplicantRejectedRepaymentPlan()
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
-        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
             || isClaimantNotSettlePartAdmitClaim();
     }
@@ -1062,17 +1054,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRespondent1NotRepresented() {
-        return NO.equals(getRespondent1Represented());
-    }
-
-    @JsonIgnore
-    public boolean isLrVLipOneVOne() {
-        return isRespondent1NotRepresented()
-            && isOneVOne(this);
-    }
-
-    @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
         return nonNull(getRespondent1ResponseDate())
             && getRespondent1ResponseDate()
@@ -1153,5 +1134,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
     }
-
 }

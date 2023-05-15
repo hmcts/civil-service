@@ -82,7 +82,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLrVLipOneVOne()) {
+            && caseData.isLRvLipOneVOne()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 

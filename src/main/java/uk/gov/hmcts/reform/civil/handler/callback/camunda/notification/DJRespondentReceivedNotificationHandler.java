@@ -84,7 +84,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isLrVLipOneVOne()
+        if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())
         ) {
