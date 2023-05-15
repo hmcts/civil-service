@@ -1,21 +1,18 @@
-package uk.gov.hmcts.reform.hmc.model.unnotifiedHearings;
+package uk.gov.hmcts.reform.hmc.model.unnotifiedhearings;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PartiesNotifiedResponses {
+public class UnNotifiedHearingResponse {
 
-    private String hearingID;
+    private List<String> hearingIds;
 
-    private List<PartiesNotifiedResponse> responses;
-
+    private Long totalFound;
 }
-

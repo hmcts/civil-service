@@ -8,8 +8,8 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedHearings.PartiesNotifiedResponses;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedHearings.UnNotifiedHearingResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import java.time.LocalDateTime;
 
 @Slf4j

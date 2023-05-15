@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.hmc.model.unnotifiedHearings;
+package uk.gov.hmcts.reform.hmc.model.unnotifiedhearings;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
