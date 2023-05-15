@@ -81,7 +81,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-        if (caseData.isRespondentResponseBilingual()) {
+        if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -95,7 +95,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (isRespondentSolicitorRegistered(caseData)) {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
-        if (caseData.isRespondentResponseBilingual()) {
+        if (caseData.isRespondent1NotRepresented()) {
             return caseData.getRespondent1().getPartyEmail();
         }
         return null;
@@ -106,12 +106,12 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
         if (caseData.isRespondent1NotRepresented()) {
-           return getCCJRespondentLiPTemplate(caseData);
+           return getCCJRespondentTemplate(caseData);
         }
         return null;
     }
 
-    private String getCCJRespondentLiPTemplate(CaseData caseData){
+    private String getCCJRespondentTemplate(CaseData caseData){
         if (caseData.isRespondentResponseBilingual()) {
             return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
         }
