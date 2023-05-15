@@ -57,7 +57,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.isLrVLipOneVOne() || caseData.getRespondent1().getPartyEmail() == null) {
+        if (!caseData.isLRvLipOneVOne() || caseData.getRespondent1().getPartyEmail() == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
