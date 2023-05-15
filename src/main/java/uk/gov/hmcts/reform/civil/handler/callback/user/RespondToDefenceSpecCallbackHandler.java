@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -36,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -267,6 +268,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
+        // null/delete the document used for preview, otherwise it will show as duplicate within case file view
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            builder.respondent1GeneratedResponseDocument(null);
+            builder.respondent2GeneratedResponseDocument(null);
+        }
+
         if (v1) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
@@ -323,6 +330,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(builder);
+        }
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -421,6 +432,24 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 caseData.getTotalClaimAmount(),
                 null
             ).name());
+        }
+
+        // add document from system generated documents, to placeholder field for preview during event.
+        if (caseData.getRespondent2DocumentURL() == null) {
+            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+                if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
+                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                }
+            });
+        } else {
+            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent1DocumentURL())) {
+                    updatedCaseData.respondent1GeneratedResponseDocument(document.getValue());
+                }
+                if (document.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getRespondent2DocumentURL())) {
+                    updatedCaseData.respondent2GeneratedResponseDocument(document.getValue());
+                }
+            });
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
