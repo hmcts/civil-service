@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
@@ -95,6 +97,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -182,6 +185,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             }
             updatedCaseData = builder.build();
         }
+        //assign category ids to documents uploaded as part of notify claim details
+        assignNotifyParticularOfClaimCategoryIds(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseData.toMap(objectMapper))
@@ -474,4 +479,18 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return caseData.getRespondent1Represented() == NO
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
+
+    private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
+        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                      Element::getValue, "particularsOfClaim");
+        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
+                                                      document -> document.getValue().getDocument(), "particularsOfClaim");
+    }
+
 }
