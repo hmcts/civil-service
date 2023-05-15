@@ -114,6 +114,7 @@ public class EventHistoryMapper {
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
     public static final String BS_END_DATE = "actual end date";
+    public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -2249,16 +2250,14 @@ public class EventHistoryMapper {
                                                CaseData caseData) {
 
         if (caseData.hasApplicantRejectedRepaymentPlan()) {
-            String detailsText = "RPA Reason: Manual Determination Required.";
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(LocalDateTime.now())
-                    .litigiousPartyID(APPLICANT_ID)
-                    .eventDetailsText(detailsText)
+                    .eventDetailsText(RPA_REASON_MANUAL_DETERMINATION)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(detailsText)
+                                      .miscText(RPA_REASON_MANUAL_DETERMINATION)
                                       .build())
                     .build());
         }
