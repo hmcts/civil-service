@@ -1178,7 +1178,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRespondentWitnesses(CallbackParams callbackParams) {
-        return validateRespondentExpertsAndWitnesses(callbackParams, "witness");
+        CaseData caseData = callbackParams.getCaseData();
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                return validateR1Witnesses(caseData);
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
+        return validateR1Witnesses(caseData);
     }
 
     private CallbackResponse validateR1Witnesses(CaseData caseData) {
@@ -1193,38 +1208,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {
-        return validateRespondentExpertsAndWitnesses(callbackParams, "experts");
-    }
-
-    private CallbackResponse validateRespondentExpertsAndWitnesses(CallbackParams callbackParams, String respondantType) {
         CaseData caseData = callbackParams.getCaseData();
         if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
-                if(respondantType.equals("witness"))
-                    return validateR1Witnesses(caseData);
-                else if(respondantType.equals("experts"))
-                    return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-                if(respondantType.equals("witness"))
-                    return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-                else if(respondantType.equals("experts"))
-                    return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
             } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                     if (caseData.getRespondent2DQ() != null
-                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
-                        if(respondantType.equals("witness"))
-                            return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
-                        else if(respondantType.equals("experts"))
-                            return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
                     }
                 }
             }
         }
-        if(respondantType.equals("witness"))
-            return validateR1Witnesses(caseData);
-        else
-            return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
