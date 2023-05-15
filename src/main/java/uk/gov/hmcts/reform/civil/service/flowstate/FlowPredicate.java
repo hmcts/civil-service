@@ -856,4 +856,11 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
         caseData.isPartAdmitClaimSettled();
+
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
+        CaseData::isClaimantNotSettlePartAdmitClaim;
+
+    // This field is used in LR ITP, prevent going another path in preview
+    public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
+        caseData.getShowResponseOneVOneFlag() != null;
 }

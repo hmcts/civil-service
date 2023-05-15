@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
@@ -61,6 +62,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isClaimantNotSettlePartAdmitClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.noticeOfChangeEnabled;
@@ -128,6 +131,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
@@ -167,8 +171,6 @@ public class StateFlowEngine {
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -182,8 +184,6 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -200,8 +200,6 @@ public class StateFlowEngine {
                     // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -212,8 +210,6 @@ public class StateFlowEngine {
                 .set(flags -> flags.putAll(
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -228,8 +224,6 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -243,8 +237,6 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -257,8 +249,6 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
@@ -469,7 +459,14 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()))
+                    .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(isOneVOneResponseFlagSpec))
+                        .set(flags -> {
+                            flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                            flags.put(FlowFlag.SDO_ENABLED.name(), featureToggleService.isSdoEnabled());
+                            flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
+                        })
+                .transitionTo(FULL_DEFENCE_PROCEED)
+            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(not(isOneVOneResponseFlagSpec)))
             .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 if (featureToggleService.isSdoEnabled()) {
@@ -502,7 +499,6 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
             .state(FULL_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(FULL_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
@@ -511,7 +507,15 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
+                .transitionTo(IN_MEDIATION)
+                .onlyIf(agreedToMediation.or(isClaimantNotSettlePartAdmitClaim.and(allAgreedToLrMediationSpec)))
+                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+                .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToLrMediationSpec)))
+                .set(flags -> {
+                   if (featureToggleService.isSdoEnabled()) {
+                       flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                   }
+                 })
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
@@ -554,6 +558,16 @@ public class StateFlowEngine {
             .state(PART_ADMIT_REJECT_REPAYMENT)
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
+            .state(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+                .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
+                .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
+                    .set(flags -> {
+                        if (featureToggleService.isSdoEnabled()) {
+                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                        }
+                    })
             .state(FULL_ADMIT_AGREE_REPAYMENT)
             .state(FULL_ADMIT_REJECT_REPAYMENT)
             .state(FULL_ADMIT_PROCEED)
