@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -180,18 +179,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
-            && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
-            return YES;
-        }
-        return NO;
-    }
-
     private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(doesPartPaymentRejectedOrItsFullDefenceResponse(caseData));
+        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
@@ -228,6 +217,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setMediationConditionFlag(caseData, caseDataBuilder);
+        setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -353,6 +343,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            } else if (
+                caseData.isClaimantNotSettlePartAdmitClaim()
+                    && ((caseData.hasClaimantNotAgreedToFreeMediation()
+                    || caseData.hasDefendantNotAgreedToFreeMediation())
+                    || caseData.isFastTrackClaim())) {
+                response.state(CaseState.JUDICIAL_REFERRAL.name());
             } else if (caseData.isPartAdmitClaimSettled()) {
                 response.state(CaseState.CASE_SETTLED.name());
             }
