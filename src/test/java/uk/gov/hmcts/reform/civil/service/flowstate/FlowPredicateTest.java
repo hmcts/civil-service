@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -75,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
@@ -2794,6 +2796,25 @@ class FlowPredicateTest {
             CaseData caseData = caseDataBuilder.atSpecAoSApplicantCorrespondenceAddressRequired(YES).build();
 
             assertFalse(contactDetailsChange.test(caseData));
+        }
+    }
+
+    @Nested
+    class OneVOneResponseFlag {
+
+        @Test
+        void shouldReturnFalse_whenShowOneVOneResponseFlagExist() {
+            CaseData caseData = CaseData.builder().build();
+
+            assertFalse(isOneVOneResponseFlagSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenShowOneVOneResponseFlagNotExist() {
+            CaseData caseData = CaseData.builder()
+                .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).build();
+
+            assertTrue(isOneVOneResponseFlagSpec.test(caseData));
         }
     }
 }
