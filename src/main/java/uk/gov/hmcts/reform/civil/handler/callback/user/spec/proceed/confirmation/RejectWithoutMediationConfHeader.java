@@ -9,19 +9,17 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 @Component
-public class ProposePaymentPlanConfHeader implements RespondToResponseConfirmationHeaderGenerator {
+public class RejectWithoutMediationConfHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isDefendantPaymentPlanYes()
-            || caseData.hasClaimantAgreedToFreeMediation()) {
+        if (!caseData.isRejectWithNoMediation()) {
             return Optional.empty();
         }
 
         String claimNumber = caseData.getLegacyCaseReference();
         return Optional.of(format(
-            "# Payment plan rejected %n## The proposed payment plan for case %s has been rejected by the claimant."
-                + "%n## A new payment plan has been submitted and will be determined manually by the Court.",
+            "# You have decided to proceed with the claim%n## Claim number: %s",
             claimNumber
         ));
     }
