@@ -7699,7 +7699,6 @@ class EventHistoryMapperTest {
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .build();
 
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
@@ -7717,7 +7716,6 @@ class EventHistoryMapperTest {
                 .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .build();
 
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
