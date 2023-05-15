@@ -81,7 +81,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLrVLipOneVOne()
+        if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
             return JUDGEMENT_BY_COURT;
         } else {
