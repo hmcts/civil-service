@@ -2556,7 +2556,7 @@ class FlowPredicateTest {
         @Test
         public void whenUnspec_false() {
             CaseData caseData = CaseData.builder().build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2564,7 +2564,7 @@ class FlowPredicateTest {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2589,12 +2589,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2622,12 +2618,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2660,12 +2652,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[2])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2698,13 +2686,27 @@ class FlowPredicateTest {
                     .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                                .hasAgreedFreeMediation(whoAgrees[2])
                                                                .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
+        }
+
+        @Test
+        void shouldReturnFalse_whenClaimantAgreedToLipMediation() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(MediationDecision.Yes)
+                                                                              .build())
+                                 .build())
+                .build();
+            //When
+            boolean result = FlowPredicate.allAgreedToLrMediationSpec.test(caseData);
+            //Then
+            assertFalse(result);
         }
     }
 

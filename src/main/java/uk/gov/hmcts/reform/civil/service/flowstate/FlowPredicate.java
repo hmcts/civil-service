@@ -819,7 +819,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
         caseData.getRespondent1PinToPostLRspec() != null;
 
-    public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+    public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
         boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
@@ -833,12 +833,7 @@ public class FlowPredicate {
                 .filter(YesOrNo.NO::equals).isPresent()
                 || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
-                .filter(MediationDecision.No::equals).isPresent()) {
+                .filter(YesOrNo.NO::equals).isPresent() || caseData.hasClaimantAgreedToFreeMediation()) {
                 result = false;
             } else {
                 result = true;
