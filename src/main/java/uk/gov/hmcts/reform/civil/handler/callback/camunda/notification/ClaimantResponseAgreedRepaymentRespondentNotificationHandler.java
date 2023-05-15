@@ -81,7 +81,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondentResponseBilingual()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -95,7 +95,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (isRespondentSolicitorRegistered(caseData)) {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondentResponseBilingual()) {
             return caseData.getRespondent1().getPartyEmail();
         }
         return null;
@@ -105,23 +105,21 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (isRespondentSolicitorRegistered(caseData)) {
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
-        if (isRespondentNotRepresented(caseData)) {
-            if (caseData.isRespondentResponseBilingual()) {
-                return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
-            } else {
-                return notificationsProperties.getRespondentCcjNotificationTemplate();
-            }
+        if (caseData.isRespondent1NotRepresented()) {
+           return getCCJRespondentTemplate(caseData);
         }
         return null;
     }
 
+    private String getCCJRespondentTemplate(CaseData caseData){
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
+        }
+        return notificationsProperties.getRespondentCcjNotificationTemplate();
+    }
     public String getRespondentLegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.map(Organisation::getName).orElse(null);
-    }
-
-    public boolean isRespondentNotRepresented(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
     }
 
     public boolean isRespondentSolicitorRegistered(CaseData caseData) {
