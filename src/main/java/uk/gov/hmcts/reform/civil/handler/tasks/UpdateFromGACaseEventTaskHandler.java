@@ -1,11 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
@@ -13,18 +7,23 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
@@ -92,6 +91,12 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "dismissalOrder");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "directionOrder");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "hearingNotice");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "generalAppEvidence");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "hearingOrder");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "requestForInformation");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepSequential");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepConcurrent");
+
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -106,25 +111,42 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
+        String civilDocPrefix = docFieldName;
+        if (civilDocPrefix.equals("generalAppEvidence")) {
+            civilDocPrefix = "gaEvidence";
+        }
+
+        if (civilDocPrefix.equals("requestForInformation")) {
+            civilDocPrefix = "requestForInfo";
+        }
+
+        if (civilDocPrefix.equals("writtenRepSequential")) {
+            civilDocPrefix = "writtenRepSeq";
+        }
+
+        if (civilDocPrefix.equals("writtenRepConcurrent")) {
+            civilDocPrefix = "writtenRepCon";
+        }
+
         //staff collection will hold ga doc accessible for judge and staff
         String fromGaList = docFieldName + gaDocSuffix;
-        String toCivilStaffList = docFieldName + civilDocStaffSuffix;
+        String toCivilStaffList = civilDocPrefix + civilDocStaffSuffix;
         updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilStaffList);
         //Claimant collection will hold ga doc accessible for Claimant
-        String toCivilClaimantList = docFieldName + civilDocClaimantSuffix;
+        String toCivilClaimantList = civilDocPrefix + civilDocClaimantSuffix;
         if (canViewClaimant(civilCaseData, generalAppCaseData)) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                     civilCaseData, toCivilClaimantList);
         }
         //RespondentSol collection will hold ga doc accessible for RespondentSol1
-        String toCivilRespondentSol1List = docFieldName + civilDocRespondentSolSuffix;
+        String toCivilRespondentSol1List = civilDocPrefix + civilDocRespondentSolSuffix;
         if (canViewResp(civilCaseData, generalAppCaseData, "1")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                     civilCaseData, toCivilRespondentSol1List);
         }
         //Respondent2Sol collection will hold ga doc accessible for RespondentSol2
-        String toCivilRespondentSol2List = docFieldName + civilDocRespondentSolTwoSuffix;
+        String toCivilRespondentSol2List = civilDocPrefix + civilDocRespondentSolTwoSuffix;
         if (canViewResp(civilCaseData, generalAppCaseData, "2")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                     civilCaseData, toCivilRespondentSol2List);
