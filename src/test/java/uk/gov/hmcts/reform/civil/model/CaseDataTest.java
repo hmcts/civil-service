@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
@@ -11,6 +10,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -22,7 +23,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
+        assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
     @Test
@@ -30,7 +31,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
+        assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
     @Test
@@ -136,7 +137,6 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.isPartAdmitClaimSettled());
         assertTrue(caseData.isPartAdmitClaimSettled());
     }
 
@@ -148,10 +148,9 @@ public class CaseDataTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
-        assertTrue(caseData.isPartAdmitClaimNotSettled());
         //When
         //Then
-        Assertions.assertTrue(caseData.isPartAdmitClaimNotSettled());
+        assertTrue(caseData.isPartAdmitClaimNotSettled());
     }
 
     @Test
@@ -160,10 +159,9 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
-        assertTrue(caseData.isPartAdmitClaimSpec());
         //When
         //Then
-        Assertions.assertTrue(caseData.isPartAdmitClaimSpec());
+        assertTrue(caseData.isPartAdmitClaimSpec());
     }
 
     @Test
@@ -172,10 +170,9 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .build();
-        assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
         //When
         //Then
-        Assertions.assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
+        assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
     }
 
     @Test
@@ -184,10 +181,9 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .build();
-        assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
         //When
         //Then
-        Assertions.assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
+        assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
     }
 
     @Test
@@ -196,10 +192,9 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
-        assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
         //When
         //Then
-        Assertions.assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
+        assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
     }
 
     @Test
@@ -233,7 +228,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.isClaimantNotSettlePartAdmitClaim());
+        assertTrue(caseData.isClaimantNotSettlePartAdmitClaim());
     }
 
     @Test
@@ -246,7 +241,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertFalse(caseData.isClaimantNotSettlePartAdmitClaim());
+        assertFalse(caseData.isClaimantNotSettlePartAdmitClaim());
     }
 
     @Test
@@ -259,7 +254,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+        assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     @Test
@@ -272,7 +267,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+        assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     @Test
@@ -285,7 +280,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertEquals(YesOrNo.NO, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+        assertEquals(YesOrNo.NO, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     @Test
@@ -296,7 +291,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertFalse(caseData.hasDefendantNotAgreedToFreeMediation());
+        assertFalse(caseData.hasDefendantNotAgreedToFreeMediation());
     }
 
     @Test
@@ -307,7 +302,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.hasDefendantNotAgreedToFreeMediation());
+        assertTrue(caseData.hasDefendantNotAgreedToFreeMediation());
     }
 
     @Test
@@ -318,7 +313,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.isFastTrackClaim());
+        assertTrue(caseData.isFastTrackClaim());
     }
 
     @Test
@@ -329,7 +324,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertFalse(caseData.isFastTrackClaim());
+        assertFalse(caseData.isFastTrackClaim());
     }
 
     @Test
@@ -340,7 +335,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.isSmallClaim());
+        assertTrue(caseData.isSmallClaim());
     }
 
     @Test
@@ -351,7 +346,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertFalse(caseData.isSmallClaim());
+        assertFalse(caseData.isSmallClaim());
     }
 
     @Test
@@ -363,7 +358,7 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertFalse(caseData.isRejectWithNoMediation());
+        assertFalse(caseData.isRejectWithNoMediation());
     }
 
     @Test
@@ -375,6 +370,6 @@ public class CaseDataTest {
             .build();
         //When
         //Then
-        Assertions.assertTrue(caseData.isRejectWithNoMediation());
+        assertTrue(caseData.isRejectWithNoMediation());
     }
 }
