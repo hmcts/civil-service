@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
@@ -190,6 +191,7 @@ public class CaseDataBuilder {
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
+    protected YesOrNo uploadParticularsOfClaim;
     protected ClaimType claimType;
     protected String claimTypeOther;
     protected PersonalInjuryType personalInjuryType;
@@ -280,6 +282,7 @@ public class CaseDataBuilder {
     protected LocalDateTime claimNotificationDeadline;
     protected LocalDateTime claimNotificationDate;
     protected LocalDateTime claimDetailsNotificationDeadline;
+    protected ServedDocumentFiles servedDocumentFiles;
     protected LocalDateTime claimDetailsNotificationDate;
     protected LocalDateTime respondent1ResponseDeadline;
     protected LocalDateTime respondent2ResponseDeadline;
@@ -1164,6 +1167,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder uploadParticularsOfClaim(YesOrNo uploadParticularsOfClaim) {
+        this.uploadParticularsOfClaim = uploadParticularsOfClaim;
+        return this;
+    }
+
     public CaseDataBuilder issueDate(LocalDate issueDate) {
         this.issueDate = issueDate;
         return this;
@@ -1870,6 +1878,7 @@ public class CaseDataBuilder {
                               .baseLocation("214320")
                               .build())
             .build();
+        uploadParticularsOfClaim = NO;
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
@@ -2494,6 +2503,7 @@ public class CaseDataBuilder {
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        servedDocumentFiles = ServedDocumentFiles.builder().particularsOfClaimText("test").build();
         return this;
     }
 
@@ -5304,6 +5314,7 @@ public class CaseDataBuilder {
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
+            .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
             .claimTypeOther(claimTypeOther)
             .personalInjuryType(personalInjuryType)
@@ -5401,6 +5412,7 @@ public class CaseDataBuilder {
             .claimNotificationDeadline(claimNotificationDeadline)
             .claimDetailsNotificationDate(claimDetailsNotificationDate)
             .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
+            .servedDocumentFiles(servedDocumentFiles)
             .respondent1ResponseDeadline(respondent1ResponseDeadline)
             .respondent2ResponseDeadline(respondent2ResponseDeadline)
             .claimDismissedDeadline(claimDismissedDeadline)
