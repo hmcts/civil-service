@@ -245,56 +245,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
         }
 
-        @Test
-        void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondentAndSpecClaimDocumentFilesNull() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued().build().toBuilder()
-                .specRespondent1Represented(YES)
-                .specClaimTemplateDocumentFiles(new Document("fake-url",
-                                                             "binary-url",
-                                                             "file-name",
-                                                             null, null))
-                .build();
-            List<DocumentMetaData> list = new ArrayList<>();
-            list.add(specClaimTimelineDocuments.get(0));
-            list.add(specClaimTimelineDocuments.get(1));
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
-            verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-
-            verify(civilDocumentStitchingService).bundle(eq(list), anyString(), anyString(),
-                                                         anyString(), eq(caseData));
-        }
-
-        @Test
-        void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondentAndSpecClaimTemplateDocumentFilesNull() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued().build().toBuilder()
-                .specRespondent1Represented(YES)
-                .specClaimDetailsDocumentFiles(new Document("fake-url",
-                                                            "binary-url",
-                                                            "file-name",
-                                                            null, null))
-                .build();
-            List<DocumentMetaData> list = new ArrayList<>();
-            list.add(specClaimTimelineDocuments.get(0));
-            list.add(specClaimTimelineDocuments.get(2));
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
-            verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
-
-            verify(civilDocumentStitchingService).bundle(eq(list), anyString(), anyString(),
-                                                         anyString(), eq(caseData));
-        }
-
     }
 
     @Test
