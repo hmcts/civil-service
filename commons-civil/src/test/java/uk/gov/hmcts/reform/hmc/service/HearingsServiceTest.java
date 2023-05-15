@@ -150,6 +150,44 @@ class HearingsServiceTest {
     }
 
     @Nested
+    class UpdatePartiesNotifiedResponses {
+        private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
+        private final LocalDateTime receivedTime = LocalDateTime.of(2023, 5, 15, 15, 0);
+        private List<PartiesNotifiedResponse> listOfPartiesNotifiedResponses =
+            List.of(getPartiesNotified(time.minusDays(2), 1, time, null),
+                    getPartiesNotified(time.minusDays(3), 2, time, null));
+        private List<PartiesNotifiedResponse> updatedListOfPartiesNotifiedResponses =
+            List.of(getPartiesNotified(time.minusDays(5), 1, time, null),
+                    getPartiesNotified(time.minusDays(8), 2, time, null));
+
+        private PartiesNotifiedResponse getPartiesNotified(LocalDateTime responseReceivedDateTime, Integer requestVersion,
+                                                           LocalDateTime partiesNotified, JsonNode serviceData) {
+            return PartiesNotifiedResponse.builder().responseReceivedDateTime(responseReceivedDateTime)
+                .requestVersion(requestVersion).partiesNotified(partiesNotified).serviceData(serviceData).build();
+        }
+
+        private PartiesNotifiedResponses getPartiesNotifiedResponse() {
+            return new PartiesNotifiedResponses(HEARING_ID, listOfPartiesNotifiedResponses);
+        }
+        private PartiesNotifiedResponses getUpdatedPartiesNotifiedResponse() {
+            return new PartiesNotifiedResponses(HEARING_ID, updatedListOfPartiesNotifiedResponses);
+        }
+
+        @Test
+        void shouldUpdatePartiesResponses_whenInvoked() {
+            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
+                .thenReturn(getPartiesNotifiedResponse());
+            PartiesNotifiedResponses result = hearingNoticeService
+                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID);
+
+            hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, 2, receivedTime);
+
+            Assertions.assertThat(result.getHearingID()).isEqualTo(HEARING_ID);
+            Assertions.assertThat(result.getResponses()).isEqualTo(listOfPartiesNotifiedResponses);
+        }
+    }
+
+    @Nested
     class GetUnNotifiedHearingResponses {
         private List<String> listOfIds = List.of(HEARING_ID, HEARING_ID_2);
         private final LocalDateTime dateFrom = LocalDateTime.of(2023, 5, 1, 15, 0);

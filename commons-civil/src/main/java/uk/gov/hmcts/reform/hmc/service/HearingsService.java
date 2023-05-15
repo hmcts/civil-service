@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.hmc.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import java.time.LocalDateTime;
@@ -44,6 +46,21 @@ public class HearingsService {
         } catch (FeignException e) {
             log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
             throw new HmcException(e);
+        }
+    }
+
+    public void updatePartiesNotifiedResponse(String authToken, String hearingId, int requestVersion, LocalDateTime receivedDateTime) {
+        try {
+            hearingNoticeApi.updatePartiesNotifiedRequest(
+                authToken,
+                authTokenGenerator.generate(),
+                hearingId,
+                requestVersion,
+                receivedDateTime
+            );
+        } catch (FeignException ex)  {
+            log.error("Failed to update partiesNotified with Id: {} from HMC", hearingId);
+            throw new HmcException(ex);
         }
     }
 
