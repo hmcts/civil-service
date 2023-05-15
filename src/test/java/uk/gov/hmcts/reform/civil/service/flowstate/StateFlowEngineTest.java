@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +35,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -4173,14 +4174,14 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
         @Test
@@ -4212,7 +4213,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
@@ -4223,8 +4224,8 @@ class StateFlowEngineTest {
                                                               )
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
         @Test
@@ -4258,7 +4259,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
@@ -4269,8 +4270,8 @@ class StateFlowEngineTest {
                                                               )
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
         @Test
@@ -4308,7 +4309,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
@@ -4319,8 +4320,8 @@ class StateFlowEngineTest {
                                                               )
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
             assertThat(newState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
             assertThat(newState.getFlags()).contains(entry(FlowFlag.LR_V_LIP_ENABLED.name(), true));
         }
@@ -4400,7 +4401,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(IN_MEDIATION.fullName(), fullState.getState().getName());
+            assertEquals(IN_MEDIATION.fullName(), fullState.getState().getName());
         }
 
         @Test
@@ -4437,7 +4438,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
+            assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
             assertThat(fullState.getFlags()).doesNotContain(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
 
@@ -4471,7 +4472,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
+            assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
             assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
@@ -4510,7 +4511,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(), fullState.getState().getName());
+            assertEquals(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(), fullState.getState().getName());
             assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
