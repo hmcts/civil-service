@@ -8,6 +8,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -28,6 +31,36 @@ public class HearingsService {
         } catch (FeignException ex)  {
             log.error("Failed to retrieve hearing with Id: {} from HMC", hearingId);
             throw new HmcException(ex);
+        }
+    }
+
+    public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId) {
+        log.debug("Requesting Get Parties Notified with Hearing ID {}", hearingId);
+        try {
+            return hearingNoticeApi.getPartiesNotifiedRequest(
+                authToken,
+                authTokenGenerator.generate(),
+                hearingId);
+        } catch (FeignException e) {
+            log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
+            throw new HmcException(e);
+        }
+    }
+
+    public UnNotifiedHearingResponse getUnNotifiedHearingResponses(String authToken, String hmctsServiceCode,
+                                                                   LocalDateTime hearingStartDateFrom,
+                                                                   LocalDateTime hearingStartDateTo) {
+        log.debug("Requesting UnNotified Hearings");
+        try {
+            return hearingNoticeApi.getUnNotifiedHearingRequest(
+                authToken,
+                authTokenGenerator.generate(),
+                hmctsServiceCode,
+                hearingStartDateFrom,
+                hearingStartDateTo);
+        } catch (FeignException e) {
+            log.error("Failed to retrieve unnotified hearings");
+            throw new HmcException(e);
         }
     }
 }
