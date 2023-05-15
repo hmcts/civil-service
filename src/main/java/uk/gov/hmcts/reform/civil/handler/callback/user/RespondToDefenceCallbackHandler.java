@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -79,6 +80,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -368,6 +370,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 )));
         if (!claimantUploads.isEmpty()) {
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            assignCategoryId.assignCategoryIdToCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
+                                                     "directionsQuestionnaire");
         }
     }
 
