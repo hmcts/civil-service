@@ -60,6 +60,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
     public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
         + "The claim will now progress offline (on paper)";
+    public static final String JUDGMENT_REQUESTED_LIP_CASE = "A request for default judgement has been sent to the court for review." +
+        "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
@@ -104,19 +106,21 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent2() != null
+        if (caseData.isLRvLipOneVOne()
+            || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+            .getLabel().startsWith("Both"))) {
             return format(JUDGMENT_REQUESTED_HEADER);
 
         } else {
             return format(JUDGMENT_GRANTED_HEADER);
         }
-
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.getRespondent2() != null
+        if (caseData.isLRvLipOneVOne()) {
+            return format(JUDGMENT_REQUESTED_LIP_CASE);
+        } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both")) {
             return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
@@ -175,7 +179,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.bothDefendantsSpec("One");
         // populate the title of next screen if only one defendant chosen
         var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
-            .getValue().getLabel() +  " paid some of the amount owed?");
+            .getValue().getLabel() + " paid some of the amount owed?");
         var currentDefendantName = (caseData.getDefendantDetailsSpec()
             .getValue().getLabel());
         if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
@@ -216,7 +220,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                           + "- if they do not apply, close this page and apply for default judgment when they do");
+                               + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -302,6 +306,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLrVLipOneVOne()
             && toggleService.isPinInPostEnabled()
+            && V_1.equals(callbackParams.getVersion())
+            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            repaymentBreakdown.append(
+                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
             && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append("The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
