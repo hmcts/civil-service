@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
@@ -106,7 +107,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.YES)
+                    ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress(),
                 identifyTemplate(caseData),
                 addProperties1v2SecondDefendant(caseData),
                 String.format(templateReference, caseData.getLegacyCaseReference())
@@ -117,7 +119,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")))) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                isNull(caseData.getRespondent2ResponseDate()) && caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.NO)
+                    ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondentSolicitor1EmailAddress(),
                 identifyTemplate(caseData),
                 addProperties2(caseData),
                 String.format(templateReference, caseData.getLegacyCaseReference())
