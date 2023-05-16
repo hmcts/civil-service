@@ -15,6 +15,7 @@ import java.util.Map;
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
@@ -455,15 +456,9 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
             .state(FULL_DEFENCE)
-                .transitionTo(FULL_DEFENCE_PROCEED)
-                    .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(isOneVOneResponseFlagSpec))
-                        .set(flags -> {
-                            flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                            flags.put(FlowFlag.SDO_ENABLED.name(), featureToggleService.isSdoEnabled());
-                            flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
-                        })
-                .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(not(isOneVOneResponseFlagSpec)))
+            .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
+            .transitionTo(FULL_DEFENCE_PROCEED)
+            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation))
             .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 if (featureToggleService.isSdoEnabled()) {
@@ -504,9 +499,9 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim.and(allAgreedToMediation))
+                .transitionTo(IN_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim.and(agreedToMediation))
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-                    .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToMediation)))
+                    .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
                         .set(flags -> {
                             if (featureToggleService.isSdoEnabled()) {
                                 flags.put(FlowFlag.SDO_ENABLED.name(), true);
