@@ -271,7 +271,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
             }
 
             @Test
-            void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
+            void shouldNotifyRespondentSolicitor2ClaimStatementOfTruth_whenNoOrgFound() {
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
