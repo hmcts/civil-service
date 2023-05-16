@@ -427,4 +427,11 @@ public class CaseDataParent implements MappableObject {
     public Optional<TranslatedDocument> getTranslatedDocument() {
         return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
     }
+
+    @JsonIgnore
+    public boolean hasClaimantNotAgreedToFreeMediation() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+            .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
 }

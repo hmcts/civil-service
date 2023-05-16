@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,13 +11,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -30,6 +35,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -61,9 +68,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -77,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DR
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -4164,14 +4174,14 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
         @Test
@@ -4203,7 +4213,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
@@ -4214,8 +4224,8 @@ class StateFlowEngineTest {
                                                               )
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
 
         @Test
@@ -4249,7 +4259,7 @@ class StateFlowEngineTest {
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
 
             // Then
-            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
                                                               .applicant1ProceedWithClaim(YES)
@@ -4260,8 +4270,60 @@ class StateFlowEngineTest {
                                                               )
                                                               .build());
 
-            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+        }
+
+        @Test
+        void fullDefenceAllMediationSpec_WithLrVLipFlag() {
+            // Given
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // full defence
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .claimNotificationDate(LocalDateTime.now())
+                // defendant agrees to mediation
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
+                                                          .hasAgreedFreeMediation(YES).build())
+                .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+
+            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .applicant1ClaimMediationSpecRequired(
+                                                                  SmallClaimMedicalLRspec.builder()
+                                                                      .hasAgreedFreeMediation(YES)
+                                                                      .build()
+                                                              )
+                                                              .build());
+
+            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            assertThat(newState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
+            assertThat(newState.getFlags()).contains(entry(FlowFlag.LR_V_LIP_ENABLED.name(), true));
         }
     }
 
@@ -4300,6 +4362,157 @@ class StateFlowEngineTest {
                 entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
+        }
+    }
+
+    @Nested
+    class FromPartAdmit {
+        @Test
+        void partAdmitInMediationSpec() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(
+                                     ClaimantMediationLip.builder()
+                                         .hasAgreedFreeMediation(MediationDecision.Yes)
+                                         .build()).build())
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(IN_MEDIATION.fullName(), fullState.getState().getName());
+        }
+
+        @Test
+        void partAdmitPartMediationSpec() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(
+                                     ClaimantMediationLip.builder()
+                                         .hasAgreedFreeMediation(MediationDecision.No)
+                                         .build()).build())
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
+            assertThat(fullState.getFlags()).doesNotContain(entry(FlowFlag.SDO_ENABLED.name(), true));
+        }
+
+        @Test
+        void partAdmitNoMediationSpec() {
+            // Given
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(NO)
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
+            assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
+        }
+    }
+
+    @Nested
+    class FromPartAdmitNotSettledNoMediation {
+        @Test
+        void partAdmitNoMediationSpec() {
+            // Given
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(NO)
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .reasonNotSuitableSDO(new ReasonNotSuitableSDO("test"))
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(), fullState.getState().getName());
+            assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
 }

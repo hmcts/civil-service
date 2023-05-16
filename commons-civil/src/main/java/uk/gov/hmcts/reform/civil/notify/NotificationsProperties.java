@@ -235,7 +235,16 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLipTemplate;
-    
+
+    @NotEmpty
+    private String notifyApplicantLRMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLRMediationAgreementTemplate;
+
     @NotEmpty
     private String bundleCreationTemplate;
 
