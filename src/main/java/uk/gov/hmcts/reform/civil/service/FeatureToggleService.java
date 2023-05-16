@@ -25,7 +25,7 @@ public class FeatureToggleService {
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
 
     public boolean isHearingAndListingSDOEnabled() {
@@ -37,7 +37,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -49,7 +49,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPbaV3Enabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isSDOEnabled() {
