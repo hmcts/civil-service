@@ -456,9 +456,15 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
             .state(FULL_DEFENCE)
-            .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
             .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation))
+            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(isOneVOneResponseFlagSpec))
+            .set(flags -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                flags.put(FlowFlag.SDO_ENABLED.name(), featureToggleService.isSdoEnabled());
+                flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
+            })
+            .transitionTo(FULL_DEFENCE_PROCEED)
+            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(not(isOneVOneResponseFlagSpec)))
             .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 if (featureToggleService.isSdoEnabled()) {
@@ -499,7 +505,7 @@ public class StateFlowEngine {
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
-                .transitionTo(IN_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim.and(agreedToMediation))
+                .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
                     .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
                         .set(flags -> {
