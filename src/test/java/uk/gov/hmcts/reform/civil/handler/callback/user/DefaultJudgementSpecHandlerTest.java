@@ -860,6 +860,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                      .build())
                                           .build())
                 .specRespondent1Represented(NO)
+                .respondent1Represented(null)
 
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
