@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
@@ -199,9 +198,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
-        caseDataBuilder.freeFormOrderDocument(null);
         caseDataBuilder.finalOrderDocument(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));        
+        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         CaseState state = All_FINAL_ORDERS_ISSUED;
         if (caseData.getFinalOrderFurtherHearingToggle() != null) {
