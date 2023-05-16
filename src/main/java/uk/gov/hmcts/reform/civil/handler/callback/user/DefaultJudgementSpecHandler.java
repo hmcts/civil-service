@@ -41,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -107,7 +106,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne() || (caseData.getRespondent2() != null
+        if (caseData.isLRvLipOneVOne()
+            || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both"))) {
             return format(JUDGMENT_REQUESTED_HEADER);
@@ -304,10 +304,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+        if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
-            && V_1.equals(callbackParams.getVersion())
-            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append(
                 "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
