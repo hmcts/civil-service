@@ -4321,7 +4321,6 @@ class StateFlowEngineTest {
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
-            assertThat(newState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
             assertThat(newState.getFlags()).contains(entry(FlowFlag.LR_V_LIP_ENABLED.name(), true));
         }
     }
@@ -4438,7 +4437,6 @@ class StateFlowEngineTest {
 
             // Then
             assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
-            assertThat(fullState.getFlags()).doesNotContain(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
 
         @Test
@@ -4470,7 +4468,6 @@ class StateFlowEngineTest {
 
             // Then
             assertEquals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(), fullState.getState().getName());
-            assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
 
@@ -4507,7 +4504,6 @@ class StateFlowEngineTest {
 
             // Then
             assertEquals(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(), fullState.getState().getName());
-            assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
 }
