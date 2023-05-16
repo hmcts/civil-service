@@ -25,8 +25,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
-import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @Slf4j
 @Service
@@ -60,10 +58,11 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        System.out.println("is being calledddd");
         List<String> errors = new ArrayList<>();
         try {
             if (isHearingFeeServiceRequest(caseData)) {
-                System.out.println("standand service request");
+                System.out.println("will be standand service request");
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
@@ -74,7 +73,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
               a new service request, for the new representative, in order to pay.
              */
             if (isHearingFeeServiceRequestAfterNoticeOfChange(caseData)) {
-                System.out.println("NOC service request");
+                System.out.println("will be NOC service request");
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
@@ -105,17 +104,16 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     }
 
     private boolean isHearingFeeServiceRequest(CaseData caseData) {
-        System.out.println("standard service request");
         return nonNull(caseData.getHearingDueDate())
             && isServiceRequestNotRequested(caseData.getHearingFeePBADetails())
             && caseData.getChangeOfRepresentation() == null;
     }
 
     private boolean isHearingFeeServiceRequestAfterNoticeOfChange(CaseData caseData) {
-        System.out.println("NOC service request2");
+        System.out.println("is being calledddd isHearingFeeServiceRequestAfterNoticeOfChange");
         return nonNull(caseData.getHearingDueDate())
             && caseData.getChangeOfRepresentation() != null
-            && caseData.getChangeOfRepresentation().getCaseRole().equals("[RESPONDENTSOLICITORONE]");
+            && caseData.getChangeOfRepresentation().getCaseRole().equals("[APPLICANTSOLICITORONE]");
     }
 
     private boolean isClaimFeeServiceRequest(CaseData caseData) {
