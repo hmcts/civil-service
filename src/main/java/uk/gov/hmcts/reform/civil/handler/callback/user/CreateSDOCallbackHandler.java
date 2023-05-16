@@ -75,6 +75,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.time.LocalDate;
@@ -144,6 +145,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
 
     @Override
@@ -738,6 +740,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (document != null) {
             updatedData.sdoOrderDocument(document);
         }
+        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -840,6 +843,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+        // null/remove preview SDO document, otherwise it will show as duplicate within case file view
+        dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 

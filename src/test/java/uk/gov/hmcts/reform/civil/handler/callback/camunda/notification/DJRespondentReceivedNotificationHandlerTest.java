@@ -146,6 +146,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
             //send Received email
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1Represented(null)
                 .addRespondent2(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .build();

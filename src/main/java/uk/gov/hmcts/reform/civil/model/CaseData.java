@@ -137,10 +137,13 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -827,6 +830,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
+    private final String respondent1DocumentURL;
+    private final String respondent2DocumentURL;
+    private final String respondent2DocumentGeneration;
+
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
     private final String freeFormRecitalTextArea;
@@ -836,8 +843,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
 
-    private Document freeFormOrderDocument;
-    private Document assistedOrderDocument;
+    private Document finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
@@ -920,27 +926,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanYes() {
+    public boolean isDefendantPaymentPlanYes() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
-        return (YesOrNo.YES.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.YES.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return hasApplicantAcceptedRepaymentPlan()
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
+            || isClaimantNotSettlePartAdmitClaim();
     }
 
     @JsonIgnore
-    public boolean isRejectDefendantPaymentPlanNo() {
+    public boolean isDefendantPaymentPlanNo() {
         Set<RespondentResponsePartAdmissionPaymentTimeLRspec> paymentPlan = EnumSet.of(
             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
         );
 
-        return (YesOrNo.NO.equals(getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.NO.equals(getApplicant1AcceptPartAdmitPaymentPlanSpec()))
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return hasApplicantRejectedRepaymentPlan()
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
+            || isClaimantNotSettlePartAdmitClaim();
     }
 
     @JsonIgnore
@@ -956,6 +962,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isPartAdmitClaimNotSettled() {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
+                || getApplicant1AcceptAdmitAmountPaidSpec() != null
                 || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
@@ -1038,9 +1045,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isLRvLipOneVOne(MultiPartyScenario multiPartyScenario) {
-        return YesOrNo.NO.equals(getSpecRespondent1Represented())
-            && multiPartyScenario.equals(ONE_V_ONE);
+    public boolean isRespondent1NotRepresented() {
+        return NO.equals(getRespondent1Represented());
+    }
+
+    @JsonIgnore
+    public boolean isLRvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isOneVOne(this);
     }
 
     @JsonIgnore
@@ -1082,5 +1094,46 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimantConfirmAmountNotPaidPartAdmit() {
         return YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse() {
+        if (isClaimantNotSettlePartAdmitClaim()
+            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
+            && !(NO.equals(getApplicant1ProceedWithClaim()))
+            && !(NO.equals(getApplicant1ProceedWithClaimSpec2v1())))) {
+            return YES;
+        }
+        return NO;
+    }
+
+    @JsonIgnore
+    public boolean isClaimantNotSettlePartAdmitClaim() {
+        return hasDefendantNotPaid()
+            || isSettlementDeclinedByClaimant()
+            || isClaimantRejectsClaimAmount();
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantNotAgreedToFreeMediation() {
+        return NO.equals(getResponseClaimMediationSpecRequired());
+    }
+
+    @JsonIgnore
+    public boolean isFastTrackClaim() {
+        return FAST_CLAIM.name().equals(getResponseClaimTrack());
+    }
+
+    @JsonIgnore
+    public boolean isSmallClaim() {
+        return SMALL_CLAIM.name().equals(getResponseClaimTrack());
+    }
+
+    @JsonIgnore
+    public boolean isRejectWithNoMediation() {
+        return isClaimantNotSettlePartAdmitClaim()
+            && ((hasClaimantNotAgreedToFreeMediation()
+            || hasDefendantNotAgreedToFreeMediation())
+            || isFastTrackClaim());
     }
 }
