@@ -645,7 +645,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertEquals(response.getErrors().get(0), "Enter a valid amount for equal instalments");
+            assertEquals("Enter a valid amount for equal instalments", response.getErrors().get(0));
         }
 
         @Test
@@ -664,7 +664,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertEquals(response.getErrors().get(0), "Enter an amount of £1 or more");
+            assertEquals("Enter an amount of £1 or more", response.getErrors().get(0));
         }
 
     }
