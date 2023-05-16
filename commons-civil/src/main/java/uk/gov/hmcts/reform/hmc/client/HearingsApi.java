@@ -35,7 +35,7 @@ public interface HearingsApi {
     PartiesNotifiedResponses getPartiesNotifiedRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
-        @RequestParam("id") String id
+        @PathVariable("id") String id
     );
 
     @GetMapping(value = UNNOTIFIED_HEARINGS_ENDPOINT + "/{hmctsServiceCode}")
