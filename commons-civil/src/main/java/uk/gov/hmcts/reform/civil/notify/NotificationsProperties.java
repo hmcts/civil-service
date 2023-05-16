@@ -237,9 +237,21 @@ public class NotificationsProperties {
     private String notifyDefendantLipTemplate;
 
     @NotEmpty
+    private String notifyApplicantLRMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLRMediationAgreementTemplate;
+
+    @NotEmpty
     private String bundleCreationTemplate;
 
     @NotEmpty
     private String hearingNotificationLipDefendantTemplate;
+
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimTemplate;
 
 }
