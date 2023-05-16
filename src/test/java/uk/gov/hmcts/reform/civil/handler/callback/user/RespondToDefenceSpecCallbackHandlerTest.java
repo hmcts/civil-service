@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -68,7 +72,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -87,12 +93,19 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -210,6 +223,79 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedContainsDQ() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+                                                               .documentName("defendant_directions_questionnaire_form")
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE).build()))
+                .respondent1DocumentURL(null)
+                .build();
+            // When
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Given
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNotNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
+        }
+
+        @Test
+        void shouldNotPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedDoesNotContainDQ() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+                                                               .documentName("banana")
+                                                               .documentType(SEALED_CLAIM).build()))
+                .respondent1DocumentURL(null)
+                .build();
+            // When
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Given
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
+        }
+
+        @Test
+        void shouldPopulateRespondent1AndRespondent2Docs_whenInvokedAndSystemGeneratedContainsDQ() {
+            // Given
+            var testDocument1 = CaseDocument.builder()
+                .documentName("defendant_directions_questionnaire_form")
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder()
+                                  .documentUrl("test-respondent1Doc-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build()).build();
+
+            var testDocument2 = CaseDocument.builder()
+                .documentName("defendant_directions_questionnaire_form")
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder()
+                                  .documentUrl("test-respondent2Doc-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build()).build();
+
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(testDocument1));
+            documentList.add(element(testDocument2));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(documentList)
+                .respondent1DocumentURL("test-respondent1Doc-url")
+                .respondent2DocumentURL("test-respondent2Doc-url")
+                .build();
+
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNotNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNotNull();
         }
     }
 
@@ -564,6 +650,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
+        @Test
+        void shouldAddPartyIdsToPartyFields_whenInvoked() {
+            var params = callbackParamsOf(
+                CaseDataBuilder.builder().atState(FlowState.Main.FULL_DEFENCE).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
+            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
+        }
+
+        @Test
+        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+            var caseData = CaseDataBuilder.builder().atState(FlowState.Main.FULL_DEFENCE).build();
+            when(featureToggleService.isHmcEnabled()).thenReturn(false);
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1")
+                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
+            assertThat(response.getData()).extracting("respondent1")
+                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
+        }
+
         @Nested
         class ResetStatementOfTruth {
 
@@ -663,6 +783,52 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getState())
                 .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldNullDocument_whenCaseFileEnabled() {
+            // Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("company name").build())
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE)
+                                                               .build()))
+                .build();
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
+            assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithoutMediationAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithFastTrackAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
 
@@ -1186,6 +1352,22 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetVulnerability_whenGivenConditionMeets() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
+
+        @Test
         void shouldNotSetMediationShowFlag_whenGivenConditionNotMeet() {
             CaseData caseData = CaseDataBuilder.builder().build();
             given(respondentMediationService.setMediationRequired(any())).willReturn(null);
@@ -1225,5 +1407,75 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class InstalmentsValidationCallback {
+        private static final String PAGE_ID = "validate-suggest-instalments";
+        LocalDate inputDate = LocalDate.now().plusDays(31);
+
+        @Test
+        void shouldReturnError_whenAmountIsZero() {
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.ZERO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Enter an amount of £1 or more");
+        }
+
+        @Test
+        void shouldReturnError_whenAmountIsLarger() {
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150000))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Enter a valid amount for equal instalments");
+        }
+
+        @Test
+        void shouldReturnError_whenDateIsBefore() {
+            LocalDate eligibleDate = LocalDate.now().plusDays(30);
+            var testDate = LocalDate.now().plusDays(25);
+
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(testDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Selected date must be after " + formatLocalDate(
+                    eligibleDate,
+                    DATE
+                ));
+        }
+    }
+
+    @Nested
+    class MidEventPaymentDate {
+        private static final String PAGE_ID = "get-payment-date";
+
+        @Test
+        void shouldReturnError_whenDateIsBefore() {
+            CaseData caseData = CaseData.builder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String paymentDate = getCaseData(response).getCurrentDateboxDefendantSpec();
+            assertThat(paymentDate).isEqualTo(formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE));
+        }
     }
 }
