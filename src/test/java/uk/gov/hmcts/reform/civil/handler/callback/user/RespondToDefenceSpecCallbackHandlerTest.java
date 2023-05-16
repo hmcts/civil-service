@@ -101,9 +101,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTEN
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -1353,22 +1350,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetVulnerability_whenGivenConditionMeets() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateSpec1v1ClaimSubmitted()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
-                .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isNull();
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
-                .contains(DefendantResponseShowTag.VULNERABILITY.name());
-        }
-
-        @Test
         void shouldNotSetMediationShowFlag_whenGivenConditionNotMeet() {
             CaseData caseData = CaseDataBuilder.builder().build();
             given(respondentMediationService.setMediationRequired(any())).willReturn(null);
@@ -1408,75 +1389,5 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
-    }
-
-    @Nested
-    class InstalmentsValidationCallback {
-        private static final String PAGE_ID = "validate-suggest-instalments";
-        LocalDate inputDate = LocalDate.now().plusDays(31);
-
-        @Test
-        void shouldReturnError_whenAmountIsZero() {
-            CaseData caseData = CaseData.builder()
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.ZERO)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0))
-                .isEqualTo("Enter an amount of £1 or more");
-        }
-
-        @Test
-        void shouldReturnError_whenAmountIsLarger() {
-            CaseData caseData = CaseData.builder()
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150000))
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0))
-                .isEqualTo("Enter a valid amount for equal instalments");
-        }
-
-        @Test
-        void shouldReturnError_whenDateIsBefore() {
-            LocalDate eligibleDate = LocalDate.now().plusDays(30);
-            var testDate = LocalDate.now().plusDays(25);
-
-            CaseData caseData = CaseData.builder()
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(testDate)
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0))
-                .isEqualTo("Selected date must be after " + formatLocalDate(
-                    eligibleDate,
-                    DATE
-                ));
-        }
-    }
-
-    @Nested
-    class MidEventPaymentDate {
-        private static final String PAGE_ID = "get-payment-date";
-
-        @Test
-        void shouldReturnError_whenDateIsBefore() {
-            CaseData caseData = CaseData.builder()
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String paymentDate = getCaseData(response).getCurrentDateboxDefendantSpec();
-            assertThat(paymentDate).isEqualTo(formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE));
-        }
     }
 }

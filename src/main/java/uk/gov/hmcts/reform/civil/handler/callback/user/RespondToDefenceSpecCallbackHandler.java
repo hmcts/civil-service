@@ -73,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -214,10 +215,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion()) && shouldVulnerabilityAppear(caseData)) {
-            setVulnerabilityFlag(caseData, caseDataBuilder);
-        }
-
         setMediationConditionFlag(caseData, caseDataBuilder);
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
 
@@ -237,7 +234,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && caseData.getApplicant1ProceedWithClaim() == YES)
-            || caseData.isClaimantNotSettlePartAdmitClaim();
+            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
