@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -96,6 +97,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
+    private final AssignCategoryId assignCategoryId;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -602,6 +604,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
+        //  we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
+        // showing, we remove.
+        caseDataBuilder.orderSDODocumentDJ(null);
+        assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -643,6 +651,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
         caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
