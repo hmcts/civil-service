@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -850,17 +851,17 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.hasApplicantAcceptedRepaymentPlan();
+    public static final Predicate<CaseData> acceptRepaymentPlan =
+        CaseData::hasApplicantAcceptedRepaymentPlan;
 
-    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.hasApplicantRejectedRepaymentPlan();
+    public static final Predicate<CaseData> rejectRepaymentPlan =
+        CaseData::hasApplicantRejectedRepaymentPlan;
 
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
-        caseData.isRespondentResponseBilingual();
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
+        CaseDataParent::isRespondentResponseBilingual;
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
-        caseData.isPartAdmitClaimSettled();
+    public static final Predicate<CaseData> agreePartAdmitSettle =
+        CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
         CaseData::isClaimantNotSettlePartAdmitClaim;
