@@ -308,7 +308,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
-            .date3(LocalDate.now().plusWeeks(4))
+            .date3(LocalDate.now().plusWeeks(8))
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
