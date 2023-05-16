@@ -107,7 +107,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
@@ -275,6 +277,31 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // need to be non-null to ensure previous data is cleaned
             assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
                 .isNotNull();
+        }
+
+        @Test
+        public void testSpecDefendantResponseFastTrackOneVTwoLegalRep() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .isRespondent2(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData().get("specDisputesOrPartAdmission")).isEqualTo("No");
+            assertThat(response.getData().get("specPaidLessAmountOrDisputesOrPartAdmission")).isEqualTo("No");
         }
 
         @Test
@@ -486,6 +513,41 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .compareTo(
                     new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmountPounds").toString())
                         .multiply(BigDecimal.valueOf(100))));
+        }
+
+        @Test
+        public void testSpecDefendantResponseAdmitPartOfClaimFastTrackRespondent2() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .ccdCaseReference(354L)
+                .totalClaimAmount(new BigDecimal(100000))
+                .respondent1(PartyBuilder.builder().individual().build())
+                .isRespondent1(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .isRespondent2(YES)
+                .defenceAdmitPartEmploymentType2Required(YES)
+                .defenceAdmitPartEmploymentType2Required(YES)
+                .specDefenceAdmitted2Required(YES)
+                .specDefenceAdmittedRequired(YES)
+                .showConditionFlags(EnumSet.of(
+                    DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1,
+                    DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+                ))
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.MULTI_CLAIM.name());
         }
 
         @Test
@@ -1759,6 +1821,88 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("label")
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
         }
+    }
+
+    @Nested
+    class MidDetermineLoggedInSolicitor {
+
+        @BeforeEach
+        void setup() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        }
+
+        @Test
+        public void testDetermineLoggedInSolicitorForRespondentSolicitor1() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build();
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "determineLoggedInSolicitor");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
+            assertThat(response.getData()).containsEntry("isRespondent2", "No");
+            assertThat(response.getData()).containsEntry("isApplicant1", "No");
+            assertThat(response.getData()).containsEntry("neitherCompanyNorOrganisation", "Yes");
+        }
+
+        @Test
+        public void testDetermineLoggedInSolicitorForRespondentSolicitor2() {
+            // Given
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .isRespondent2(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "determineLoggedInSolicitor");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
+            assertThat(response.getData()).containsEntry("isRespondent2", "Yes");
+            assertThat(response.getData()).containsEntry("isApplicant1", "No");
+            assertThat(response.getData()).containsEntry("neitherCompanyNorOrganisation", "Yes");
+        }
+
+        @Test
+        public void testDetermineLoggedInSolicitorForApplicantSolicitor() {
+            // Given
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(APPLICANTSOLICITORONE))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "determineLoggedInSolicitor");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
+            assertThat(response.getData()).containsEntry("isRespondent2", "No");
+            assertThat(response.getData()).containsEntry("isApplicant1", "Yes");
+        }
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);
     }
 
 }

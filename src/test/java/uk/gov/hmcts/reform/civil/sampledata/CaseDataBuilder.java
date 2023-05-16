@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
@@ -429,6 +430,9 @@ public class CaseDataBuilder {
     private YesOrNo claimant2ResponseFlag;
     private TimelineUploadTypeSpec specClaimResponseTimelineList;
     private TimelineUploadTypeSpec specClaimResponseTimelineList2;
+    private YesOrNo defenceAdmitPartEmploymentTypeRequired;
+    private YesOrNo specDefenceFullAdmitted2Required;
+    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5285,6 +5289,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setDefenceAdmitPartEmploymentTypeRequired(YesOrNo yesOrNo) {
+        this.defenceAdmitPartEmploymentTypeRequired = defenceAdmitPartEmploymentTypeRequired;
+        return this;
+    }
+
+    public CaseDataBuilder specDefenceFullAdmitted2Required(YesOrNo yesOrNo) {
+        this.specDefenceFullAdmitted2Required = specDefenceFullAdmitted2Required;
+        return this;
+    }
+
+    public CaseDataBuilder defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponsePartAdmissionPaymentTimeLRspec) {
+        this.defenceAdmitPartPaymentTimeRouteRequired = respondentResponsePartAdmissionPaymentTimeLRspec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5542,6 +5561,9 @@ public class CaseDataBuilder {
             .claimant2ResponseFlag(claimant2ResponseFlag)
             .specClaimResponseTimelineList(specClaimResponseTimelineList)
             .specClaimResponseTimelineList2(specClaimResponseTimelineList2)
+            .defenceAdmitPartEmploymentTypeRequired(defenceAdmitPartEmploymentTypeRequired)
+            .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
+            .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .build();
     }
 

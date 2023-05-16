@@ -1509,4 +1509,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
     }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_SPEC);
+    }
 }
