@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
