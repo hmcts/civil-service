@@ -467,11 +467,11 @@ public class StateFlowEngine {
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(not(
                          isOneVOneResponseFlagSpec)))
-                        .set(flags -> {
-                             flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                             if (featureToggleService.isSdoEnabled()) {
-                                 flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                             }
+                     .set(flags -> {
+                          flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                          if(featureToggleService.isSdoEnabled()) {
+                              flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                          }
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate()).and(agreedToMediation.negate()))
@@ -510,11 +510,11 @@ public class StateFlowEngine {
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
                                                                               .and(not(agreedToMediation)))
-                   .set(flags -> {
-                        if (featureToggleService.isSdoEnabled()) {
-                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                        }
-                   })
+                .set(flags -> {
+                    if(featureToggleService.isSdoEnabled()) {
+                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                    }
+                })
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
