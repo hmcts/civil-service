@@ -466,8 +466,9 @@ public class StateFlowEngine {
                             flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
                         })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(not(isOneVOneResponseFlagSpec)))
-            .set(flags -> {
+                .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(not(
+                isOneVOneResponseFlagSpec)))
+                .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 if (featureToggleService.isSdoEnabled()) {
                     flags.put(FlowFlag.SDO_ENABLED.name(), true);
@@ -508,9 +509,9 @@ public class StateFlowEngine {
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION)
-                .onlyIf(agreedToMediation.or(isClaimantNotSettlePartAdmitClaim.and(allAgreedToLrMediationSpec)))
+                .onlyIf(agreedToMediation)
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-                .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(allAgreedToLrMediationSpec)))
+                .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
                 .set(flags -> {
                    if (featureToggleService.isSdoEnabled()) {
                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
