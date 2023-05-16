@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PartiesNotified {
+
     private Integer requestVersion;
     private JsonNode serviceData;
 }
