@@ -24,4 +24,10 @@ public class CaseDataLiP {
         return applicant1ClaimMediationSpecRequiredLip != null
             && applicant1ClaimMediationSpecRequiredLip.hasClaimantAgreedToFreeMediation();
     }
+
+    @JsonIgnore
+    public boolean hasClaimantNotAgreedToFreeMediation() {
+        return applicant1ClaimMediationSpecRequiredLip != null
+            && applicant1ClaimMediationSpecRequiredLip.hasClaimantNotAgreedToFreeMediation();
+    }
 }

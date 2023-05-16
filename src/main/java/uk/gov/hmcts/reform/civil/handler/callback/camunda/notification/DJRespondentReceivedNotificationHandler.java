@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -26,7 +24,6 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -87,10 +84,9 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+        if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())
-            && MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)
         ) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
