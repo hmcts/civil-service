@@ -52,7 +52,10 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
-    private static final CaseDetails CASE_DETAILS = CaseDetails.builder().id(1L).build();
+    private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
+        .id(1L)
+        .createdDate(LocalDateTime.now())
+        .build();
 
     @BeforeEach
     void setUp() {
