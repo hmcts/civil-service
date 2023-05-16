@@ -8,9 +8,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -30,6 +31,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
+    private static final String REFERENCE_TEMPLATE_HEARING_LIP = "notification-of-hearing-lip-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
 
     @Override
@@ -46,23 +48,15 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
-        sendEmail(caseData, recipient);
+        boolean isApplicantLip = isApplicantLip(caseData);
+        sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip)
+            , isApplicantLip);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
-    private void sendEmail(CaseData caseData, String recipient) {
-        String emailTemplate;
-        if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
-            BigDecimal.ZERO) > 0) {
-            emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplate();
-        } else {
-            emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
-        }
-        notificationService.sendMail(recipient, emailTemplate, addProperties(caseData),
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
-        );
+    private void sendEmail(CaseData caseData, String recipient, String reference, Boolean isApplicantLip) {
+        notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addProperties(caseData), reference);
     }
 
     @Override
@@ -77,26 +71,66 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         int hours = Integer.parseInt(hourMinute.substring(0, 2));
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime time = LocalTime.of(hours, minutes, 0);
-        if (caseData.getSolicitorReferences() == null
-            || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
-            reference = "";
+        String legacyCaseRef = caseData.getLegacyCaseReference();
+        String hearingDate = caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String hearingTime = time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm");
+        if (!isApplicantLip(caseData)) {
+            if (caseData.getSolicitorReferences() == null
+                || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
+                reference = "";
+            } else {
+                reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
+            }
+            return new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER,
+                legacyCaseRef,
+                HEARING_FEE,
+                caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
+                HEARING_DATE,
+                hearingDate,
+                HEARING_TIME,
+                hearingTime,
+                HEARING_DUE_DATE,
+                caseData.getHearingDueDate() == null ? "" :
+                    caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                CLAIMANT_REFERENCE_NUMBER, reference
+            ));
         } else {
-            reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
+            return new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER,
+                legacyCaseRef,
+                HEARING_DATE,
+                hearingDate,
+                HEARING_TIME,
+                hearingTime
+            ));
         }
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
-            HEARING_FEE,
-            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
-            HEARING_DATE,
-            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            HEARING_TIME,
-            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm"),
-            HEARING_DUE_DATE,
-            caseData.getHearingDueDate() == null ? "" :
-                caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            CLAIMANT_REFERENCE_NUMBER, reference
+    }
 
-        ));
+    private boolean isApplicantLip(CaseData caseData) {
+        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
+    }
+    private String getRecipient(CaseData caseData, Boolean isApplicantLip){
+        return Boolean.TRUE.equals(isApplicantLip) ? caseData.getApplicant1().getPartyEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+    }
+
+    private String getReferenceTemplate(CaseData caseData, Boolean isApplicantLip){
+        return Boolean.TRUE.equals(isApplicantLip) ?
+            String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
+            : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
+    }
+
+    private String getEmailTemplate(CaseData caseData, Boolean isApplicantLip){
+        if (Boolean.FALSE.equals(isApplicantLip)) {
+            if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
+                BigDecimal.ZERO) > 0) {
+                return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
+            } else {
+                return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
+            }
+        } else {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplate();
+        }
     }
 }
