@@ -12,6 +12,8 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class LitigationFriend {
 
+    private final String partyID;
+
     // CIV-5557 to be removed
     private final String fullName;
     private final String firstName;
