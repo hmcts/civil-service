@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmidietelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithoutMediationConfText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -25,6 +26,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitPayImmediatelyProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildProposePaymentPlanCaseData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseDefendantWithOutMediationData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseWithOutMediationFastTrackData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildCaseClaimantWithOutMediationData;
 
 public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
@@ -49,8 +53,10 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
             Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfText.class),
             Pair.of(buildProposePaymentPlanCaseData(), ProposePaymentPlanConfText.class),
             Pair.of(buildCaseWithMediation(), RejectWithMediationConfText.class),
-            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class)
-
+            Pair.of(buildAcceptPartAdmitAndPaidCaseData(), AcceptPartAdmitAndPaidConfText.class),
+            Pair.of(buildCaseDefendantWithOutMediationData(), RejectWithoutMediationConfText.class),
+            Pair.of(buildCaseWithOutMediationFastTrackData(), RejectWithoutMediationConfText.class),
+            Pair.of(buildCaseClaimantWithOutMediationData(), RejectWithoutMediationConfText.class)
         );
     }
 }
