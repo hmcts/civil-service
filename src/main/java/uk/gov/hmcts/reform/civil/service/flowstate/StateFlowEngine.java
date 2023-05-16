@@ -455,14 +455,14 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
             .state(FULL_DEFENCE)
-            .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(isOneVOneResponseFlagSpec))
-            .set(flags -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.SDO_ENABLED.name(), featureToggleService.isSdoEnabled());
-                flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
-            })
-            .transitionTo(FULL_DEFENCE_PROCEED)
+                .transitionTo(FULL_DEFENCE_PROCEED)
+                    .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(isOneVOneResponseFlagSpec))
+                        .set(flags -> {
+                            flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                            flags.put(FlowFlag.SDO_ENABLED.name(), featureToggleService.isSdoEnabled());
+                            flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
+                        })
+                .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(not(isOneVOneResponseFlagSpec)))
             .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
