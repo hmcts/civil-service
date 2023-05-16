@@ -467,12 +467,12 @@ public class StateFlowEngine {
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(not(
                          isOneVOneResponseFlagSpec)))
-                .set(flags -> {
-                     flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                     if (featureToggleService.isSdoEnabled()) {
-                         flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                     }
-                 })
+            .set(flags -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                if (featureToggleService.isSdoEnabled()) {
+                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                }
+            })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate()).and(agreedToMediation.negate()))
                 .set(flags -> {
