@@ -32,12 +32,8 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -125,9 +121,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.helpers.RespondToClaimHelper.addResponseDocuments;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
@@ -213,9 +209,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(NO);
             }
             if (YES.equals(caseData.getIsRespondent2())) {
-               updateDisputesOrPartAdmission(caseData, updatedCase);
+               updateDisputesOrPartAdmission(caseData,caseData.getRespondent2ClaimResponseTypeForSpec(), updatedCase);
             } else {
-                updateDisputesOrPartAdmission(caseData, updatedCase);
+                updateDisputesOrPartAdmission(caseData,caseData.getRespondent1ClaimResponseTypeForSpec(), updatedCase);
             }
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCase.responseClaimTrack(allocatedTrack.name());
@@ -225,20 +221,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void updateDisputesOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
-        if (hasPaidlessThanAndDisputesClaimOrPartAdmission(caseData)) {
+    private void updateDisputesOrPartAdmission(CaseData caseData,RespondentResponseTypeSpec respondentResponseTypeSpec,
+                                               CaseData.CaseDataBuilder<?, ?> updatedCase) {
+        if (hasPaidlessThanAndDisputesClaimOrPartAdmission(caseData, respondentResponseTypeSpec)) {
             updatedCase.specDisputesOrPartAdmission(YES);
         } else {
             updatedCase.specDisputesOrPartAdmission(NO);
         }
     }
 
-    private boolean hasPaidlessThanAndDisputesClaimOrPartAdmission(CaseData caseData) {
+    private boolean hasPaidlessThanAndDisputesClaimOrPartAdmission(CaseData caseData,
+                                                                   RespondentResponseTypeSpec respondentResponseTypeSpec) {
         return RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
             != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
             && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-            || caseData.getRespondent1ClaimResponseTypeForSpec()
-            == RespondentResponseTypeSpec.PART_ADMISSION);
+            || respondentResponseTypeSpec == RespondentResponseTypeSpec.PART_ADMISSION);
     }
 
     // called on full_admit, also called after whenWillClaimBePaid
@@ -310,7 +307,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedCaseData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
         }
-        updateDisputesOrPartAdmission(caseData, updatedCaseData);
+        updateDisputesOrPartAdmission(caseData,caseData.getRespondent1ClaimResponseTypeForSpec(), updatedCaseData);
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
             && caseData.getSpecDefenceAdmittedRequired() == NO) {
             updatedCaseData.specPartAdmitPaid(NO);
@@ -1493,80 +1490,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
-        ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
-        if (respondent1SpecDefenceResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
-            if (respondent1ClaimDocument != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                          updatedCaseData.build().getRespondent1ResponseDate(),
-                                          DocumentType.DEFENDANT_DEFENCE
-                    ));
-                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
-            }
-        }
-        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-        if (respondent1DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
-            if (respondent1DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
-                        respondent1DQDraftDirections,
-                        "Defendant",
-                        updatedCaseData.build().getRespondent1ResponseDate(),
-                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
-                assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
-            }
-            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
-            if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
-                if (respondent2ClaimDocument != null) {
-                    defendantUploads.add(
-                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                              updatedCaseData.build().getRespondent2ResponseDate(),
-                                              DocumentType.DEFENDANT_DEFENCE
-                        ));
-                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                           "defendant2DefenseDirectionsQuestionnaire");
-                }
-            }
-        } else {
-            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
-            if (respondent2SpecDefenceResponseDocument != null) {
-                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
-                if (respondent2ClaimDocument != null) {
-                    defendantUploads.add(
-                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                              updatedCaseData.build().getRespondent2ResponseDate(),
-                                              DocumentType.DEFENDANT_DEFENCE
-                        ));
-                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                           "defendant2DefenseDirectionsQuestionnaire");
-                }
-            }
-        }
-        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-        if (respondent2DQ != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
-            if (respondent2DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
-                        respondent2DQDraftDirections,
-                        "Defendant 2",
-                        updatedCaseData.build().getRespondent2ResponseDate(),
-                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
-                assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
-            }
-        }
-        if (!defendantUploads.isEmpty()) {
-            updatedCaseData.defendantResponseDocuments(defendantUploads);
-        }
+        addResponseDocuments(caseData.getRespondent1SpecDefenceResponseDocument(),
+                                                  caseData.getRespondent2SpecDefenceResponseDocument(),
+                                                  caseData, updatedCaseData, assignCategoryId);
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
         if (toggleService.isCaseFileViewEnabled()) {
