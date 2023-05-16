@@ -36,7 +36,7 @@ public class DocumentHearingLocationHelper {
         LocationRefData locationRefData = Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(CaseLocationCivil::getBaseLocation)
             .map(baseLocation -> {
-                List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsId(
+                List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     authorisation,
                     baseLocation
                 ).stream().filter(location -> StringUtils.equals(
