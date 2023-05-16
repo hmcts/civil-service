@@ -40,9 +40,16 @@ public class DashboardClaimInfoService {
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
+
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
-            .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate, Comparator.reverseOrder()))
+            .sorted(this::compareClaimByCreateDate)
             .collect(Collectors.toList());
+    }
+
+    private int compareClaimByCreateDate(DashboardClaimInfo claim1, DashboardClaimInfo claim2) {
+        if(claim1.getCreatedDate() == null || claim2.getCreatedDate() == null)
+            return 0;
+        return claim1.getCreatedDate().compareTo(claim2.getCreatedDate());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
