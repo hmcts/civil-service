@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -45,8 +47,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -114,17 +117,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             checkFieldDate(caseData, errors);
         }
 
-        //Remove when Assisted Order Document generation is developed
-        if (FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())) {
-            CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-                caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
+            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
 
-            if (caseData.getFinalOrderSelection() == FinalOrderSelection.FREE_FORM_ORDER) {
-                caseDataBuilder.freeFormOrderDocument(finalDocument.getDocumentLink());
-            } else {
-                caseDataBuilder.assistedOrderDocument(finalDocument.getDocumentLink());
-            }
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -201,13 +197,20 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
-        //  we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
+        // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.freeFormOrderDocument(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
+        caseDataBuilder.finalOrderDocument(null);
+        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));        
+
+        CaseState state = All_FINAL_ORDERS_ISSUED;
+        if (caseData.getFinalOrderFurtherHearingToggle() != null) {
+            state = CASE_PROGRESSION;
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(state.name())
             .build();
     }
 
@@ -235,5 +238,4 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             return format(BODY_1v1, caseData.getApplicant1().getPartyName(), caseData.getRespondent1().getPartyName());
         }
     }
-
 }
