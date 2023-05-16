@@ -46,7 +46,7 @@ public class ClaimStoreService {
     }
 
     private LocalDateTime createAtToCreateDate(CmcClaim claim) {
-        if(claim.getCreatedAt() == null) {
+        if (claim.getCreatedAt() == null) {
             return LocalDateTime.now();
         }
 
