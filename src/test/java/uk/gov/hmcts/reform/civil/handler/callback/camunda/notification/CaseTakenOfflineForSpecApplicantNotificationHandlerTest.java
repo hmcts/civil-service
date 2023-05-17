@@ -22,10 +22,12 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
@@ -77,6 +79,36 @@ class CaseTakenOfflineForSpecApplicantNotificationHandlerTest extends BaseCallba
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            );
+        }
+
+        @Test
+        void shouldReturnCorrectActivityId_whenRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            assertThat(handler.camundaActivityId(params)).isEqualTo("TakeCaseOfflineForSpecNotifyApplicantSolicitor1");
+        }
+
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE_SPEC);
+        }
+
+        @Test
+        void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.empty());
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "case-taken-offline-spec-applicant-notification-000DC001"
             );
         }
     }
