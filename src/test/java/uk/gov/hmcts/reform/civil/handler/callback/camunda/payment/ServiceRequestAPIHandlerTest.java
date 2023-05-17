@@ -13,10 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -259,6 +256,50 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         private SRPbaDetails extractHearingPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getHearingFeePBADetails();
+        }
+
+        @Test
+        void shouldMakeHearingPaymentServiceRequest_whenInvokedAndIsNoticeOfChange() {
+            //Given
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            caseData = caseData.toBuilder()
+                .hearingDueDate(LocalDate.now())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build())
+                .hearingUnpaidAfterNocFlag("NEW_REP_ALLOW_SERVICE_REQUEST")
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("[APPLICANTSOLICITORONE]").build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            assertThat(extractHearingPaymentDetailsFromResponse(response).getServiceReqReference())
+                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+            assertThat(response.getData().get("hearingUnpaidAfterNocFlag")).isEqualTo("CURRENT_REP_HAS_SERVICE_REQUEST");
+        }
+
+        @Test
+        void shouldNotMakeHearingPaymentServiceRequest_whenInvokedAndIsSameNoticeOfChange() {
+            // When a NOC is applied to a case to change claimant rep, we generate a service request, but we then want
+            // to block additional service requests for that claimant rep, e.g. if hearing notice event is retriggered
+            // after a NOC has been applied
+            //Given
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            caseData = caseData.toBuilder()
+                .hearingDueDate(LocalDate.now())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build())
+                .hearingUnpaidAfterNocFlag("CURRENT_REP_HAS_SERVICE_REQUEST")
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("[APPLICANTSOLICITORONE]").build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //Then
+            verifyNoInteractions(paymentsService);
         }
     }
 }

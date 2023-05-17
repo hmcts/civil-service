@@ -761,6 +761,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EvidenceUploadTrial> trialSelectionEvidence;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
+    private final String hearingUnpaidAfterNocFlag;
+
     //applicant
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
