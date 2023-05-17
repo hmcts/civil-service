@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.getDynamicListValue;
 
 public class HearingDetailsMapper {
 
@@ -130,7 +131,19 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getHearingChannels(CaseData caseData) {
-        return null; //todo civ-6261
+        if (caseData.getHearingMethodValuesFastTrack() != null) {
+            return List.of(getDynamicListValue(caseData.getHearingMethodValuesFastTrack()));
+        } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
+            return List.of(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearing()));
+        } else if (caseData.getHearingMethodValuesDisposalHearingDJ() != null) {
+            return List.of(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearingDJ()));
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null) {
+            return List.of(getDynamicListValue(caseData.getHearingMethodValuesTrialHearingDJ()));
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null) {
+            return List.of(getDynamicListValue(caseData.getHearingMethodValuesSmallClaims()));
+        } else {
+            return null;
+        }
     }
 
 }

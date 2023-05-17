@@ -314,9 +314,49 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnList_whenHearingChannelsInvoked() {
+    void shouldReturnNull_whenHearingChannelIsNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
+    }
+
+    @Test
+    void shouldReturnList_whenSDOFastTrackHearingChannelSelected() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssuedFastTrackSDOInPersonHearing()
+            .build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
+    }
+
+    @Test
+    void shouldReturnList_whenSDOSmallClaimsHearingChannelSelected() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssuedSmallClaimsSDOInPersonHearing()
+            .build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
+    }
+
+    @Test
+    void shouldReturnList_whenSDODisposalHearingChannelSelected() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+            .build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
+    }
+
+    @Test
+    void shouldReturnList_whenDJDisposalHearingChannelSelected() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssuedDisposalDJVideoCallNew()
+            .build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("Video"));
+    }
+
+    @Test
+    void shouldReturnList_whenDJTrialHearingChannelSelected() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssuedTrialDJInPersonHearingNew()
+            .build();
+        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
     }
 
     @Test

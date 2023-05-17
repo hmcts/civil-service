@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.ArrayList;
 import java.util.List;
