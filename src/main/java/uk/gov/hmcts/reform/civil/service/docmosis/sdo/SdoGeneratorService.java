@@ -49,7 +49,7 @@ public class SdoGeneratorService {
 
         boolean isJudge = false;
 
-        if(userDetails.getRoles() != null) {
+        if (userDetails.getRoles() != null) {
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
