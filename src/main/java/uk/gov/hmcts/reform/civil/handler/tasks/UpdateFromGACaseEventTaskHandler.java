@@ -102,7 +102,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    private int checkIfDocumentExists(List<Element> civilCaseDocumentList,
+    protected int checkIfDocumentExists(List<Element> civilCaseDocumentList,
                                       List<Element> gaCaseDocumentlist) {
         return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
               .parallelStream().anyMatch(gaDocument -> gaDocument.getId().equals(civilDocument.getId())))

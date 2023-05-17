@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -476,6 +477,18 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    @Test
+    void checkIfDocumentExists() {
+        Element same = Element.builder().id(UUID.randomUUID())
+                .value(CaseDocument.builder().build()).build();
+        List<Element> civilCaseDocumentList = new ArrayList<>();
+        civilCaseDocumentList.add(same);
+        List<Element> gaDocumentList = new ArrayList<>();
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isLessThan(1);
+        gaDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()
