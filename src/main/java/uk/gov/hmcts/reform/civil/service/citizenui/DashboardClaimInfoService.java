@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +51,7 @@ public class DashboardClaimInfoService {
         if (claim1.getCreatedDate() == null || claim2.getCreatedDate() == null) {
             return 0;
         }
-        return claim1.getCreatedDate().compareTo(claim2.getCreatedDate());
+        return claim2.getCreatedDate().compareTo(claim1.getCreatedDate());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {

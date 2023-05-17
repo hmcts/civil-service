@@ -149,8 +149,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
-@Jacksonized
 @SuperBuilder(toBuilder = true)
+@Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class CaseData extends CaseDataParent implements MappableObject {

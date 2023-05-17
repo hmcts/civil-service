@@ -52,17 +52,33 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
+    private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
+    private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
-        .createdDate(LocalDateTime.now())
+        .createdDate(DATE_IN_2021)
         .build();
+    private static final CaseDetails CASE_DETAILS_2 = CaseDetails.builder()
+        .id(2L)
+        .build();
+
+    private static final List<DashboardClaimInfo> ORDERED_CASES =
+        Arrays.asList(DashboardClaimInfo.builder()
+                          .ocmc(true)
+                          .createdDate(DATE_IN_2021)
+                          .build(),
+                      DashboardClaimInfo.builder()
+                          .ocmc(true)
+                          .createdDate(DATE_IN_2022)
+                          .build()
+        );
 
     @BeforeEach
     void setUp() {
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
-        List<CaseDetails> cases = List.of(CASE_DETAILS);
+        List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();
         given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
@@ -83,6 +99,23 @@ public class DashboardClaimInfoServiceTest {
                                             .build())
                             .build());
 
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS_2))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Tom")
+                                            .individualLastName("Cruise")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName("Jackie")
+                                             .individualLastName("Chan")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .claimValue(ClaimValue
+                                            .builder()
+                                            .statementOfValueInPennies(new BigDecimal("100000"))
+                                            .build())
+                            .build());
     }
 
     @Test
@@ -169,5 +202,18 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.size()).isEqualTo(2);
         assertThat(claimsForDefendant.get(1).getPaymentDate()).isEqualTo(now.toLocalDate());
+    }
+
+    @Test
+    void shouldReturnCasesInProperOrder() {
+        given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
+
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+
+        assertThat(claimsForDefendant.get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
+        assertThat(claimsForDefendant.get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
     }
 }
