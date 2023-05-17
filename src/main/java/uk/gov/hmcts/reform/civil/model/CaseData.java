@@ -679,6 +679,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocRespondentSol;
     private final List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
 
+    private final List<Element<CaseDocument>> consentOrderDocument;
+    private final List<Element<CaseDocument>> consentOrderDocStaff;
+    private final List<Element<CaseDocument>> consentOrderDocClaimant;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSolTwo;
+
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocStaff;
     private final List<Element<CaseDocument>> dismissalOrderDocClaimant;

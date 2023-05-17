@@ -96,6 +96,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "requestForInformation");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepSequential");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepConcurrent");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "consentOrder");
 
         } catch (Exception e) {
             log.error(e.getMessage());
