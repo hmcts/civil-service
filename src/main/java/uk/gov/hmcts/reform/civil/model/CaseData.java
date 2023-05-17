@@ -732,12 +732,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> writtenRepConDocRespondentSol;
     private final List<Element<CaseDocument>> writtenRepConDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> gaRespDocument;
+    private final List<Element<Document>> gaRespDocument;
 
-    private final List<Element<CaseDocument>> gaRespDocStaff;
-    private final List<Element<CaseDocument>> gaRespDocClaimant;
-    private final List<Element<CaseDocument>> gaRespDocRespondentSol;
-    private final List<Element<CaseDocument>> gaRespDocRespondentSolTwo;
+    private final List<Element<Document>> gaRespDocStaff;
+    private final List<Element<Document>> gaRespDocClaimant;
+    private final List<Element<Document>> gaRespDocRespondentSol;
+    private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
