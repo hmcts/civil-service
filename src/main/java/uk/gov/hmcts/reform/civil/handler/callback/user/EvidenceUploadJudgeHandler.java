@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::populateSubmittedDateTime)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -45,6 +47,19 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private AboutToStartOrSubmitCallbackResponse populateSubmittedDateTime(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (caseData.getCaseNoteTypeNoteTA() != null) {
+            caseDataBuilder.noteAdditionDateTime(LocalDateTime.now());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -69,10 +84,10 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
-            IntStream.range(0, caseData.getDocumentOnly()
+            IntStream.range(0, caseData.getDocumentAndName()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentOnly().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
-                
+                caseData.getDocumentAndName().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
+
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
         }
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
