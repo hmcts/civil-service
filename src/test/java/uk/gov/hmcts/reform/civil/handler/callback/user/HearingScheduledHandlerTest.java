@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,8 +55,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 })
 class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
-    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
-
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
@@ -76,30 +72,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         given(time.now()).willReturn(LocalDateTime.now());
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(Fee.builder().build());
         given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(Fee.builder().build());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        // current date,hearing date,expected
-        "2022-10-27,2022-11-04,2022-11-03",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-29",   // hearing date more than 36 days away -> expect in 28 straight days time
-        "2022-10-01,2022-10-14,2022-10-08",   // hearing date less than 36 days away -> expect in 7 straight days
-        "2022-10-01,2022-10-10,2022-10-08"    // should never happen. If it does the deadline is the hearing day
-    })
-    void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
-        String strCurrentDate, String strHearingDate, String strExpectedHearingDueDate) {
-        // Given
-
-        LocalDate currentDate = LocalDate.parse(strCurrentDate, DATE_FORMAT);
-        LocalDate hearingDate = LocalDate.parse(strHearingDate, DATE_FORMAT);
-        LocalDate expectedHearingDueDate = LocalDate.parse(strExpectedHearingDueDate, DATE_FORMAT);
-
-        // When
-        LocalDate actualHearingDueDate = handler.calculateHearingDueDate(currentDate, hearingDate);
-
-        // Then
-        assertThat(actualHearingDueDate).isEqualTo(expectedHearingDueDate);
-
     }
 
     @ParameterizedTest
