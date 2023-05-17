@@ -307,6 +307,49 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNullDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "directionOrderDocument",
+                    caseData, "directionOrderDocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNoExistFieldDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        String noExistingField = "notExist";
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, noExistingField+"Document",
+                    caseData, noExistingField+"DocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get(noExistingField+"DocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void testUpdateDocCollectionWithoutNoticeGaCreatedByResp2() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
