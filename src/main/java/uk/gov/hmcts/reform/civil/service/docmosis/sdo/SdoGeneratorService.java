@@ -46,8 +46,13 @@ public class SdoGeneratorService {
 
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
-        boolean isJudge = userDetails.getRoles().stream()
-            .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+
+        boolean isJudge = false;
+
+        if(userDetails.getRoles() != null) {
+            isJudge = userDetails.getRoles().stream()
+                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        }
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
