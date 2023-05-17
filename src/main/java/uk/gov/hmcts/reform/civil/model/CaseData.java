@@ -137,8 +137,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -732,12 +730,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> writtenRepConDocRespondentSol;
     private final List<Element<CaseDocument>> writtenRepConDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> gaRespDocument;
+    private final List<Element<Document>> gaRespDocument;
 
-    private final List<Element<CaseDocument>> gaRespDocStaff;
-    private final List<Element<CaseDocument>> gaRespDocClaimant;
-    private final List<Element<CaseDocument>> gaRespDocRespondentSol;
-    private final List<Element<CaseDocument>> gaRespDocRespondentSolTwo;
+    private final List<Element<Document>> gaRespDocStaff;
+    private final List<Element<Document>> gaRespDocClaimant;
+    private final List<Element<Document>> gaRespDocRespondentSol;
+    private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
@@ -939,8 +937,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         );
 
         return hasApplicantAcceptedRepaymentPlan()
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
-            || isClaimantNotSettlePartAdmitClaim();
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
@@ -951,8 +948,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         );
 
         return hasApplicantRejectedRepaymentPlan()
-            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired())
-            || isClaimantNotSettlePartAdmitClaim();
+            || !paymentPlan.contains(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
@@ -968,7 +964,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isPartAdmitClaimNotSettled() {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
-                || getApplicant1AcceptAdmitAmountPaidSpec() != null
                 || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
@@ -1100,46 +1095,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimantConfirmAmountNotPaidPartAdmit() {
         return YesOrNo.NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec());
-    }
-
-    @JsonIgnore
-    public YesOrNo doesPartPaymentRejectedOrItsFullDefenceResponse() {
-        if (isClaimantNotSettlePartAdmitClaim()
-            || (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
-            && !(NO.equals(getApplicant1ProceedWithClaim()))
-            && !(NO.equals(getApplicant1ProceedWithClaimSpec2v1())))) {
-            return YES;
-        }
-        return NO;
-    }
-
-    @JsonIgnore
-    public boolean isClaimantNotSettlePartAdmitClaim() {
-        return hasDefendantNotPaid()
-            || isSettlementDeclinedByClaimant()
-            || isClaimantRejectsClaimAmount();
-    }
-
-    @JsonIgnore
-    public boolean hasDefendantNotAgreedToFreeMediation() {
-        return NO.equals(getResponseClaimMediationSpecRequired());
-    }
-
-    @JsonIgnore
-    public boolean isFastTrackClaim() {
-        return FAST_CLAIM.name().equals(getResponseClaimTrack());
-    }
-
-    @JsonIgnore
-    public boolean isSmallClaim() {
-        return SMALL_CLAIM.name().equals(getResponseClaimTrack());
-    }
-
-    @JsonIgnore
-    public boolean isRejectWithNoMediation() {
-        return isClaimantNotSettlePartAdmitClaim()
-            && ((hasClaimantNotAgreedToFreeMediation()
-            || hasDefendantNotAgreedToFreeMediation())
-            || isFastTrackClaim());
     }
 }
