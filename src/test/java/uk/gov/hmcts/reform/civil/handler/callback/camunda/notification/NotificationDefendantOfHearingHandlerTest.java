@@ -237,7 +237,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         }
 
         @Test
-        void shouldNotifyRespondentSolicitorLip_whenInvokedAnd1v1LipApplicant() {
+        void shouldNotifyRespondentSolicitorLip_whenInvokedAnd1v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
