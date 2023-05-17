@@ -1160,6 +1160,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(type)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now()).build())
                 .specDefenceFullAdmittedRequired(NO)
                 .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
