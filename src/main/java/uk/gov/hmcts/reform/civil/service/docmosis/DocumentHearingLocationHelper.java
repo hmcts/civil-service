@@ -36,13 +36,14 @@ public class DocumentHearingLocationHelper {
         LocationRefData locationRefData = Optional.ofNullable(caseData.getCaseManagementLocation())
             .map(CaseLocationCivil::getBaseLocation)
             .map(baseLocation -> {
-                List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsId(
+                List<LocationRefData> sameLocation = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     authorisation,
                     baseLocation
                 ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()
-                ) && StringUtils.equals(location.getCourtType(), "10")).collect(Collectors.toList());
+                //) && StringUtils.equals(location.getCourtType(), "10"))).collect(Collectors.toList());
+                )).collect(Collectors.toList());
                 if (sameLocation.isEmpty()) {
                     return null;
                 } else if (sameLocation.size() == 1) {

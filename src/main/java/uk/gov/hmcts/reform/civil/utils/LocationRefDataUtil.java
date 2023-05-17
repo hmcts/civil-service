@@ -31,7 +31,7 @@ public class LocationRefDataUtil {
         if (caseData.getCourtLocation().getCaseLocation() == null) {
             return caseData.getCourtLocation().getApplicantPreferredCourt();
         } else {
-            List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
+            List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                 authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
             if (!courtLocations.isEmpty()) {
                 return courtLocations.stream()

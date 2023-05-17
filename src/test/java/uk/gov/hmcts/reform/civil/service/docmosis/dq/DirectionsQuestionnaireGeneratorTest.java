@@ -1267,7 +1267,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .courtTypeId(RoboticsDataUtil.CIVIL_COURT_TYPE_ID)
                 .build();
             List<LocationRefData> locationList = Collections.singletonList(location);
-            when(locationRefDataService.getCourtLocationsByEpimmsId(
+            when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                 anyString(),
                 eq(caseData.getRespondent2DQ().getRequestedCourt().getCaseLocation().getBaseLocation())
             )).thenReturn(locationList);

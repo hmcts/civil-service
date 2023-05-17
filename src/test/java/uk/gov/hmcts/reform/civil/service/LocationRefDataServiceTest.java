@@ -445,7 +445,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenReturn(mockedResponse);
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
             String prefferedCourtCode = result.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
