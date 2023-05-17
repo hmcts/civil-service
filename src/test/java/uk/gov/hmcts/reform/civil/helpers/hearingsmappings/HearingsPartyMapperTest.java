@@ -792,7 +792,7 @@ public class HearingsPartyMapperTest {
             .interpreterLanguage(null)
             .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
-            .vulnerabilityDetails(null)
+            .vulnerabilityDetails(emptyList())
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
@@ -818,7 +818,7 @@ public class HearingsPartyMapperTest {
                                                                    String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(null)
+            .organisationType(ORG.getLabel())
             .cftOrganisationID(cftOrganisationID)
             .build();
 

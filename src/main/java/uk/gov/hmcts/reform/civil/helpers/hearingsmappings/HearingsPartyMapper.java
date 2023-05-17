@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -281,7 +282,7 @@ public class HearingsPartyMapper {
             .interpreterLanguage(getInterpreterLanguage(flagDetails))
             .reasonableAdjustments(getReasonableAdjustments(flagDetails))
             .vulnerableFlag(hasVulnerableFlag(flagDetails))
-            .vulnerabilityDetails(null)
+            .vulnerabilityDetails(getVulnerabilityDetails(flagDetails))
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
@@ -294,7 +295,6 @@ public class HearingsPartyMapper {
             .partyName(partyName)
             .partyRole(partyRole)
             .individualDetails(individualDetails)
-            .organisationDetails(null)
             .unavailabilityDOW(null)
             .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
                 Collectors.toList()) : null)
@@ -308,7 +308,7 @@ public class HearingsPartyMapper {
                                                                  List<Element<UnavailableDate>> unavailableDates) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(null)
+            .organisationType(ORG.getLabel())
             .cftOrganisationID(cftOrganisationID)
             .build();
 
@@ -317,7 +317,6 @@ public class HearingsPartyMapper {
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)
-            .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
             .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
