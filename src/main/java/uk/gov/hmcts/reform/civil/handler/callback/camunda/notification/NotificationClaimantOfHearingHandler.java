@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
@@ -66,14 +67,10 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String hourMinute = caseData.getHearingTimeHourMinute();
         String reference;
-        int hours = Integer.parseInt(hourMinute.substring(0, 2));
-        int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-        LocalTime time = LocalTime.of(hours, minutes, 0);
         String legacyCaseRef = caseData.getLegacyCaseReference();
-        String hearingDate = caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        String hearingTime = time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm");
+        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData);
+        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData);
         if (!isApplicantLip(caseData)) {
             if (caseData.getSolicitorReferences() == null
                 || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {

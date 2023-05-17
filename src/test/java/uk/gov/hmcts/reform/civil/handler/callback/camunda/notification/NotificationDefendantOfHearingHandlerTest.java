@@ -68,6 +68,8 @@ public class NotificationDefendantOfHearingHandlerTest {
         void setup() {
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplate())
                 .thenReturn("test-template-no-fee-defendant-id");
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-defendant-lip-id");
         }
 
         @Test
@@ -233,6 +235,33 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "notification-of-hearing-000HN001"
             );
         }
+
+        @Test
+        void shouldNotifyRespondentSolicitorLip_whenInvokedAnd1v1LipApplicant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .hearingTimeHourMinute("1100")
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .hearingReferenceNumber("000HN001")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "respondent1@example.com",
+                "test-template-defendant-lip-id",
+                getNotificationLipDataMap(caseData),
+                "notification-of-hearing-lip-000HN001"
+            );
+        }
     }
 
     @NotNull
@@ -268,6 +297,14 @@ public class NotificationDefendantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
             "hearingTime", "03:30pm"
+        );
+    }
+
+    @NotNull
+    private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            "hearingDate", "17-05-2023", "hearingTime", "11:00am"
         );
     }
 

@@ -12,9 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,13 +59,12 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     }
 
     private void sendEmail(CaseData caseData, String recipient, boolean isDefendant1, boolean isRespondentLip) {
-
         Map<String, String> properties = addProperties(caseData);
-        properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
-
-        notificationService.sendMail(recipient, getEmailTemplate(isRespondentLip), properties,
-                                     String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
-        );
+        if (!isRespondentLip) {
+            properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
+        }
+        notificationService.sendMail(recipient, getEmailTemplate(isRespondentLip), properties
+            , getReferenceTemplate(caseData, isRespondentLip));
     }
 
     @Override
@@ -76,17 +74,16 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String hourMinute = caseData.getHearingTimeHourMinute();
-        int hours = Integer.parseInt(hourMinute.substring(0, 2));
-        int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-        LocalTime time = LocalTime.of(hours, minutes, 0);
+        String legacyCaseRef = caseData.getLegacyCaseReference();
+        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData);
+        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData);
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
+            legacyCaseRef,
             HEARING_DATE,
-            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            hearingDate,
             HEARING_TIME,
-            time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
+            hearingTime
         ));
     }
 
@@ -95,17 +92,19 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     }
 
     private String getRespondentRecipient(CaseData caseData, boolean isDefendant1, boolean isRespondentLip) {
-            if (isDefendant1) {
-                return isRespondentLip ? caseData.getRespondent1().getPartyEmail()
-                    : caseData.getRespondentSolicitor1EmailAddress();
-            } else {
-                if (!isRespondentLip && nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
-                    return caseData.getRespondentSolicitor2EmailAddress();
-                } else if (isRespondentLip && nonNull(caseData.getRespondent2().getPartyEmail())) {
-                    return caseData.getRespondent2().getPartyEmail();
-                }
-                return null;
+        if (isDefendant1) {
+            return isRespondentLip ? caseData.getRespondent1().getPartyEmail()
+                : caseData.getRespondentSolicitor1EmailAddress();
+        } else {
+            if (!isRespondentLip && nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
+                return caseData.getRespondentSolicitor2EmailAddress();
+            } else if (!isRespondentLip) {
+                return caseData.getRespondentSolicitor1EmailAddress();
+            } else if (isRespondentLip && nonNull(caseData.getRespondent2().getPartyEmail())) {
+                return caseData.getRespondent2().getPartyEmail();
             }
+            return null;
+        }
     }
 
     private String getDefRefNumber(CaseData caseData, boolean isDefendant1) {
@@ -124,5 +123,11 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private String getEmailTemplate(boolean isRespondentLip) {
         return isRespondentLip ? notificationsProperties.getHearingNotificationLipDefendantTemplate()
             :  notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
+    }
+
+
+    private String getReferenceTemplate(CaseData caseData, boolean isRespondentLip){
+        return isRespondentLip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
+            : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
     }
 }
