@@ -16,9 +16,11 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -329,6 +331,7 @@ public class CaseDataBuilder {
     protected YesOrNo respondentSolicitor1ServiceAddressRequired;
     protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
+    protected YesOrNo isRespondent2;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
@@ -432,6 +435,12 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
     private CaseDataLiP caseDataLiP;
+    private YesOrNo claimant2ResponseFlag;
+    private TimelineUploadTypeSpec specClaimResponseTimelineList;
+    private TimelineUploadTypeSpec specClaimResponseTimelineList2;
+    private YesOrNo defenceAdmitPartEmploymentTypeRequired;
+    private YesOrNo specDefenceFullAdmitted2Required;
+    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -554,6 +563,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder isRespondent1(YesOrNo isRespondent1) {
         this.isRespondent1 = isRespondent1;
+        return this;
+    }
+
+    public CaseDataBuilder isRespondent2(YesOrNo isRespondent2) {
+        this.isRespondent2 = isRespondent2;
         return this;
     }
 
@@ -5375,6 +5389,36 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder enableRespondent2ResponseFlag() {
+        this.claimant2ResponseFlag = YES;
+        return this;
+    }
+
+    public CaseDataBuilder setSpecClaimResponseTimelineList(TimelineUploadTypeSpec timelineUploadTypeSpec) {
+        this.specClaimResponseTimelineList = timelineUploadTypeSpec;
+        return this;
+    }
+
+    public CaseDataBuilder setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec timelineUploadTypeSpec2) {
+        this.specClaimResponseTimelineList2 = timelineUploadTypeSpec2;
+        return this;
+    }
+
+    public CaseDataBuilder setDefenceAdmitPartEmploymentTypeRequired(YesOrNo yesOrNo) {
+        this.defenceAdmitPartEmploymentTypeRequired = defenceAdmitPartEmploymentTypeRequired;
+        return this;
+    }
+
+    public CaseDataBuilder specDefenceFullAdmitted2Required(YesOrNo yesOrNo) {
+        this.specDefenceFullAdmitted2Required = specDefenceFullAdmitted2Required;
+        return this;
+    }
+
+    public CaseDataBuilder defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponsePartAdmissionPaymentTimeLRspec) {
+        this.defenceAdmitPartPaymentTimeRouteRequired = respondentResponsePartAdmissionPaymentTimeLRspec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5513,6 +5557,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
             .isRespondent1(isRespondent1)
+            .isRespondent2(isRespondent2)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
@@ -5633,6 +5678,12 @@ public class CaseDataBuilder {
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .caseDataLiP(caseDataLiP)
+            .claimant2ResponseFlag(claimant2ResponseFlag)
+            .specClaimResponseTimelineList(specClaimResponseTimelineList)
+            .specClaimResponseTimelineList2(specClaimResponseTimelineList2)
+            .defenceAdmitPartEmploymentTypeRequired(defenceAdmitPartEmploymentTypeRequired)
+            .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
+            .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .build();
     }
 
