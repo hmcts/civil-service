@@ -90,6 +90,15 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
             given(time.now()).willReturn(submittedDate);
         }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponse() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+        }
     }
 
     @Nested
