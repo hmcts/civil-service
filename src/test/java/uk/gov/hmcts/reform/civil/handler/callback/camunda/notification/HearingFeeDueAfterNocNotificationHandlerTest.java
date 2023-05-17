@@ -86,7 +86,29 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap1(caseData),
+                "NOC-hearing-fee-unpaid-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldSendClaimantEmail_whenInvokedNoOrganisationName() {
+            when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build().toBuilder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+                .hearingDate(LocalDate.of(1990, 2, 20))
+                .hearingTimeHourMinute("1215")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingDueDate(LocalDate.of(1990, 2, 20))
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                TEMPLATE_ID,
+                getNotificationDataMap2(caseData),
                 "NOC-hearing-fee-unpaid-applicant-notification-000DC001"
             );
         }
@@ -94,7 +116,20 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationDataMap2(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            LEGAL_ORG_NAME, "Signer Name",
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
+            COURT_LOCATION, "County Court",
+            HEARING_TIME, "1215",
+            HEARING_FEE, "£300.00",
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
+        );
+    }
+
+    @NotNull
+    private Map<String, String> getNotificationDataMap1(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
             LEGAL_ORG_NAME, "Test org name",

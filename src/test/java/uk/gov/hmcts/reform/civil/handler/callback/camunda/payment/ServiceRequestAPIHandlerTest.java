@@ -305,5 +305,22 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //Then
             verifyNoInteractions(paymentsService);
         }
+
+        @Test
+        void shouldNotMakeHearingPaymentServiceRequest_whenInvokedNoticeOfChangeRespondent() {
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            caseData = caseData.toBuilder()
+                .hearingDueDate(LocalDate.now())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build())
+                .hearingUnpaidAfterNocFlag("CURRENT_REP_HAS_SERVICE_REQUEST")
+                .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("[RESPONDENTSOLICITORONE]").build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //Then
+            verifyNoInteractions(paymentsService);
+        }
     }
 }

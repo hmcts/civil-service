@@ -77,7 +77,7 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             COURT_LOCATION, caseData.getHearingLocation().getValue().getLabel(),
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
-            HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
+            HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
             HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
         );
     }

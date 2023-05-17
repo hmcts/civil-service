@@ -71,7 +71,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
               a new service request for the new representative, in order to pay.
              */
             if (isHearingFeeServiceRequestAfterNoticeOfChange(caseData)) {
-                System.out.println("service request after noc");
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
