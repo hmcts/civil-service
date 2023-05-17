@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_FEE_SPEC;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -39,5 +40,18 @@ public class ValidateFeeForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertThat(response.getErrors()).isNull();
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("ValidateClaimFeeForSpec");
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(VALIDATE_FEE_SPEC);
     }
 }
