@@ -59,7 +59,7 @@ public class DocumentHearingLocationHelperTest {
         Mockito.when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
             .thenReturn(Optional.empty());
         Mockito.when(locationRefDataService
-                         .getCourtLocationsByEpimmsIdAndCourtType(
+                         .getCourtLocationsByEpimmsId(
                              authorisation,
                              caseData.getCaseManagementLocation().getBaseLocation()
                          )).thenReturn(Collections.singletonList(location1));
