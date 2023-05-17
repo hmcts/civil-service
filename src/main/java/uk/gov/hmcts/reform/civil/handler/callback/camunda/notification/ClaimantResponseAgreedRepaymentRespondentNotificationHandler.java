@@ -106,17 +106,18 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
         if (caseData.isRespondent1NotRepresented()) {
-           return getCCJRespondentTemplate(caseData);
+            return getCCJRespondentTemplate(caseData);
         }
         return null;
     }
 
-    private String getCCJRespondentTemplate(CaseData caseData){
+    private String getCCJRespondentTemplate(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
             return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
         }
         return notificationsProperties.getRespondentCcjNotificationTemplate();
     }
+
     public String getRespondentLegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.map(Organisation::getName).orElse(null);
