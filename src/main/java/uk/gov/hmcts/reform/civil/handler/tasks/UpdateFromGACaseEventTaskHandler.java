@@ -102,8 +102,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    protected int checkIfDocumentExists(List<Element> civilCaseDocumentList,
-                                      List<Element> gaCaseDocumentlist) {
+    protected int checkIfDocumentExists(List<Element<?>> civilCaseDocumentList,
+                                      List<Element<?>> gaCaseDocumentlist) {
         return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
               .parallelStream().anyMatch(gaDocument -> gaDocument.getId().equals(civilDocument.getId())))
             .collect(Collectors.toList()).size();
@@ -170,11 +170,11 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                         CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(fromGaList));
-        List<Element> gaDocs =
-                (List<Element>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        List<Element<?>> gaDocs =
+                (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(toCivilList));
-        List<Element> civilDocs =
-                (List<Element>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+        List<Element<?>> civilDocs =
+                (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                         .orElse(newArrayList());
 
         if (gaDocs != null
