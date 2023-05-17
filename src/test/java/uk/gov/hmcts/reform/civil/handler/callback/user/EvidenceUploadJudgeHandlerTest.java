@@ -130,7 +130,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentOnly(documentList)
+                .documentAndName(documentList)
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);

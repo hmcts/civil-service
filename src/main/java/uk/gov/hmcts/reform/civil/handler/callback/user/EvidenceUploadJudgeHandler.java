@@ -84,9 +84,9 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
-            IntStream.range(0, caseData.getDocumentOnly()
+            IntStream.range(0, caseData.getDocumentAndName()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentOnly().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
+                caseData.getDocumentAndName().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
 
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
         }
