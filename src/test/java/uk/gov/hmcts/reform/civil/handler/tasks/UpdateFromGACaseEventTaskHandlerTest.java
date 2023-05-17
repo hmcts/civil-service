@@ -339,10 +339,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         String noExistingField = "notExist";
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
         try {
-            handler.updateDocCollection(output, gaCaseData, noExistingField+"Document",
-                    caseData, noExistingField+"DocStaff");
+            handler.updateDocCollection(output, gaCaseData, noExistingField + "Document",
+                    caseData, noExistingField + "DocStaff");
             List<Element<CaseDocument>> toUpdatedDocs =
-                    (List<Element<CaseDocument>>)output.get(noExistingField+"DocStaff");
+                    (List<Element<CaseDocument>>)output.get(noExistingField + "DocStaff");
             assertThat(toUpdatedDocs).isNull();
         } catch (Exception e) {
             throw new RuntimeException(e);
