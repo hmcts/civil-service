@@ -1472,7 +1472,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
         }
 
-
         @Test
         void specificSummary_whenRepayPlanFullAdmit() {
             // Given
