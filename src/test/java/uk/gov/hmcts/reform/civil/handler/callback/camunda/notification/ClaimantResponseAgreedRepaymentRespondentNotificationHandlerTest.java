@@ -79,6 +79,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 .respondent1(respondent1)
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT")
@@ -104,6 +105,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 .respondent1(respondent1)
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
 
