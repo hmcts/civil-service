@@ -103,6 +103,8 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
+    private static final String HEARING_CHANNEL = "HearingChannel";
+    private static final String SPEC_SERVICE_ID = "AAA6";
     private static final String UNSPEC_SERVICE_ID = "AAA7";
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
         + "%n## Claim number: %s";
