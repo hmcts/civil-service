@@ -54,6 +54,8 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-fee-claimant-id");
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-claimant-lip-id");
         }
 
         @Test
@@ -272,6 +274,31 @@ public class NotificationClaimantOfHearingHandlerTest {
                 "notification-of-hearing-000HN001"
             );
         }
+
+        @Test
+        void shouldNotifyApplicantSolicitorLip_whenInvokedAnd1v1LipApplicant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .hearingTimeHourMinute("1030")
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .hearingReferenceNumber("000HN001")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicant1@example.com",
+                "test-template-claimant-lip-id",
+                getNotificationLipDataMap(caseData),
+                "notification-of-hearing-lip-000HN001"
+            );
+        }
     }
 
     @NotNull
@@ -298,6 +325,14 @@ public class NotificationClaimantOfHearingHandlerTest {
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "", "hearingFee", "£0.00",
             "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", ""
+        );
+    }
+
+    @NotNull
+    private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            "hearingDate", "17-05-2023", "hearingTime", "10:30am"
         );
     }
 
