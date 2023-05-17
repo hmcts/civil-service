@@ -55,7 +55,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             .build();
     }
 
-    private void sendEmail(CaseData caseData, String recipient, String reference, Boolean isApplicantLip) {
+    private void sendEmail(CaseData caseData, String recipient, String reference, boolean isApplicantLip) {
         notificationService.sendMail(recipient, getEmailTemplate(caseData, isApplicantLip), addProperties(caseData), reference);
     }
 
@@ -110,19 +110,18 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private boolean isApplicantLip(CaseData caseData) {
         return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
     }
-    private String getRecipient(CaseData caseData, Boolean isApplicantLip){
-        return Boolean.TRUE.equals(isApplicantLip) ? caseData.getApplicant1().getPartyEmail()
+    private String getRecipient(CaseData caseData, boolean isApplicantLip){
+        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
-    private String getReferenceTemplate(CaseData caseData, Boolean isApplicantLip){
-        return Boolean.TRUE.equals(isApplicantLip) ?
-            String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
+    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip){
+        return isApplicantLip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
             : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
     }
 
-    private String getEmailTemplate(CaseData caseData, Boolean isApplicantLip){
-        if (Boolean.FALSE.equals(isApplicantLip)) {
+    private String getEmailTemplate(CaseData caseData, boolean isApplicantLip){
+        if (!isApplicantLip) {
             if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
                 BigDecimal.ZERO) > 0) {
                 return notificationsProperties.getHearingListedFeeClaimantLrTemplate();

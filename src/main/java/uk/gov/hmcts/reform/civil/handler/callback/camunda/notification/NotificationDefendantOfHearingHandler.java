@@ -33,6 +33,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT1_HEARING, NOTIFY_DEFENDANT2_HEARING);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
+    private static final String REFERENCE_TEMPLATE_HEARING_LIP = "notification-of-hearing-lip-%s";
     public static final String TASK_ID_DEFENDANT1 = "NotifyDefendant1Hearing";
     public static final String TASK_ID_DEFENDANT2 = "NotifyDefendant2Hearing";
 
@@ -52,35 +53,18 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private CallbackResponse notifyDefendantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isRespondentLip = isRespondentLip(caseData);
-        String recipient = caseData.getRespondentSolicitor1EmailAddress();
-
-        if (isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
-            sendEmail(caseData, recipient, true);
-        } else {
-            if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
-                recipient = caseData.getRespondentSolicitor2EmailAddress();
-            }
-            sendEmail(caseData, recipient, false);
-        }
+        boolean isDefendant1 = isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING);
+        sendEmail(caseData, getRespondentRecipient(caseData, isDefendant1, isRespondentLip), isDefendant1, isRespondentLip);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
-    private void sendEmail(CaseData caseData, String recipient, boolean isFirst) {
-        String defRefNumber = "";
-        if (isFirst) {
-            if (nonNull(caseData.getSolicitorReferences())
-                && nonNull(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())) {
-                defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
-            }
-        } else {
-            defRefNumber = caseData.getRespondentSolicitor2Reference() == null ? "" :
-                caseData.getRespondentSolicitor2Reference();
-        }
+    private void sendEmail(CaseData caseData, String recipient, boolean isDefendant1, boolean isRespondentLip) {
+
         Map<String, String> properties = addProperties(caseData);
-        properties.put(DEFENDANT_REFERENCE_NUMBER, defRefNumber);
-        String emailTemplate = notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
-        notificationService.sendMail(recipient, emailTemplate, properties,
+        properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
+
+        notificationService.sendMail(recipient, getEmailTemplate(isRespondentLip), properties,
                                      String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
         );
     }
@@ -108,5 +92,37 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private boolean isRespondentLip(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
+    }
+
+    private String getRespondentRecipient(CaseData caseData, boolean isDefendant1, boolean isRespondentLip) {
+            if (isDefendant1) {
+                return isRespondentLip ? caseData.getRespondent1().getPartyEmail()
+                    : caseData.getRespondentSolicitor1EmailAddress();
+            } else {
+                if (!isRespondentLip && nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
+                    return caseData.getRespondentSolicitor2EmailAddress();
+                } else if (isRespondentLip && nonNull(caseData.getRespondent2().getPartyEmail())) {
+                    return caseData.getRespondent2().getPartyEmail();
+                }
+                return null;
+            }
+    }
+
+    private String getDefRefNumber(CaseData caseData, boolean isDefendant1) {
+        if (isDefendant1) {
+            if (nonNull(caseData.getSolicitorReferences())
+                && nonNull(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())) {
+                return caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+            }
+        } else {
+            return caseData.getRespondentSolicitor2Reference() == null ? "" :
+                caseData.getRespondentSolicitor2Reference();
+        }
+        return "";
+    }
+
+    private String getEmailTemplate(boolean isRespondentLip) {
+        return isRespondentLip ? notificationsProperties.getHearingNotificationLipDefendantTemplate()
+            :  notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
     }
 }
