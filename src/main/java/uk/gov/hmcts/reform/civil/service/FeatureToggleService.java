@@ -16,14 +16,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
-    }
-
-    public boolean isSpecRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
-    }
-
     public boolean isSdoEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
@@ -74,6 +66,10 @@ public class FeatureToggleService {
 
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
+    }
+
+    public boolean isCaseFileViewEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
 }

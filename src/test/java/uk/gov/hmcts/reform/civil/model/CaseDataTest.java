@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
@@ -19,7 +23,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
+        assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
     @Test
@@ -27,7 +31,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
             .build();
-        Assertions.assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
+        assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
     @Test
@@ -124,62 +128,248 @@ public class CaseDataTest {
     }
 
     @Test
-    public void applicant_partAdmitClaimSettled() {
+    void applicant_partAdmitClaimSettled() {
+        //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimSettled());
+        //When
+        //Then
+        assertTrue(caseData.isPartAdmitClaimSettled());
     }
 
     @Test
-    public void applicant_partAdmitClaimNotSettled() {
+    void applicant_partAdmitClaimNotSettled() {
+        //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimNotSettled());
+        //When
+        //Then
+        assertTrue(caseData.isPartAdmitClaimNotSettled());
     }
 
     @Test
-    public void applicant_isClaimPartAdmitSpec() {
+    void applicant_isClaimPartAdmitSpec() {
+        //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
-        Assertions.assertTrue(caseData.isPartAdmitClaimSpec());
+        //When
+        //Then
+        assertTrue(caseData.isPartAdmitClaimSpec());
     }
 
     @Test
-    public void applicant_isPartAdmitIntentionToSettleClaim() {
+    void applicant_isPartAdmitIntentionToSettleClaim() {
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
+        //When
+        //Then
+        assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
     }
 
     @Test
-    public void applicant_isPartAdmitIntentionNotToSettleClaim() {
+    void applicant_isPartAdmitIntentionNotToSettleClaim() {
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
+        //When
+        //Then
+        assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
     }
 
     @Test
-    public void applicant_isPartAdmitConfirmAmountPaid() {
+    void applicant_isPartAdmitConfirmAmountPaid() {
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
-        Assertions.assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
+        //When
+        //Then
+        assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
     }
 
     @Test
-    public void applicant_isPartAdmitConfirmAmountNotPaid() {
+    void applicant_isPartAdmitConfirmAmountNotPaid() {
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
-        Assertions.assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+        assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
+    }
+
+    @Test
+    public void givenRespondentUnrepresentedAndOnvOne_whenIsLRvLipOneVOne_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().build())
+            .applicant1(Party.builder().build())
+            .build();
+        //Then
+        assertTrue(caseData.isLRvLipOneVOne());
+    }
+
+    @Test
+    void isClaimantNotSettlePartAdmitClaim_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isClaimantNotSettlePartAdmitClaim());
+    }
+
+    @Test
+    void isClaimantNotSettlePartAdmitClaim_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        assertFalse(caseData.isClaimantNotSettlePartAdmitClaim());
+    }
+
+    @Test
+    void doesPartPaymentRejectedOrItsFullDefenceResponse_fullDefence() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectYes() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectNo() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        assertEquals(YesOrNo.NO, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    }
+
+    @Test
+    void hasDefendantNotAgreedToFreeMediation_Yes() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        assertFalse(caseData.hasDefendantNotAgreedToFreeMediation());
+    }
+
+    @Test
+    void hasDefendantNotAgreedToFreeMediation_No() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.hasDefendantNotAgreedToFreeMediation());
+    }
+
+    @Test
+    void isFastTrackClaim_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isFastTrackClaim());
+    }
+
+    @Test
+    void isFastTrackClaim_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .build();
+        //When
+        //Then
+        assertFalse(caseData.isFastTrackClaim());
+    }
+
+    @Test
+    void isSmallClaim_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isSmallClaim());
+    }
+
+    @Test
+    void isSmallClaim_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .build();
+        //When
+        //Then
+        assertFalse(caseData.isSmallClaim());
+    }
+
+    @Test
+    void isRejectWithMediation_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+            .build();
+        //When
+        //Then
+        assertFalse(caseData.isRejectWithNoMediation());
+    }
+
+    @Test
+    void isRejectWithMediation_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isRejectWithNoMediation());
     }
 }
