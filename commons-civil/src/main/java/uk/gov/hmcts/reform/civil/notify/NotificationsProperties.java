@@ -251,4 +251,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String bundleCreationTemplate;
 
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimTemplate;
+
 }
