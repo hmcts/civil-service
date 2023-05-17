@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +49,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
-        sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip)
-            , isApplicantLip);
+        sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
@@ -107,17 +105,18 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private boolean isApplicantLip(CaseData caseData) {
         return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
     }
-    private String getRecipient(CaseData caseData, boolean isApplicantLip){
+
+    private String getRecipient(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
-    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip){
+    private String getReferenceTemplate(CaseData caseData, boolean isApplicantLip) {
         return isApplicantLip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
             : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
     }
 
-    private String getEmailTemplate(CaseData caseData, boolean isApplicantLip){
+    private String getEmailTemplate(CaseData caseData, boolean isApplicantLip) {
         if (!isApplicantLip) {
             if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
                 BigDecimal.ZERO) > 0) {
