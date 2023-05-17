@@ -134,7 +134,7 @@ public class DashboardClaimInfoServiceTest {
             "authorisation",
             "123"
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(2);
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(0)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
         assertThat(claimsForDefendant.get(1).getDefendantName()).isEqualTo(DEFENDANT_NAME);
         assertThat(claimsForDefendant.get(1).getClaimantName()).isEqualTo(CLAIMANT_NAME);
@@ -166,7 +166,7 @@ public class DashboardClaimInfoServiceTest {
             "authorisation",
             "123"
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(2);
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(1).getResponseDeadline()).isEqualTo(now.toLocalDate());
     }
 
@@ -200,7 +200,7 @@ public class DashboardClaimInfoServiceTest {
             "authorisation",
             "123"
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(2);
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(1).getPaymentDate()).isEqualTo(now.toLocalDate());
     }
 
@@ -213,6 +213,7 @@ public class DashboardClaimInfoServiceTest {
             "123"
         );
 
+        assertThat(claimsForDefendant.size()).isEqualTo(4);
         assertThat(claimsForDefendant.get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
         assertThat(claimsForDefendant.get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
     }
