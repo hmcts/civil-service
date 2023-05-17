@@ -42,7 +42,6 @@ public class DocumentHearingLocationHelper {
                 ).stream().filter(location -> StringUtils.equals(
                     location.getRegionId(),
                     caseData.getCaseManagementLocation().getRegion()
-                //) && StringUtils.equals(location.getCourtType(), "10"))).collect(Collectors.toList());
                 )).collect(Collectors.toList());
                 if (sameLocation.isEmpty()) {
                     return null;

@@ -71,4 +71,5 @@ public class DocumentHearingLocationHelperTest {
 
         Assertions.assertEquals(location, location1);
     }
+
 }
