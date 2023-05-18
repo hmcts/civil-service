@@ -24,12 +24,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -86,11 +81,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,6 +97,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -415,6 +407,47 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .compareTo(
                     new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmountPounds").toString())
                         .multiply(BigDecimal.valueOf(100))));
+
+        }
+
+        @Test
+        public void testSpecDefendantResponseAdmitPartOfClaimFastTrackWithFinancialFlag() {
+            Set<DefendantResponseShowTag> defendantResponseShowTagSet = new HashSet<>();
+            defendantResponseShowTagSet.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+            defendantResponseShowTagSet.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            // admitted amount is pence, total claimed is pounds
+            BigDecimal admittedAmount = caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(50));
+            caseData = caseData.toBuilder()
+                .respondToAdmittedClaimOwingAmount(admittedAmount)
+                .isRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .showConditionFlags(defendantResponseShowTagSet)
+                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertEquals(0, new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmount").toString())
+                .compareTo(
+                    new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmountPounds").toString())
+                        .multiply(BigDecimal.valueOf(100))));
+            assertThat(response.getData().get("showConditionFlags")).isNotNull();
         }
 
         @Test
@@ -1690,4 +1723,51 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);
+    }
+
+    @Test
+    void testSpecHandleResponseType() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .respondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM).build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "specHandleResponseType");
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData()).containsEntry("specDefenceFullAdmittedRequired", "No");
+    }
+
+    @Test
+    void testSetUploadTimelineTypeFlagWithUpload() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .respondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
+            .build();
+        caseData = caseData.toBuilder().specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD).build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "set-upload-timeline-type-flag");
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("showConditionFlags")).isNotNull();
+    }
+
+    @Test
+    void testSetUploadTimelineTypeFlagWithManual() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .respondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
+            .build();
+        caseData = caseData.toBuilder().specClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL).build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "set-upload-timeline-type-flag");
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("showConditionFlags")).isNotNull();
+    }
 }
