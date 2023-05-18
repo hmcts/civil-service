@@ -373,6 +373,22 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvidedAndRespondentFlagEnabled() {
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .applicant2DQ(Applicant2DQ.builder().applicant2DQWitnesses(witnesses).build())
+                .enableRespondent2ResponseFlag()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
             CaseData caseData = CaseDataBuilder.builder()
@@ -417,6 +433,32 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                                      .name("test expert").build()))
                                                            .build())
                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenExpertRequiredAndDetailsProvidedInApplicant2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQExperts(Experts.builder()
+                                                           .expertRequired(YES)
+                                                           .details(wrapElements(Expert.builder()
+                                                                                     .name("test expert").build()))
+                                                           .build())
+                                  .build())
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQExperts(Experts.builder()
+                                                           .expertRequired(YES)
+                                                           .details(wrapElements(Expert.builder()
+                                                                                     .name("test expert").build()))
+                                                           .build())
+                                  .build())
+                .enableRespondent2ResponseFlag()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
