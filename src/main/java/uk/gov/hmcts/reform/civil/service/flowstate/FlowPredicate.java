@@ -3,11 +3,14 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
@@ -31,6 +34,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class FlowPredicate {
+
+    private FlowPredicate() {
+        //Utility classes require a private constructor for checkstyle
+    }
 
     public static final Predicate<CaseData> hasNotifiedClaimDetailsToBoth = caseData ->
         Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
@@ -212,10 +219,6 @@ public class FlowPredicate {
         return caseData.getRespondent1TimeExtensionDate() != null;
     }
 
-    public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
-        caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null;
-
     public static final Predicate<CaseData> fullDefence = caseData ->
         getPredicateForResponseType(caseData, FULL_DEFENCE);
 
@@ -351,61 +354,20 @@ public class FlowPredicate {
         }
     }
 
-    public static final Predicate<CaseData> fullDefenceAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
-
-    public static final Predicate<CaseData> fullDefenceAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_DEFENCE;
-
     public static final Predicate<CaseData> fullAdmission = caseData ->
         getPredicateForResponseType(caseData, FULL_ADMISSION);
-
-    public static final Predicate<CaseData> fullAdmissionAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
-
-    public static final Predicate<CaseData> fullAdmissionAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == FULL_ADMISSION;
 
     public static final Predicate<CaseData> partAdmission = caseData ->
         getPredicateForResponseType(caseData, PART_ADMISSION);
 
-    public static final Predicate<CaseData> partAdmissionAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
-
-    public static final Predicate<CaseData> partAdmissionAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == PART_ADMISSION;
-
     public static final Predicate<CaseData> counterClaim = caseData ->
         getPredicateForResponseType(caseData, COUNTER_CLAIM);
 
-    public static final Predicate<CaseData> counterClaimAfterNotifyDetails = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
-
-    public static final Predicate<CaseData> counterClaimAfterAcknowledge = caseData ->
-        caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ClaimResponseType() == COUNTER_CLAIM;
-
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
+
+    public static final Predicate<CaseData> fullAdmitPayImmidiately = caseData ->
+        getPredicateForPayImmidiately(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
 
@@ -770,10 +732,6 @@ public class FlowPredicate {
     public static final Predicate<CaseData> specClaim = caseData ->
         SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
-    private FlowPredicate() {
-        //Utility class
-    }
-
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -805,6 +763,17 @@ public class FlowPredicate {
                     break;
                 default:
                     break;
+            }
+        }
+        return predicate;
+    }
+
+    private static boolean getPredicateForPayImmidiately(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
+                predicate = null != caseData.getWhenToBePaidText()
+                    &&  null == caseData.getApplicant1ProceedWithClaim();
             }
         }
         return predicate;
@@ -880,8 +849,11 @@ public class FlowPredicate {
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
                 .filter(YesOrNo.NO::equals).isPresent()) {
                 result = false;
-            } else if (caseData.hasClaimantAgreedToFreeMediation()) {
-                result = true;
+            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
+                .filter(MediationDecision.No::equals).isPresent()) {
+                result = false;
             } else {
                 result = true;
             }
@@ -901,4 +873,13 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
         caseData.isRespondentResponseBilingual();
 
+    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
+        caseData.isPartAdmitClaimSettled();
+
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
+        CaseData::isClaimantNotSettlePartAdmitClaim;
+
+    // This field is used in LR ITP, prevent going another path in preview
+    public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
+        caseData.getShowResponseOneVOneFlag() != null;
 }

@@ -321,6 +321,28 @@ public class DeadlinesCalculatorTest {
                 .isWeekday()
                 .isTheSame(expectedDeadline);
         }
+
+        @Test
+        void shouldReturnPaidByDateWithAnExtraDay33_whenResponseDateIsWeekdayAfter4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 1, 25).atTime(18, 0);
+            LocalDate expectedPaidByDate = weekdayDate.toLocalDate().plusDays(6);
+            LocalDate paidByDate = calculator.calculateWhenToBePaid(weekdayDate);
+
+            assertThat(paidByDate)
+                .isWeekday()
+                .isTheSame(expectedPaidByDate);
+        }
+
+        @Test
+        void shouldReturnPaidByDate_whenResponseDateIsWeekdayBefore4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 1, 23).atTime(12, 0);
+            LocalDate expectedPaidByDate = weekdayDate.toLocalDate().plusDays(7);
+            LocalDate paidByDate = calculator.calculateWhenToBePaid(weekdayDate);
+
+            assertThat(paidByDate)
+                .isWeekday()
+                .isTheSame(expectedPaidByDate);
+        }
     }
 
     @Nested
