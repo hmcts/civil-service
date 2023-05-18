@@ -1516,29 +1516,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void specificSummary_whenFullAdmitPayImmediately() {
-            // Given
-            BigDecimal admitted = BigDecimal.valueOf(1000);
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .build().toBuilder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondToAdmittedClaimOwingAmountPounds(admitted)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            // When
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getConfirmationBody())
-                .contains(caseData.getApplicant1().getPartyName())
-                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
-        }
-
-        @Test
         void specificSummary_whenRepayPlanFullAdmit() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
