@@ -75,8 +75,7 @@ public class RoboticsNotificationService {
             roboticsJsonData = roboticsCaseDataDTO.getJsonRawData();
 
             if (SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())) {
-                RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(params.getCaseData());
-                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
+                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
                 log.info(String.format("triggerEvent %s", triggerEvent));
@@ -131,7 +130,7 @@ public class RoboticsNotificationService {
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        String subject = null;
+        String subject;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             subject = getSubjectForSpec(caseData, triggerEvent, isMultiParty);
         } else {

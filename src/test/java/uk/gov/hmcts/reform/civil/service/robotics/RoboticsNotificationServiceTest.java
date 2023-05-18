@@ -331,12 +331,11 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
-    void shouldSendNotificationEmailForLRvsLiP_whenCaseDataIsProvidedAndRpaEnabled() {
+    void shouldSendNotificationEmailForLRvsLiP_whenCaseDataIsProvided() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
 
-        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -374,8 +373,6 @@ class RoboticsNotificationServiceTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
-
-        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
