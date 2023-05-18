@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -25,16 +26,15 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -59,19 +59,19 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -82,13 +82,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
@@ -108,16 +107,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -365,8 +364,6 @@ public class CaseDataBuilder {
     private LocalDateTime addLegalRepDeadline;
     private DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
-    private DynamicList hearingMethodValuesDisposalHearingDJ;
-    private DynamicList hearingMethodValuesTrialHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
@@ -423,10 +420,6 @@ public class CaseDataBuilder {
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
 
     private CCJPaymentDetails ccjPaymentDetails;
-    private DisposalHearingMethod disposalHearingMethod;
-    private DynamicList hearingMethodValuesDisposalHearing;
-    private DynamicList hearingMethodValuesFastTrack;
-    private DynamicList hearingMethodValuesSmallClaims;
 
     private List<Element<PartyFlagStructure>> applicantExperts;
     private List<Element<PartyFlagStructure>> applicantWitnesses;
@@ -964,6 +957,42 @@ public class CaseDataBuilder {
         ).build();
 
         applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQSmallCalimExperts() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+
+        applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
+                                                    .expertName("Mr Expert Defendant")
+                                                    .firstName("Expert")
+                                                    .lastName("Defendant")
+                                                    .phoneNumber("07123456789")
+                                                    .emailAddress("test@email.com")
+                                                    .fieldofExpertise("Roofing")
+                                                    .estimatedCost(new BigDecimal(434))
+                                                    .build()).build();
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQSmallCalimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+
+        applicant2DQBuilder.applicant2RespondToClaimExperts(ExpertDetails.builder()
+                                                                .expertName("Mr Expert Defendant")
+                                                                .firstName("Expert")
+                                                                .lastName("Defendant")
+                                                                .phoneNumber("07123456789")
+                                                                .emailAddress("test@email.com")
+                                                                .fieldofExpertise("Roofing")
+                                                                .estimatedCost(new BigDecimal(434))
+                                                                .build()).build();
+
+        applicant2DQ = applicant2DQBuilder.build();
         return this;
     }
 
@@ -2174,97 +2203,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private DynamicList getHearingMethodList(String key, String value) {
-        Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
-        DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
-        hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
-        return hearingMethodList;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalHearingSDOInPersonHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesDisposalHearing = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalHearingSDOTelephoneHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesDisposalHearing = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalHearingSDOVideoHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesDisposalHearing = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedFastTrackSDOInPersonHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesFastTrack = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedFastTrackSDOTelephoneHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesFastTrack = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedFastTrackSDOVideoHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesFastTrack = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedSmallClaimsSDOInPersonHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesSmallClaims = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedSmallClaimsSDOTelephoneHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesSmallClaims = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedSmallClaimsSDOVideoHearing() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesSmallClaims = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearingNew() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
         trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearingNew() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOTelephoneHearing() {
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearingNew() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesTrialHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedTrialSDOVideoHearing() {
-        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
@@ -2353,24 +2293,6 @@ public class CaseDataBuilder {
             .date(LocalDate.now().plusWeeks(16))
             .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
             .build();
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalSDOInPerson() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalSDOTelephoneCall() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCallNew() {
-        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
-        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
         return this;
     }
 
@@ -5625,8 +5547,6 @@ public class CaseDataBuilder {
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
-            .hearingMethodValuesDisposalHearingDJ(hearingMethodValuesDisposalHearingDJ)
-            .hearingMethodValuesTrialHearingDJ(hearingMethodValuesTrialHearingDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
             .disposalHearingBundleDJ(disposalHearingBundleDJ)
@@ -5664,9 +5584,6 @@ public class CaseDataBuilder {
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .applicant1AcceptPartAdmitPaymentPlanSpec(applicant1AcceptPartAdmitPaymentPlanSpec)
             .respondToAdmittedClaimOwingAmountPounds(respondToAdmittedClaimOwingAmountPounds)
-            .hearingMethodValuesDisposalHearing(hearingMethodValuesDisposalHearing)
-            .hearingMethodValuesFastTrack(hearingMethodValuesFastTrack)
-            .hearingMethodValuesSmallClaims(hearingMethodValuesSmallClaims)
             .applicantExperts(applicantExperts)
             .applicantWitnesses(applicantWitnesses)
             .respondent1Experts(respondent1Experts)
