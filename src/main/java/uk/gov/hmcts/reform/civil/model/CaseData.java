@@ -482,6 +482,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime respondent2LitigationFriendDate;
     private final String paymentTypePBA;
     private final String paymentTypePBASpec;
+    private final String whenToBePaidText;
 
     private final LocalDateTime respondent1LitigationFriendCreatedDate;
     private final LocalDateTime respondent2LitigationFriendCreatedDate;
@@ -736,9 +737,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
     //case progression
-    private final List<Element<DocumentWithName>> documentOnly;
+    private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+    private final String caseNoteTypeNoteTA;
+    private final LocalDateTime noteAdditionDateTime;
     private final String caseTypeFlag;
     private final String witnessStatementFlag;
     private final String witnessSummaryFlag;
