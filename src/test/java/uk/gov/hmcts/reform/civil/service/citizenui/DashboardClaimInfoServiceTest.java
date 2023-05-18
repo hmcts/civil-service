@@ -217,4 +217,20 @@ public class DashboardClaimInfoServiceTest {
         assertThat(claimsForDefendant.get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
         assertThat(claimsForDefendant.get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
     }
+
+    @Test
+    void shouldReturnEmptyList() {
+        List<CaseDetails> cases = List.of();
+        SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
+
+        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
+
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+
+        assertThat(claimsForDefendant.size()).isEqualTo(0);
+    }
 }
