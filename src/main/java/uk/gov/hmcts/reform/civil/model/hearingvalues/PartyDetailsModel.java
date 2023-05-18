@@ -19,12 +19,22 @@ import java.util.List;
 public class PartyDetailsModel {
 
     private String partyID;
+
     private PartyType partyType;
+
     private String partyName;
+
     private String partyRole;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private IndividualDetailsModel individualDetails;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private OrganisationDetailsModel organisationDetails;
+
     private List<UnavailabilityDOWModel> unavailabilityDOW;
+
     private List<UnavailabilityRangeModel> unavailabilityRange;
+
     private String hearingSubChannel;
 }
