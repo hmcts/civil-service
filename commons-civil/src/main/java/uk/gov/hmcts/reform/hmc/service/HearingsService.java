@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.hmc.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import java.time.LocalDateTime;
@@ -48,11 +50,14 @@ public class HearingsService {
         }
     }
 
-    public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId, int requestVersion, LocalDateTime receivedDateTime) {
+    public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
+                                                        int requestVersion, LocalDateTime receivedDateTime,
+                                                        PartiesNotified serviceData) {
         try {
             return hearingNoticeApi.updatePartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                serviceData,
                 hearingId,
                 requestVersion,
                 receivedDateTime

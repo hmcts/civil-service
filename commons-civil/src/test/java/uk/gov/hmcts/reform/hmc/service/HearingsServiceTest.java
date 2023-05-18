@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -153,24 +154,26 @@ class HearingsServiceTest {
     @Nested
     class UpdatedPartiedNotifiedResponses {
         private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
+        private final  PartiesNotified partiesNotified = PartiesNotified.builder().requestVersion(1).serviceData(null).build();
 
         @Test
         void shouldUpdatePartiesResponses_whenInvoked() {
             // when
-            hearingNoticeService.updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time);
+            hearingNoticeService .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
 
             //then
-            verify(hearingNoticeApi).updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, 1, time);
+            verify(hearingNoticeApi).updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, 1, time);
         }
 
         @Test
         void shouldThrowException_whenExceptionError() {
-            when(hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, 1, time))
+
+            when(hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, 1, time))
                 .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(HmcException.class, () -> {
                 hearingNoticeService
-                    .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time);
+                    .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
             });
 
             String expectedMessage = "Failed to retrieve data from HMC";
