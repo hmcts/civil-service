@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -73,6 +72,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
         }
+
         @Test
         void testAboutToSubmit_handler() {
             PaymentDto paymentDto = PaymentDto.builder().paymentReference("123").build();
@@ -99,7 +99,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).doesNotHaveToString("paymentReference");
             assertThat(response.getData()).extracting("paymentDetails")
-                .extracting( "status").isEqualTo(FAILED.toString());
+                .extracting("status").isEqualTo(FAILED.toString());
         }
 
         @Test
@@ -124,6 +124,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             ));
         }
+
         private FeignException buildFeignExceptionWithInvalidResponse(int status, String errorMsg) {
             return buildFeignClientException(status, errorMsg.getBytes(UTF_8));
         }
