@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergen
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmitPayImmidiately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
@@ -117,6 +118,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FLOW_NA
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -498,6 +500,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE).onlyIf(claimDismissedByCamunda)
             .state(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE)
             .state(FULL_ADMISSION)
+                .transitionTo(FULL_ADMIT_PAY_IMMEDIATELY).onlyIf(fullAdmitPayImmidiately)
                 .transitionTo(FULL_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
@@ -570,6 +573,7 @@ public class StateFlowEngine {
             .state(FULL_ADMIT_REJECT_REPAYMENT)
             .state(FULL_ADMIT_PROCEED)
             .state(FULL_ADMIT_NOT_PROCEED)
+            .state(FULL_ADMIT_PAY_IMMEDIATELY)
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
             .state(IN_MEDIATION)
             .build();

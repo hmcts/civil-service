@@ -187,4 +187,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));
         }
     }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(callbackHandler.handledEvents()).contains(LIFT_BREATHING_SPACE_SPEC);
+    }
 }
