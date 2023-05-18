@@ -145,7 +145,7 @@ ccd:
       autoscaling:
         enabled: false
       environment:
-        LOG_CALLBACK_DETAILS: *
+        LOG_CALLBACK_DETAILS: '*'
         CASE_DOCUMENT_AM_API_ATTACH_DOCUMENT_ENABLED: false
         DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
