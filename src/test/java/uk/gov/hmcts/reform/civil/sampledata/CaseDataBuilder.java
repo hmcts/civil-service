@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -15,9 +17,11 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -28,9 +32,9 @@ import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -55,19 +59,19 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -78,13 +82,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
@@ -104,16 +107,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -327,6 +330,7 @@ public class CaseDataBuilder {
     protected YesOrNo respondentSolicitor1ServiceAddressRequired;
     protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
+    protected YesOrNo isRespondent2;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
@@ -424,6 +428,12 @@ public class CaseDataBuilder {
     private List<Element<PartyFlagStructure>> respondent2Experts;
     private List<Element<PartyFlagStructure>> respondent2Witnesses;
     private CaseDataLiP caseDataLiP;
+    private YesOrNo claimant2ResponseFlag;
+    private TimelineUploadTypeSpec specClaimResponseTimelineList;
+    private TimelineUploadTypeSpec specClaimResponseTimelineList2;
+    private YesOrNo defenceAdmitPartEmploymentTypeRequired;
+    private YesOrNo specDefenceFullAdmitted2Required;
+    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -546,6 +556,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder isRespondent1(YesOrNo isRespondent1) {
         this.isRespondent1 = isRespondent1;
+        return this;
+    }
+
+    public CaseDataBuilder isRespondent2(YesOrNo isRespondent2) {
+        this.isRespondent2 = isRespondent2;
         return this;
     }
 
@@ -942,6 +957,42 @@ public class CaseDataBuilder {
         ).build();
 
         applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQSmallCalimExperts() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+
+        applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
+                                                    .expertName("Mr Expert Defendant")
+                                                    .firstName("Expert")
+                                                    .lastName("Defendant")
+                                                    .phoneNumber("07123456789")
+                                                    .emailAddress("test@email.com")
+                                                    .fieldofExpertise("Roofing")
+                                                    .estimatedCost(new BigDecimal(434))
+                                                    .build()).build();
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQSmallCalimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+
+        applicant2DQBuilder.applicant2RespondToClaimExperts(ExpertDetails.builder()
+                                                                .expertName("Mr Expert Defendant")
+                                                                .firstName("Expert")
+                                                                .lastName("Defendant")
+                                                                .phoneNumber("07123456789")
+                                                                .emailAddress("test@email.com")
+                                                                .fieldofExpertise("Roofing")
+                                                                .estimatedCost(new BigDecimal(434))
+                                                                .build()).build();
+
+        applicant2DQ = applicant2DQBuilder.build();
         return this;
     }
 
@@ -5260,6 +5311,36 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder enableRespondent2ResponseFlag() {
+        this.claimant2ResponseFlag = YES;
+        return this;
+    }
+
+    public CaseDataBuilder setSpecClaimResponseTimelineList(TimelineUploadTypeSpec timelineUploadTypeSpec) {
+        this.specClaimResponseTimelineList = timelineUploadTypeSpec;
+        return this;
+    }
+
+    public CaseDataBuilder setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec timelineUploadTypeSpec2) {
+        this.specClaimResponseTimelineList2 = timelineUploadTypeSpec2;
+        return this;
+    }
+
+    public CaseDataBuilder setDefenceAdmitPartEmploymentTypeRequired(YesOrNo yesOrNo) {
+        this.defenceAdmitPartEmploymentTypeRequired = defenceAdmitPartEmploymentTypeRequired;
+        return this;
+    }
+
+    public CaseDataBuilder specDefenceFullAdmitted2Required(YesOrNo yesOrNo) {
+        this.specDefenceFullAdmitted2Required = specDefenceFullAdmitted2Required;
+        return this;
+    }
+
+    public CaseDataBuilder defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponsePartAdmissionPaymentTimeLRspec) {
+        this.defenceAdmitPartPaymentTimeRouteRequired = respondentResponsePartAdmissionPaymentTimeLRspec;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5398,6 +5479,7 @@ public class CaseDataBuilder {
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
             .isRespondent1(isRespondent1)
+            .isRespondent2(isRespondent2)
             .defendantSolicitorNotifyClaimOptions(defendantSolicitorNotifyClaimOptions)
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
@@ -5513,6 +5595,12 @@ public class CaseDataBuilder {
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
             .caseDataLiP(caseDataLiP)
+            .claimant2ResponseFlag(claimant2ResponseFlag)
+            .specClaimResponseTimelineList(specClaimResponseTimelineList)
+            .specClaimResponseTimelineList2(specClaimResponseTimelineList2)
+            .defenceAdmitPartEmploymentTypeRequired(defenceAdmitPartEmploymentTypeRequired)
+            .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
+            .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .build();
     }
 
