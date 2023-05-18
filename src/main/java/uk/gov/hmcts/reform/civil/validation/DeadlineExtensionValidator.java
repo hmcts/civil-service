@@ -52,10 +52,6 @@ public class DeadlineExtensionValidator {
             return List.of("The agreed extension date cannot be more than 28 days after the current deadline");
         }
 
-        if (!workingDayIndicator.isWorkingDay(dateToValidate)) {
-            return List.of("Date must be a working weekday");
-        }
-
         return emptyList();
     }
 
