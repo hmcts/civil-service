@@ -159,7 +159,7 @@ class HearingsServiceTest {
         @Test
         void shouldUpdatePartiesResponses_whenInvoked() {
             // when
-            hearingNoticeService .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
+            hearingNoticeService.updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
 
             //then
             verify(hearingNoticeApi).updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, 1, time);
