@@ -2837,6 +2837,6 @@ class FlowPredicateTest {
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .build();
 
-        assertTrue(isInHearingReadiness.test(caseData));
+        assertFalse(isInHearingReadiness.test(caseData));
     }
 }
