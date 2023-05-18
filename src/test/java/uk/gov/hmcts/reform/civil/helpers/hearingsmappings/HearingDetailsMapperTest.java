@@ -10,9 +10,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
@@ -25,14 +23,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class HearingDetailsMapperTest {
 
     @Test
-    void shouldReturnEmptyString_whenHearingTypeInvoked() {
-        assertThat(HearingDetailsMapper.getHearingType()).isEqualTo("");
+    void shouldReturnNull_whenHearingTypeInvoked() {
+        assertThat(HearingDetailsMapper.getHearingType()).isNull();
     }
 
     @Test
-    void shouldReturnEmptyObject_whenHearingWindowInvoked() {
-        HearingWindowModel expected = HearingWindowModel.builder().build();
-        assertThat(HearingDetailsMapper.getHearingWindow()).isEqualTo(expected);
+    void shouldReturnNull_whenHearingWindowInvoked() {
+        assertThat(HearingDetailsMapper.getHearingWindow()).isNull();
     }
 
     @Test
@@ -292,9 +289,8 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnPanelRequirements_whenInvoked() {
-        PanelRequirementsModel expected = PanelRequirementsModel.builder().build();
-        assertThat(HearingDetailsMapper.getPanelRequirements()).isEqualTo(expected);
+    void shouldReturnNull_whenPanelRequirementsInvoked() {
+        assertThat(HearingDetailsMapper.getPanelRequirements()).isNull();
     }
 
     @Test
