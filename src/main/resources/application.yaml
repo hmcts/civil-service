@@ -138,6 +138,7 @@ civil:
   n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
   n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
   n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
+  n225-url: https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
