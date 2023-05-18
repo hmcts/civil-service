@@ -30,10 +30,8 @@ public enum DocmosisTemplates {
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01282.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01284.docx", "Order_trial_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    SDO_SMALL("CV-UNS-STD-ENG-01262.docx", "small_claims_sdo_%s.pdf"),
+    SDO_SMALL("CV-UNS-STD-ENG-01287.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST(" CV-UNS-STD-ENG-01259.docx", "fast_track_sdo_%s.pdf"),
-    SDO_SMALL_HNL("CV-UNS-STD-ENG-01262.docx", "small_claims_sdo_%s.pdf"),
-    SDO_HNL_FAST("CV-UNS-STD-ENG-01259.docx", "fast_track_sdo_%s.pdf"),
     HEARING_SMALL_CLAIMS("CV-UNS-HNO-ENG-01197.docx", "hearing_small_claim_%s.pdf"),
     HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01198.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION("CV-UNS-HNO-ENG-01199.docx", "hearing_application_%s.pdf"),
@@ -48,10 +46,9 @@ public enum DocmosisTemplates {
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01270.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01272.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf"),
-    
     // judge final Order
-    FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf");
-
+    FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
     private final String template;
     private final String documentTitle;
 

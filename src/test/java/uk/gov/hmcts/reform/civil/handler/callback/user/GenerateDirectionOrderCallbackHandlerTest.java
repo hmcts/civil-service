@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -185,7 +186,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
@@ -199,7 +200,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then    ** Modify when Assisted Order Document Generation is developed
-            //assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
@@ -240,6 +241,61 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID().equals("finalOrders"));
+        }
+
+        @Test
+        void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+        }
+
+        @Test
+        void shouldChangeStateToFinalOrder_onAboutToSubmitAndAssistedOrderAndNoFurtherHearing() {
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(null)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+        }
+
+        @Test
+        void shouldChangeStateToCaseProgression_onAboutToSubmitAndAssistedOrderWithFurtherHearing() {
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getState()).isEqualTo("CASE_PROGRESSION");
         }
     }
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 @Service
 @RequiredArgsConstructor
@@ -83,8 +81,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (caseData.isLRvLipOneVOne(multiPartyScenario)
+        if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
             return JUDGEMENT_BY_COURT;
         } else {
