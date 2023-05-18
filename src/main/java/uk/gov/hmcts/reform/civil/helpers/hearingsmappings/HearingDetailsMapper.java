@@ -16,22 +16,21 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 
 public class HearingDetailsMapper {
 
-    private static String EMPTY_STRING = "";
-    private static final String WELSH_REGION_ID = "7";
-    public static String STANDARD_PRIORITY = "Standard";
+    public static final String WELSH_REGION_ID = "7";
+    public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
+    private static String EMPTY_STRING = "";
 
     private HearingDetailsMapper() {
         //NO-OP
     }
 
     public static String getHearingType() {
-        return EMPTY_STRING;
+        return null;
     }
 
     public static HearingWindowModel getHearingWindow() {
-        return HearingWindowModel.builder()
-            .build();
+        return null;
     }
 
     public static Integer getDuration() {
@@ -113,13 +112,8 @@ public class HearingDetailsMapper {
         return false;
     }
 
-    public static boolean getCaseInterpreterRequiredFlag() {
-        return false;
-        // todo civ-6888
-    }
-
     public static PanelRequirementsModel getPanelRequirements() {
-        return PanelRequirementsModel.builder().build();
+        return null;
     }
 
     public static String getLeadJudgeContractType() {

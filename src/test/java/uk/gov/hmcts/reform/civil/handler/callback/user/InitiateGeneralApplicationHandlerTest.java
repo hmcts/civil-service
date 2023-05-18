@@ -60,11 +60,13 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_OR_DISCONTINUE_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -250,7 +252,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleType() {
+        void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithVaryJudgement() {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -264,6 +266,25 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
             assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary judgment"));
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithSettleOrDiscontinueConsent() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT,
+                    SETTLE_OR_DISCONTINUE_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
+            assertThat(response.getErrors().size()).isEqualTo(1);
+            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type " +
+                    "when applying to settle or discontinue by consent"));
         }
     }
 
@@ -326,6 +347,67 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventForConsentOrder extends LocationRefSampleDataBuilder {
+
+        private static final String VALIDATE_GA_CONSENT = "ga-validate-consent";
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsent() {
+
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .build().toBuilder()
+                    .generalAppRespondentAgreement(GARespondentOrderAgreement
+                            .builder().hasAgreed(NO).build())
+                    .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
+
+            List<GeneralApplicationTypes> types = List.of(SETTLE_OR_DISCONTINUE_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .build().toBuilder()
+                    .generalAppRespondentAgreement(GARespondentOrderAgreement
+                            .builder().hasAgreed(YES).build())
+                    .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
+
+            List<GeneralApplicationTypes> types = List.of(SETTLE_OR_DISCONTINUE_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .build().toBuilder()
+                    .generalAppRespondentAgreement(GARespondentOrderAgreement
+                            .builder().hasAgreed(NO).build())
+                    .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_OR_DISCONTINUE_CONSENT);
         }
     }
 
@@ -734,7 +816,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                                                                 any(CaseData.class), any(UserDetails.class)))
                 .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
@@ -758,7 +840,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                     any(CaseData.class), any(UserDetails.class)))
                     .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
@@ -857,7 +939,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     }
             );
 
-            when(helper.setRespondentDetailsIfPresent(any(GeneralApplication.class),
+            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
                     any(CaseData.class), any(UserDetails.class)))
                     .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

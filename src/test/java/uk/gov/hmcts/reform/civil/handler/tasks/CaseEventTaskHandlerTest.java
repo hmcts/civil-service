@@ -708,8 +708,6 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
@@ -721,16 +719,13 @@ class CaseEventTaskHandlerTest {
                 || state.equals(COUNTER_CLAIM)
                 || state.equals(FULL_DEFENCE_PROCEED)
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
-                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                 );
             }
-            return Map.of("RPA_CONTINUOUS_FEED", false,
-                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true,
+            return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
                           FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                     );
@@ -753,7 +748,7 @@ class CaseEventTaskHandlerTest {
                         .respondent2Represented(null);
                     break;
                 case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails()
+                    caseDataBuilder.atStateRespondent1CounterClaimAfterNotifyDetails()
                         .addRespondent2(NO)
                         .respondent2OrgRegistered(null)
                         .respondent2Represented(null);
