@@ -29,13 +29,16 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
                             .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
-                .should(boolQuery()
+                            .must(isUnSpecClaim())
+                .should(boolQuery() //create claim unspec
                             .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
                             .must(beState(CASE_ISSUED)))
+                            .must(isUnSpecClaim())
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                .should(boolQuery()
+                            .must(isUnSpecClaim())
+                .should(boolQuery() //create claim spec
                         .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
                         .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                         .must(isSpecClaim()),
@@ -52,6 +55,11 @@ public class CaseDismissedSearchService extends ElasticSearchService {
     public BoolQueryBuilder isSpecClaim() {
         return boolQuery()
             .must(matchQuery("data.CaseAccessCategory", "SPEC_CLAIM"));
+    }
+
+    public BoolQueryBuilder isUnSpecClaim() {
+        return boolQuery()
+            .must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM"));
     }
 
 }
