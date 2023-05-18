@@ -60,6 +60,11 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private String identifyTemplate(CaseData caseData) {
         String template = null;
+        if (caseData.isLRvLipOneVOne()) {
+            template = notificationsProperties.getRespondent1DefaultJudgmentReceived();
+            templateReference = REFERENCE_TEMPLATE_REQUESTED;
+            return template;
+        }
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
@@ -86,8 +91,14 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
-            && V_1.equals(callbackParams.getVersion())
-        ) {
+            && V_1.equals(callbackParams.getVersion())) {
+            if (caseData.getRespondent1().getPartyEmail() != null) {
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    identifyTemplate(caseData),
+                    addProperties1v1LRvLip(caseData),
+                    String.format(templateReference, caseData.getLegacyCaseReference()));
+            }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -177,6 +188,14 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData)
+        );
+    }
+
+    public Map<String, String> addProperties1v1LRvLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME_INTERIM, getPartyNameBasedOnType(caseData.getRespondent1()),
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }
 
