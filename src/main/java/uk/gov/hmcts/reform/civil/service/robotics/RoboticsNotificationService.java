@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -21,13 +20,13 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.params.RoboticsEmailParams;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
@@ -45,7 +44,6 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
         requireNonNull(caseData);
@@ -63,15 +61,6 @@ public class RoboticsNotificationService {
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
-    private boolean canSendEmailSpec() {
-        try {
-            return toggleService.isSpecRpaContinuousFeedEnabled();
-        } catch (Throwable e) {
-            log.error("Exception on launchdarkly check", e);
-            return false;
-        }
-    }
-
     private Optional<EmailData> prepareEmailData(RoboticsEmailParams params) {
 
         log.info(String.format("Start prepareEmailData %s", params.getCaseData().getLegacyCaseReference()));
@@ -86,11 +75,8 @@ public class RoboticsNotificationService {
             roboticsJsonData = roboticsCaseDataDTO.getJsonRawData();
 
             if (SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())) {
-                if (canSendEmailSpec()) {
-                    triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
-                } else {
-                    return Optional.empty();
-                }
+                RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(params.getCaseData());
+                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
                 log.info(String.format("triggerEvent %s", triggerEvent));
@@ -162,7 +148,7 @@ public class RoboticsNotificationService {
     }
 
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        String subject = null;
+        String subject;
         if (caseData.isRespondent1NotRepresented()) {
             subject = String.format(
                 "LR v LiP Case Data for %s",

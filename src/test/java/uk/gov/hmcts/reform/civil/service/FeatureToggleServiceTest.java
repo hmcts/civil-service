@@ -35,15 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
-        var multipartyFeatureKey = "rpaContinuousFeed";
-        givenToggle(multipartyFeatureKey, toggleState);
-
-        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
         var noticeOfChangeKey = "notice-of-change";
         givenToggle(noticeOfChangeKey, toggleState);
@@ -121,14 +112,6 @@ class FeatureToggleServiceTest {
         givenToggle(certificateOfServiceKey, toggleStat);
 
         assertThat(featureToggleService.isCertificateOfServiceEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    public void rpaContinuousFeed_LDTagName(Boolean toggleStat) {
-        var rpaContinuousFeed = "specified-rpa-continuous-feed";
-        givenToggle(rpaContinuousFeed, toggleStat);
-        assertThat(featureToggleService.isSpecRpaContinuousFeedEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

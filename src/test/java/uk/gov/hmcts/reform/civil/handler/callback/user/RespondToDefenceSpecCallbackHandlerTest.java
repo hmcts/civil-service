@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -33,6 +34,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -83,6 +86,7 @@ import java.util.stream.Collectors;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -95,11 +99,15 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -599,6 +607,73 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidGetPaymentDate {
+        private static final String PAGE_ID = "get-payment-date";
+
+        @Test
+        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("currentDateboxDefendantSpec")
+                .isNotNull();
+        }
+
+    }
+
+    @Nested
+    class MidSugestInstalmentsValidation {
+        private static final String PAGE_ID = "validate-suggest-instalments";
+
+        @Test
+        void shouldreturnError_whenPopulated() {
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build().toBuilder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.TEN)
+                .totalClaimAmount(BigDecimal.ONE)
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertEquals("Enter a valid amount for equal instalments", response.getErrors().get(0));
+        }
+
+        @Test
+        void shouldReturnPaymentError_whenPopulated() {
+            String name = "John Smith";
+            String role = "Solicitor";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .build().toBuilder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal(-4))
+                .totalClaimAmount(BigDecimal.ONE)
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertEquals("Enter an amount of £1 or more", response.getErrors().get(0));
+        }
+
+    }
+
+    @Nested
     class AboutToSubmitCallback {
         private final LocalDateTime localDateTime = now();
 
@@ -644,6 +719,40 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(READY.name(), CLAIMANT_RESPONSE_SPEC.name());
 
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @Test
+        void shouldAddExperts_whenAtFullDefenceStateV1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .build();
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                caseData.toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .applicant2(Party.builder()
+                                    .companyName("company")
+                                    .type(Party.Type.COMPANY)
+                                    .build())
+                    .applicant2DQ(Applicant2DQ.builder()
+                                      .applicant2DQFileDirectionsQuestionnaire(
+                                          caseData.getApplicant1DQ()
+                                              .getApplicant1DQFileDirectionsQuestionnaire())
+                                      .applicant2RespondToClaimExperts(
+                                          ExpertDetails.builder().build())
+                                      .build())
+                    .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                        ExpertDetails.builder().build()).build())
+                    .build(),
+                ABOUT_TO_SUBMIT
+            );
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1DQExperts").isNotNull();
         }
 
         @Test
@@ -798,6 +907,34 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
             assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
         }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithoutMediationAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithFastTrackAndFlagV2() {
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
     }
 
     @Nested
@@ -911,6 +1048,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
+        @ParameterizedTest
+        @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
+        void shouldGetOneVOnePartAdmitImmediatelyFlagV2(RespondentResponsePartAdmissionPaymentTimeLRspec type) {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(type)
+                .specDefenceAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isNotNull();
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
+        }
+
         @Test
         void shouldGetOneVOneFullAdmitFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
@@ -947,6 +1106,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
             assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE);
+            assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
+        void shouldGetOneVOneFullAdmitBySetDateFlagV2Parameterized(
+            RespondentResponsePartAdmissionPaymentTimeLRspec type) {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(type)
+                .specDefenceFullAdmittedRequired(NO)
+                .totalClaimAmount(BigDecimal.valueOf(5000_00))
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isNotNull();
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
@@ -1320,6 +1501,22 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetVulnerability_whenGivenConditionMeets() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
+        }
+
+        @Test
         void shouldNotSetMediationShowFlag_whenGivenConditionNotMeet() {
             CaseData caseData = CaseDataBuilder.builder().build();
             given(respondentMediationService.setMediationRequired(any())).willReturn(null);
@@ -1359,5 +1556,80 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+  
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_SPEC);
+    }
+
+    @Nested
+    class InstalmentsValidationCallback {
+        private static final String PAGE_ID = "validate-suggest-instalments";
+        LocalDate inputDate = LocalDate.now().plusDays(31);
+
+        @Test
+        void shouldReturnError_whenAmountIsZero() {
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.ZERO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Enter an amount of £1 or more");
+        }
+
+        @Test
+        void shouldReturnError_whenAmountIsLarger() {
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150000))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(inputDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Enter a valid amount for equal instalments");
+        }
+
+        @Test
+        void shouldReturnError_whenDateIsBefore() {
+            LocalDate eligibleDate = LocalDate.now().plusDays(30);
+            var testDate = LocalDate.now().plusDays(25);
+
+            CaseData caseData = CaseData.builder()
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(testDate)
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("Selected date must be after " + formatLocalDate(
+                    eligibleDate,
+                    DATE
+                ));
+        }
+    }
+
+    @Nested
+    class MidEventPaymentDate {
+        private static final String PAGE_ID = "get-payment-date";
+
+        @Test
+        void shouldReturnError_whenDateIsBefore() {
+            CaseData caseData = CaseData.builder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String paymentDate = getCaseData(response).getCurrentDateboxDefendantSpec();
+            assertThat(paymentDate).isEqualTo(formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE));
+        }
     }
 }
