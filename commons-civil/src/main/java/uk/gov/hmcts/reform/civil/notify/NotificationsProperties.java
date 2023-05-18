@@ -142,9 +142,6 @@ public class NotificationsProperties {
     private String respondentSolicitor1DefaultJudgmentReceived;
 
     @NotEmpty
-    private String respondent1DefaultJudgmentReceived;
-
-    @NotEmpty
     private String breathingSpaceEnterDefendantEmailTemplate;
 
     @NotEmpty
@@ -256,5 +253,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
+
+    @NotEmpty
+    private String respondent1DefaultJudgmentRequestedTemplate;
 
 }

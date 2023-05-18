@@ -61,7 +61,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private String identifyTemplate(CaseData caseData) {
         String template = null;
         if (caseData.isLRvLipOneVOne()) {
-            template = notificationsProperties.getRespondent1DefaultJudgmentReceived();
+            template = notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate();
             templateReference = REFERENCE_TEMPLATE_REQUESTED;
             return template;
         }

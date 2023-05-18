@@ -217,7 +217,6 @@ notifications:
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
   respondentSolicitor1DefaultJudgmentReceived: "3f09399e-b76b-4ea4-8084-c27693e6fd28"
-  respondent1DefaultJudgmentReceived: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondentSolicitor1DefaultJudgmentRequested: "9a974b63-6d0f-4714-8e5d-488554fdc8a0"
   applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
   interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
@@ -256,6 +255,7 @@ notifications:
   notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
   notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
+  respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
 
 
 sendgrid:
