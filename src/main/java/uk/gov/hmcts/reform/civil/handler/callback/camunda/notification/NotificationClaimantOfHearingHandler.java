@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
 
@@ -65,41 +66,22 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String reference;
+        String reference = "";
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData);
         String hearingTime = NotificationUtils.getFormattedHearingTime(caseData);
+        Map<String, String> map = new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef,
+            HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
         if (!isApplicantLip(caseData)) {
-            if (caseData.getSolicitorReferences() == null
-                || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
-                reference = "";
-            } else {
+            if (nonNull(caseData.getSolicitorReferences())
+                && nonNull(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())) {
                 reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
             }
-            return new HashMap<>(Map.of(
-                CLAIM_REFERENCE_NUMBER,
-                legacyCaseRef,
-                HEARING_FEE,
-                caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
-                HEARING_DATE,
-                hearingDate,
-                HEARING_TIME,
-                hearingTime,
-                HEARING_DUE_DATE,
-                caseData.getHearingDueDate() == null ? "" :
-                    caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                CLAIMANT_REFERENCE_NUMBER, reference
-            ));
-        } else {
-            return new HashMap<>(Map.of(
-                CLAIM_REFERENCE_NUMBER,
-                legacyCaseRef,
-                HEARING_DATE,
-                hearingDate,
-                HEARING_TIME,
-                hearingTime
-            ));
+            map.put(HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()));
+            map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null ? "" : caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            map.put(CLAIMANT_REFERENCE_NUMBER, reference);
         }
+        return map;
     }
 
     private boolean isApplicantLip(CaseData caseData) {
@@ -117,15 +99,14 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getEmailTemplate(CaseData caseData, boolean isApplicantLip) {
-        if (!isApplicantLip) {
-            if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
-                BigDecimal.ZERO) > 0) {
-                return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
-            } else {
-                return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
-            }
-        } else {
+        if (isApplicantLip) {
             return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         }
+        if (nonNull(caseData.getHearingFee()) && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(BigDecimal.ZERO) > 0) {
+            return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
+        } else {
+            return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
+        }
     }
+
 }

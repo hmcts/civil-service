@@ -76,14 +76,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         String legacyCaseRef = caseData.getLegacyCaseReference();
         String hearingDate = NotificationUtils.getFormattedHearingDate(caseData);
         String hearingTime = NotificationUtils.getFormattedHearingTime(caseData);
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            legacyCaseRef,
-            HEARING_DATE,
-            hearingDate,
-            HEARING_TIME,
-            hearingTime
-        ));
+        return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
     }
 
     private boolean isRespondentLip(CaseData caseData) {
