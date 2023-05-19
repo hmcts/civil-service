@@ -254,4 +254,10 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
 
+    @NotEmpty
+    private String mediationUnsuccessfulClaimantLRTemplate;
+
+    @NotEmpty
+    private String mediationUnsuccessfulDefendantLIPTemplate;
+
 }
