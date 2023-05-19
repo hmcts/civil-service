@@ -48,7 +48,13 @@ public enum DocmosisTemplates {
     TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf"),
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+
+    // hearing notice guidance docs
+    TELEPHONE_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00001", "%s_hearing_guidance_%s.pdf"),
+    VIDEO_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00002", "%s_hearing_guidance_%s.pdf"),
+    IN_PERSON_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00003", "%s_hearing_guidance_%s.pdf");
+
     private final String template;
     private final String documentTitle;
 
