@@ -2305,8 +2305,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
-
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
