@@ -246,6 +246,9 @@ public class NotificationsProperties {
     private String notifyRespondentLiPMediationAgreementTemplate;
 
     @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplateWelsh;
+
+    @NotEmpty
     private String notifyRespondentLRMediationAgreementTemplate;
 
     @NotEmpty
@@ -253,7 +256,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String generateOrderNotificationTemplate;
-  
+
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
 
