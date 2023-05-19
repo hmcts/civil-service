@@ -51,9 +51,9 @@ public enum DocmosisTemplates {
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
 
     // hearing notice guidance docs
-    TELEPHONE_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00001", "%s_hearing_guidance_%s.pdf"),
-    VIDEO_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00002", "%s_hearing_guidance_%s.pdf"),
-    IN_PERSON_HEARING_GUIDANCE("CV-DAM-HNO-ENG-00003", "%s_hearing_guidance_%s.pdf");
+    HEARING_GUIDANCE_TELEPHONE("CV-DAM-HNO-ENG-00001", "%s_hearing_guidance_telephone_%s.pdf"),
+    HEARING_GUIDANCE_VIDEO("CV-DAM-HNO-ENG-00002", "%s_hearing_guidance_video_%s.pdf"),
+    HEARING_GUIDANCE_IN_PERSON("CV-DAM-HNO-ENG-00003", "%s_hearing_guidance_in_person_%s.pdf");
 
     private final String template;
     private final String documentTitle;
