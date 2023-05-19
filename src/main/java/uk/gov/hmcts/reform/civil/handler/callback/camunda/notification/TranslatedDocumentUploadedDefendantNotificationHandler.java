@@ -20,12 +20,12 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
     @Service
     @RequiredArgsConstructor
-    public class TranslatedDocumentUploadedRespondentNotificationHandler extends CallbackHandler implements NotificationData {
+    public class TranslatedDocumentUploadedDefendantNotificationHandler extends CallbackHandler implements NotificationData {
 
         private final NotificationService notificationService;
         private final NotificationsProperties notificationsProperties;
         private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED);
-        private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-respondent-notification-%s";
+        private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-defendant-notification-%s";
         public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToDefendant";
 
         @Override
@@ -59,7 +59,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getNotifyRespondentTranslatedDocumentUploaded(),
+                notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

@@ -12,13 +12,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -31,16 +29,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @SpringBootTest(classes = {
-    TranslatedDocumentUploadedApplicantNotificationHandler.class,
+    TranslatedDocumentUploadedClaimantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private TranslatedDocumentUploadedApplicantNotificationHandler handler;
+    private TranslatedDocumentUploadedClaimantNotificationHandler handler;
     @MockBean
     private OrganisationService organisationService;
 

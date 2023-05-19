@@ -22,12 +22,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @Service
 @RequiredArgsConstructor
-public class TranslatedDocumentUploadedApplicantNotificationHandler extends CallbackHandler implements NotificationData {
+public class TranslatedDocumentUploadedClaimantNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED);
-    private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
     final  OrganisationService organisationService;
 
@@ -62,7 +62,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getNotifyApplicantTranslatedDocumentUploaded(),
+            notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );

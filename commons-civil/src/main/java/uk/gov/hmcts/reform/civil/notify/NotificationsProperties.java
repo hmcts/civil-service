@@ -255,9 +255,9 @@ public class NotificationsProperties {
     private String respondentLipPartAdmitSettleClaimTemplate;
 
     @NotEmpty
-    private String notifyApplicantTranslatedDocumentUploaded;
+    private String notifyClaimantTranslatedDocumentUploaded;
 
     @NotEmpty
-    private String notifyRespondentTranslatedDocumentUploaded;
+    private String notifyDefendantTranslatedDocumentUploaded;
 
 }

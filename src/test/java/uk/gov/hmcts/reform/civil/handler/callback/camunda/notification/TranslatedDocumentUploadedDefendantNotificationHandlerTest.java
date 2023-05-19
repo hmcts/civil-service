@@ -14,14 +14,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
-    TranslatedDocumentUploadedRespondentNotificationHandler.class,
+    TranslatedDocumentUploadedDefendantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
 public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
@@ -41,7 +39,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
     @MockBean
     private NotificationsProperties notificationsProperties;
     @Autowired
-    private TranslatedDocumentUploadedRespondentNotificationHandler handler;
+    private TranslatedDocumentUploadedDefendantNotificationHandler handler;
     @MockBean
     private OrganisationService organisationService;
 
@@ -50,7 +48,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyRespondentTranslatedDocumentUploaded()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn("template-id");
         }
 
         @Test
