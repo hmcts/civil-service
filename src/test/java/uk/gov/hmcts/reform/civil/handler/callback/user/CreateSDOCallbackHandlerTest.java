@@ -345,7 +345,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
-                .thenReturn(LocalDate.now().plusDays(5));
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -378,7 +378,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
-                .thenReturn(LocalDate.now().plusDays(5));
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -417,7 +417,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
-                .thenReturn(LocalDate.now().plusDays(5));
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -462,7 +462,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
-                .thenReturn(LocalDate.now().plusDays(5));
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
