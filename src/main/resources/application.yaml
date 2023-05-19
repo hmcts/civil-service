@@ -49,6 +49,9 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+hmc:
+  api:
+    url: ${HMC_API_URL:http://localhost:8765}
 
 serviceRequest:
   api:
@@ -135,6 +138,7 @@ civil:
   n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
   n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
   n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
+  n225-url: https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -201,6 +205,7 @@ notifications:
   claimantSolicitorAgreedExtensionDateForSpec: "5b6d65ea-a3b5-4e40-94e0-69dc7100c982"
   respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
   claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
   sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
@@ -223,6 +228,7 @@ notifications:
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
   respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
+  respondentDeadlineExtensionWelsh: "5fb6d574-e1b8-42bc-9d97-fcd8042f36d3"
   claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
   respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
@@ -243,9 +249,15 @@ notifications:
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
+  generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
   notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
+
+  notifyApplicantLRMediationAgreementTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
+  notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
+  notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
+  respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
 
 
 sendgrid:

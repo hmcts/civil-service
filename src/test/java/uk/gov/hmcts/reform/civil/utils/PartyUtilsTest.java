@@ -9,15 +9,21 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
@@ -25,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISS
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.sampledata.PartyBuilder.DATE_OF_BIRTH;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 class PartyUtilsTest {
 
@@ -500,6 +507,203 @@ class PartyUtilsTest {
             PartyData actualData = PartyUtils.respondent2Data(caseData);
 
             assertEquals(expectedData, actualData);
+        }
+    }
+
+    @Nested
+    class AppendWithNewPartyId {
+
+        @Test
+        void shouldAddPartyId_toGivenParty() {
+            Party party = Party.builder().partyName("mock party").build();
+
+            Party actual = PartyUtils.appendWithNewPartyId(party);
+
+            assertNotNull(actual.getPartyID());
+        }
+
+        @Test
+        void shouldNotAppendPartyId_whenPartyIdExists() {
+            Party expected = Party.builder()
+                .partyID(UUID.randomUUID().toString())
+                .partyName("mock party")
+                .build();
+
+            Party actual = PartyUtils.appendWithNewPartyId(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenGivenPartyIsNull() {
+            Party party = null;
+
+            Party actual = PartyUtils.appendWithNewPartyId(party);
+
+            assertNull(actual);
+        }
+
+        @Test
+        void shouldAddPartyId_toGivenLitigationFriend() {
+            LitigationFriend litigationFriend = LitigationFriend.builder()
+                .firstName("mock party").build();
+
+            LitigationFriend actual = PartyUtils.appendWithNewPartyId(litigationFriend);
+
+            assertNotNull(actual.getPartyID());
+        }
+
+        @Test
+        void shouldNotAppendPartyId_whenLitigationFriendPartyIdExists() {
+            LitigationFriend expected = LitigationFriend.builder()
+                .partyID(UUID.randomUUID().toString())
+                .firstName("litfriend")
+                .build();
+
+            LitigationFriend actual = PartyUtils.appendWithNewPartyId(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenGivenLitigationFriendIsNull() {
+            LitigationFriend litigationFriend = null;
+
+            LitigationFriend actual = PartyUtils.appendWithNewPartyId(litigationFriend);
+
+            assertNull(actual);
+        }
+
+        @Test
+        void shouldAddPartyId_toGivenPartyFlagStructure() {
+            PartyFlagStructure partyFlagStructure = PartyFlagStructure.builder()
+                .firstName("mock party").build();
+
+            PartyFlagStructure actual = PartyUtils.appendWithNewPartyId(partyFlagStructure);
+
+            assertNotNull(actual.getPartyID());
+        }
+
+        @Test
+        void shouldNotAppendPartyId_whenPartyFlagStructurePartyIdExists() {
+            PartyFlagStructure expected = PartyFlagStructure.builder()
+                .partyID(UUID.randomUUID().toString())
+                .firstName("structure")
+                .build();
+
+            PartyFlagStructure actual = PartyUtils.appendWithNewPartyId(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenGivenPartyFlagStructureIsNull() {
+            PartyFlagStructure partyFlagStructure = null;
+
+            PartyFlagStructure actual = PartyUtils.appendWithNewPartyId(partyFlagStructure);
+
+            assertNull(actual);
+        }
+    }
+
+    @Nested
+    class AppendWithNewPartyIds {
+
+        @Test
+        void shouldAddPartyIds_toGivenListOfPartyFlagStructures() {
+            List<Element<PartyFlagStructure>> partyFlagStructures = wrapElements(List.of(
+                PartyFlagStructure.builder()
+                    .firstName("structure").build()
+            ));
+
+            var actual = PartyUtils.appendWithNewPartyIds(partyFlagStructures);
+
+            assertEquals(partyFlagStructures.size(), actual.size());
+            assertNotNull(actual.get(0).getValue().getPartyID());
+        }
+
+        @Test
+        void shouldNotAppendParty_whenPartyIdExists() {
+            List<Element<PartyFlagStructure>> expected = wrapElements(List.of(
+                PartyFlagStructure.builder()
+                    .firstName("structure")
+                    .partyID("some id")
+                    .build()
+            ));
+
+            List<Element<PartyFlagStructure>> actual = PartyUtils.appendWithNewPartyIds(expected);
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenGivenListOfPartyFlagStructuresIsNull() {
+            List<Element<PartyFlagStructure>> party = null;
+
+            List<Element<PartyFlagStructure>> actual = PartyUtils.appendWithNewPartyIds(party);
+
+            assertNull(actual);
+        }
+    }
+
+    @Nested
+    class PopulateWithPartyIds {
+
+        @Test
+        void shouldPopulatePartyIds_withinGivenCaseDataBuilder() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicant1(Party.builder().partyName("mock party 1").build())
+                .applicant2(Party.builder().partyName("mock party 3").build())
+                .respondent1(Party.builder().partyName("mock party 4").build())
+                .respondent2(Party.builder().partyName("mock party 5").build())
+                .applicant1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 1").build())
+                .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build())
+                .respondent2LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 3").build())
+                .applicantExperts(wrapElements(List.of(PartyFlagStructure.builder().firstName("expert 1").build())))
+                .respondent1Experts(wrapElements(List.of(PartyFlagStructure.builder().firstName("expert 2").build())))
+                .respondent2Experts(wrapElements(List.of(PartyFlagStructure.builder().firstName("expert 3").build())))
+                .applicantWitnesses(wrapElements(List.of(PartyFlagStructure.builder().firstName("witness 1").build())))
+                .respondent1Witnesses(wrapElements(List.of(PartyFlagStructure.builder().firstName("witness 2").build())))
+                .respondent2Witnesses(wrapElements(List.of(PartyFlagStructure.builder().firstName("witness 3").build())));
+
+            PartyUtils.populateWithPartyIds(builder);
+            CaseData actual = builder.build();
+
+            assertNotNull(actual.getApplicant1().getPartyID());
+            assertNotNull(actual.getApplicant2().getPartyID());
+            assertNotNull(actual.getRespondent1().getPartyID());
+            assertNotNull(actual.getRespondent2().getPartyID());
+            assertNotNull(actual.getApplicant1LitigationFriend().getPartyID());
+            assertNotNull(actual.getRespondent1LitigationFriend().getPartyID());
+            assertNotNull(actual.getRespondent2LitigationFriend().getPartyID());
+            assertNotNull(actual.getApplicantExperts().get(0).getValue().getPartyID());
+            assertNotNull(actual.getRespondent1Experts().get(0).getValue().getPartyID());
+            assertNotNull(actual.getRespondent2Experts().get(0).getValue().getPartyID());
+            assertNotNull(actual.getApplicantWitnesses().get(0).getValue().getPartyID());
+            assertNotNull(actual.getRespondent1Witnesses().get(0).getValue().getPartyID());
+            assertNotNull(actual.getRespondent2Witnesses().get(0).getValue().getPartyID());
+        }
+
+        @Test
+        void shouldNotPopulateAlreadyNullPartyFields_withinCaseDataBuilder() {
+            CaseData.CaseDataBuilder builder = CaseData.builder()
+                .applicant1(Party.builder().partyName("mock party 1").build())
+                .respondent1(Party.builder().partyName("mock party 4").build())
+                .applicant1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 1").build())
+                .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build())
+                .applicantExperts(wrapElements(List.of(PartyFlagStructure.builder().firstName("expert 1").build())))
+                .respondent1Experts(wrapElements(List.of(PartyFlagStructure.builder().firstName("expert 2").build())))
+                .applicantWitnesses(wrapElements(List.of(PartyFlagStructure.builder().firstName("witness 1").build())))
+                .respondent1Witnesses(wrapElements(List.of(PartyFlagStructure.builder().firstName("witness 2").build())));
+
+            PartyUtils.populateWithPartyIds(builder);
+            CaseData actual = builder.build();
+
+            assertNull(actual.getApplicant2());
+            assertNull(actual.getRespondent2());
+            assertNull(actual.getRespondent2LitigationFriend());
+            assertNull(actual.getRespondent2Experts());
+            assertNull(actual.getRespondent2Witnesses());
         }
     }
 }

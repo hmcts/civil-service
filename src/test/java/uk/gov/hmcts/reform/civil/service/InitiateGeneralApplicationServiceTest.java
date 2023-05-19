@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.GA_DOC_CATEGORY_ID;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -430,7 +431,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
+    void shouldNotPopulateStatementOfTruthAndSetNoticeAndConsentOrderIfConsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
         when(locationRefDataService.getCcmccLocation(any()))
@@ -441,9 +442,13 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-            .isNull();
+            .isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
                        .getReasonsForWithoutNotice()).isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                .getGeneralAppConsentOrder()).isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                .getGeneralAppConsentOrder()).isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
@@ -1099,6 +1104,20 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("22222");
+    }
+
+    @Test
+    void shouldCopyN245toEvidenceWithCategoryId_whenCreateVaryApplication() {
+        CaseData caseData = new GeneralApplicationDetailsBuilder()
+                .getVaryJudgmentWithN245TestData();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0)
+                .getValue().getGeneralAppEvidenceDocument()).hasSize(2);
+        assertThat(result.getGeneralApplications().get(0)
+                .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
+                .isEqualTo(GA_DOC_CATEGORY_ID);
     }
 
     private void assertCaseDateEntries(CaseData caseData) {
