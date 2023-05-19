@@ -117,6 +117,7 @@ public class DeadlinesCalculator {
 
     public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
+        LocalDate checkingIfWorkingday;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
