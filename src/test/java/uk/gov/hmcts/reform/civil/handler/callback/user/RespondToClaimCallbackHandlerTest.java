@@ -627,7 +627,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
-                .thenReturn(false).thenReturn(true);
+                .thenReturn(false,true);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2DQ(Respondent2DQ
@@ -757,7 +757,94 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldValidateWitness_whenMultipartyAndSameLRepAndRespondent1DQIsNull() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When Respondent1DQ() is null and try to validate witness of Respondent1DQ()
+            // Then throws Null pointer
+            //Code Might need to validated to check Respondent1DQ() for Nulls
+            assertThrows(
+                NullPointerException.class,
+                () -> handler.handle(params)
+            );
+        }
+        @Test
+        void shouldValidateWitness_whenMultipartyAndDiffLRepAndRespondent1DQIsNull() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When Respondent1DQ() is null and try to validate witness of Respondent1DQ()
+            // Then throws Null pointer
+            //Code Might need to validated to check Respondent1DQ() for Nulls
+            assertThrows(
+                NullPointerException.class,
+                () -> handler.handle(params)
+            );
+        }
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQAndRespondent1DQIsNull() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent2DQ(null)
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When Respondent1DQ() is null and try to validate witness of Respondent1DQ()
+            // Then throws Null pointer
+            //Code Might need to validated to check Respondent1DQ() for Nulls
+            assertThrows(
+                NullPointerException.class,
+                () -> handler.handle(params)
+            );
+        }
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQWitNullAndRespondent1DQIsNull() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(null).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When Respondent1DQ() is null and try to validate witness of Respondent1DQ()
+            // Then throws Null pointer
+            //Code Might need to validated to check Respondent1DQ() for Nulls
+            assertThrows(
+                NullPointerException.class,
+                () -> handler.handle(params)
+            );
+        }
+        @Test
         void shouldValidateWitness_whenMultipartyAndSameLRDiffResponseAndRespondent2DQWitness() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false);
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldValidateWitness_whenMultipartyAndSameLRSameResponseAndRespondent1DQWitness() {
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true, false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
@@ -765,7 +852,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
                 .respondent2SameLegalRepresentative(YES)
-                .respondentResponseIsSame(NO)
+                .respondentResponseIsSame(YES)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -914,7 +1002,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
         }
-      
+
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1945,7 +2033,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly("It is not possible to respond for both defendants with Reject all of the claim. "
                                      + "Please go back and select single response option.");
         }
-
         @Test
         void shouldNotReturnError_WhenNotBothFullDefence() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
