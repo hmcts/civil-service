@@ -135,6 +135,14 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                        .role("sot role")
                                        .build()
                                )
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("121")
+                                       .caseLocation(CaseLocationCivil.builder()
+                                                         .region("2")
+                                                         .baseLocation("000000")
+                                                         .build())
+                                       .build())
                                .build())
             .respondent2DQ(Respondent2DQ.builder()
                                .respondent2DQStatementOfTruth(
@@ -178,7 +186,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             .specResponseTimelineOfEvents(timelines)
             .build();
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData,BEARER_TOKEN);
+            caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
         Assertions.assertEquals(
