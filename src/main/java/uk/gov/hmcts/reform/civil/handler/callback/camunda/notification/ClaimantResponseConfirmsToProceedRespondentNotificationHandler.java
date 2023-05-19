@@ -83,6 +83,14 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.isLRvLipOneVOne()) {
+            if (caseData.getRespondent1().getPartyEmail() != null) {
+                notificationService.sendMail(
+                    recipient,
+                    notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
+                    addPropertiesLRvLip(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -133,6 +141,13 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+        );
+    }
+
+    public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 
