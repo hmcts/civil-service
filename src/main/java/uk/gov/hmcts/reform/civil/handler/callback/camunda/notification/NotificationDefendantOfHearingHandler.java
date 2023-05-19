@@ -88,15 +88,17 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             return isRespondentLip ? caseData.getRespondent1().getPartyEmail()
                 : caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            if (!isRespondentLip && nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
-                return caseData.getRespondentSolicitor2EmailAddress();
-            } else if (!isRespondentLip) {
-                return caseData.getRespondentSolicitor1EmailAddress();
-            } else if (isRespondentLip && nonNull(caseData.getRespondent2().getPartyEmail())) {
+            if (!isRespondentLip) {
+                if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
+                    return caseData.getRespondentSolicitor2EmailAddress();
+                } else {
+                    return caseData.getRespondentSolicitor1EmailAddress();
+                }
+            } else if (nonNull(caseData.getRespondent2().getPartyEmail())) {
                 return caseData.getRespondent2().getPartyEmail();
             }
-            return null;
         }
+        return null;
     }
 
     private String getDefRefNumber(CaseData caseData, boolean isDefendant1) {
