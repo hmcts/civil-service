@@ -978,7 +978,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant2DQSmallCalimExperts() {
+    public CaseDataBuilder applicant2DQSmallClaimExperts() {
         var applicant2DQBuilder = applicant2DQ != null
             ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
 
