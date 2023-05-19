@@ -55,7 +55,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     private LocationRefDataService locationRefDataService;
 
     @Test
-    public void contentCheck() {
+    public void contentCheckRespondent1() {
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
@@ -110,6 +110,68 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
             templateData.getStatementOfTruth().getRole()
         );
+    }
+
+    @Test
+    public void contentCheckRespondent2() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name2").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("case reference")
+            .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQStatementOfTruth(
+                StatementOfTruth.builder()
+                    .name("sot1 name")
+                    .role("sot1 role")
+                    .build()).build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQStatementOfTruth(
+                                   StatementOfTruth.builder()
+                                       .name("sot2 name")
+                                       .role("sot2 role")
+                                       .build()
+                               )
+                               .respondent2DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("121")
+                                       .caseLocation(CaseLocationCivil.builder()
+                                                         .region("2")
+                                                         .baseLocation("000000")
+                                                         .build())
+                                       .build())
+                               .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.COMPANY)
+                            .companyName("applicant name")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("defendant name")
+                             .build())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("defendant2 name")
+                             .build())
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+
+        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
+            caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
+        Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
+                                templateData.getWhyDisputeTheClaim());
+        Assertions.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName(),
+                                templateData.getStatementOfTruth().getName());
+        Assertions.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getRole(),
+                                templateData.getStatementOfTruth().getRole());
+        Assertions.assertEquals(locations.get(0).getCourtName(),
+                                templateData.getHearingCourtLocation());
     }
 
     @Test
