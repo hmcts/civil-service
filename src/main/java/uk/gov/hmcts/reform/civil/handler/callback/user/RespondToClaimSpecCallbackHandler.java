@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -1456,6 +1457,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               .build())
                     .build());
         }
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
