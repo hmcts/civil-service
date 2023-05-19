@@ -1344,6 +1344,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicant2(YesOrNo addApplicant2) {
+        this.addApplicant2 = addApplicant2;
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2() {
+        this.addApplicant2 = YES;
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
         this.respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
         return this;
@@ -4235,11 +4245,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicantSolicitor1UserDetails(IdamUserDetails applicantSolicitor1UserDetails) {
         this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
-        return this;
-    }
-
-    public CaseDataBuilder addApplicant2() {
-        this.addApplicant2 = YES;
         return this;
     }
 
