@@ -322,6 +322,36 @@ public class NotificationDefendantOfHearingHandlerTest {
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationLipDataMap(caseData));
             assertThat(reference.getAllValues().get(0)).isEqualTo("notification-of-hearing-lip-000HN001");
         }
+
+        @Test
+        void shouldNotifyRespondentSolicitorLip1_whenInvokedAnd1v2AndResp2EmailNull() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .hearingTimeHourMinute("1100")
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YES)
+                .applicant1(Party.builder().partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .respondent2(Party.builder().partyName("Peter").type(Party.Type.INDIVIDUAL).build())
+                .hearingReferenceNumber("000HN001")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondent1@example.com");
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("test-template-defendant-lip-id");
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationLipDataMap(caseData));
+            assertThat(reference.getAllValues().get(0)).isEqualTo("notification-of-hearing-lip-000HN001");
+        }
     }
 
     @NotNull

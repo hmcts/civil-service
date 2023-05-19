@@ -94,11 +94,14 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
                 } else {
                     return caseData.getRespondentSolicitor1EmailAddress();
                 }
-            } else if (nonNull(caseData.getRespondent2().getPartyEmail())) {
-                return caseData.getRespondent2().getPartyEmail();
+            } else {
+                if (nonNull(caseData.getRespondent2().getPartyEmail())) {
+                    return caseData.getRespondent2().getPartyEmail();
+                } else {
+                    return caseData.getRespondent1().getPartyEmail();
+                }
             }
         }
-        return null;
     }
 
     private String getDefRefNumber(CaseData caseData, boolean isDefendant1) {
