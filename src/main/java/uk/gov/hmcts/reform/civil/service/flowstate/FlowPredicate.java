@@ -366,6 +366,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
 
+    public static final Predicate<CaseData> fullAdmitPayImmidiately = caseData ->
+        getPredicateForPayImmidiately(caseData);
+
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
 
         caseData.getReasonNotSuitableSDO() != null
@@ -765,6 +768,17 @@ public class FlowPredicate {
         return predicate;
     }
 
+    private static boolean getPredicateForPayImmidiately(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
+                predicate = null != caseData.getWhenToBePaidText()
+                    &&  null == caseData.getApplicant1ProceedWithClaim();
+            }
+        }
+        return predicate;
+    }
+
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -861,4 +875,11 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
         caseData.isPartAdmitClaimSettled();
+
+    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
+        CaseData::isClaimantNotSettlePartAdmitClaim;
+
+    // This field is used in LR ITP, prevent going another path in preview
+    public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
+        caseData.getShowResponseOneVOneFlag() != null;
 }

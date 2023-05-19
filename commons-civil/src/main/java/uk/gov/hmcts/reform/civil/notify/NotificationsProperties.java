@@ -163,6 +163,9 @@ public class NotificationsProperties {
     private String respondentDeadlineExtension;
 
     @NotEmpty
+    private String respondentDeadlineExtensionWelsh;
+
+    @NotEmpty
     private String claimantDeadlineExtension;
 
     @NotEmpty
@@ -235,8 +238,23 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLipTemplate;
-    
+
+    @NotEmpty
+    private String notifyApplicantLRMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLRMediationAgreementTemplate;
+
     @NotEmpty
     private String bundleCreationTemplate;
+
+    @NotEmpty
+    private String generateOrderNotificationTemplate;
+  
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimTemplate;
 
 }
