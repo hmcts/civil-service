@@ -7,10 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -45,6 +47,8 @@ public class Party {
 
     private String partyEmail;
     private String partyPhone;
+
+    private List<Element<UnavailableDate>> unavailableDates;
 
     private Flags flags;
 
