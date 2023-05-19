@@ -35,14 +35,14 @@ public interface HearingsApi {
         @RequestParam(name = "isValid", required = false) Boolean isValid
     );
 
-    @GetMapping(value = PARTIES_NOTIFIED_ENDPOINT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = PARTIES_NOTIFIED_ENDPOINT + "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     PartiesNotifiedResponses getPartiesNotifiedRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @PathVariable("id") String id
     );
 
-    @PutMapping(value = PARTIES_NOTIFIED_ENDPOINT)
+    @PutMapping(value = PARTIES_NOTIFIED_ENDPOINT + "/{id}")
     ResponseEntity updatePartiesNotifiedRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
@@ -53,7 +53,7 @@ public interface HearingsApi {
             LocalDateTime receivedDateTime
     );
 
-    @GetMapping(value = UNNOTIFIED_HEARINGS_ENDPOINT + "/{hmctsServiceCode}")
+    @GetMapping(value = UNNOTIFIED_HEARINGS_ENDPOINT + "/{id}" + "/{hmctsServiceCode}")
     UnNotifiedHearingResponse getUnNotifiedHearingRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
