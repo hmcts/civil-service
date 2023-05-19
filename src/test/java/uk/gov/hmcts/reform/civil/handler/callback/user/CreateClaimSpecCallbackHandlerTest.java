@@ -119,6 +119,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     OrgPolicyValidator.class,
     StateFlowEngine.class,
     PostcodeValidator.class,
+    InterestCalculator.class,
     StateFlowEngine.class,
     ValidateEmailService.class,
     },
