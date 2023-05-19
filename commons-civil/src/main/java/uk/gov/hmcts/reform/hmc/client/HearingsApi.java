@@ -53,7 +53,7 @@ public interface HearingsApi {
             LocalDateTime receivedDateTime
     );
 
-    @GetMapping(value = UNNOTIFIED_HEARINGS_ENDPOINT + "/{id}" + "/{hmctsServiceCode}")
+    @GetMapping(value = UNNOTIFIED_HEARINGS_ENDPOINT + "/{hmctsServiceCode}")
     UnNotifiedHearingResponse getUnNotifiedHearingRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
