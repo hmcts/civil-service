@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -306,6 +307,49 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNullDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "directionOrderDocument",
+                    caseData, "directionOrderDocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNoExistFieldDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        String noExistingField = "notExist";
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, noExistingField + "Document",
+                    caseData, noExistingField + "DocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get(noExistingField + "DocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void testUpdateDocCollectionWithoutNoticeGaCreatedByResp2() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
@@ -507,6 +551,18 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    @Test
+    void checkIfDocumentExists() {
+        Element same = Element.builder().id(UUID.randomUUID())
+                .value(CaseDocument.builder().build()).build();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        civilCaseDocumentList.add(same);
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
+        gaDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()
