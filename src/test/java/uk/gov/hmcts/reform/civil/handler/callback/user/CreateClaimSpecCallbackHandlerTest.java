@@ -918,7 +918,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getData().get("calculatedInterest")).isNotNull();
+            assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
+                " |---|---| \n" +
+                " | Claim amount | £ 1000 | \n" +
+                " | Interest amount | £ 0.00 | \n" +
+                " | Total amount | £ 1000.00 |");
         }
     }
 
