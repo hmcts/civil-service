@@ -905,7 +905,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidCalculateInterest {
 
         @Test
-        void shouldCalculateInterest_whenPopulated_before4pm() {
+        void shouldCalculateInterest_whenPopulated() {
             // Given
             CaseData caseData = CaseData.builder().claimInterest(YES)
                 .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -923,8 +923,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
                 " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0.00 | \n" +
-                " | Total amount | £ 1000.00 |");
+                " | Interest amount | £ 0 | \n" +
+                " | Total amount | £ 1000 |");
         }
     }
 
