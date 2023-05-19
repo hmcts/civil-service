@@ -100,17 +100,19 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
-    public LocalDate plusWorkingDaysCalculation(LocalDateTime dateTime) {
-        LocalDateTime currentDate = dateTime;
-        if (is4pmOrAfter(currentDate)) {
-            currentDate = currentDate.plusDays(1);
+    public LocalDate getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime fromDateTime) {
+        LocalDate fromDate = is4pmOrAfter(fromDateTime) ? fromDateTime.toLocalDate().plusDays(1)
+            : fromDateTime.toLocalDate();
+        while (workingDayIndicator.isWeekend(fromDate)) {
+            fromDate = fromDate.plusDays(1);
         }
-        LocalDate returnDate = currentDate.toLocalDate();
-        while (!workingDayIndicator.isWorkingDay(returnDate)) {
-            returnDate = returnDate.plusDays(1);
+
+        LocalDate deadline = fromDate.plusDays(7);
+        while (workingDayIndicator.isWeekend(deadline)) {
+            deadline = deadline.plusDays(1);
         }
-        returnDate = calculateFirstWorkingDay(currentDate.toLocalDate()).plusDays(5);
-        return calculateFirstWorkingDay(returnDate);
+
+        return deadline;
     }
 
     public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {

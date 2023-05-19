@@ -417,23 +417,24 @@ public class DeadlinesCalculatorTest {
 
         @Test
         void plusWorkingDaysCalcultaionScenerio1() {
-            LocalDateTime start = LocalDateTime.of(2023, 3, 12, 18, 0, 0);
+            LocalDateTime start = LocalDateTime.of(2023, 5, 5, 16, 1, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 15);
 
-            Assertions.assertEquals(start.plusDays(8).toLocalDate(), calculator.plusWorkingDaysCalculation(start));
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
         }
 
         @Test
         void plusWorkingDaysCalcultaionScenerio2() {
             LocalDateTime start = LocalDateTime.of(2023, 4, 8, 18, 0, 0);
 
-            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalculation(start));
+            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
         }
 
         @Test
         void plusWorkingDaysCalcultaionScenerio3() {
             LocalDateTime start = LocalDateTime.of(2023, 3, 25, 18, 0, 0);
 
-            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.plusWorkingDaysCalculation(start));
+            Assertions.assertEquals(start.plusDays(9).toLocalDate(), calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
         }
     }
 

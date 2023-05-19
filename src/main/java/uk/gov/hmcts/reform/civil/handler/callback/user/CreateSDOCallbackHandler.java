@@ -386,7 +386,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
                     + "on %s.",
-                deadlinesCalculator.plusWorkingDaysCalculation(LocalDateTime.now())
+                deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime.now())
                     .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
             ))
             .build();
