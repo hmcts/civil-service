@@ -67,7 +67,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
-
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";
@@ -186,7 +185,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("freeFormOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
@@ -200,7 +199,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then    ** Modify when Assisted Order Document Generation is developed
-            //assertThat(response.getData()).extracting("assistedOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("finalOrderDocument").isNotNull();
         }
 
         @Test
