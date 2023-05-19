@@ -34,7 +34,6 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED);
     private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-respondent-received-notification-%s";
     private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-respondent-requested-notification-%s";
-    private String templateReference;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
@@ -48,6 +47,11 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         );
     }
 
+    private class EmailTemplateReference {
+        String template;
+        String templateReference;
+    }
+
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
@@ -58,46 +62,46 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         return TASK_ID;
     }
 
-    private String identifyTemplate(CaseData caseData) {
-        String template = null;
+    private EmailTemplateReference identifyTemplate(CaseData caseData) {
+        EmailTemplateReference emailTemplate = new EmailTemplateReference();
         if (caseData.isLRvLipOneVOne()) {
-            template = notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate();
-            templateReference = REFERENCE_TEMPLATE_REQUESTED;
-            return template;
+            emailTemplate.template = notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
+            return emailTemplate;
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")))) {
-            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
-            templateReference = REFERENCE_TEMPLATE_RECEIVED;
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")))) {
-            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
-            templateReference = REFERENCE_TEMPLATE_REQUESTED;
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
         if (ofNullable(caseData.getRespondent2()).isEmpty()) {
-
-            template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
-            templateReference = REFERENCE_TEMPLATE_RECEIVED;
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
-        return template;
+        return emailTemplate;
     }
 
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        EmailTemplateReference emailTemplate = identifyTemplate(caseData);
         if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
-                    identifyTemplate(caseData),
+                    emailTemplate.template,
                     addProperties1v1LRvLip(caseData),
-                    String.format(templateReference, caseData.getLegacyCaseReference()));
+                    String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference()));
             }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
@@ -108,15 +112,15 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             "Both")))) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                identifyTemplate(caseData),
+                emailTemplate.template,
                 addProperties1v2FirstDefendant(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
+                String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
             );
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                identifyTemplate(caseData),
+                emailTemplate.template,
                 addProperties1v2SecondDefendant(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
+                String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
             );
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -125,17 +129,17 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             "Both")))) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                identifyTemplate(caseData),
+                emailTemplate.template,
                 addProperties2(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
+                String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
             );
         }
         if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                identifyTemplate(caseData),
+                emailTemplate.template,
                 addProperties(caseData),
-                String.format(templateReference, caseData.getLegacyCaseReference())
+                String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
