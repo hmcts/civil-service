@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.sdo.CheckCheckToggle;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
@@ -650,7 +651,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
      * RTJ = Refer To Judge.
      */
     private final String additionalInformationRTJ;
-
+    //private List<CheckCheckToggle> checkCheckToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingMedicalEvidenceDJToggle;

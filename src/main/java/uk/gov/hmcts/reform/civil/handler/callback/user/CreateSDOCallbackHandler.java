@@ -13,12 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.*;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -549,10 +544,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
+        List<CheckCheckToggle> checkListlol = List.of(CheckCheckToggle.SHOW);
+
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
+            .dateToToggle(checkListlol)
+            .dateFrom(LocalDate.now().plusWeeks(33))
+            .dateTo(LocalDate.now().plusWeeks(22))
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
@@ -616,6 +616,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private CaseData fillCheckCheckToggle(CaseData caseData, List<CheckCheckToggle> checkList) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        //caseDataBuilder.checkCheckToggle(checkList);
+        return caseDataBuilder.build();
+    }
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
             .map(JudgementSum::getJudgementSum)
