@@ -119,7 +119,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     OrgPolicyValidator.class,
     StateFlowEngine.class,
     PostcodeValidator.class,
-    InterestCalculator.class,
     StateFlowEngine.class,
     ValidateEmailService.class,
     },
@@ -193,6 +192,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
+
+    @MockBean
+    private InterestCalculator interestCalculator;
 
     @Nested
     class AboutToStartCallback {
@@ -903,7 +905,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidCalculateInterest {
 
         @Test
-        void shouldCalculateInterest_whenPopulated() {
+        void shouldCalculateInterest_whenPopulated_before4pm() {
             // Given
             CaseData caseData = CaseData.builder().claimInterest(YES)
                 .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -911,7 +913,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000)).build();
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
 
             // When
@@ -937,7 +939,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -953,6 +955,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1010,6 +1013,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ClaimInterest");
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1037,7 +1041,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "spec-fee");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
