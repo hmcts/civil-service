@@ -82,10 +82,11 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()) {
+            && caseData.isLRvLipOneVOne()
+            && !isCcNotification(callbackParams)) {
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
-                    recipient,
+                    caseData.getRespondent1().getPartyEmail(),
                     notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
                     addPropertiesLRvLip(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
