@@ -164,95 +164,95 @@ public class StateFlowEngine {
     public StateFlow build(FlowState.Main initialState) {
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(initialState)
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(claimSubmittedOneRespondentRepresentative)
-                .set(flags -> flags.putAll(
-                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                    // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
-                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
-                            .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered))
-                .set(flags -> flags.putAll(
-                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                    // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
-                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
-                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabled.negate()
-                            .and((claimSubmittedBothRespondentUnrepresented
-                                .or(claimSubmittedOnlyOneRespondentRepresented)
-                                .or(claimSubmittedBothUnregisteredSolicitors)
-                                // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
-                                .or(claimSubmittedOneUnrepresentedDefendantOnly))))
-                .set(flags -> flags.putAll(
-                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                    // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            // Only one unrepresented defendant
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabled.and(claimSubmittedOneUnrepresentedDefendantOnly))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            // Unrepresented defendant 1
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabled
-                            .and(claimSubmittedRespondent1Unrepresented)
-                            .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
-                            .and(claimSubmittedRespondent2Unrepresented.negate()))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            // Unrepresented defendant 2
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabled
-                            .and(claimSubmittedRespondent2Unrepresented
-                                     .and(claimSubmittedRespondent1Unrepresented.negate())))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
-            // Unrepresented defendants
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabled.and(claimSubmittedRespondent1Unrepresented.and(
-                    claimSubmittedRespondent2Unrepresented)))
-                .set(flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
-                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
-                    )))
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(claimSubmittedOneRespondentRepresentative)
+                    .set(flags -> flags.putAll(
+                        // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                        // camunda diagram for TAKE_CASE_OFFLINE is changed
+                        Map.of(
+                            FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
+                                .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered))
+                    .set(flags -> flags.putAll(
+                        // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                        // camunda diagram for TAKE_CASE_OFFLINE is changed
+                        Map.of(
+                            FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
+                            FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(noticeOfChangeEnabled.negate()
+                                .and((claimSubmittedBothRespondentUnrepresented
+                                    .or(claimSubmittedOnlyOneRespondentRepresented)
+                                    .or(claimSubmittedBothUnregisteredSolicitors)
+                                    // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
+                                    .or(claimSubmittedOneUnrepresentedDefendantOnly))))
+                    .set(flags -> flags.putAll(
+                        // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                        // camunda diagram for TAKE_CASE_OFFLINE is changed
+                        Map.of(
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                // Only one unrepresented defendant
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(noticeOfChangeEnabled.and(claimSubmittedOneUnrepresentedDefendantOnly))
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                // Unrepresented defendant 1
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(noticeOfChangeEnabled
+                                .and(claimSubmittedRespondent1Unrepresented)
+                                .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
+                                .and(claimSubmittedRespondent2Unrepresented.negate()))
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                // Unrepresented defendant 2
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(noticeOfChangeEnabled
+                                .and(claimSubmittedRespondent2Unrepresented
+                                         .and(claimSubmittedRespondent1Unrepresented.negate())))
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
+                // Unrepresented defendants
+                .transitionTo(CLAIM_SUBMITTED)
+                    .onlyIf(noticeOfChangeEnabled.and(claimSubmittedRespondent1Unrepresented.and(
+                        claimSubmittedRespondent2Unrepresented)))
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
+                            FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                            FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
+                            GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        )))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
@@ -261,53 +261,56 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
                 .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(pendingClaimIssued)
-            // Unrepresented
-            // 1. Both def1 and def2 unrepresented
-            // 2. Def1 unrepresented, Def2 registered
-            // 3. Def1 registered, Def 2 unrepresented
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
-                        .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                        .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
-                        .and(not(specClaim))
-                        .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                                                   .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                                                   .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
-                                .and(specClaim)))
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-            })
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-            })
-            // Unregistered
-            // 1. Both def1 and def2 unregistered
-            // 2. Def1 unregistered, Def2 registered
-            // 3. Def1 registered, Def 2 unregistered
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT).onlyIf(
-                ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                    .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                            .and(bothDefSameLegalRep.negate())
-                    )
-            )
-            // Unrepresented and Unregistered
-            // 1. Def1 unrepresented, Def2 unregistered
-            // 2. Def1 unregistered, Def 2 unrepresented
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT).onlyIf(
-                (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
-                            .and(respondent2NotRepresented)))
+                // Unrepresented
+                // 1. Both def1 and def2 unrepresented
+                // 2. Def1 unrepresented, Def2 registered
+                // 3. Def1 registered, Def 2 unrepresented
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+                    .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
+                                .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                                .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
+                                .and(not(specClaim))
+                                .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
+                                                           .or(respondent1NotRepresented
+                                                                   .and(respondent2OrgNotRegistered.negate()))
+                                                           .or(respondent1OrgNotRegistered.negate()
+                                                                   .and(respondent2NotRepresented)))
+                                        .and(specClaim)))
+                .set(flags -> {
+                    if (featureToggleService.isPinInPostEnabled()) {
+                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                    }
+                })
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
+                    .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
+                .set(flags -> {
+                    if (featureToggleService.isPinInPostEnabled()) {
+                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                    }
+                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                })
+                // Unregistered
+                // 1. Both def1 and def2 unregistered
+                // 2. Def1 unregistered, Def2 registered
+                // 3. Def1 registered, Def 2 unregistered
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
+                    .onlyIf(((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                        .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                                .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                        .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                                .and(bothDefSameLegalRep.negate())
+                        )
+                )
+                // Unrepresented and Unregistered
+                // 1. Def1 unrepresented, Def2 unregistered
+                // 2. Def1 unregistered, Def 2 unrepresented
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                    .onlyIf((respondent1NotRepresented.and(respondent2OrgNotRegistered
+                                                               .and(respondent2NotRepresented.negate())))
+                        .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
+                                .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -465,15 +468,15 @@ public class StateFlowEngine {
                             flags.put(FlowFlag.LR_V_LIP_ENABLED.name(), featureToggleService.isPinInPostEnabled());
                         })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(not(isOneVOneResponseFlagSpec)))
-            .set(flags -> {
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                if (featureToggleService.isSdoEnabled()) {
-                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                }
-            })
+                    .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation).and(not(isOneVOneResponseFlagSpec)))
+                .set(flags -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                    if (featureToggleService.isSdoEnabled()) {
+                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                    }
+                })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()))
+                    .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()))
                 .set(flags -> {
                     if (featureToggleService.isSdoEnabled()) {
                         flags.put(FlowFlag.SDO_ENABLED.name(), true);
