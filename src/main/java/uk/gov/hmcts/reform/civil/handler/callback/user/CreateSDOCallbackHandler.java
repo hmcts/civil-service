@@ -159,6 +159,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
@@ -353,6 +354,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+            .dateFrom(LocalDate.now().plusWeeks(22))
+            .dateTo(LocalDate.now().plusWeeks(30))
+            .dateToToggle(dateToShowTrue)
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
             .helpText2("Not more than seven nor less than three clear days before the trial, "
@@ -544,13 +548,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
-        List<CheckCheckToggle> checkListlol = List.of(CheckCheckToggle.SHOW);
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
-            .dateToToggle(checkListlol)
+            .dateToToggle(dateToShowTrue)
             .dateFrom(LocalDate.now().plusWeeks(33))
             .dateTo(LocalDate.now().plusWeeks(22))
             .build();
@@ -616,12 +619,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData fillCheckCheckToggle(CaseData caseData, List<CheckCheckToggle> checkList) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        //caseDataBuilder.checkCheckToggle(checkList);
-        return caseDataBuilder.build();
-    }
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
             .map(JudgementSum::getJudgementSum)

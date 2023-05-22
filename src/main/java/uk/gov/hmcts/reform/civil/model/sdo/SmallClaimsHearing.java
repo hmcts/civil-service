@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.CheckCheckToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
 import java.math.BigDecimal;
@@ -24,7 +23,7 @@ public class SmallClaimsHearing {
     private BigDecimal otherHours;
     private BigDecimal otherMinutes;
     private String input2;
-    private List<CheckCheckToggle> dateToToggle;
+    private List<DateToShowToggle> dateToToggle;
     private LocalDate dateFrom;
     private LocalDate dateTo;
 }

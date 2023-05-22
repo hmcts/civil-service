@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -416,6 +417,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " upload to the Digital Portal ")
                                                 .build());
 
+        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
         // copy of above method as to not break existing cases
         caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
                                                .helpText1(
@@ -431,6 +433,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                        + "must endeavour to agree the contents of the bundle before it "
                                                        + "is filed. The bundle will include a case summary and a "
                                                        + "chronology.")
+                                               .dateToToggle(dateToShowTrue)
+                                               .date1(LocalDate.now().plusWeeks(33))
+                                               .date2(LocalDate.now().plusWeeks(22))
                                                .build());
 
         caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()

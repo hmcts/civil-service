@@ -72,7 +72,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
     private final SmallClaimsNotes smallClaimsNotes;
-
+    private final boolean smallClaimsHearingDateToToggle;
     private final boolean smallClaimsHearingToggle;
     private final boolean smallClaimsMethodToggle;
     private final boolean smallClaimsDocumentsToggle;

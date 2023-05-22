@@ -333,6 +333,12 @@ public class SdoHelper {
                 return caseData.getDisposalHearingCostsToggle() != null;
             case "disposalHearingAddNewDirections":
                 return caseData.getDisposalHearingAddNewDirections() != null;
+            case "disposalHearingDateToToggle":
+                return caseData.getSmallClaimsHearing().getDateToToggle() != null;
+            case "fastTrackTrialDateToToggle":
+                return caseData.getFastTrackHearingTime().getDateToToggle()!= null;
+            case "smallClaimsHearingDateToToggle":
+                return caseData.getTrialHearingTimeDJ().getDateToToggle() != null;
             default:
                 return false;
         }
