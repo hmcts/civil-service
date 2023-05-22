@@ -109,6 +109,9 @@ public class NotificationsProperties {
     private String claimantSolicitorDefendantResponseForSpec;
 
     @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpec;
+
+    @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
 
     @NotEmpty
@@ -254,6 +257,9 @@ public class NotificationsProperties {
     @NotEmpty
     private String bundleCreationTemplate;
 
+    @NotEmpty
+    private String generateOrderNotificationTemplate;
+  
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
 
