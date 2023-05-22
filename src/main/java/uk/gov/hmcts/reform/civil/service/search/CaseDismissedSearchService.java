@@ -29,19 +29,12 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
                             .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
-                            .must(isUnSpecClaim())
-                .should(boolQuery() //create claim unspec
+                .should(boolQuery()
                             .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
                             .must(beState(CASE_ISSUED)))
-                            .must(isUnSpecClaim())
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                            .must(isUnSpecClaim())
-                .should(boolQuery() //create claim spec
-                        .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                        .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                        .must(isSpecClaim()),
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
         );
@@ -51,15 +44,4 @@ public class CaseDismissedSearchService extends ElasticSearchService {
         return boolQuery()
             .must(matchQuery("state", state.toString()));
     }
-
-    public BoolQueryBuilder isSpecClaim() {
-        return boolQuery()
-            .must(matchQuery("data.CaseAccessCategory", "SPEC_CLAIM"));
-    }
-
-    public BoolQueryBuilder isUnSpecClaim() {
-        return boolQuery()
-            .must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM"));
-    }
-
 }

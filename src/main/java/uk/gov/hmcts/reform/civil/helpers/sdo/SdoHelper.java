@@ -137,6 +137,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsWitnessStatementToggle() != null;
             case "smallClaimsAddNewDirections":
                 return caseData.getSmallClaimsAddNewDirections() != null;
+            case "smallClaimsHearingDateToToggle":
+                return caseData.getSmallClaimsHearing().getDateToToggle() != null;
             default:
                 return false;
         }
@@ -201,6 +203,8 @@ public class SdoHelper {
                 return caseData.getFastTrackMethodToggle() != null;
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
+            case "fastTrackTrialDateToToggle":
+                return caseData.getFastTrackHearingTime().getDateToToggle()!= null;
             default:
                 return false;
         }
@@ -334,10 +338,6 @@ public class SdoHelper {
             case "disposalHearingAddNewDirections":
                 return caseData.getDisposalHearingAddNewDirections() != null;
             case "disposalHearingDateToToggle":
-                return caseData.getSmallClaimsHearing().getDateToToggle() != null;
-            case "fastTrackTrialDateToToggle":
-                return caseData.getFastTrackHearingTime().getDateToToggle()!= null;
-            case "smallClaimsHearingDateToToggle":
                 return caseData.getTrialHearingTimeDJ().getDateToToggle() != null;
             default:
                 return false;
