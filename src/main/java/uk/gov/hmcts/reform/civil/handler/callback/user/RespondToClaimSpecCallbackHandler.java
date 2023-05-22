@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -67,6 +68,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1338,6 +1340,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            )) {
+            LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
+            updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                          .whenWillThisAmountBePaid(whenBePaid).build());
+        }
+
         CaseRole respondentTwoCaseRoleToCheck;
 
         respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
@@ -1436,6 +1448,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               .build())
                     .build());
         }
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 

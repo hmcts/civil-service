@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -396,6 +397,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
 
                 updatedData.respondent1DQ(dq.build());
+
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
                 //1v2 same Solicitor responding to respondents individually
@@ -415,6 +417,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         .respondent1DQStatementOfTruth(statementOfTruth);
                     handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
                     updatedData.respondent1DQ(dq.build());
+
                 } else {
                     //required as ccd populated the respondent DQ with null objects.
                     updatedData.respondent1DQ(null);
@@ -426,6 +429,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         .respondent2DQStatementOfTruth(statementOfTruth);
                     handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
                     updatedData.respondent2DQ(dq2.build());
+
                 } else {
                     updatedData.respondent2DQ(null);
                 }
@@ -511,6 +515,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         assembleResponseDocuments(caseData, updatedData);
 
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
