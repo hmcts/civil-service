@@ -252,7 +252,7 @@ notifications:
   notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
 
-  notifyApplicantLRMediationSuccessfulTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
+  notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
 
 sendgrid:
