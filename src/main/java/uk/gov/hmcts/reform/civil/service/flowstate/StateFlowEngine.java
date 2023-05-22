@@ -379,7 +379,7 @@ public class StateFlowEngine {
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
+                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .onlyIf(awaitingResponsesFullDefenceReceived
                         .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
