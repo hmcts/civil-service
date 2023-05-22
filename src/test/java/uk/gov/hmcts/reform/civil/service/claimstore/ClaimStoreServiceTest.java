@@ -67,7 +67,7 @@ public class ClaimStoreServiceTest {
             .referenceNumber(REFERENCE_NUMBER)
             .responseDeadline(RESPONSE_DEADLINE)
             .totalAmountTillToday(TOTAL_AMOUNT)
-            .createdAt(CREATE_DATE)
+            .createdAt(CREATE_DATETIME)
             .build();
         given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
