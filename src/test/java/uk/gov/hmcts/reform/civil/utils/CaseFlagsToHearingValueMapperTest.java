@@ -120,6 +120,13 @@ public class CaseFlagsToHearingValueMapperTest {
         }
 
         @Test
+        public void shouldReturnNullWhenNoFlags() {
+            List<FlagDetail> flagDetails = List.of();
+
+            assertEquals(null, getInterpreterLanguage(flagDetails));
+        }
+
+        @Test
         public void shouldReturnSignLanguageKeyWhenNoSpokenLanguageKey() {
             FlagDetail flagDetail1 = FlagDetail.builder()
                 .status("Active")
@@ -171,7 +178,15 @@ public class CaseFlagsToHearingValueMapperTest {
                 .subTypeValue("WELSH")
                 .build();
 
-            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+            FlagDetail flagDetail4 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .subTypeKey("sign-sse")
+                .subTypeValue("Speech Supported English (SSE)")
+                .flagCode("RA0042")
+                .build();
+
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3, flagDetail4);
 
             assertEquals("fra", getInterpreterLanguage(flagDetails));
         }
