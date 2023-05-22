@@ -406,7 +406,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
 
-        if (isdefendatFullAdmitPayImmidietely(caseData)) {
+        if (isDefendantFullAdmitPayImmediately(caseData)) {
             LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
@@ -474,7 +474,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
-        } else if (isdefendatFullAdmitPayImmidietely(caseData)) {
+        } else if (isDefendantFullAdmitPayImmediately(caseData)) {
             caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
         }
 
@@ -667,7 +667,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
-    private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
+    private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
