@@ -385,7 +385,7 @@ public class StateFlowEngine {
                 .transitionTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
                     .onlyIf(awaitingResponsesNonFullDefenceReceived
                         .and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)z
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotified)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
