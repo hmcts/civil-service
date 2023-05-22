@@ -35,7 +35,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLiP
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
         );
     }
 
@@ -44,7 +44,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return TASK_ID;
     }
 
-    private CallbackResponse notifyDefendantLiP(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
