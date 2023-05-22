@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
@@ -40,15 +39,13 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
     @Autowired
     private TranslatedDocumentUploadedDefendantNotificationHandler handler;
-    @MockBean
-    private OrganisationService organisationService;
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn("template-id");
         }
 
         @Test

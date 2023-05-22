@@ -47,7 +47,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyApplicantTranslatedDocumentUploaded()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn("template-id");
         }
 
         @Test
