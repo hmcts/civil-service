@@ -34,7 +34,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantTranslatedDocumentUploaded
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimant
         );
     }
 
@@ -57,7 +57,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
         );
     }
 
-    private CallbackResponse notifyClaimantTranslatedDocumentUploaded(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
