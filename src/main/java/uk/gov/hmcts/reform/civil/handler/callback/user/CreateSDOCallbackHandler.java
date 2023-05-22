@@ -137,6 +137,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
+    private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -165,8 +166,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
-
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
@@ -553,7 +552,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
-
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "

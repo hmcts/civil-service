@@ -204,7 +204,7 @@ public class SdoHelper {
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
             case "fastTrackTrialDateToToggle":
-                return caseData.getFastTrackHearingTime().getDateToToggle()!= null;
+                return caseData.getFastTrackHearingTime().getDateToToggle() != null;
             default:
                 return false;
         }

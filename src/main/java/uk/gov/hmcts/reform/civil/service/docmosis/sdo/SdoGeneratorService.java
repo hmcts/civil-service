@@ -118,7 +118,7 @@ public class SdoGeneratorService {
             )
             .disposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
             .disposalHearingNotes(caseData.getDisposalHearingNotes())
-           .disposalHearingDisclosureOfDocumentsToggle(
+            .disposalHearingDisclosureOfDocumentsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle")
             )
             .disposalHearingWitnessOfFactToggle(
