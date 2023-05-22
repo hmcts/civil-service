@@ -31,7 +31,8 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitSuccessfulMediation
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitSuccessfulMediation,
+            callbackKey(CallbackType.SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
