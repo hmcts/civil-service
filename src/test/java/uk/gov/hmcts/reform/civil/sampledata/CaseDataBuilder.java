@@ -1033,7 +1033,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant2DQSmallCalimExperts() {
+    public CaseDataBuilder applicant2DQSmallClaimExperts() {
         var applicant2DQBuilder = applicant2DQ != null
             ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
 
@@ -1343,6 +1343,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addRespondent2(YesOrNo addRespondent2) {
         this.addRespondent2 = addRespondent2;
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2(YesOrNo addApplicant2) {
+        this.addApplicant2 = addApplicant2;
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2() {
+        this.addApplicant2 = YES;
         return this;
     }
 
@@ -4245,11 +4255,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicantSolicitor1UserDetails(IdamUserDetails applicantSolicitor1UserDetails) {
         this.applicantSolicitor1UserDetails = applicantSolicitor1UserDetails;
-        return this;
-    }
-
-    public CaseDataBuilder addApplicant2() {
-        this.addApplicant2 = YES;
         return this;
     }
 
