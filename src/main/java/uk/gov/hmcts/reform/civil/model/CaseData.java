@@ -529,30 +529,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocClaimant;
     private final List<Element<CaseDocument>> generalOrderDocRespondentSol;
     private final List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
-    
+
     private final List<Element<CaseDocument>> consentOrderDocument;
     private final List<Element<CaseDocument>> consentOrderDocStaff;
     private final List<Element<CaseDocument>> consentOrderDocClaimant;
     private final List<Element<CaseDocument>> consentOrderDocRespondentSol;
     private final List<Element<CaseDocument>> consentOrderDocRespondentSolTwo;
-
-    private final List<Element<CaseDocument>> dismissalOrderDocument;
-    private final List<Element<CaseDocument>> dismissalOrderDocStaff;
-    private final List<Element<CaseDocument>> dismissalOrderDocClaimant;
-    private final List<Element<CaseDocument>> dismissalOrderDocRespondentSol;
-    private final List<Element<CaseDocument>> dismissalOrderDocRespondentSolTwo;
-
-    private final List<Element<CaseDocument>> directionOrderDocument;
-    private final List<Element<CaseDocument>> directionOrderDocStaff;
-    private final List<Element<CaseDocument>> directionOrderDocClaimant;
-    private final List<Element<CaseDocument>> directionOrderDocRespondentSol;
-    private final List<Element<CaseDocument>> directionOrderDocRespondentSolTwo;
-
-    private final List<Element<CaseDocument>> hearingNoticeDocument;
-    private final List<Element<CaseDocument>> hearingNoticeDocStaff;
-    private final List<Element<CaseDocument>> hearingNoticeDocClaimant;
-    private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
-    private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
     private final List<Element<Document>> generalAppEvidenceDocument;
 
