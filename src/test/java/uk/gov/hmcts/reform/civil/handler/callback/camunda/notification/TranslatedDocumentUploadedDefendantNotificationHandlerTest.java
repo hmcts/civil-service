@@ -68,7 +68,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
                 "applicantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMapSpec(caseData),
-                "translated-document-uploaded-respondent-notification-000DC001"
+                "translated-document-uploaded-defendant-notification-000DC001"
             );
         }
 

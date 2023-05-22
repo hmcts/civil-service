@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
     JacksonAutoConfiguration.class
 })
 public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
@@ -65,7 +66,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
                 "applicantsolicitor@example.com",
                 "template-id",
                 getNotificationDataMapSpec(caseData),
-                "translated-document-uploaded-applicant-notification-000DC001"
+                "translated-document-uploaded-claimant-notification-000DC001"
             );
         }
 

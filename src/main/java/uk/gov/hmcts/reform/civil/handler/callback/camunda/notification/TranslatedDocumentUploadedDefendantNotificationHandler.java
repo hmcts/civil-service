@@ -18,53 +18,53 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-    @Service
-    @RequiredArgsConstructor
-    public class TranslatedDocumentUploadedDefendantNotificationHandler extends CallbackHandler implements NotificationData {
+@Service
+@RequiredArgsConstructor
+public class TranslatedDocumentUploadedDefendantNotificationHandler extends CallbackHandler implements NotificationData {
 
-        private final NotificationService notificationService;
-        private final NotificationsProperties notificationsProperties;
-        private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED);
-        private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-defendant-notification-%s";
-        public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToDefendant";
+    private final NotificationService notificationService;
+    private final NotificationsProperties notificationsProperties;
+    private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED);
+    private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-defendant-notification-%s";
+    public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToDefendant";
 
-        @Override
-        protected Map<String, Callback> callbacks() {
-            return Map.of(
-                callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantTranslatedDocumentUploaded
-            );
-        }
-
-        @Override
-        public String camundaActivityId(CallbackParams callbackParams) {
-            return TASK_ID;
-        }
-
-        @Override
-        public List<CaseEvent> handledEvents() {
-            return EVENTS;
-        }
-
-        @Override
-        public Map<String, String> addProperties(CaseData caseData) {
-
-            return Map.of(
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-            );
-        }
-
-        private CallbackResponse notifyClaimantTranslatedDocumentUploaded(CallbackParams callbackParams) {
-            CaseData caseData = callbackParams.getCaseData();
-
-            notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
+    @Override
+    protected Map<String, Callback> callbacks() {
+        return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantTranslatedDocumentUploaded
+        );
     }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+
+        return Map.of(
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+        );
+    }
+
+    private CallbackResponse notifyClaimantTranslatedDocumentUploaded(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+}
 
 
