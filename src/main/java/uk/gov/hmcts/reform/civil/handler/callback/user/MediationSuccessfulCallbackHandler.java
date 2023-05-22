@@ -27,7 +27,6 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MEDIATION_SUCCESSFUL);
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
