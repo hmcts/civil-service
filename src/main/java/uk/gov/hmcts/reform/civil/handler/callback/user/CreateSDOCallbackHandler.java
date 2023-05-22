@@ -558,8 +558,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
             .dateToToggle(dateToShowTrue)
-            .dateFrom(LocalDate.now().plusWeeks(33))
-            .dateTo(LocalDate.now().plusWeeks(22))
+            .dateFrom(LocalDate.now().plusWeeks(22))
+            .dateTo(LocalDate.now().plusWeeks(30))
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();

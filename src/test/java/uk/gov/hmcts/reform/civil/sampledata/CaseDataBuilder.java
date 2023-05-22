@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -2194,6 +2196,12 @@ public class CaseDataBuilder {
             .build();
         return this;
     }
+    public CaseDataBuilder setClaimTrackl(ClaimsTrack claimTrack) {
+        defendantDetails = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Mr. Sole Trader").build())
+            .build();
+        return this;
+    }
 
     public CaseDataBuilder atRespondToClaimWithSingleUnAvailabilityDate() {
 
@@ -2278,6 +2286,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoTrialDj() {
+        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
         trialHearingTimeDJ = TrialHearingTimeDJ.builder()
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
@@ -2288,8 +2297,9 @@ public class CaseDataBuilder {
                            + "the contents of the bundle before it is filed. The bundle will include a case "
                            + "summary and a chronology.")
             .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
-            .date1(LocalDate.parse("2022-01-01"))
-            .date2(LocalDate.parse("2022-01-02"))
+            .dateToToggle(dateToShowTrue)
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(30))
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
             .input("This order has been made without a hearing. "

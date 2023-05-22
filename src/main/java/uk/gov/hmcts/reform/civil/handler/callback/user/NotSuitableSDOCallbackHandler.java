@@ -83,7 +83,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder dataBuilder = callbackParams.getCaseData().toBuilder();
 
         dataBuilder.unsuitableSDODate(time.now());
-        dataBuilder.unsuitableSDODate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

@@ -844,6 +844,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
                 .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
                                + "notification. The hearing will have a time estimate of");
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateToToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateFrom")
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 4 weeks before the hearing date, pay the court the "
                                + "required hearing fee or submit a fully completed application for Help with Fees. \n"
@@ -957,6 +962,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
                                + "they must inform the court within 7 days of the date of this order.");
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateToToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateFrom")
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
                 .isEqualTo("Not more than seven nor less than three clear days before the trial, "
                                + "the claimant must file at court and serve an indexed and paginated bundle of "
