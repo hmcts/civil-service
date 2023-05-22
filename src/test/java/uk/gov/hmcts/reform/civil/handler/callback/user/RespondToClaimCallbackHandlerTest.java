@@ -1672,10 +1672,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
-                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
-                        .label("selected location label")
-                        .code(UUID.randomUUID().toString())
-                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
@@ -1714,6 +1710,61 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .extracting("responseCourtCode").isEqualTo("312");
                 }
 
+                @Test
+                void shouldHandleCourtLocationData_when2ndRespondentWithNoDynamicValForCourtLocation() {
+                    //Given
+                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
+                        .thenReturn(true);
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .respondent2DQ(
+                            Respondent2DQ.builder().respondent2DQRequestedCourt(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .build()).build())
+                        .respondent1Copy(PartyBuilder.builder().individual().build())
+                        .respondent2Copy(PartyBuilder.builder().individual().build())
+                        .build();
+
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    //When No dynamic values provided
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                    //Then
+                    assertThat(response.getData())
+                        .extracting("respondent2DQRequestedCourt")
+                        .extracting("responseCourtLocations").isNull();
+
+                }
+                @Test
+                void shouldHandleCourtLocationData_when2ndRespondentResponseCourtLocationIsNotPresent() {
+                    //Given
+                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
+                        .thenReturn(true);
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                        .respondent2Responds(FULL_DEFENCE)
+                        .respondent2DQ(
+                            Respondent2DQ.builder().respondent2DQRequestedCourt(
+                                RequestedCourt.builder()
+                                    .build()).build())
+                        .respondent1Copy(PartyBuilder.builder().individual().build())
+                        .respondent2Copy(PartyBuilder.builder().individual().build())
+                        .build();
+
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    //When No Response court locations is present
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                    //Then
+                    assertThat(response.getData())
+                        .extracting("respondent2DQRequestedCourt")
+                        .extracting("responseCourtLocations").isNull();
+
+                }
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentAnsweringBefore2nd() {
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
@@ -1764,6 +1815,32 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     assertThat(response.getData())
                         .extracting("respondent1DQRequestedCourt")
                         .extracting("responseCourtCode").isEqualTo("312");
+                }
+                @Test
+                void shouldHandleCourtLocationData_when1stRespondentWithNoDynamicValForCourtLocation() {
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORONE)
+                    )).thenReturn(true);
+
+                    CaseData caseData = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
+                        .respondent1Copy(PartyBuilder.builder().individual().build())
+                        .respondent2Copy(PartyBuilder.builder().individual().build())
+                        .respondent1DQ(
+                            Respondent1DQ.builder().respondent1DQRequestedCourt(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtCode("312")
+                                    .build()).build())
+                        .build();
+
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                    assertThat(response.getData())
+                        .extracting("respondent1DQRequestedCourt")
+                        .extracting("responseCourtLocations").isNull();
                 }
             }
 
@@ -1907,6 +1984,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         }
 
         private static final String PAGE_ID = "set-generic-response-type-flag";
@@ -1995,6 +2073,92 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionv2FullDefence() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionSolicitorAndR1ResponseMatch() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(FULL_DEFENCE)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(COUNTER_CLAIM)
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionSolicitorAndR2ResponseMatch() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionSolicitorResponsenNotMatch() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(COUNTER_CLAIM)
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
