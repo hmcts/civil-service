@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -57,12 +58,14 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
     private CallbackResponse notifyDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

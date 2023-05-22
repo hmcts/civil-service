@@ -50,7 +50,8 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
-            Party party = PartyBuilder.builder().soleTrader()
+            Party party = PartyBuilder.builder()
+                .individual("respondent")
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -65,7 +66,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
+                "respondent@example.com",
                 "template-id",
                 getNotificationDataMapSpec(caseData),
                 "translated-document-uploaded-defendant-notification-000DC001"
