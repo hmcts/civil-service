@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -68,24 +69,142 @@ public class CaseFlagsToHearingValueMapperTest {
         assertEquals(true, getAdditionalSecurity(flagDetails));
     }
 
-    @Test
-    public void testHasLanguageInterpreterFlag() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .subTypeValue("english")
-            .build();
+    @Nested
+    class GetLanguageInterpreter {
+        @Test
+        public void shouldReturnLanguageInterpreterFlag() {
+            FlagDetail flagDetail1 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .subTypeKey("fra")
+                .subTypeValue("French")
+                .build();
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("INACTIVE")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .build();
+            FlagDetail flagDetail2 = FlagDetail.builder()
+                .status("INACTIVE")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .build();
 
-        List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2);
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2);
 
-        assertEquals("english", getInterpreterLanguage(flagDetails));
+            assertEquals("fra", getInterpreterLanguage(flagDetails));
+        }
+
+        @Test
+        public void shouldReturnNullWhenNoSubValueKey() {
+            FlagDetail flagDetail1 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .subTypeValue("random")
+                .build();
+
+            FlagDetail flagDetail2 = FlagDetail.builder()
+                .status("INACTIVE")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .build();
+
+            FlagDetail flagDetail3 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .subTypeValue("American Sign Language")
+                .flagCode("RA0042")
+                .build();
+
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+
+            assertEquals(null, getInterpreterLanguage(flagDetails));
+        }
+
+        @Test
+        public void shouldReturnSignLanguageKeyWhenNoSpokenLanguageKey() {
+            FlagDetail flagDetail1 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .subTypeValue("random")
+                .build();
+
+            FlagDetail flagDetail2 = FlagDetail.builder()
+                .status("INACTIVE")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .build();
+
+            FlagDetail flagDetail3 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .subTypeKey("sign-sse")
+                .subTypeValue("Speech Supported English (SSE)")
+                .flagCode("RA0042")
+                .build();
+
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+
+            assertEquals("sign-sse", getInterpreterLanguage(flagDetails));
+        }
+
+        @Test
+        public void shouldReturnFirstSpokenLanguageInterpreterFlag() {
+            FlagDetail flagDetail1 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .subTypeKey("fra")
+                .subTypeValue("French")
+                .build();
+
+            FlagDetail flagDetail2 = FlagDetail.builder()
+                .status("INACTIVE")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .build();
+
+            FlagDetail flagDetail3 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .subTypeKey("wel")
+                .subTypeValue("WELSH")
+                .build();
+
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+
+            assertEquals("fra", getInterpreterLanguage(flagDetails));
+        }
+
+        @Test
+        public void shouldReturnFirstSignLanguageInterpreterFlag() {
+            FlagDetail flagDetail1 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .subTypeKey("sign-sse")
+                .subTypeValue("Speech Supported English (SSE)")
+                .flagCode("RA0042")
+                .build();
+
+            FlagDetail flagDetail2 = FlagDetail.builder()
+                .status("INACTIVE")
+                .hearingRelevant(YES)
+                .flagCode("PF0015")
+                .build();
+
+            FlagDetail flagDetail3 = FlagDetail.builder()
+                .status("Active")
+                .hearingRelevant(YES)
+                .subTypeKey("sign")
+                .subTypeValue("Some other sign")
+                .flagCode("RA0042")
+                .build();
+
+            List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
+
+            assertEquals("sign-sse", getInterpreterLanguage(flagDetails));
+        }
+
     }
 
     @Test
