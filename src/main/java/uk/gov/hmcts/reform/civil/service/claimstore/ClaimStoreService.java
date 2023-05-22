@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +49,6 @@ public class ClaimStoreService {
             return LocalDateTime.now();
         }
 
-        return claim.getCreatedAt().atTime(LocalTime.MIDNIGHT);
+        return claim.getCreatedAt();
     }
 }
