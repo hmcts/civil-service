@@ -28,11 +28,15 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
     void notifyRespondentPartySDOTriggered(CaseData caseData) {
         String email = getRecipientEmail(caseData);
         if (StringUtils.isNotBlank(email)) {
+            String sdoTemplate = notificationsProperties.getSdoOrdered();
+            if (caseData.isRespondentResponseBilingual()) {
+                sdoTemplate = notificationsProperties.getSdoOrderedSpecBilingual();
+            } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM){
+                sdoTemplate = notificationsProperties.getSdoOrderedSpec();
+            };
             notificationService.sendMail(
                 email,
-                caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                    ? notificationsProperties.getSdoOrderedSpec()
-                    : notificationsProperties.getSdoOrdered(),
+                sdoTemplate,
                 addProperties(caseData),
                 getDocReference(caseData)
             );
