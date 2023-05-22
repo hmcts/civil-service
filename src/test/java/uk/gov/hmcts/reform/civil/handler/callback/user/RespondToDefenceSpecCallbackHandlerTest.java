@@ -796,7 +796,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateApplicant1DQExpertsDetails(FlowState.Main flowState) {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
-                    .applicant1DQSmallCalimExperts()
+                    .applicant2DQSmallClaimExperts()
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -817,7 +817,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateApplicant2DQExpertsDetails(FlowState.Main flowState) {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
-                    .applicant2DQSmallCalimExperts()
+                    .applicant2DQSmallClaimExperts()
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
