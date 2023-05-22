@@ -16,11 +16,11 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Component
 @RequiredArgsConstructor
-public class PayImmidietelyConfText implements RespondToResponseConfirmationTextGenerator {
+public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (!isdefendatFullAdmitPayImmidietely(caseData)) {
+        if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
         LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
@@ -40,7 +40,7 @@ public class PayImmidietelyConfText implements RespondToResponseConfirmationText
         ));
     }
 
-    private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
+    private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
