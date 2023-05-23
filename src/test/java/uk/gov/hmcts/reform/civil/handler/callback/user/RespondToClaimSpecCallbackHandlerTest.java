@@ -291,9 +291,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceFastTrack()
                 .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .isRespondent2(YES)
                 .build();
+            caseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
+            )).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
             // When
@@ -309,6 +313,64 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("specDisputesOrPartAdmission", "No");
             assertThat(response.getData()).containsEntry("specPaidLessAmountOrDisputesOrPartAdmission",
                 "No");
+        }
+
+        @Test
+        void testSpecDefendantResponseFastTrackOneVTwoSameLegalRep() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(YES)
+                .isRespondent2(YES)
+                .build();
+            caseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+            )).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).containsEntry("specDisputesOrPartAdmission", "No");
+            assertThat(response.getData()).containsEntry("specPaidLessAmountOrDisputesOrPartAdmission",
+                                                         "No");
+        }
+
+        @Test
+        void testSpecDefendantResponseFastTrackTwoVOne() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceFastTrack()
+                .addApplicant2()
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
+            caseData = caseData.toBuilder().defendantSingleResponseToBothClaimants(YES)
+                .respondent1ClaimResponseTestForSpec(FULL_ADMISSION).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+            assertThat(response.getData()).isNotNull();
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).containsEntry("specDisputesOrPartAdmission", "No");
+            assertThat(response.getData()).containsEntry("specPaidLessAmountOrDisputesOrPartAdmission",
+                                                         "No");
         }
 
         @Test
@@ -711,13 +773,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             Address changedAddress = AddressBuilder.maximal().build();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
                 .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
                 .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
                 .build();
@@ -860,13 +920,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             Address changedAddress = AddressBuilder.maximal().build();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
                 .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
                 .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
                 .build();
