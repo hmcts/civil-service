@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -20,7 +21,9 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
         String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         String applicantName = caseData.getApplicant1().getPartyName();
 
