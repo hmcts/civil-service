@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.List;
-
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -464,13 +464,12 @@ public class CaseFlagsToHearingValueMapperTest {
             .flagComment("this is a comment")
             .build();
 
-        List<String> expected = List.of(
-            "Private waiting area - this is a comment",
-            "Support worker or carer with me",
-            "Vulnerable user - this is a comment"
-        );
+        String expected =
+            "Private waiting area - this is a comment; " +
+            "Support worker or carer with me; " +
+            "Vulnerable user - this is a comment";
 
-        List<String> actualVulnerabilityDetails = getVulnerabilityDetails(
+        String actualVulnerabilityDetails = getVulnerabilityDetails(
             List.of(
                 flagDetail1,
                 flagDetail2,
@@ -499,12 +498,12 @@ public class CaseFlagsToHearingValueMapperTest {
             .flagComment("a sign language comment")
             .build();
 
-        List<String> actualVulnerabilityDetails = getVulnerabilityDetails(
+        String actualVulnerabilityDetails = getVulnerabilityDetails(
             List.of(
                 flagDetail1,
                 flagDetail2
             ));
 
-        assertTrue(actualVulnerabilityDetails.isEmpty());
+        assertThat(actualVulnerabilityDetails).isEqualTo(null);
     }
 }
