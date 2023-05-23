@@ -11,12 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -25,18 +23,19 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @RequiredArgsConstructor
 public class MediationSuccessfulApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
+    private final OrganisationDetailsService organisationDetailsService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyApplicant";
-    private final OrganisationService organisationService;
+    private final Map<String, Callback> callbacksMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
-        );
+        return callbacksMap;
     }
 
     @Override
@@ -65,15 +64,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }
 
-    private String getApplicantLegalOrganizationName(CaseData caseData) {
-        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
-    }
 }

@@ -27,12 +27,13 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-respondent-notification-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyRespondent";
+    private final Map<String, Callback> callbacksMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondent
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondent
-        );
+        return callbacksMap;
     }
 
     @Override
