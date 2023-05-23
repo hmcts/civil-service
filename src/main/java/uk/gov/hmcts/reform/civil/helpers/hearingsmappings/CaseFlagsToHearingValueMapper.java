@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagPredicates;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.filter;
@@ -24,15 +25,16 @@ public class CaseFlagsToHearingValueMapper {
         ).stream().count() > 0;
     }
 
-    public static List<String> getVulnerabilityDetails(List<FlagDetail> flagDetails) {
-        return filter(
+    public static String getVulnerabilityDetails(List<FlagDetail> flagDetails) {
+        List<String> details = filter(
             flagDetails,
             CaseFlagPredicates.isActive(),
             CaseFlagPredicates.hasVulnerableFlag()
-        ).stream().map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s" : "%s",
-                                           flagDetail.getName(),
-                                           flagDetail.getFlagComment()))
+        ).stream()
+            .map(flagDetail -> String.format(flagDetail.getFlagComment() != null ? "%s - %s" : "%s", flagDetail.getName(), flagDetail.getFlagComment()))
             .toList();
+
+        return details.isEmpty() ? null : details.stream().map(Objects::toString).collect(Collectors.joining("; "));
     }
 
     public static boolean getAdditionalSecurity(List<FlagDetail> flagDetails) {

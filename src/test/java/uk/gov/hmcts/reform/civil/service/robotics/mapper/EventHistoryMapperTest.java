@@ -17,8 +17,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -27,12 +25,17 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -4524,6 +4527,15 @@ class EventHistoryMapperTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                         .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                        .respondentResponseIsSame(YES)
+                        .respondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build())
                         .build();
                     if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
@@ -4864,6 +4876,14 @@ class EventHistoryMapperTest {
                         .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                         .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .respondentResponseIsSame(YES)
+                        .respondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build())
                         .build();
                     if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
@@ -5028,6 +5048,14 @@ class EventHistoryMapperTest {
                         && caseData.getRespondent2Represented() == null) {
                         caseData = caseData.toBuilder()
                             .respondent2Represented(YES)
+                            .respondent1DQ(Respondent1DQ.builder()
+                                               .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                             .oneMonthStayRequested(YES)
+                                                                                             .build())
+                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                                .responseCourtCode("444")
+                                                                                .build())
+                                               .build())
                             .build();
                     }
                     Event expectedDefence1 = Event.builder()
