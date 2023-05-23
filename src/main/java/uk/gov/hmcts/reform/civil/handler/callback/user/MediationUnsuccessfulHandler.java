@@ -28,7 +28,8 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitUnsuccessfulMediation
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitUnsuccessfulMediation,
+            callbackKey(CallbackType.SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 

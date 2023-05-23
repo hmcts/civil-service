@@ -38,10 +38,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
 
     private CallbackResponse notifyClaimantLRForMediationUnsuccessful(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        // TODO: move sendEmail content here instead call it
         sendEmail(caseData);
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -64,9 +61,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
         );
     }
 
-    private void sendEmail(CaseData caseData) {
-        // TODO: don't create on time variables
-        // TODO: check if email is correct
+    private void sendEmail(final CaseData caseData) {
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String emailTemplate = notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate();
         notificationService.sendMail(
