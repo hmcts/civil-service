@@ -95,7 +95,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         if (isNull(date)) {
             return null;
         }
-        return DateFormatHelper.formatLocalDate(date, "dd/MMM/yyyy");
+        return DateFormatHelper.formatLocalDate(date, "dd/MM/yyyy");
     }
 
     private boolean checkReference(CaseData caseData) {
