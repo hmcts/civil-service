@@ -451,6 +451,7 @@ class LocationRefDataServiceTest {
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
 
+            assertThat(result).isNotNull();
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
@@ -482,6 +483,7 @@ class LocationRefDataServiceTest {
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
 
+            assertThat(result).isNotNull();
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
@@ -500,8 +502,7 @@ class LocationRefDataServiceTest {
                 uriCaptor.capture(),
                 httpMethodCaptor.capture(),
                 httpEntityCaptor.capture(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
-            ))
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenThrow(new RestClientException("403"));
 
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280") ;
@@ -516,8 +517,7 @@ class LocationRefDataServiceTest {
                 uriCaptor.capture(),
                 httpMethodCaptor.capture(),
                 httpEntityCaptor.capture(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
-            ))
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenThrow(new RestClientException("403"));
 
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280") ;
