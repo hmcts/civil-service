@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -867,5 +868,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && ((hasClaimantNotAgreedToFreeMediation()
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
+    }
+
+    @JsonIgnore
+    public String getOrganisationId() {
+        return Optional.ofNullable(getRespondent1OrganisationPolicy())
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID)
+            .orElse("");
     }
 }
