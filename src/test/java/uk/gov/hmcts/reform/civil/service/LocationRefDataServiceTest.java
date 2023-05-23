@@ -505,7 +505,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenThrow(new RestClientException("403"));
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280") ;
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
 
             assertThat(result.isEmpty());
         }
@@ -520,7 +520,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenThrow(new RestClientException("403"));
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280") ;
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
 
             assertThat(result.isEmpty());
         }
