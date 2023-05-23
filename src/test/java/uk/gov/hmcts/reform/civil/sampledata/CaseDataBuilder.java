@@ -28,7 +28,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
-import uk.gov.hmcts.reform.civil.enums.sdo.*;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -108,7 +111,17 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -387,6 +400,8 @@ public class CaseDataBuilder {
 
     private FastTrackHearingTime fastTrackHearingTime;
     private SmallClaimsHearing smallClaimsHearing;
+    private List<DateToShowToggle> smallTrackDateToToggle;
+    private List<DateToShowToggle> fastTrackTrialDateToToggle;
     private SmallClaimsNotes smallClaimsNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
 
@@ -2235,12 +2250,13 @@ public class CaseDataBuilder {
                         + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
                         + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
                         + "struck without further order.")
-            .dateToToggle( List.of(DateToShowToggle.SHOW))
+            .dateToToggle(List.of(DateToShowToggle.SHOW))
             .dateFrom(LocalDate.now().plusWeeks(22))
             .dateTo(LocalDate.now().plusWeeks(30))
             .time(SmallClaimsTimeEstimate.ONE_DAY)
             .build();
-         smallClaimsNotes = SmallClaimsNotes.builder()
+        smallTrackDateToToggle = List.of(DateToShowToggle.SHOW);
+        smallClaimsNotes = SmallClaimsNotes.builder()
             .input(String.format("Each party has the right to apply "
                                      + "to have this Order set aside or varied. Any such application must be "
                                      + "received by the Court (together with the appropriate fee) by 4pm "
@@ -2249,7 +2265,6 @@ public class CaseDataBuilder {
             .build();
         return this;
     }
-
 
     public CaseDataBuilder atStateSdoDisposal() {
         disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
@@ -5654,6 +5669,8 @@ public class CaseDataBuilder {
             .fastTrackOrderWithoutJudgement(fastTrackOrderWithoutJudgement)
             .smallClaimsNotes(smallClaimsNotes)
             .smallClaimsHearing(smallClaimsHearing)
+            .smallTrackDateToToggle(smallTrackDateToToggle)
+            .fastTrackTrialDateToToggle(fastTrackTrialDateToToggle)
             .disposalHearingHearingTime(disposalHearingHearingTime)
             .disposalOrderWithoutHearing(disposalOrderWithoutHearing)
             .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)

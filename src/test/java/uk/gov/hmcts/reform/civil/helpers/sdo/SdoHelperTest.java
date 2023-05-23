@@ -576,7 +576,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isFalse();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
-
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
         }
     }
