@@ -400,7 +400,7 @@ public class CaseDataBuilder {
 
     private FastTrackHearingTime fastTrackHearingTime;
     private SmallClaimsHearing smallClaimsHearing;
-    private List<DateToShowToggle> smallTrackDateToToggle;
+    private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
     private SmallClaimsNotes smallClaimsNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
@@ -2255,7 +2255,7 @@ public class CaseDataBuilder {
             .dateTo(LocalDate.now().plusWeeks(30))
             .time(SmallClaimsTimeEstimate.ONE_DAY)
             .build();
-        smallTrackDateToToggle = List.of(DateToShowToggle.SHOW);
+       // smallClaimsHearingDateToToggle = List.of(DateToShowToggle.SHOW);
         smallClaimsNotes = SmallClaimsNotes.builder()
             .input(String.format("Each party has the right to apply "
                                      + "to have this Order set aside or varied. Any such application must be "
@@ -5669,7 +5669,7 @@ public class CaseDataBuilder {
             .fastTrackOrderWithoutJudgement(fastTrackOrderWithoutJudgement)
             .smallClaimsNotes(smallClaimsNotes)
             .smallClaimsHearing(smallClaimsHearing)
-            .smallTrackDateToToggle(smallTrackDateToToggle)
+            .smallClaimsHearingDateToToggle(smallClaimsHearingDateToToggle)
             .fastTrackTrialDateToToggle(fastTrackTrialDateToToggle)
             .disposalHearingHearingTime(disposalHearingHearingTime)
             .disposalOrderWithoutHearing(disposalOrderWithoutHearing)

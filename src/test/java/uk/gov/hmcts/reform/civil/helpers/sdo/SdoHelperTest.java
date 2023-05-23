@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
@@ -343,6 +344,7 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isFalse();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "invalid input")).isFalse();
         }
     }
@@ -518,7 +520,6 @@ public class SdoHelperTest {
                 .fastTrackSchedulesOfLossToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-                .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
@@ -533,6 +534,22 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+        }
+
+
+        @Test
+        void shouldReturnTrue_whenSmallDateToTogglesExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateSdoSmallTrackTrial()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")).isTrue();
         }
 
         @Test
