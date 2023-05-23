@@ -16,12 +16,11 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.*;
 
 @Data
 @Builder
@@ -54,7 +53,7 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime ccjRequestedDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
     private DashboardClaimStatus status;
