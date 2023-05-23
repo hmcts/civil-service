@@ -28,16 +28,20 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
-                            .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
-                .should(boolQuery() 
+                            .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION))
+                            .must(isUnSpecClaim()))
+                .should(boolQuery() //create claim unspec
                             .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                            .must(beState(CASE_ISSUED)))
+                            .must(beState(CASE_ISSUED))
+                            .must(isUnSpecClaim()))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                            .must(isUnSpecClaim()))
                 .should(boolQuery() //create claim spec
-                        .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                        .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                            .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
+                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                            .must(isSpecClaim())),
             List.of("reference"),
             startIndex
         );
