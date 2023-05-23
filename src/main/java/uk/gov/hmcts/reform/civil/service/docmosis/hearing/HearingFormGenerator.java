@@ -102,6 +102,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         return  fixDate.contains("Sept") ? fixDate.replace("Sept","Sep") : fixDate;
 
     }
+
     private boolean checkReference(CaseData caseData) {
         return nonNull(caseData.getSolicitorReferences());
     }
