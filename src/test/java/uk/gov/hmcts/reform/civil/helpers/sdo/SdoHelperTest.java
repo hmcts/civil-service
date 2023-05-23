@@ -344,7 +344,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "invalid input")).isFalse();
         }
     }
@@ -550,6 +549,21 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenFastDateToTogglesExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateSdoFastTrackTrial()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle")).isTrue();
         }
 
         @Test

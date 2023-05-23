@@ -2231,6 +2231,7 @@ public class CaseDataBuilder {
             .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
             .dateFrom(LocalDate.parse("2022-01-01"))
             .dateTo(LocalDate.parse("2022-01-02"))
+            .dateToToggle(List.of(DateToShowToggle.SHOW))
             .build();
         fastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
             .input(String.format("Each party has the right to apply "
