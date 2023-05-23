@@ -8,7 +8,10 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 @Builder(toBuilder = true)
 public class PartyFlagStructure {
 
+    private final String partyID;
     private final String firstName;
     private final String lastName;
+    private final String email;
+    private final String phone;
     private final Flags flags;
 }

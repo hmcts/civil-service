@@ -97,6 +97,9 @@ public class NotificationsProperties {
     private String solicitorTrialReady;
 
     @NotEmpty
+    private String otherPartyTrialReady;
+
+    @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
 
     @NotEmpty
@@ -104,6 +107,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpec;
 
     @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
@@ -119,6 +125,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpecLip;
 
     @NotEmpty
     private String respondentSolicitorNotifyNotToProceedSpec;
@@ -155,6 +164,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentDeadlineExtension;
+
+    @NotEmpty
+    private String respondentDeadlineExtensionWelsh;
 
     @NotEmpty
     private String claimantDeadlineExtension;
@@ -222,9 +234,33 @@ public class NotificationsProperties {
     private String respondentCcjNotificationTemplate;
 
     @NotEmpty
+    private String respondentCcjNotificationWelshTemplate;
+
+    @NotEmpty
     private String respondentSolicitorCcjNotificationTemplate;
 
     @NotEmpty
+    private String notifyClaimantLrTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLipTemplate;
+
+    @NotEmpty
+    private String notifyApplicantLRMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLRMediationAgreementTemplate;
+
+    @NotEmpty
     private String bundleCreationTemplate;
+
+    @NotEmpty
+    private String generateOrderNotificationTemplate;
+  
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimTemplate;
 
 }

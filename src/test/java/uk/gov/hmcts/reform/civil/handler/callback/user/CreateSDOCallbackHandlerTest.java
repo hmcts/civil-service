@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -72,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -81,7 +83,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     MockDatabaseConfiguration.class,
     DeadlinesCalculator.class,
     ValidationAutoConfiguration.class,
-    LocationHelper.class},
+    LocationHelper.class,
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -98,6 +101,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CreateSDOCallbackHandler handler;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -313,6 +319,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldReturnNullDocument_whenInvokedAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNull();
         }
     }
 
@@ -598,7 +615,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
                 .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must upload to the Digital Portal");
+                               + "the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"
@@ -630,7 +647,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
                                + "wish to rely at trial by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
 
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
@@ -672,14 +689,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
                                + "their case on periodical payments, they must do so in the respective schedule and "
                                + "counter-schedule.");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input4")
-                .isEqualTo("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                               + "therefore final, no further schedule of loss shall be uploaded without permission to"
-                               + " amend. The defendant shall upload to the Digital Portal an up-to-date counter"
-                               + " schedule of loss by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
                 .isEqualTo("The time provisionally allowed for this trial is");
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
@@ -926,20 +935,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date4")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input8")
-                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to "
-                               + "the paragraph above, each party may rely upon the written evidence by way of witness"
-                               + " statement of one witness to provide evidence of basic hire rates available within"
-                               + " the claimant's geographical location from a mainstream supplier, or a local"
-                               + " reputable supplier if none is available.");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input9")
-                .isEqualTo("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date5")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input10")
-                .isEqualTo(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on");
-            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date6")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input11")
                 .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
 
@@ -1179,6 +1174,22 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
         }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
+        }
+
     }
 
     @Nested
@@ -1198,7 +1209,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CONFIRMATION_SUMMARY_1v1,
                 "Mr. John Rambo",
                 "Mr. Sole Trader"
-            );
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1226,7 +1237,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Sole Trader",
                 "Mr. John Rambo"
-            );
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -1254,7 +1265,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Mr. John Rambo",
                 "Mr. Jason Rambo",
                 "Mr. Sole Trader"
-            );
+            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

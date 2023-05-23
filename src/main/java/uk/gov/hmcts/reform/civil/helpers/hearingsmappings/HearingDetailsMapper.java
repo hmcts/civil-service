@@ -1,20 +1,26 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 
 public class HearingDetailsMapper {
 
+    public static final String WELSH_REGION_ID = "7";
+    public static final String STANDARD_PRIORITY = "Standard";
+    public static final String SECURE_DOCK_KEY = "11";
     private static String EMPTY_STRING = "";
-    public static String STANDARD_PRIORITY = "Standard";
 
     private static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
@@ -23,12 +29,11 @@ public class HearingDetailsMapper {
     }
 
     public static String getHearingType() {
-        return EMPTY_STRING;
+        return null;
     }
 
     public static HearingWindowModel getHearingWindow() {
-        return HearingWindowModel.builder()
-            .build();
+        return null;
     }
 
     public static Integer getDuration() {
@@ -43,8 +48,43 @@ public class HearingDetailsMapper {
         return 0;
     }
 
-    public static boolean getHearingInWelshFlag() {
-        return false;
+    public static boolean getHearingInWelshFlag(CaseData caseData) {
+        return isHearingInWales(caseData) && isWelshHearingSelected(caseData);
+    }
+
+    private static boolean isHearingInWales(CaseData caseData) {
+        if (Objects.nonNull(caseData.getCaseManagementLocation()) && Objects.nonNull(caseData.getCaseManagementLocation()
+                                                                                         .getRegion())) {
+            return caseData.getCaseManagementLocation().getRegion().equals(WELSH_REGION_ID);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isWelshHearingSelected(CaseData caseData) {
+        List<Language> welshLanguageRequirements = getWelshLanguageRequirements(caseData);
+
+        return (welshLanguageRequirements.contains(Language.WELSH) || welshLanguageRequirements.contains(Language.BOTH));
+    }
+
+    private static List<Language> getWelshLanguageRequirements(CaseData caseData) {
+        List<Language> welshLanguageRequirements = new ArrayList<>();
+        if (Objects.nonNull(caseData.getRespondent1DQ()) && Objects.nonNull(caseData.getRespondent1DQ()
+                                                                                .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getRespondent1DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        if (Objects.nonNull(caseData.getRespondent2DQ()) && Objects.nonNull(caseData.getRespondent2DQ()
+                                                                                .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getRespondent2DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        if (Objects.nonNull(caseData.getApplicant1DQ()) && Objects.nonNull(caseData.getApplicant1DQ()
+                                                                               .getWelshLanguageRequirements())) {
+            welshLanguageRequirements.add(caseData.getApplicant1DQ().getWelshLanguageRequirements().getCourt());
+        }
+
+        return welshLanguageRequirements;
     }
 
     public static List<HearingLocationModel> getHearingLocations(CaseData caseData) {
@@ -56,7 +96,9 @@ public class HearingDetailsMapper {
     }
 
     public static List<String> getFacilitiesRequired(CaseData caseData) {
-        // todo civ-6888
+        if (CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)) {
+            return List.of(SECURE_DOCK_KEY);
+        }
         return null;
     }
 
@@ -83,13 +125,8 @@ public class HearingDetailsMapper {
         return false;
     }
 
-    public static boolean getCaseInterpreterRequiredFlag() {
-        return false;
-        // todo civ-6888
-    }
-
     public static PanelRequirementsModel getPanelRequirements() {
-        return PanelRequirementsModel.builder().build();
+        return null;
     }
 
     public static String getLeadJudgeContractType() {

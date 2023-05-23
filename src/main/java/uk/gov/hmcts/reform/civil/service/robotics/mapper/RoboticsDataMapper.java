@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
@@ -95,7 +95,7 @@ public class RoboticsDataMapper {
     private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("390")
+            .owningCourtCode("807")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))

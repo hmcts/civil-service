@@ -35,15 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
-        var multipartyFeatureKey = "rpaContinuousFeed";
-        givenToggle(multipartyFeatureKey, toggleState);
-
-        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
         var noticeOfChangeKey = "notice-of-change";
         givenToggle(noticeOfChangeKey, toggleState);
@@ -125,21 +116,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void rpaContinuousFeed_LDTagName(Boolean toggleStat) {
-        var rpaContinuousFeed = "specified-rpa-continuous-feed";
-        givenToggle(rpaContinuousFeed, toggleStat);
-        assertThat(featureToggleService.isSpecRpaContinuousFeedEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    public void globalSearch_LDTagName(Boolean toggleStat) {
-        givenToggle("global-search-specified", toggleStat);
-        assertThat(featureToggleService.isGlobalSearchEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         givenToggle(pbaV3Key, toggleStat);
@@ -154,6 +130,24 @@ class FeatureToggleServiceTest {
         givenToggle(hmcKey, toggleStat);
 
         assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
+        var enableRPAEmailsKey = "enable-rpa-emails";
+        givenToggle(enableRPAEmailsKey, toggleStat);
+
+        assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
+        var caseFileKey = "case-file-view";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

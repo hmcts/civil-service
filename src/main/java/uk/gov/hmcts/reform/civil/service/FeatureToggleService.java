@@ -16,18 +16,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("rpaContinuousFeed");
-    }
-
-    public boolean isSpecRpaContinuousFeedEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("specified-rpa-continuous-feed");
-    }
-
-    public boolean isGlobalSearchEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("global-search-specified");
-    }
-
     public boolean isSdoEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
@@ -72,8 +60,16 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("isCertificateOfServiceEnabled");
     }
 
+    public boolean isRPAEmailEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+    }
+
     public boolean isHmcEnabled() {
         return this.featureToggleApi.isFeatureEnabled("hmc");
+    }
+
+    public boolean isCaseFileViewEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
 }
