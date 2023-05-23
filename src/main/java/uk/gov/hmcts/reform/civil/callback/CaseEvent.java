@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 public enum CaseEvent {
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
-    CREATE_SERVICE_REQUEST(USER),
     CREATE_SERVICE_REQUEST_CLAIM(USER),
     CREATE_CLAIM_SPEC_AFTER_PAYMENT(USER),
     CREATE_CLAIM_AFTER_PAYMENT(USER),
