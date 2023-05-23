@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSU
 
 @Service
 @RequiredArgsConstructor
-public class NotificationMediationUnsuccessfulClaimantLRHandler extends CallbackHandler implements NotificationData{
+public class NotificationMediationUnsuccessfulClaimantLRHandler extends CallbackHandler implements NotificationData {
 
     private final OrganisationDetailsService organisationDetailsService;
     private final NotificationService notificationService;
