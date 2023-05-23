@@ -37,11 +37,11 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return true;
     }
 
     public boolean isPinInPostEnabled() {

@@ -107,7 +107,9 @@ public class HearingDetailsMapper {
             .flatMap(flags -> flags.getDetails().stream())
             .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
             .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
-            .reduce("", String::concat);
+            .reduce("", String::concat)
+            .replaceAll("\n", " ")
+            .replaceAll("\\s+", " ");
 
         if (comments != null && !comments.isEmpty()) {
             String refactoredComment = comments.substring(0, comments.length() - 2);
