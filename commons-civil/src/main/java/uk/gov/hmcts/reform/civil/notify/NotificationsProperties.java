@@ -109,6 +109,9 @@ public class NotificationsProperties {
     private String claimantSolicitorDefendantResponseForSpec;
 
     @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpec;
+
+    @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
 
     @NotEmpty
@@ -229,6 +232,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentCcjNotificationTemplate;
+
+    @NotEmpty
+    private String respondentCcjNotificationWelshTemplate;
 
     @NotEmpty
     private String respondentSolicitorCcjNotificationTemplate;
