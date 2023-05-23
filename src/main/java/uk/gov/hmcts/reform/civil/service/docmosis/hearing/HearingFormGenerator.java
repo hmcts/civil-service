@@ -99,7 +99,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     private String fixSepDateIssue(String fixDate) {
-        return  fixDate.contains("Sept") ? fixDate.replace("Sept","Sep") : fixDate;
+        return  fixDate.contains("Sept") ? fixDate.replace("Sept", "Sep") : fixDate;
 
     }
 
