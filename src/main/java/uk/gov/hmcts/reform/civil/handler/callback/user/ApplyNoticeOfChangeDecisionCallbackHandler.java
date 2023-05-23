@@ -79,10 +79,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .changeOfRepresentation(getChangeOfRepresentation(
                     callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
-        // When case has hearing fee unpaid and is in HEARING_READINESS, if a NOC is applied to change claimant rep,
-        // we want to allow a service request to be regenerated for new rep. Use this flag in ServiceRequestAPIHandler
-        updatedCaseDataBuilder.hearingUnpaidAfterNocFlag("NEW_REP_ALLOW_SERVICE_REQUEST");
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
     }

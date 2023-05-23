@@ -112,6 +112,9 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 caseDataBuilder.respondent2SameLegalRepresentative(NO);
             }
         }
+        // When case has hearing fee unpaid and is in HEARING_READINESS, if a NOC is applied to change claimant rep,
+        // we want to allow a service request to be regenerated for new rep. Use this flag in ServiceRequestAPIHandler
+        caseDataBuilder.hearingUnpaidAfterNocFlag("NEW_REP_ALLOW_SERVICE_REQUEST");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
