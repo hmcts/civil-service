@@ -473,7 +473,7 @@ public class StateFlowEngine {
                 }
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()))
+            .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()).and(applicantOutOfTime.negate()))
                 .set(flags -> {
                     if (featureToggleService.isSdoEnabled()) {
                         flags.put(FlowFlag.SDO_ENABLED.name(), true);
