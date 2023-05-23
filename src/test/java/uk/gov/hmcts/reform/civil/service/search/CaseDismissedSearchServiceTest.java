@@ -23,20 +23,20 @@ class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(rangeQuery("data.claimDetailsNotificationDeadline").lt("now"))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_CASE_DETAILS_NOTIFICATION"))))
-                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM")))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_CASE_DETAILS_NOTIFICATION")))
+                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM"))))
             .should(boolQuery()
                         .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                        .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))))
-                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM")))
+                        .must(boolQuery().must(matchQuery("state", "CASE_ISSUED")))
+                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM"))))
             .should(boolQuery()
                         .must(rangeQuery("data.claimDismissedDeadline").lt("now"))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
-                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM")))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "UNSPEC_CLAIM"))))
             .should(boolQuery()
                         .must(rangeQuery("data.claimNotificationDeadline").lt("now"))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
-                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "SPEC_CLAIM")));
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                        .must(boolQuery().must(matchQuery("data.CaseAccessCategory", "SPEC_CLAIM"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
