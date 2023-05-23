@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -42,32 +43,37 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
     private TranslatedDocumentUploadedClaimantNotificationHandler handler;
     @MockBean
     private OrganisationService organisationService;
+    private final String emailTemplate = "template-id";
+    private final String claimantEmail = "applicantsolicitor@example.com";
+    private final String legacyCaseReference = "translated-document-uploaded-claimant-notification-000DC001";
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(emailTemplate);
         }
 
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
+            //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED")
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                     .build()).build();
-
+            //When
             handler.handle(params);
-
+            //Then
             verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id",
+                claimantEmail,
+                emailTemplate,
                 getNotificationDataMapSpec(caseData),
-                "translated-document-uploaded-claimant-notification-000DC001"
+                legacyCaseReference
             );
+
         }
 
         @NotNull

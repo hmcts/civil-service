@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -39,20 +40,25 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
     @Autowired
     private TranslatedDocumentUploadedDefendantNotificationHandler handler;
+    private final String emailTemplate = "template-id";
+    private final String defendantEmail = "respondent@example.com";
+    private final String legacyCaseReference = "translated-document-uploaded-defendant-notification-000DC001";
+    private final String defendantName = "respondent";
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(emailTemplate);
         }
 
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
+            //Given
             Party party = PartyBuilder.builder()
-                .individual("respondent")
-                .partyEmail("respondent@example.com")
+                .individual(defendantName)
+                .partyEmail(defendantEmail)
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -60,25 +66,25 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
                 .respondent1(party)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED")
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                     .build()).build();
-
+            //When
             handler.handle(params);
-
+            //Then
             verify(notificationService).sendMail(
-                "respondent@example.com",
-                "template-id",
+                defendantEmail,
+                emailTemplate,
                 getNotificationDataMapSpec(caseData),
-                "translated-document-uploaded-defendant-notification-000DC001"
+                legacyCaseReference
             );
         }
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-            );
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                );
         }
     }
 
