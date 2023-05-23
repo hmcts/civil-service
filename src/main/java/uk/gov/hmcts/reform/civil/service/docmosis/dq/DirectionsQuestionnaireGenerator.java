@@ -158,7 +158,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
-            templateData = getRespondent1TemplateData(caseData, "ONE");
+            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
         } else if (respondent.equals("TWO")) {
             templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         } else {
@@ -205,7 +205,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         DirectionsQuestionnaireForm templateData;
         if (respondent.equals("ONE")) {
-            templateData = getRespondent1TemplateData(caseData, "ONE");
+            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
         } else {
             // TWO
             templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
@@ -589,7 +589,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .build();
     }
 
-    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier) {
+    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent1DQ();
 
         return DirectionsQuestionnaireForm.builder()
@@ -613,7 +613,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
-            .requestedCourt(dq.getRequestedCourt())
+            .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
 

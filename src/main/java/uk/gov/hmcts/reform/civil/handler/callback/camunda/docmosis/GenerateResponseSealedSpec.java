@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.GENERATE_RESPONSE_SEALED);
@@ -63,6 +65,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("CaseData: " + caseData);
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         CaseDocument sealedForm = formGenerator.generate(
