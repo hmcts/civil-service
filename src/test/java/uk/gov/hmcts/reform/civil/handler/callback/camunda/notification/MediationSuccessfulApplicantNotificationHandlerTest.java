@@ -14,13 +14,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
     @MockBean
     private NotificationsProperties notificationsProperties;
     @MockBean
-    private OrganisationService organisationService;
+    private OrganisationDetailsService organisationDetailsService;
     @Autowired
     private MediationSuccessfulApplicantNotificationHandler handler;
 
@@ -77,17 +75,11 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             );
         }
 
-        private String getApplicantLegalOrganizationName(CaseData caseData) {
-            String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-            Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-            return organisation.isPresent() ? organisation.get().getName() :
-                caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
-        }
     }
 }
 
