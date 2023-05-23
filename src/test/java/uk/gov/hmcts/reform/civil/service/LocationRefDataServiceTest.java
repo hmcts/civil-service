@@ -437,6 +437,7 @@ class LocationRefDataServiceTest {
                 .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
                 .venueName("CCMCC").courtLocationCode("121").build();
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),
@@ -490,6 +491,38 @@ class LocationRefDataServiceTest {
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
                 .isEqualTo("service_token");
             assertThat(prefferedCourtCode).isEqualTo("121");
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
+            ))
+                .thenThrow(new RestClientException("403"));
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280") ;
+
+            assertThat(result.isEmpty());
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenEpimmsIdAndCourtTypeThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
+            ))
+                .thenThrow(new RestClientException("403"));
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280") ;
+
+            assertThat(result.isEmpty());
         }
     }
 
