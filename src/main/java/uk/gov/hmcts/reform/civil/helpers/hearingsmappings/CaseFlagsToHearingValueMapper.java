@@ -44,10 +44,32 @@ public class CaseFlagsToHearingValueMapper {
     }
 
     public static String getInterpreterLanguage(List<FlagDetail> flagDetails) {
-        var flags = filter(flagDetails, CaseFlagPredicates.isActive(), CaseFlagPredicates.isHearingRelevant(),
-                           CaseFlagPredicates.hasLanguageInterpreterFlag()
+        String spokenLanguageInterpreter = getSpokenLanguageInterpreter(flagDetails);
+        String signLanguageInterpreter = getSignLanguageInterpreter(flagDetails);
+
+        return spokenLanguageInterpreter != null ? spokenLanguageInterpreter : signLanguageInterpreter;
+    }
+
+    private static String getSpokenLanguageInterpreter(List<FlagDetail> flagDetails) {
+        var flags = filter(
+            flagDetails,
+            CaseFlagPredicates.isActive(),
+            CaseFlagPredicates.isHearingRelevant(),
+            CaseFlagPredicates.hasLanguageInterpreterFlag()
         );
-        return flags.stream().count() > 0 ? flags.get(0).getSubTypeValue() : null;
+
+        return flags.stream().count() > 0 ? flags.get(0).getSubTypeKey() : null;
+    }
+
+    private static String getSignLanguageInterpreter(List<FlagDetail> flagDetails) {
+        var flags = filter(
+            flagDetails,
+            CaseFlagPredicates.isActive(),
+            CaseFlagPredicates.isHearingRelevant(),
+            CaseFlagPredicates.hasSignLanguageInterpreterFlag()
+        );
+
+        return flags.stream().count() > 0 ? flags.get(0).getSubTypeKey() : null;
     }
 
     public static String getCustodyStatus(List<FlagDetail> flagDetails) {
