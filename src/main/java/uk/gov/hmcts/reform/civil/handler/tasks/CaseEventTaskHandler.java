@@ -136,6 +136,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF:
                     return "RPA Reason: Case taken offline by staff.";
+                case CLAIM_DETAILS_NOTIFIED:
+                case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
+                    return "RPA Reason: Not suitable for SDO.";
                 default:
                     throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
             }
