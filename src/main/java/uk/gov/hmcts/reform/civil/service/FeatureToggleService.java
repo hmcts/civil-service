@@ -17,7 +17,8 @@ public class FeatureToggleService {
     }
 
     public boolean isSdoEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
+        //return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isGeneralApplicationsEnabled() {
@@ -37,7 +38,8 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
+        return true;
+        //return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -45,15 +47,18 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return true;
+        //return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return false;
+        //return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
+        return true;
+        //return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isCertificateOfServiceEnabled() {
