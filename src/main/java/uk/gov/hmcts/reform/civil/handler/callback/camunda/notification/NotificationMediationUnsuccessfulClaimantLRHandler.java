@@ -28,12 +28,14 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR);
     private static final String LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "notification-mediation-unsuccessful-claimant-LR-%s";
-    public static final String TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "SendMediationUnsuccessfulClaimantLR";
+    private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "SendMediationUnsuccessfulClaimantLR";
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantLRForMediationUnsuccessful
+    );
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantLRForMediationUnsuccessful
-        );
+        return callbackMap;
     }
 
     private CallbackResponse notifyClaimantLRForMediationUnsuccessful(CallbackParams callbackParams) {
