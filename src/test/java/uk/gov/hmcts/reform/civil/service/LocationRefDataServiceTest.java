@@ -491,7 +491,6 @@ class LocationRefDataServiceTest {
                 .isEqualTo("service_token");
             assertThat(prefferedCourtCode).isEqualTo("121");
         }
-
     }
 
     @Nested
