@@ -63,7 +63,6 @@ class HmcDataUtilsTest {
                     .build())
             .build();
 
-
         PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
                              .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
@@ -93,7 +92,6 @@ class HmcDataUtilsTest {
                              .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
                              .hearingLocation("Venue A")
                              .build()).build();
-
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
 

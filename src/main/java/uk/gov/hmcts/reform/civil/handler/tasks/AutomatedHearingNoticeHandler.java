@@ -34,9 +34,8 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
-    private final ObjectMapper mapper;
     private final FeatureToggleService featureToggleService;
-
+    private final ObjectMapper mapper;
     @Override
     @SuppressWarnings("unchecked")
     public void handleTask(ExternalTask externalTask) {
@@ -81,15 +80,18 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                     }
                 } catch (Exception e) {
                     log.error(String.format("An error occured when processing hearingId [%s]: %s",
-                                            hearingId, e.getMessage()));
+                                            hearingId, e.getMessage()
+                    ));
                 }
             });
 
-        runtimeService.setVariables(externalTask.getProcessInstanceId(),
-                                HearingNoticeSchedulerVars.builder()
-                                .dispatchedHearingIds(dispatchedHearingIds)
-                                .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
-                                .build().toMap(mapper));
+        runtimeService.setVariables(
+            externalTask.getProcessInstanceId(),
+            HearingNoticeSchedulerVars.builder()
+                .dispatchedHearingIds(dispatchedHearingIds)
+                .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
+                .build().toMap(mapper)
+        );
     }
 
     private UnNotifiedHearingResponse getUnnotifiedHearings(String serviceId) {
@@ -100,6 +102,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             null
         );
     }
+
     private List<String> getDispatchedHearingIds(HearingNoticeSchedulerVars schedulerVars) {
         return schedulerVars.getDispatchedHearingIds() != null
             ? schedulerVars.getDispatchedHearingIds() : new ArrayList<>();
@@ -111,6 +114,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             .setVariables(messageVars.toMap(mapper))
             .correlateStartMessage();
     }
+
     private UserAuthContent getSystemUpdateUser() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
@@ -129,10 +133,11 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             partiesNotifiedPayload
         );
     }
-     private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
+
+    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
         var partiesNotified = hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-         return HmcDataUtils.getLatestPartiesNotifiedResponse(partiesNotified);
+        return HmcDataUtils.getLatestPartiesNotifiedResponse(partiesNotified);
     }
 
     private boolean hearingNoticeDispatched(String hearingId, List<String> dispatchedHearingIds) {

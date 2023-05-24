@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-import java.util.HashMap;
-import java.util.List;
-
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @Data

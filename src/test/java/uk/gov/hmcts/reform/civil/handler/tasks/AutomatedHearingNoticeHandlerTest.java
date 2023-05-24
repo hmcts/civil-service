@@ -34,8 +34,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -142,9 +140,20 @@ class AutomatedHearingNoticeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of(hearingId)).build().toMap(mapper));
+        verify(runtimeService).setVariables(
+            processInstanceId,
+            HearingNoticeSchedulerVars.builder()
+                .totalNumberOfUnnotifiedHearings(1)
+                .dispatchedHearingIds(List.of(hearingId))
+                .build().toMap(mapper)
+        );
         verify(runtimeService, times(1)).createMessageCorrelation(camundaMessageId);
-        verify(messageCorrelationBuilder, times(1)).setVariables(HearingNoticeMessageVars.builder().caseId(caseId).hearingId(hearingId).triggeredViaScheduler(true).build().toMap(mapper));
+        verify(messageCorrelationBuilder, times(1)).setVariables(
+            HearingNoticeMessageVars.builder()
+                .caseId(caseId)
+                .hearingId(hearingId)
+                .triggeredViaScheduler(true)
+                .build().toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
         verify(externalTaskService).complete(mockTask);
     }
@@ -164,7 +173,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .hearingId(hearingId)
                 .triggeredViaScheduler(true)
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
             createHearing(caseId, ListAssistCaseStatus.LISTED));
@@ -173,9 +183,17 @@ class AutomatedHearingNoticeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of(hearingId)).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of(hearingId))
+            .build().toMap(mapper));
         verify(runtimeService, times(1)).createMessageCorrelation(camundaMessageId);
-        verify(messageCorrelationBuilder, times(1)).setVariables(HearingNoticeMessageVars.builder().caseId(caseId).hearingId(hearingId).triggeredViaScheduler(true).build().toMap(mapper));
+        verify(messageCorrelationBuilder, times(1)).setVariables(
+            HearingNoticeMessageVars.builder()
+                .caseId(caseId)
+                .hearingId(hearingId)
+                .triggeredViaScheduler(true)
+                .build().toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
         verify(externalTaskService).complete(mockTask);
     }
@@ -187,7 +205,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .serviceId(serviceId)
                 .dispatchedHearingIds(List.of())
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
             createHearing(caseId, ListAssistCaseStatus.CASE_CLOSED));
@@ -206,7 +225,10 @@ class AutomatedHearingNoticeHandlerTest {
                     .serviceData(PartiesNotifiedServiceData.builder().hearingNoticeGenerated(false).build())
                     .build()
             );
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of()).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of())
+            .build().toMap(mapper));
         verify(runtimeService, times(0)).createMessageCorrelation(camundaMessageId);
         verifyNoInteractions(messageCorrelationBuilder);
         verify(externalTaskService).complete(mockTask);
@@ -221,7 +243,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .serviceId(serviceId)
                 .dispatchedHearingIds(dispatchedHearingIds)
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
             createHearing(caseId, ListAssistCaseStatus.LISTED));
@@ -230,7 +253,10 @@ class AutomatedHearingNoticeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of(hearingId)).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of(hearingId))
+            .build().toMap(mapper));
         verify(runtimeService, times(0)).createMessageCorrelation(camundaMessageId);
         verifyNoInteractions(messageCorrelationBuilder);
         verify(externalTaskService).complete(mockTask);
@@ -249,7 +275,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .hearingId(hearingId)
                 .triggeredViaScheduler(true)
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
             createHearing(caseId, ListAssistCaseStatus.LISTED));
@@ -266,9 +293,17 @@ class AutomatedHearingNoticeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of(hearingId)).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of(hearingId))
+            .build().toMap(mapper));
         verify(runtimeService, times(1)).createMessageCorrelation(camundaMessageId);
-        verify(messageCorrelationBuilder, times(1)).setVariables(HearingNoticeMessageVars.builder().caseId(caseId).hearingId(hearingId).triggeredViaScheduler(true).build().toMap(mapper));
+        verify(messageCorrelationBuilder, times(1)).setVariables(
+            HearingNoticeMessageVars.builder()
+                .caseId(caseId)
+                .hearingId(hearingId)
+                .triggeredViaScheduler(true)
+                .build().toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
         verify(externalTaskService).complete(mockTask);
     }
@@ -286,7 +321,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .hearingId(hearingId)
                 .triggeredViaScheduler(true)
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
             createHearing(caseId, ListAssistCaseStatus.LISTED));
@@ -303,7 +339,10 @@ class AutomatedHearingNoticeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of(hearingId)).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of(hearingId))
+            .build().toMap(mapper));
         verify(runtimeService, times(1)).createMessageCorrelation(camundaMessageId);
         verify(messageCorrelationBuilder, times(1)).setVariables(
             HearingNoticeMessageVars.builder().caseId(caseId).hearingId(hearingId).triggeredViaScheduler(true).build().toMap(mapper));
@@ -319,7 +358,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(List.of())
                 .build());
 
-        when(hearingsService.getUnNotifiedHearingResponses(authToken, serviceId, null, null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            authToken, serviceId, null, null)).thenReturn(
             createUnnotifiedHearings(List.of(hearingId)));
 
         when(hearingsService.getHearingResponse(authToken, hearingId)).thenReturn(
@@ -349,7 +389,10 @@ class AutomatedHearingNoticeHandlerTest {
                                                       .hearingDate(hearingDate)
                                                       .hearingNoticeGenerated(false).build()).build()
         );
-        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder().totalNumberOfUnnotifiedHearings(1).dispatchedHearingIds(List.of()).build().toMap(mapper));
+        verify(runtimeService).setVariables(processInstanceId, HearingNoticeSchedulerVars.builder()
+            .totalNumberOfUnnotifiedHearings(1)
+            .dispatchedHearingIds(List.of()).build()
+            .toMap(mapper));
         verify(runtimeService, times(0)).createMessageCorrelation(camundaMessageId);
         verifyNoInteractions(messageCorrelationBuilder);
         verify(externalTaskService).complete(mockTask);
@@ -382,5 +425,4 @@ class AutomatedHearingNoticeHandlerTest {
                     .build())
             .build();
     }
-
 }
