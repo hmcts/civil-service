@@ -23,13 +23,13 @@ public class HearingUpdate {
     @JsonProperty("HMCStatus")
     private HmcStatus hmcStatus;
 
-     @JsonProperty("hearingListingStatus")
-     private ListingStatus listingStatus;
+    @JsonProperty("hearingListingStatus")
+    private ListingStatus listingStatus;
 
     private LocalDateTime nextHearingDate;
 
-     @JsonProperty("ListAssistCaseStatus")
-     private ListAssistCaseStatus listAssistCaseStatus;
+    @JsonProperty("ListAssistCaseStatus")
+    private ListAssistCaseStatus listAssistCaseStatus;
 
     private String listAssistSessionID;
 
