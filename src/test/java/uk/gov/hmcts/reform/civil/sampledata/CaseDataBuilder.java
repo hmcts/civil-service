@@ -2256,13 +2256,14 @@ public class CaseDataBuilder {
             .dateTo(LocalDate.now().plusWeeks(30))
             .time(SmallClaimsTimeEstimate.ONE_DAY)
             .build();
-       // smallClaimsHearingDateToToggle = List.of(DateToShowToggle.SHOW);
         smallClaimsNotes = SmallClaimsNotes.builder()
-            .input(String.format("Each party has the right to apply "
-                                     + "to have this Order set aside or varied. Any such application must be "
-                                     + "received by the Court (together with the appropriate fee) by 4pm "
-                                     + "on %s.",
-                                 LocalDate.parse("2022-01-30")))
+            .input(String.format(
+                "Each party has the right to apply "
+                    + "to have this Order set aside or varied. Any such application must be "
+                    + "received by the Court (together with the appropriate fee) by 4pm "
+                    + "on %s.",
+                LocalDate.parse("2022-01-30")
+            ))
             .build();
         return this;
     }
