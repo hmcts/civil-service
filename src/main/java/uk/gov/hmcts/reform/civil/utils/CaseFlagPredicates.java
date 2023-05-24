@@ -40,6 +40,10 @@ public class CaseFlagPredicates {
         return flagDetail -> LANGUAGE_INTERPRETER_FLAGS.contains(flagDetail.getFlagCode());
     }
 
+    public static Predicate<FlagDetail> hasSignLanguageInterpreterFlag() {
+        return flagDetail -> SIGN_LANGUAGE_INTERPRETER_FLAGS.contains(flagDetail.getFlagCode());
+    }
+
     public static Predicate<FlagDetail> hasCaseInterpreterRequiredFlag() {
         return flagDetail -> SIGN_LANGUAGE_INTERPRETER_FLAGS.contains(flagDetail.getFlagCode())
             || LANGUAGE_INTERPRETER_FLAGS.contains(flagDetail.getFlagCode());
