@@ -708,8 +708,6 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         NOC_REQUEST,
                         APPLY_NOC_DECISION,
-                        ACKNOWLEDGE_CLAIM,
-                        DEFENDANT_RESPONSE,
                         INFORM_AGREED_EXTENSION_DATE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
@@ -718,11 +716,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
-                        STANDARD_DIRECTION_ORDER_DJ,
-                        CREATE_SDO,
                         NotSuitable_SDO,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -796,8 +791,7 @@ class FlowStateAllowedEventServiceTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
-                    IN_HEARING_READINESS.fullName()}),
+                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName(),
                     PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{FULL_DEFENCE.fullName()}),
@@ -808,8 +802,7 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     }
                 ),
                 of(
