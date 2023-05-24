@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -15,9 +16,13 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,15 +47,8 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
 
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
-            .sorted(this::compareClaimByCreateDate)
+            .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
             .collect(Collectors.toList());
-    }
-
-    private int compareClaimByCreateDate(DashboardClaimInfo claim1, DashboardClaimInfo claim2) {
-        if (claim1.getCreatedDate() == null || claim2.getCreatedDate() == null) {
-            return 0;
-        }
-        return claim2.getCreatedDate().compareTo(claim1.getCreatedDate());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
@@ -74,7 +72,7 @@ public class DashboardClaimInfoService {
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
-            .createdDate(caseData.getSubmittedDate().atOffset(ZoneOffset.UTC))
+            .createdDate(submittedDateToCreatedDate(caseData))
             .claimNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
@@ -88,5 +86,14 @@ public class DashboardClaimInfoService {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
         return item;
+    }
+
+    private OffsetDateTime submittedDateToCreatedDate(CaseData caseData) {
+        LocalDateTime createdDate = LocalDateTime.now();
+        if(!Objects.isNull(caseData.getSubmittedDate())) {
+            createdDate = caseData.getSubmittedDate();
+        }
+
+        return createdDate.atOffset(ZoneOffset.UTC);
     }
 }
