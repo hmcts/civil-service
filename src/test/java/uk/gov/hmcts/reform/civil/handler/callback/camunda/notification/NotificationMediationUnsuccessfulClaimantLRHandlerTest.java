@@ -62,15 +62,16 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
     @Nested
     class AboutToSubmitCallback {
 
-        private static final String CLAIMANT_EMAIL_ADDRESS =  "applicantemail@hmcts.net";
+        private static final String CLAIMANT_EMAIL_ADDRESS = "applicantemail@hmcts.net";
         private static final String ORGANISATION_NAME = "Org Name";
         private static final String DEFENDANT_PARTY_NAME = "Lets party";
-        private static final String REFERENCE_NUMBER ="8372942374";
+        private static final String REFERENCE_NUMBER = "8372942374";
         private static final String EMAIL_TEMPLATE = "test-notification-id";
 
         private static final Map<String, String> PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                                                                        DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
+                                                                       CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER
+        );
 
         @BeforeEach
         void setUp() {
@@ -79,7 +80,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         }
 
         @Test
-        void shouldSendNotificationToClaimantLr_whenEventIsCalled(){
+        void shouldSendNotificationToClaimantLr_whenEventIsCalled() {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
@@ -102,6 +103,4 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
         }
     }
-
-
 }
