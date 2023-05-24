@@ -834,6 +834,7 @@ public class FlowPredicate {
         caseData.getRespondent1PinToPostLRspec() != null;
 
     public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+
         boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
