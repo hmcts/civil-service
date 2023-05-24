@@ -64,15 +64,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -211,8 +209,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()
-                           .equals("There is a problem\nYou have already submitted the defendant's response"));
+            assertTrue(response.getErrors()
+                           .contains("There is a problem\nYou have already submitted the defendant's response"));
         }
 
         @Test
@@ -230,8 +228,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()
-                           .equals("There is a problem\nYou have already submitted the defendant's response"));
         }
 
         @Test
@@ -877,7 +873,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
@@ -1655,6 +1651,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .atStateClaimDetailsNotified()
+                .respondent2(PartyBuilder.builder().individual().build())
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
@@ -1693,6 +1690,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .atStateClaimDetailsNotified()
+                .respondent2(PartyBuilder.builder().individual().build())
                 .respondent1ClaimResponseTypeToApplicant1(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
@@ -1832,10 +1830,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
-                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
-                        .label("selected location label")
-                        .code(UUID.randomUUID().toString())
-                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1887,10 +1881,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
-                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
-                        .label("selected location label")
-                        .code(UUID.randomUUID().toString())
-                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence()
@@ -1941,11 +1931,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .courtAddress("Lane 1").postcode("123").build();
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
-
-                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
-                        .label("selected location label")
-                        .code(UUID.randomUUID().toString())
-                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -2125,11 +2110,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .courtAddress("Lane 1").postcode("123").build();
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
-
-                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
-                        .label("selected location label")
-                        .code(UUID.randomUUID().toString())
-                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
