@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,10 +46,12 @@ public class ClaimStoreService {
     }
 
     private LocalDateTime createAtToCreateDate(CmcClaim claim) {
-        if (claim.getCreatedAt() == null) {
-            return LocalDateTime.now();
+        LocalDateTime createdDate = LocalDateTime.now();
+
+        if (claim.getCreatedAt() != null) {
+            createdDate = claim.getCreatedAt();
         }
 
-        return claim.getCreatedAt();
+        return createdDate.truncatedTo(ChronoUnit.SECONDS);
     }
 }
