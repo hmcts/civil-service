@@ -123,6 +123,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
     LocationHelper.class,
+    LocationRefDataService.class,
     JudgementService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -773,7 +774,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateApplicant1DQExpertsDetails(FlowState.Main flowState) {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
-                    .applicant1DQSmallCalimExperts()
+                    .applicant2DQSmallClaimExperts()
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -794,7 +795,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateApplicant2DQExpertsDetails(FlowState.Main flowState) {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
-                    .applicant2DQSmallCalimExperts()
+                    .applicant2DQSmallClaimExperts()
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -1519,6 +1520,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetVulnerability_whenGivenConditionMeets() {
+            given(respondentMediationService.setMediationRequired(any())).willReturn(DefendantResponseShowTag.VULNERABILITY);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSpec1v1ClaimSubmitted()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
