@@ -270,6 +270,24 @@ class UnsecuredDocumentManagementServiceTest {
             verify(documentMetadataDownloadClient)
                 .getDocumentMetadata(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentPath));
         }
+
+        @Test
+        void shouldThrow_whenDocumentDownloadFailsCUI() {
+
+            String documentBinary = "documents/85d97996-22a5-40d7-882e-3a382c8ae1b7/binary";
+
+            when(documentDownloadClient
+                     .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary))
+            ).thenReturn(null);
+
+            DocumentDownloadException documentManagementException = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentBinary)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentBinary), documentManagementException.getMessage());
+
+        }
     }
 
     @Nested
