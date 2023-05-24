@@ -29,11 +29,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -133,9 +131,6 @@ public class HearingValuesServiceTest {
 
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 
-        HearingWindowModel expectedHearingWindow = HearingWindowModel.builder()
-            .build();
-
         List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
                                                        .locationId(BASE_LOCATION_ID)
                                                        .locationType(COURT)
@@ -155,8 +150,8 @@ public class HearingValuesServiceTest {
             .caseManagementLocationCode(BASE_LOCATION_ID)
             .caseSLAStartDate("2023-01-30")
             .autoListFlag(false)
-            .hearingType("")
-            .hearingWindow(expectedHearingWindow)
+            .hearingType(null)
+            .hearingWindow(null)
             .duration(0)
             .hearingPriorityType("Standard")
             .numberOfPhysicalAttendees(0)
@@ -167,7 +162,7 @@ public class HearingValuesServiceTest {
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
-            .panelRequirements(PanelRequirementsModel.builder().build())
+            .panelRequirements(null)
             .leadJudgeContractType("")
             .judiciary(expectedJudiciary)
             .hearingIsLinkedFlag(false)
@@ -224,6 +219,7 @@ public class HearingValuesServiceTest {
 
     private List<PartyDetailsModel> getExpectedPartyModel() {
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -237,6 +233,7 @@ public class HearingValuesServiceTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -253,7 +250,7 @@ public class HearingValuesServiceTest {
                        respondentPartyDetails, respondentSolicitorParty);
     }
 
-    private PartyDetailsModel buildExpectedIndividualPartyDetails(String firstName, String lastName,
+    private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
                                                                   String partyName, String partyRole,
                                                                   String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
@@ -271,7 +268,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(partyId)
             .partyType(IND)
             .partyName(partyName)
             .partyRole(partyRole)
@@ -287,12 +284,12 @@ public class HearingValuesServiceTest {
                                                                    String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(null)
+            .organisationType(ORG.getLabel())
             .cftOrganisationID(cftOrganisationID)
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(null)
             .partyType(ORG)
             .partyName(name)
             .partyRole("LGRP")

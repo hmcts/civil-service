@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
-import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseFlags;
+import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyFlagsModel;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class CaseFlagsMapper {
     }
 
     public static CaseFlags getCaseFlags(CaseData caseData) {
-        List<Flags> allActiveFlags = getAllActiveFlags(caseData);
+        List<PartyFlags> allActiveFlags = getAllActiveFlags(caseData);
         getAllHearingRelevantCaseFlags(allActiveFlags);
 
         if (allActiveFlags.isEmpty()) {
@@ -34,11 +34,11 @@ public class CaseFlagsMapper {
 
         List<PartyFlagsModel> partyFlagsModelList = new ArrayList<>();
 
-        for (Flags activeFlag : allActiveFlags) {
+        for (PartyFlags activeFlag : allActiveFlags) {
             String partyName = activeFlag.getPartyName();
             for (Element<FlagDetail> flagDetail : activeFlag.getDetails()) {
                 PartyFlagsModel partyFlagModel = PartyFlagsModel.builder()
-                    .partyID("") // todo civ-7029
+                    .partyID(activeFlag.getPartyId())
                     .partyName(partyName)
                     .flagParentId("")
                     .flagId(flagDetail.getValue().getFlagCode())
