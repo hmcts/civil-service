@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class DashboardClaimInfoService {
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
-            .createdDate(caseData.getSubmittedDate())
+            .createdDate(caseData.getSubmittedDate().atOffset(ZoneOffset.UTC))
             .claimNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())

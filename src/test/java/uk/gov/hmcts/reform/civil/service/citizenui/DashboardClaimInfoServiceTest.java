@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,11 +54,11 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
-    private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
-    private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
+    private static final OffsetDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
+    private static final OffsetDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
-        .createdDate(DATE_IN_2021)
+        .createdDate(DATE_IN_2021.toLocalDateTime())
         .build();
     private static final CaseDetails CASE_DETAILS_2 = CaseDetails.builder()
         .id(2L)

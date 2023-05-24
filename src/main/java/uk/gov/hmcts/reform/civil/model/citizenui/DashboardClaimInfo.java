@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import java.time.LocalDateTime;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.*;
 
 @Data
 @Builder
@@ -52,9 +52,9 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime ccjRequestedDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime createdDate;
+    private OffsetDateTime createdDate;
     private DashboardClaimStatus status;
 
     @JsonGetter("numberOfDays")
