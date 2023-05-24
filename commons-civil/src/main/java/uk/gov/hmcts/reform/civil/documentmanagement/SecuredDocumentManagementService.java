@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -133,23 +132,46 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    public Document getDocumentMetaData(String authorisation, String documentPath) {
-        log.info("Getting metadata for file {}", documentPath);
-
+    @Override
+    public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
+        log.info("Downloading document CUI {}", documentPath);
         try {
-            return caseDocumentClientApi.getMetadataForDocument(
+            UserInfo userInfo = userService.getUserInfo(authorisation);
+            String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
+            ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
                 authorisation,
                 authTokenGenerator.generate(),
-                getDocumentIdFromSelfHref(documentPath)
+                userRoles,
+                userInfo.getUid(),
+                documentPath
             );
-
+            return Optional.ofNullable(responseEntity.getBody())
+                .map(ByteArrayResource.class::cast)
+                .map(ByteArrayResource::getByteArray)
+                .orElseThrow(RuntimeException::new);
         } catch (Exception ex) {
-            log.error("Failed getting metadata for {}", documentPath, ex);
+            log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
 
-    private UUID getDocumentIdFromSelfHref(String selfHref) {
-        return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    public Document getDocumentMetaData (String authorisation, String documentPath){
+            log.info("Getting metadata for file {}", documentPath);
+
+            try {
+                return caseDocumentClientApi.getMetadataForDocument(
+                    authorisation,
+                    authTokenGenerator.generate(),
+                    getDocumentIdFromSelfHref(documentPath)
+                );
+
+            } catch (Exception ex) {
+                log.error("Failed getting metadata for {}", documentPath, ex);
+                throw new DocumentDownloadException(documentPath, ex);
+            }
+        }
+
+        private UUID getDocumentIdFromSelfHref (String selfHref){
+            return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+        }
     }
-}

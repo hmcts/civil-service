@@ -118,6 +118,34 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
         }
     }
 
+    @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
+    @Override
+    public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
+        log.info("Downloading document CUI {}", documentPath);
+        try {
+            UserInfo userInfo = userService.getUserInfo(authorisation);
+            String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
+            Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
+
+            ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
+                authorisation,
+                authTokenGenerator.generate(),
+                userRoles,
+                userInfo.getUid(),
+                URI.create(documentMetadata.links.binary.href).getPath()
+            );
+
+            return Optional.ofNullable(responseEntity.getBody())
+                .map(ByteArrayResource.class::cast)
+                .map(ByteArrayResource::getByteArray)
+                .orElseThrow(RuntimeException::new);
+        } catch (Exception ex) {
+            log.error("Failed downloading document {}", documentPath, ex);
+            throw new DocumentDownloadException(documentPath, ex);
+        }
+    }
+
+
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
 

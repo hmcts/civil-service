@@ -9,4 +9,6 @@ public interface DocumentManagementService {
 
     byte[] downloadDocument(String authorisation, String documentPath);
 
+    byte[] downloadDocumentCUI(String authorisation, String documentPath);
+
 }
