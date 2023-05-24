@@ -113,7 +113,7 @@ class GeneralAppFeesServiceTest {
 
         assertThat(feeDto).isEqualTo(FEE_PENCE_108);
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo(AppnToVaryOrSuspend);
+                .hasToString(AppnToVaryOrSuspend);
     }
 
     @Test
@@ -125,7 +125,7 @@ class GeneralAppFeesServiceTest {
 
         assertThat(feeDto).isEqualTo(FEE_PENCE_108);
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo(WithoutNotice);
+                .hasToString(WithoutNotice);
     }
 
     @Test
@@ -137,7 +137,7 @@ class GeneralAppFeesServiceTest {
 
         assertThat(feeDto).isEqualTo(FEE_PENCE_108);
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo(WithoutNotice);
+                .hasToString(WithoutNotice);
     }
 
     @Test
@@ -151,7 +151,7 @@ class GeneralAppFeesServiceTest {
         verify(feesConfiguration, times(1)).getWithNoticeKeyword();
         verify(feesConfiguration, never()).getConsentedOrWithoutNoticeKeyword();
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo(GAOnNotice);
+                .hasToString(GAOnNotice);
     }
 
     @Test
@@ -185,9 +185,9 @@ class GeneralAppFeesServiceTest {
     void throwRuntimeException_whenFeeServiceThrowsException() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
                 .thenThrow(new RuntimeException("Some Exception"));
-
+        String keyword = feesConfiguration.getWithNoticeKeyword();
         Exception exception = assertThrows(RuntimeException.class, () -> feesService
-                .getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null));
+                .getFeeForGA(keyword, null, null));
 
         assertThat(exception.getMessage()).isEqualTo("java.lang.RuntimeException: Some Exception");
     }
@@ -196,9 +196,9 @@ class GeneralAppFeesServiceTest {
     void throwRuntimeException_whenNoFeeIsReturnedByFeeService() {
         when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
                 .thenReturn(null);
-
+        String keyword = feesConfiguration.getWithNoticeKeyword();
         Exception exception = assertThrows(RuntimeException.class, () -> feesService
-                .getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null));
+                .getFeeForGA(keyword, null, null));
 
         assertThat(exception.getMessage())
                 .isEqualTo("No Fees returned by fee-service while creating General Application");
@@ -211,9 +211,9 @@ class GeneralAppFeesServiceTest {
                         .code("test_fee_code")
                         .version(1)
                         .build());
-
+        String keyword = feesConfiguration.getWithNoticeKeyword();
         Exception exception = assertThrows(RuntimeException.class, () -> feesService
-                .getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null));
+                .getFeeForGA(keyword, null, null));
 
         assertThat(exception.getMessage())
                 .isEqualTo("No Fees returned by fee-service while creating General Application");
@@ -267,7 +267,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void default_types_with_notice() {
+        void default_types_with_notice_should_pay_275() {
             List<GeneralApplicationTypes> allTypes =
                     Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -289,7 +289,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void default_types_without_notice() {
+        void default_types_without_notice_should_pay_108() {
             List<GeneralApplicationTypes> allTypes =
                     Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());
             allTypes.removeAll(GeneralAppFeesService.VARY_TYPES);
@@ -311,7 +311,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void adjourn() {
+        void adjourn_should_pay_default_or_free_fee() {
             CaseData caseDataWithin14DaysWithNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
                     YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1));
@@ -330,7 +330,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void vary() {
+        void vary_types_should_be_14() {
             for (GeneralApplicationTypes type : GeneralAppFeesService.VARY_TYPES) {
                 CaseData caseDataWithNotice = getFeeCase(
                         List.of(type),
@@ -346,7 +346,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void settle() {
+        void settle_should_be_108() {
             CaseData caseDataWithNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT),
                     YesOrNo.YES, YesOrNo.YES, null);
@@ -355,7 +355,7 @@ class GeneralAppFeesServiceTest {
         }
 
         @Test
-        void setAside() {
+        void setAside_should_be_275() {
             CaseData caseDataWithNotice = getFeeCase(
                     List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT),
                     YesOrNo.YES, YesOrNo.YES, null);
@@ -433,6 +433,25 @@ class GeneralAppFeesServiceTest {
             int min = 1;
             int max = allTypes.size();
             return allTypes.subList(0, rand.nextInt(min, max));
+        }
+
+        private CaseData getFeeCase(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
+                                    YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
+            CaseData.CaseDataBuilder builder = CaseData.builder();
+            builder.generalAppType(GAApplicationType.builder().types(types).build());
+            if (Objects.nonNull(hasAgreed)) {
+                builder.generalAppRespondentAgreement(GARespondentOrderAgreement
+                        .builder().hasAgreed(hasAgreed).build());
+            }
+            if (Objects.nonNull(isWithNotice)) {
+                builder.generalAppInformOtherParty(
+                        GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
+            }
+            if (Objects.nonNull(hearingScheduledDate)) {
+                builder.generalAppHearingDate(GAHearingDateGAspec.builder()
+                        .hearingScheduledDate(hearingScheduledDate).build());
+            }
+            return builder.build();
         }
     }
 }

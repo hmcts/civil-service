@@ -55,17 +55,9 @@ public class GeneralAppFeesService {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = caseData.getGeneralAppType().getTypes().size();
         if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
-            Fee varyFeeForGA = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
-            if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
-                typeSize--;
-            }
-            if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_ORDER)) {
-                typeSize--;
-            }
-            if (varyFeeForGA.getCalculatedAmountInPence()
-                    .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = varyFeeForGA;
-            }
+            //only minus 1 as VARY_JUDGEMENT can't be multi selected
+            typeSize--;
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
         }
         if (typeSize > 0
                 && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
@@ -86,12 +78,7 @@ public class GeneralAppFeesService {
             }
         }
         if (typeSize > 0) {
-            Fee defaultFee;
-            if (isFreeApplication(caseData)) {
-                defaultFee = getFeeForGA(feesConfiguration.getFreeKeyword(), "copies", "insolvency");
-            } else {
-                defaultFee = getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
-            }
+            Fee defaultFee = getDefaultFee(caseData);
             if (defaultFee.getCalculatedAmountInPence()
                     .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = defaultFee;
@@ -130,6 +117,14 @@ public class GeneralAppFeesService {
             throw new RuntimeException("No Fees returned by fee-service while creating General Application");
         }
         return buildFeeDto(feeLookupResponseDto);
+    }
+
+    private Fee getDefaultFee(CaseData caseData) {
+        if (isFreeApplication(caseData)) {
+            return getFeeForGA(feesConfiguration.getFreeKeyword(), "copies", "insolvency");
+        } else {
+            return getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
+        }
     }
 
     protected String getFeeRegisterKeyword(CaseData caseData) {
