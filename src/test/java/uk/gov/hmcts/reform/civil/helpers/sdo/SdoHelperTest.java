@@ -517,6 +517,7 @@ public class SdoHelperTest {
                 .fastTrackWitnessOfFactToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackSchedulesOfLossToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
