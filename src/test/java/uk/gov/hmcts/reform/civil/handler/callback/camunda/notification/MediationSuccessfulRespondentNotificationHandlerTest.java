@@ -52,7 +52,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldNotifyRespondent_whenInvoked() {
-
+            //Given
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -66,9 +66,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
                     .build()).build();
-
+            //When
             handler.handle(params);
-
+            //Then
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
@@ -79,6 +79,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldNotSendEmail_whenEventIsCalledAndDefendantHasNoEmail() {
+            //Given
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(null)
                 .build();
@@ -104,6 +105,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldNotSendEmail_whenRespondentIsLR() {
+            //Given
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
