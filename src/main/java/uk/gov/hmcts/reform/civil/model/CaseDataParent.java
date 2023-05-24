@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
@@ -713,5 +714,10 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
     }
 }
