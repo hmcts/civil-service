@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
@@ -360,10 +361,10 @@ public class StateFlowEngine {
                         flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
                     })
             .state(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL)
-                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)))
-                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)))
-                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)))
-                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(not(contactDetailsChange)))
+                .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(isTranslatedDocumentUploaded))
+                .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(isTranslatedDocumentUploaded))
+                .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(isTranslatedDocumentUploaded))
+                .transitionTo(COUNTER_CLAIM).onlyIf(counterClaimSpec.and(isTranslatedDocumentUploaded))
             .state(CLAIM_NOTIFIED)
                 .transitionTo(CLAIM_DETAILS_NOTIFIED).onlyIf(claimDetailsNotified)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
