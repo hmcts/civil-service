@@ -65,7 +65,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
     private void sendEmail(final CaseData caseData) {
         if (caseData.getRespondent1().getPartyEmail() != null) {
             String recipient = caseData.getRespondent1().getPartyEmail();
-            String emailTemplate = notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate();
+            String emailTemplate = notificationsProperties.getMediationUnsuccessfulDefendantLIPTemplate();
             notificationService.sendMail(
                 recipient,
                 emailTemplate,

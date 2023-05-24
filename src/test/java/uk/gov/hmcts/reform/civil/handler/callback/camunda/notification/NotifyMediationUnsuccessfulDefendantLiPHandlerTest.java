@@ -70,7 +70,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
 
         @BeforeEach
         void setUp() {
-            given(notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(notificationsProperties.getMediationUnsuccessfulDefendantLIPTemplate()).willReturn(EMAIL_TEMPLATE);
         }
 
         @Test
