@@ -131,7 +131,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
-
+    @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
     public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
         log.info("Downloading document CUI {}", documentPath);
@@ -145,6 +145,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 userInfo.getUid(),
                 documentPath
             );
+
             return Optional.ofNullable(responseEntity.getBody())
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)

@@ -87,7 +87,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
 
     public byte[] downloadDocument(CaseDocument caseDocument) {
         String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
+        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentBinaryUrl()).getPath();
         return documentManagementService.downloadDocumentCUI(authorisation, documentPath);
     }
 

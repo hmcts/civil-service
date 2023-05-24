@@ -125,14 +125,12 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-            Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
-
             ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
                 authorisation,
                 authTokenGenerator.generate(),
                 userRoles,
                 userInfo.getUid(),
-                URI.create(documentMetadata.links.binary.href).getPath()
+                documentPath
             );
 
             return Optional.ofNullable(responseEntity.getBody())
