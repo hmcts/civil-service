@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -90,7 +89,7 @@ public class DashboardClaimInfoService {
 
     private OffsetDateTime submittedDateToCreatedDate(CaseData caseData) {
         LocalDateTime createdDate = LocalDateTime.now();
-        if(!Objects.isNull(caseData.getSubmittedDate())) {
+        if (!Objects.isNull(caseData.getSubmittedDate())) {
             createdDate = caseData.getSubmittedDate();
         }
 
