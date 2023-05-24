@@ -81,9 +81,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()
-            && !isCcNotification(callbackParams)) {
+        if (isLRvLipToDefendant(callbackParams)) {
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
@@ -175,5 +173,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.isLRvLipOneVOne()
+            && !isCcNotification(callbackParams);
     }
 }
