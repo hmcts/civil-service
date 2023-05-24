@@ -266,6 +266,7 @@ class SecuredDocumentManagementServiceTest {
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+
         @Test
         void shouldThrow_whenDocumentDownloadFailsCUI() {
 
