@@ -99,9 +99,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 })
 class DirectionsQuestionnaireGeneratorTest {
 
-    @MockBean
-    private LocationRefDataService locationRefDataService;
-
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -157,6 +154,9 @@ class DirectionsQuestionnaireGeneratorTest {
 
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @Nested
     class RespondentOne {
@@ -296,7 +296,8 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
-        void specGenerate() {
+        void shouldGenerateDQ_specRespondent() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)))
                 .thenReturn(new DocmosisDocument(
@@ -323,6 +324,44 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
                 eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)
+            );
+        }
+
+        @Test
+        void shouldGenerateDQ_specClaimant() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(),
+                                          "claimant", REFERENCE_NUMBER
+            );
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimantFullDefence()
+                .applicant1DQWithExperts()
+                .applicant1DQWithWitnesses()
+                .applicant1DQWithHearingSupport()
+                .build()
+                .toBuilder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
             );
         }
 
@@ -1240,6 +1279,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateRespondentTwoCertificateOfService_whenStateFlowIsFullDefenceForBoth() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
@@ -1358,6 +1398,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
 
@@ -2059,6 +2100,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
@@ -2113,6 +2155,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlySecondIntendsToProceed() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
@@ -2141,6 +2184,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstOnlyFirstDefendant() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
@@ -2167,6 +2211,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstOnlySecondDefendant() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
@@ -2193,6 +2238,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstBothDefendant() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class),
                 eq(N181_MULTIPARTY_SAME_SOL)
@@ -2283,8 +2329,14 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void checkStatementOfTruthTextForDefendent() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                              .courtTypeId("10").courtLocationCode("121")
+                              .epimmsId("000000").build());
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
+                .atStateRespondentFullDefenceWithHearingSupport()
                 .build()
                 .toBuilder()
                 .businessProcess(BusinessProcess.builder()
