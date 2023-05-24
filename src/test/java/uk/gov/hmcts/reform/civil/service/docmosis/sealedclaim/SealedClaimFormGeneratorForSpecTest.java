@@ -288,6 +288,15 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(userConfig.getPassword()).thenReturn("test");
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(documentManagementService.downloadDocument(anyString(), anyString())).thenReturn(bytes);
+        byte[] fileArr = sealedClaimFormGenerator.downloadDocument(CASE_DOCUMENT, "arbitrary access token");
+        assertThat(fileArr).isEqualTo(bytes);
+    }
+    @Test
+    void testDownloadCui() {
+        when(userConfig.getUserName()).thenReturn("test");
+        when(userConfig.getPassword()).thenReturn("test");
+        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
+        when(documentManagementService.downloadDocumentCUI(anyString(), anyString())).thenReturn(bytes);
         byte[] fileArr = sealedClaimFormGenerator.downloadDocument(CASE_DOCUMENT);
         assertThat(fileArr).isEqualTo(bytes);
     }

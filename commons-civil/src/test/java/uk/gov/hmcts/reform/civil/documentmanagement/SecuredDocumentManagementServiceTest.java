@@ -178,6 +178,34 @@ class SecuredDocumentManagementServiceTest {
             verify(documentDownloadClient)
                 .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
         }
+        @Test
+        void shouldDownloadDocumentCuiFromDocumentManagement() throws JsonProcessingException {
+
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentBinary = URI.create(document.links.binary.href).getPath().replaceFirst("/", "");
+
+            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+
+            when(documentDownloadClient.downloadBinary(
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentBinary)
+                 )
+            ).thenReturn(responseEntity);
+
+            byte[] pdf = documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentBinary);
+
+            assertNotNull(pdf);
+            assertArrayEquals("test".getBytes(), pdf);
+
+            verify(documentDownloadClient)
+                .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
+        }
 
         @Test
         void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentClientApi() throws JsonProcessingException {
