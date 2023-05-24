@@ -31,9 +31,9 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
             String sdoTemplate = notificationsProperties.getSdoOrdered();
             if (caseData.isRespondentResponseBilingual()) {
                 sdoTemplate = notificationsProperties.getSdoOrderedSpecBilingual();
-            } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM){
+            } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
                 sdoTemplate = notificationsProperties.getSdoOrderedSpec();
-            };
+            }
             notificationService.sendMail(
                 email,
                 sdoTemplate,
@@ -57,7 +57,7 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if(caseData.isRespondentResponseBilingual()){
+        if (caseData.isRespondentResponseBilingual()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getRespondentLegalName(caseData)
