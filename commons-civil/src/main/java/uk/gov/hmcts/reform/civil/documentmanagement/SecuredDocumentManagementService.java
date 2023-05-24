@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -156,23 +157,23 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    public Document getDocumentMetaData (String authorisation, String documentPath){
-            log.info("Getting metadata for file {}", documentPath);
+    public Document getDocumentMetaData(String authorisation, String documentPath) {
+        log.info("Getting metadata for file {}", documentPath);
 
-            try {
-                return caseDocumentClientApi.getMetadataForDocument(
-                    authorisation,
-                    authTokenGenerator.generate(),
-                    getDocumentIdFromSelfHref(documentPath)
-                );
+        try {
+            return caseDocumentClientApi.getMetadataForDocument(
+                authorisation,
+                authTokenGenerator.generate(),
+                getDocumentIdFromSelfHref(documentPath)
+            );
 
-            } catch (Exception ex) {
-                log.error("Failed getting metadata for {}", documentPath, ex);
-                throw new DocumentDownloadException(documentPath, ex);
-            }
-        }
-
-        private UUID getDocumentIdFromSelfHref (String selfHref){
-            return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+        } catch (Exception ex) {
+            log.error("Failed getting metadata for {}", documentPath, ex);
+            throw new DocumentDownloadException(documentPath, ex);
         }
     }
+
+    private UUID getDocumentIdFromSelfHref(String selfHref) {
+        return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    }
+}

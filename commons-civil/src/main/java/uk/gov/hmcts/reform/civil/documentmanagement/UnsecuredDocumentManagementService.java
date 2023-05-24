@@ -143,7 +143,6 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
         }
     }
 
-
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
 

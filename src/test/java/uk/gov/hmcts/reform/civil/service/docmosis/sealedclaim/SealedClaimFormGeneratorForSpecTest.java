@@ -291,6 +291,7 @@ public class SealedClaimFormGeneratorForSpecTest {
         byte[] fileArr = sealedClaimFormGenerator.downloadDocument(CASE_DOCUMENT, "arbitrary access token");
         assertThat(fileArr).isEqualTo(bytes);
     }
+
     @Test
     void testDownloadCui() {
         when(userConfig.getUserName()).thenReturn("test");
