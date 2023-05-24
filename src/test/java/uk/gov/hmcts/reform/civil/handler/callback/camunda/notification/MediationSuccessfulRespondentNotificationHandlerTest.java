@@ -22,7 +22,9 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -47,7 +49,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).thenReturn("template-id");
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn("template-id");
         }
 
         @Test
