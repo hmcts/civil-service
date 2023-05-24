@@ -259,8 +259,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String generateOrderNotificationTemplate;
-  
+
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
 
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimBilingualTemplate;
 }
