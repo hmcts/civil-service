@@ -282,7 +282,7 @@ class UnsecuredDocumentManagementServiceTest {
 
             DocumentDownloadException documentManagementException = assertThrows(
                 DocumentDownloadException.class,
-                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentBinary)
+                () -> documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentBinary)
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentBinary), documentManagementException.getMessage());
