@@ -479,7 +479,169 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondents() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(true);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepAndDiffResponse() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasDiffLegalRep() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent2SameLegalRepresentative(NO)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepAndResponse() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepAndResponseIsNull() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepDiffResponseRespondent2DQHearingIsNull() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2DQ(Respondent2DQ.builder().build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepDiffResponseRespondent2DQIsNull() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(false);
+            Hearing hearing = Hearing.builder()
+                .unavailableDatesRequired(YES)
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
         @Test
         void shouldValidateExperts_whenDef2HasSameLRAndDiffResAndRespondent2DQHearingPresent() {
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
@@ -646,6 +808,96 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
                                    .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndDiffLRDiffResponse() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndDiffLRResponseNullValidRespondent1DQExperts() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndDiffLRResponseSameValidRespondent1DQExperts() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndDiffLRDiffResponseSameRespondent2DQNull() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+        @Test
+        void shouldValidateExperts_whenMultipartyAndDiffLRDiffResponseSameRespondent2DQExpertsIsNull() {
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(false).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent2DQ(Respondent2DQ
+                                   .builder().build())
+                .respondent1DQ(Respondent1DQ
+                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -2494,6 +2746,48 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
+        }
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionFullDefenceForBothDefendants() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(FULL_DEFENCE)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .respondent2SameLegalRepresentative(YES)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
+        }
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_WhenFullDefenceForBothDefendantsRes2DiffLegalRep() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(FULL_DEFENCE)
+                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .respondent2ClaimResponseType(FULL_DEFENCE)
+                .respondent2SameLegalRepresentative(NO)
+                .build().toBuilder().ccdCaseReference(1234L)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionRespondent1ResponseIsMatching() {
