@@ -119,14 +119,13 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         @Test
         void shouldNotifyRespondentLiPWithBilingual_whenInvoked() {
             Party party = PartyBuilder.builder()
-                .individual(defendantName )
+                .individual(defendantName)
                 .partyEmail(defendantEmail)
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder().
-                                 respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .respondent1(party)
            .build();
             CallbackParams params = CallbackParams.builder()
@@ -149,8 +148,6 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
                 "create-sdo-respondent-1-notification-000DC001"
             );
         }
-
-
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
