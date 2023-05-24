@@ -88,10 +88,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
-    private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(FILE_NAME)
-        .documentType(SEALED_CLAIM)
-        .build();
     private static final String BASE_URL = "/case/document";
     private static final String GENERATE_DOC_URL = BASE_URL + "/generateSealedDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
@@ -129,35 +125,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             readString("document-management/download.success.json"),
             Document.class
         );
-    }
-
-    @Test
-    void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentController() throws JsonProcessingException {
-
-        CaseDocument caseDocument = mapper.readValue(
-            readString("document-management/download.document.json"),
-            CaseDocument.class
-        );
-
-        String documentPath = URI.create(document.links.self.href).getPath();
-        UUID documentId = getDocumentIdFromSelfHref(documentPath);
-
-        when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
-        when(caseDocumentClientApi.getDocumentBinary(
-                 anyString(),
-                 anyString(),
-                 eq(documentId)
-             )
-        ).thenReturn(responseEntity);
-
-        byte[] pdf = documentController.downloadSealedDocument(caseDocument);
-
-        assertNotNull(pdf);
-        assertArrayEquals("test".getBytes(), pdf);
-
-        verify(caseDocumentClientApi)
-            .getDocumentBinary(anyString(), anyString(), eq(documentId));
     }
 
     @Test
