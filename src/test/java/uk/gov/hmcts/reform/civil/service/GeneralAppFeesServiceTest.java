@@ -412,7 +412,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void mix_default_vary_set_aside_should_be_14() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.VARY_JUDGEMENT);
+            randomList.add(GeneralApplicationTypes.VARY_ORDER);
             randomList.add(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
