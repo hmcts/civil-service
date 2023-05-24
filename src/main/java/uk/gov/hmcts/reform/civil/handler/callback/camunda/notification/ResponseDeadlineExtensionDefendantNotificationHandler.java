@@ -63,7 +63,7 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getRespondentDeadlineExtension(),
+                addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -82,6 +82,14 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
             )
         );
+    }
+
+    private String addTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getRespondentDeadlineExtensionWelsh();
+        } else {
+            return notificationsProperties.getRespondentDeadlineExtension();
+        }
     }
 
     public String getApplicantLegalOrganizationName(CaseData caseData) {

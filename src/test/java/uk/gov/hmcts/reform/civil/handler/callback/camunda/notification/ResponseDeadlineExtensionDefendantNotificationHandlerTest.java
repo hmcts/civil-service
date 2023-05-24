@@ -10,6 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -59,6 +62,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
     class AboutToSubmitCallback {
 
         private final String emailTemplate = "emailTemplate";
+        private final String emailTemplateWelsh = "emailTemplateWelsh";
         private final String defendantEmail = "sherlock@scotlandyard.co.uk";
         private final String legacyReference = "000MC001";
 
@@ -66,15 +70,15 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
         void setUp() {
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            given(notificationsProperties.getRespondentDeadlineExtensionWelsh()).willReturn(emailTemplateWelsh);
             given(notificationsProperties.getRespondentDeadlineExtension()).willReturn(emailTemplate);
         }
 
         @Test
-        void shouldSendEmailToLipDefendant() {
+        void shouldSendEmailToLipDefendantNotBilingual() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .build()
-                .builder()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
                 .legacyCaseReference(legacyReference)
                 .respondent1(Party
                                  .builder().type(Party.Type.INDIVIDUAL)
@@ -96,6 +100,39 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
             verify(notificationService).sendMail(
                 defendantEmail,
                 emailTemplate,
+                getNotificationDataMap(caseData),
+                "defendant-deadline-extension-notification-" + legacyReference
+            );
+        }
+
+        @Test
+        void shouldSendEmailToLipDefendantBilingual() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .legacyCaseReference(legacyReference)
+                .respondent1(Party
+                                 .builder().type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr")
+                                 .individualFirstName("Sherlock")
+                                 .individualLastName("Holmes")
+                                 .partyEmail(defendantEmail)
+                                 .build())
+                .applicant1(Party.builder()
+                                .type(Party.Type.COMPANY)
+                                .companyName("Bad guys ltd")
+                                .build())
+                .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                defendantEmail,
+                emailTemplateWelsh,
                 getNotificationDataMap(caseData),
                 "defendant-deadline-extension-notification-" + legacyReference
             );
