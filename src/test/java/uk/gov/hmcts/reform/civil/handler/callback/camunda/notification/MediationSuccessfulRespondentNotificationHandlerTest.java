@@ -22,8 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.Map;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -75,6 +74,55 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 "template-id",
                 getNotificationDataMapSpec(caseData),
                 "mediation-successful-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotSendEmail_whenEventIsCalledAndDefendantHasNoEmail() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail(null)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService, times(0)).sendMail("respondent@example.com",
+                                                           "template-id",
+                                                           getNotificationDataMapSpec(caseData),
+                                                           "mediation-successful-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotSendEmail_whenRespondentIsLR() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .specRespondent1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService, times(0)).sendMail("respondent@example.com",
+                                                           "template-id",
+                                                           getNotificationDataMapSpec(caseData),
+                                                           "mediation-successful-respondent-notification-000DC001"
             );
         }
 
