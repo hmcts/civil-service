@@ -178,6 +178,7 @@ class SecuredDocumentManagementServiceTest {
             verify(documentDownloadClient)
                 .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
         }
+
         @Test
         void shouldDownloadDocumentCuiFromDocumentManagement() throws JsonProcessingException {
 

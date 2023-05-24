@@ -132,6 +132,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
+
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
     public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
