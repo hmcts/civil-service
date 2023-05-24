@@ -56,7 +56,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         }
     }
 
-    private void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 

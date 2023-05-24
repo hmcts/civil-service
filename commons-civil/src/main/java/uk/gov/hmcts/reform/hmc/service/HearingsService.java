@@ -50,7 +50,7 @@ public class HearingsService {
     }
 
     public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
-                                                        Long requestVersion, LocalDateTime receivedDateTime,
+                                                        int requestVersion, LocalDateTime receivedDateTime,
                                                         PartiesNotified payload) {
         try {
             return hearingNoticeApi.updatePartiesNotifiedRequest(
@@ -58,7 +58,7 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 payload,
                 hearingId,
-                requestVersion.intValue(),
+                requestVersion,
                 receivedDateTime
             );
         } catch (FeignException ex)  {

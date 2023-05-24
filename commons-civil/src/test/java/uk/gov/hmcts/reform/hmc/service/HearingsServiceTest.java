@@ -54,7 +54,7 @@ class HearingsServiceTest {
     private static final String HEARING_ID = "hearing_id";
     private static final String HEARING_ID_2 = "hearing_id-2";
     private static final String HMCTS_SERVICE_CODE = "hmcts-service-code";
-    private static final Long VERSION_NUMBER = Long.parseLong("1");
+    private static final int VERSION_NUMBER = 1;
 
     private final FeignException notFoundFeignException = new FeignException.NotFound(
         "not found message",

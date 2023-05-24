@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class HearingNoticeSchedulerVars implements MappableObject {
+
     private String serviceId;
     private List<String> dispatchedHearingIds;
     private int totalNumberOfUnnotifiedHearings;

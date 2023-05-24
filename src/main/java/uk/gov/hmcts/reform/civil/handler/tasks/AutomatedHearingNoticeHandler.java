@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -24,6 +26,8 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Optional.ofNullable;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -36,6 +40,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
     private final RuntimeService runtimeService;
     private final FeatureToggleService featureToggleService;
     private final ObjectMapper mapper;
+
     @Override
     @SuppressWarnings("unchecked")
     public void handleTask(ExternalTask externalTask) {
@@ -47,7 +52,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
         var dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
         var unnotifiedHearings = getUnnotifiedHearings(schedulerVars.getServiceId());
 
-        log.info(String.format("Found (%d) unnotified hearings", unnotifiedHearings.getTotalFound()));
+        log.info("Found [{}] unnotified hearings", unnotifiedHearings.getTotalFound());
 
         unnotifiedHearings.getHearingIds()
             .stream()
@@ -56,15 +61,13 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                 try {
                     var hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
                     var hearingStatus = hearing.getHearingResponse().getListAssistCaseStatus();
-                    log.info(String.format("Processing hearing id: %s status: %s", hearingId, hearingStatus));
+                    log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
 
                     if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
                         var partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
                         if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-                            log.info(String.format(
-                                "Dispatching new camunda process to generate hearing notice for hearing: %s.",
-                                hearingId
-                            ));
+                            log.info("Dispatching hearing notice task for hearing [{}].",
+                                hearingId);
                             triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
                                                           .hearingId(hearingId)
                                                           .caseId(hearing.getCaseDetails().getCaseRef())
@@ -79,9 +82,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                         notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
                     }
                 } catch (Exception e) {
-                    log.error(String.format("An error occured when processing hearingId [%s]: %s",
-                                            hearingId, e.getMessage()
-                    ));
+                    log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage());
                 }
             });
 
@@ -92,6 +93,28 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                 .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
                 .build().toMap(mapper)
         );
+    }
+
+    @Override
+    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        String topicName = externalTask.getTopicName();
+        String processInstanceId = externalTask.getProcessInstanceId();
+
+        try {
+            ofNullable(getVariableMap()).ifPresentOrElse(
+                variableMap -> externalTaskService.complete(externalTask, variableMap),
+                () -> externalTaskService.complete(externalTask)
+            );
+            log.info("External task '{}' finished with processInstanceId '{}'",
+                     topicName, processInstanceId
+            );
+        } catch (NotFoundException e) {
+            log.info("Completing external task '{}' was skipped as process instance '{}' has already completed.",
+                      topicName, processInstanceId);
+        } catch (Exception ex) {
+            log.error("Completing external task '{}' errored  with processInstanceId '{}'",
+                      topicName, processInstanceId, ex);
+        }
     }
 
     private UnNotifiedHearingResponse getUnnotifiedHearings(String serviceId) {
@@ -128,7 +151,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
         hearingsService.updatePartiesNotifiedResponse(
             getSystemUpdateUser().getUserToken(),
             hearingId,
-            hearing.getRequestDetails().getVersionNumber(),
+            hearing.getRequestDetails().getVersionNumber().intValue(),
             hearing.getHearingResponse().getReceivedDateTime(),
             partiesNotifiedPayload
         );
@@ -142,10 +165,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
 
     private boolean hearingNoticeDispatched(String hearingId, List<String> dispatchedHearingIds) {
         if (dispatchedHearingIds.contains(hearingId)) {
-            log.info(String.format(
-                "A process has already been dispatched for hearing: %s. Skipping...",
-                hearingId
-            ));
+            log.info("A process has already been dispatched for hearing [{}]. Skipping...", hearingId);
             return true;
         }
         return false;
@@ -156,4 +176,3 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
         return 1;
     }
 }
-
