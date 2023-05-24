@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
     JacksonAutoConfiguration.class,
 })
 class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
@@ -99,6 +100,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotSendEmail_whenEventIsCalledAndDefendantHasNoEmail() {
+            //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_NAME).build())
