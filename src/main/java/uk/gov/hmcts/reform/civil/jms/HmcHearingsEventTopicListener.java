@@ -13,10 +13,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.exception.HmcTopicEventProcessingException;
 import uk.gov.hmcts.reform.hmc.model.jms.HmcMessage;
 
-
 import javax.jms.JMSException;
 import java.nio.charset.StandardCharsets;
-
 
 @Slf4j
 @Component
