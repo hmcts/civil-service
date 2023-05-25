@@ -285,7 +285,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
             if (!featureToggleService.isHearingAndListingLegalRepEnabled()) {
-                witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+                witnesses = getWitnessesSmallClaim(caseData);
             }
             specAndSmallClaim = true;
         }
@@ -1023,16 +1023,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .build();
     }
 
-    private Witnesses getWitnessesSmallClaim(Integer witnessesIncludingDefendants) {
-        if (witnessesIncludingDefendants != null
-            && witnessesIncludingDefendants > 0) {
-            return Witnesses.builder().witnessesToAppear(YES)
+    private Witnesses getWitnessesSmallClaim(CaseData caseData) {
+        uk.gov.hmcts.reform.civil.model.dq.Witnesses witnesses;
+        if (isClaimantResponse(caseData)) {
+            witnesses = caseData.getApplicant1DQWitnessesSmallClaim();
+        } else {
+            if (isRespondent2(caseData)) {
+                witnesses = caseData.getRespondent2DQWitnessesSmallClaim();
+            } else {
+                witnesses = caseData.getRespondent1DQWitnessesSmallClaim();
+            }
+        }
+        if (witnesses == null) {
+            return Witnesses.builder().witnessesToAppear(NO)
                 .details(Collections.emptyList())
                 .build();
+        } else {
+            return Witnesses.builder().witnessesToAppear(witnesses.getWitnessesToAppear())
+                .details(ElementUtils.unwrapElements(witnesses.getDetails()))
+                .build();
         }
-        return Witnesses.builder().witnessesToAppear(NO)
-            .details(Collections.emptyList())
-            .build();
     }
 
     private Hearing getHearing(DQ dq) {
