@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -28,9 +29,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.HearingFeeDueAfterNocNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.COURT_LOCATION;
@@ -111,6 +114,27 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
                 getNotificationDataMap2(caseData),
                 "NOC-hearing-fee-unpaid-applicant-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotSendClaimantEmail_whenInvokedAndFeeAlreadyPaid() {
+            when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build().toBuilder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+                .hearingDate(LocalDate.of(1990, 2, 20))
+                .hearingTimeHourMinute("1215")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingDueDate(LocalDate.of(1990, 2, 20))
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .reference("REFERENCE")
+                                              .build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
         }
 
     }

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -53,17 +55,16 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantSolicitorForHearingFeeUnpaidNoc(
-        CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantSolicitorForHearingFeeUnpaidNoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getHearingFeeUnpaidNoc(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
+        if (!hearingAlreadyPaidCheck(caseData)) {
+            notificationService.sendMail(
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                notificationsProperties.getHearingFeeUnpaidNoc(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -88,5 +89,10 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
             return organisation.get().getName();
         }
         return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private boolean hearingAlreadyPaidCheck(CaseData caseData) {
+        return nonNull(caseData.getHearingFeePaymentDetails())
+            && caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.SUCCESS);
     }
 }

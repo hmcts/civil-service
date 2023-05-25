@@ -65,20 +65,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
                 caseData = caseData.toBuilder().hearingFeePBADetails(paymentDetails.build()).build();
-            }
-            /** If hearing notice is submitted service request is made. Upon a NOC being submitted for
-              a change of claimant representative we want to regenerate
-              a new service request for the new representative, in order to pay.
-             */
-            if (isHearingFeeServiceRequestAfterNoticeOfChange(caseData)) {
-                log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
-                SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
-                    .fee(caseData.getHearingFee());
-                // hearingUnpaidAfterNocFlag is used to block additional service requests being generated, after a
-                // new service request has been generated if a NOC has occurred.
-                caseData = caseData.toBuilder()
-                    .hearingFeePBADetails(paymentDetails.build())
-                    .hearingUnpaidAfterNocFlag("CURRENT_REP_HAS_SERVICE_REQUEST").build();
             } else if (isClaimFeeServiceRequest(caseData)) {
                 log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
@@ -106,16 +92,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private boolean isHearingFeeServiceRequest(CaseData caseData) {
         return nonNull(caseData.getHearingDueDate())
-            && isServiceRequestNotRequested(caseData.getHearingFeePBADetails())
-            && caseData.getChangeOfRepresentation() == null;
-    }
-
-    private boolean isHearingFeeServiceRequestAfterNoticeOfChange(CaseData caseData) {
-        return nonNull(caseData.getHearingDueDate())
-            && caseData.getHearingUnpaidAfterNocFlag() != null
-            && caseData.getHearingUnpaidAfterNocFlag().equals("NEW_REP_ALLOW_SERVICE_REQUEST")
-            && caseData.getChangeOfRepresentation() != null
-            && caseData.getChangeOfRepresentation().getCaseRole().equals("[APPLICANTSOLICITORONE]");
+            && isServiceRequestNotRequested(caseData.getHearingFeePBADetails());
     }
 
     private boolean isClaimFeeServiceRequest(CaseData caseData) {
