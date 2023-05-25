@@ -792,7 +792,7 @@ public class HearingsPartyMapperTest {
             .interpreterLanguage(null)
             .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
-            .vulnerabilityDetails(emptyList())
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
