@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -49,6 +51,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn("spec-lip-template-id");
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn("spec-lip-template-id");
         }
 
         @Test
@@ -103,6 +106,50 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             handler.handle(params);
 
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldNotNotify_whenInvoked_spec_lip_bilingual() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .specClaim1v1LrVsLip()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "spec-lip-template-id",
+                getNotificationDataMap(caseData),
+                "claimant-part-admit-settle-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotNotify_whenInvoked_spec_lip_english() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .specClaim1v1LrVsLip()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "spec-lip-template-id",
+                getNotificationDataMap(caseData),
+                "claimant-part-admit-settle-respondent-notification-000DC001"
+            );
         }
 
         @NotNull
