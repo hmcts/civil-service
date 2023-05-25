@@ -23,5 +23,4 @@ public class RequestedCourt {
     private final DynamicList responseCourtLocations;
     private final CaseLocationCivil caseLocation;
     private final String responseCourtName;
-
 }
