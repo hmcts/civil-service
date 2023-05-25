@@ -160,7 +160,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
     private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
         var partiesNotified = hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestPartiesNotifiedResponse(partiesNotified);
+        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
 
     private boolean hearingNoticeDispatched(String hearingId, List<String> dispatchedHearingIds) {

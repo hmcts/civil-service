@@ -25,7 +25,7 @@ class HmcDataUtilsTest {
     void getLatestPartiesNotifiedResponse_WhenEmptyList_ReturnsNull() {
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getLatestPartiesNotifiedResponse(partiesNotified);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
         assertNull(result);
     }
@@ -45,7 +45,7 @@ class HmcDataUtilsTest {
             .responses(List.of(res1, expected, res2))
             .build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getLatestPartiesNotifiedResponse(partiesNotified);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
         assertEquals(result, expected);
     }
