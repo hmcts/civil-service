@@ -364,7 +364,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         // persist respondent address (ccd issue)
-        //when Respondent1Copy() is null breaks with null pointer
+        //FIXME: when Respondent1Copy() is null breaks with null pointer. Can it even be null in the real world?
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
@@ -514,8 +514,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
-            //Code will never reach inside this loop since we get in the else loop only when respondent2HasSameLegalRep is false
-            if (respondent2HasSameLegalRep(caseData)) {
+            //FIXME: Code will never reach inside this loop since we get in the else loop only when respondent2HasSameLegalRep is false
+            if (respondent2HasSameLegalRep(caseData)) { // FIXME: Unreacheable code. Delete this if an its content.
                 // if responses are marked as same, copy respondent 1 values into respondent 2
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
                     updatedData.respondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
@@ -629,7 +629,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
         if (respondent1ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
-            //Never Null when respondent1ClaimResponseDocument  is not null
+            //FIXME: Never Null when respondent1ClaimResponseDocument  is not null. The null check can be removed.
             if (respondent1ClaimDocument != null) {
                 defendantUploads.add(
                     buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
@@ -692,7 +692,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
     }
 
-    //This line will not be reached when AddApplicant2 Is No, so can never be fully covered
     private boolean applicant2Present(CaseData caseData) {
         return caseData.getAddApplicant2() != null && caseData.getAddApplicant2() == YES;
     }
