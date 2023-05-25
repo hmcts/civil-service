@@ -76,6 +76,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -430,6 +431,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime unsuitableSDODate;
+    private final OtherDetails  otherDetails;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
