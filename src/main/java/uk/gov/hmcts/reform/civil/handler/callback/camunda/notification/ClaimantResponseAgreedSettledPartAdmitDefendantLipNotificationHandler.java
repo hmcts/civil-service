@@ -64,8 +64,8 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         notificationService.sendMail(
             caseData.getRespondent1().getPartyEmail(),
-            caseData.isRespondentResponseBilingual() ?
-                notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
+            caseData.isRespondentResponseBilingual()
+                ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
                 : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
