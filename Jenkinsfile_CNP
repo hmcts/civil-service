@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "CIV-0000_pipeline_fix_25May"
+def ccdBranch = "master"
 def camundaBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
@@ -126,7 +126,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-ccd-files.sh ${ccdBranch}
-      ./bin/import-ccd-definition.sh "-e *GAspec.json,*-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json,*CUI.json"
+      ./bin/import-ccd-definition.sh "-e *GAspec.json,*-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json,*CUI.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-bpmn-diagram.sh .
     """
     env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
