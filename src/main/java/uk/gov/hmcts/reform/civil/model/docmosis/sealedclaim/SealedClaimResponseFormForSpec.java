@@ -40,5 +40,6 @@ public class SealedClaimResponseFormForSpec implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate paymentDate;
     private final String paymentMethod;
+    private final String hearingCourtLocation;
     private final StatementOfTruth statementOfTruth;
 }
