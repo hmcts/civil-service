@@ -5,10 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -34,12 +33,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,9 +66,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
     @MockBean
-    private HearingReferenceNumberRepository hearingReferenceNumberRepository;
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
+    private HearingFeesService feesService;
 
     @MockBean
     private Time time;
@@ -78,20 +74,17 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     public void prepareTest() {
         given(time.now()).willReturn(LocalDateTime.now());
-
-        Set<LocalDate> publicHolidays = new HashSet<>();
-        publicHolidays.add(time.now().toLocalDate().plusDays(3));
-        given(publicHolidaysCollection.getPublicHolidays()).willReturn(publicHolidays);
-
+        given(feesService.getFeeForHearingSmallClaims(any())).willReturn(Fee.builder().build());
+        given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(Fee.builder().build());
     }
 
     @ParameterizedTest
     @CsvSource({
         // current date,hearing date,expected
-        "2022-10-27,2022-11-04,2022-11-04",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
-        "2022-10-01,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
-        "2022-10-01,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
+        "2022-10-27,2022-11-04,2022-11-03",   // based on bug report: on the boundary of exactly 7 days
+        "2022-10-01,2022-11-14,2022-10-29",   // hearing date more than 36 days away -> expect in 28 straight days time
+        "2022-10-01,2022-10-14,2022-10-08",   // hearing date less than 36 days away -> expect in 7 straight days
+        "2022-10-01,2022-10-10,2022-10-08"    // should never happen. If it does the deadline is the hearing day
     })
     void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
         String strCurrentDate, String strHearingDate, String strExpectedHearingDueDate) {
@@ -100,10 +93,9 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         LocalDate currentDate = LocalDate.parse(strCurrentDate, DATE_FORMAT);
         LocalDate hearingDate = LocalDate.parse(strHearingDate, DATE_FORMAT);
         LocalDate expectedHearingDueDate = LocalDate.parse(strExpectedHearingDueDate, DATE_FORMAT);
-        Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
 
         // When
-        LocalDate actualHearingDueDate = handler.calculateHearingDueDate(currentDate, hearingDate, holidays);
+        LocalDate actualHearingDueDate = handler.calculateHearingDueDate(currentDate, hearingDate);
 
         // Then
         assertThat(actualHearingDueDate).isEqualTo(expectedHearingDueDate);
@@ -217,6 +209,33 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        // listing/relisting,case state
+        "LISTING,HEARING_READINESS",
+        "RELISTING,PREPARE_FOR_HEARING_CONDUCT_HEARING"
+    })
+    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmit(String listingType, String expectedStateStr) {
+        // Given: a case either in listing or relisting
+        ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
+        CaseState expectedState = CaseState.valueOf(expectedStateStr);  // converting the string would be redundant but ensures there are no typos
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .listingOrRelisting(listingOrRelisting)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When: I call the handler
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then: I expect the resulting state to match the expectation for the listing or relisting
+        assertThat(response.getState()).isEqualTo(expectedState.name());
+    }
+
     @Test
     void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit() {
         // Given
@@ -228,14 +247,16 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(34600)).code("FEE0225").version("7").build();
+        given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
+            expectedFee);
     }
 
     @Test
@@ -283,27 +304,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(NO)
-            .listingOrRelisting(ListingOrRelisting.LISTING)
-            .hearingDate(time.now().toLocalDate().plusWeeks(5))
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(117500)).build());
-    }
-
-    @Test
     void shouldGetDueDateAndFeeFastAndClaimValueClaim_whenAboutToSubmit() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -314,14 +314,15 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(expectedFee);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+        assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
     }
 
     @Test
@@ -334,17 +335,20 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
             .totalClaimAmount(new BigDecimal(1000))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(expectedFee);
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
+        assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
     }
 
     @Test
@@ -360,21 +364,45 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(2700)).code("FEE0221").version("7").build();
+        given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingFee()).isEqualTo(
-            Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(2700)).build());
+        assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
+    }
+
+    @Test
+    void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+            .totalClaimAmount(new BigDecimal(123000))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        Fee expectedFee = Fee.builder()
+            .calculatedAmountInPence(new BigDecimal(117500)).code("FEE0440").version("2").build();
+        given(feesService.getFeeForHearingMultiClaims(any())).willReturn(expectedFee);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingFee()).isEqualTo(expectedFee);
     }
 
     @Test
     void shouldReturnHearingNoticeCreated_WhenSubmitted() {
         // Given
-        given(hearingReferenceNumberRepository.getHearingReferenceNumber()).willReturn("000HN001");
-
         String header = "# Hearing notice created\n"
             + "# Your reference number\n" + "# 000HN001";
 
@@ -382,13 +410,11 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             + ", for example, book an interpreter.";
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingReferenceNumber("000HN001")
             .build();
-
-        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
         // When
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
         // Then
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(header)

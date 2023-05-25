@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -11,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -23,9 +26,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
@@ -34,15 +34,18 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,29 +67,31 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
 @RequiredArgsConstructor
-public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<DirectionsQuestionnaireForm> {
+public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DocmosisTemplates templateId;
@@ -94,17 +99,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                     ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
 
-        templateData = getTemplateData(caseData);
+        templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
         return documentManagementService.uploadDocument(
@@ -116,26 +121,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = featureToggleService.isHearingAndListingSDOEnabled()
+        DocmosisTemplates templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
             ? HNL_DQ_RESPONSE_1V1 : N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS : N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS : N181_MULTIPARTY_SAME_SOL;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_2V1 : N181_2V1;
                 }
                 break;
@@ -149,19 +154,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                               String respondent) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
                                                             .getMultiPartyScenario(caseData)) ? N181_2V1 :
-            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
+            (featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
-            templateData = getRespondent1TemplateData(caseData, "ONE");
+            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
         } else if (respondent.equals("TWO")) {
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         } else {
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
+            templateData, featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -177,7 +182,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
                                                             .getMultiPartyScenario(caseData)) ? N181_2V1 :
-            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
+            (featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -200,14 +205,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
         DirectionsQuestionnaireForm templateData;
         if (respondent.equals("ONE")) {
-            templateData = getRespondent1TemplateData(caseData, "ONE");
+            templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
         } else {
             // TWO
-            templateData = getRespondent2TemplateData(caseData, "TWO");
+            templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
+            templateData, featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         CaseDocument document = documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -245,7 +250,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     @Override
-    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
+    public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
@@ -279,7 +284,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         boolean specAndSmallClaim = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
-            if (!featureToggleService.isHearingAndListingSDOEnabled()) {
+            if (!featureToggleService.isHearingAndListingLegalRepEnabled()) {
                 witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
             }
             specAndSmallClaim = true;
@@ -288,7 +293,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData))
+            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
@@ -300,7 +305,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .requestedCourt(getRequestedCourt(dq));
+            .requestedCourt(getRequestedCourt(dq, authorisation));
 
         return builder.build();
     }
@@ -495,17 +500,25 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private RequestedCourt getRequestedCourt(DQ dq) {
+    private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
-        if (rc == null) {
-            return RequestedCourt.builder()
+        if (rc != null && null !=  rc.getCaseLocation()) {
+            List<LocationRefData> courtLocations = (locationRefDataService
+                .getCourtLocationsByEpimmsId(authorisation,
+                    rc.getCaseLocation().getBaseLocation()
+                ));
+            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
-                .build();
+                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .findFirst().ifPresent(court -> builder
+                    .responseCourtCode(court.getCourtLocationCode())
+                    .responseCourtName(court.getCourtName()));
+            return builder.build();
         } else {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .responseCourtCode(rc.getResponseCourtCode())
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         }
     }
@@ -546,10 +559,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
-    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier) {
+    private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent2DQ();
 
-        return DirectionsQuestionnaireForm.builder()
+        return  DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
@@ -561,7 +574,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+                         ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
@@ -571,10 +585,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
+            .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
 
-    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier) {
+    private DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent1DQ();
 
         return DirectionsQuestionnaireForm.builder()
@@ -587,7 +602,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+                         ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
@@ -597,6 +613,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
+            .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
     }
 
@@ -933,11 +950,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private Experts getSmallClaimExperts(DQ dq, CaseData caseData) {
+    private Experts getSmallClaimExperts(DQ dq, CaseData caseData, String defendantIdentifier) {
         var experts = dq.getSmallClaimExperts();
-        YesOrNo expertRequired = caseData.getResponseClaimExpertSpecRequired();
+        YesOrNo expertRequired = defendantIdentifier == null || defendantIdentifier.equals("ONE")
+            ? caseData.getResponseClaimExpertSpecRequired()
+            : caseData.getResponseClaimExpertSpecRequired2();
         if (isClaimantResponse(caseData)) {
-            expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
+            expertRequired = caseData.getApplicantMPClaimExpertSpecRequired() != null
+                ? caseData.getApplicantMPClaimExpertSpecRequired() : caseData.getApplicant1ClaimExpertSpecRequired();
         }
         Expert expertDetails;
         if (experts != null) {

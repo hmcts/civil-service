@@ -11,14 +11,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final AssignCategoryId assignCategoryId;
 
     private final FeatureToggleService featureToggleService;
 
@@ -76,6 +78,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
 
         if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())

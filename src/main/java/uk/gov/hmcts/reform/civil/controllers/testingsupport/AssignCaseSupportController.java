@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.UnassignUserFromCasesRequestBody;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Optional;
 
-@Api
+@Tag(name = "Assign Case Support Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -40,7 +40,7 @@ public class AssignCaseSupportController {
     private final AssignCaseService assignCaseService;
 
     @PostMapping(value = {"/assign-case/{caseId}", "/assign-case/{caseId}/{caseRole}"})
-    @ApiOperation("Assign case to user")
+    @Operation(summary = "Assign case to user")
     public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                            @PathVariable("caseId") String caseId,
                            @PathVariable("caseRole") Optional<CaseRole> caseRole) {
@@ -48,7 +48,7 @@ public class AssignCaseSupportController {
     }
 
     @PostMapping(value = {"/unassign-user", "/unassign-user"})
-    @ApiOperation("Unassign user from cases")
+    @Operation(summary = "Unassign user from cases")
     public void unAssignUserFromCases(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestBody UnassignUserFromCasesRequestBody requestBody) {

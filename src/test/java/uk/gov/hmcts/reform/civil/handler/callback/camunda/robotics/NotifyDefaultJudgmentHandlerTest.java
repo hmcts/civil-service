@@ -14,14 +14,14 @@ import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -31,16 +31,18 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
@@ -59,7 +61,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
+public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
@@ -74,15 +76,24 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    @MockBean
+    private JsonSchemaValidationService validationService;
+    @MockBean
+    private Time time;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
+
+    @Autowired
+    private NotifyDefaultJudgmentHandler handler;
 
     @Nested
     class ValidJsonPayload {
 
-        @Autowired
-        private NotifyDefaultJudgmentHandler handler;
-
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
@@ -94,28 +105,38 @@ public class NotifyDefaultJudgmentHandlerTest  extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotNotifyRobotics_whenLrDisabled() {
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
                 .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
         }
-    }
 
-    @MockBean
-    RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @MockBean
-    private Time time;
+        @Test
+        void shouldNotNotifyRobotics_whenRpaToggleOff() {
+            // Given
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
+                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            boolean multiPartyScenario = isMultiPartyScenario(caseData);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(roboticsNotificationService, times(0)).notifyRobotics(caseData, multiPartyScenario,
+                                                                         params.getParams().get(BEARER_TOKEN).toString()
+            );
+        }
+    }
 
     @Nested
     class InValidJsonPayload {
 
-        @MockBean
-        private JsonSchemaValidationService validationService;
-        @Autowired
-        private NotifyDefaultJudgmentHandler handler;
-
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
+            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

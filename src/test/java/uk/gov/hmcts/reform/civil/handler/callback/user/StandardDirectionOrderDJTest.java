@@ -14,19 +14,21 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -47,13 +49,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 
 public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
@@ -62,6 +67,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private StandardDirectionOrderDJ handler;
+    @Autowired
+    private AssignCategoryId assignCategoryId;
     @MockBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
@@ -228,8 +235,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 
             assertThat(response.getData()).extracting("disposalHearingBundleDJ").extracting("input")
-                .isEqualTo("At least 7 days before the disposal hearing, the claimant must upload to the"
-                               + " Digital Portal");
+                .isEqualTo("At least 7 days before the disposal hearing, the claimant must file and serve");
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
                 .isEqualTo("This order has been made without a hearing. Each "
@@ -268,7 +274,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
                 .isEqualTo("by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
 
             //trialHearingWitnessOfFactDJ
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input1")
@@ -549,6 +555,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
         }
+
     }
 
     @Nested
@@ -601,6 +608,36 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(locations.get(0).getRegionId());
             assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
                 .isEqualTo(locations.get(0).getEpimmsId());
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            CaseDocument testDocument = CaseDocument.builder()
+                .createdBy("John")
+                .documentName("document name")
+                .documentSize(0L)
+                .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                                  .documentUrl("fake-url")
+                                  .documentFileName("file-name")
+                                  .documentBinaryUrl("binary-url")
+                                  .build())
+                .build();
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(testDocument));
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .orderSDODocumentDJCollection(documentList)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            //Then
+            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("sdo");
         }
     }
 

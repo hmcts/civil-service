@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
@@ -81,7 +81,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -95,7 +95,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (isRespondentSolicitorRegistered(caseData)) {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondent1NotRepresented()) {
             return caseData.getRespondent1().getPartyEmail();
         }
         return null;
@@ -105,19 +105,22 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (isRespondentSolicitorRegistered(caseData)) {
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
-        if (isRespondentNotRepresented(caseData)) {
-            return notificationsProperties.getRespondentCcjNotificationTemplate();
+        if (caseData.isRespondent1NotRepresented()) {
+            return getCCJRespondentTemplate(caseData);
         }
         return null;
+    }
+
+    private String getCCJRespondentTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getRespondentCcjNotificationWelshTemplate();
+        }
+        return notificationsProperties.getRespondentCcjNotificationTemplate();
     }
 
     public String getRespondentLegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.map(Organisation::getName).orElse(null);
-    }
-
-    public boolean isRespondentNotRepresented(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
     }
 
     public boolean isRespondentSolicitorRegistered(CaseData caseData) {

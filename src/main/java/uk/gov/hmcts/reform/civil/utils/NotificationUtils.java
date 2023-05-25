@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -32,7 +32,12 @@ public class NotificationUtils {
         //NO-OP
     }
 
-    public static Boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
+    public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        return caseEvent.equals(matchEvent);
+    }
+
+    public static boolean isDefendant1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return caseEvent.equals(matchEvent);
     }
@@ -57,8 +62,8 @@ public class NotificationUtils {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                        ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                        : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                    ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),

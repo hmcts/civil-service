@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -57,8 +57,9 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -93,7 +94,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -162,7 +163,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .generalAppType(GAApplicationType.builder()
@@ -294,6 +295,9 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000")
+                                                   .region("2").build());
+        caseDataBuilder.locationName("locationOfRegion2");
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -327,6 +331,52 @@ public class GeneralApplicationDetailsBuilder {
         if (withGADetailsResp2) {
             caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
                                                                        .toArray(new GADetailsRespondentSol[0])));
+        }
+        return caseDataBuilder.build();
+    }
+
+    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+                                               boolean withGADetails,
+                                               boolean withGADetailsResp,
+                                               boolean withGADetailsResp2, boolean withGADetailsMaster,
+                                               Map<String, String> applicationIdStatus) {
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
+                                                   .region("2").build());
+        caseDataBuilder.ccdCaseReference(1L);
+        if (!Collections.isEmpty(applicationIdStatus)) {
+            List<GeneralApplication> genApps = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
+            caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
+        }
+
+        if (withGADetails) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.claimantGaAppDetails(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        if (withGADetailsMaster) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.gaDetailsMasterCollection(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
+        List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
+        applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
+        if (withGADetailsResp) {
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
+
+        if (withGADetailsResp2) {
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
+                                                                          .toArray(new GADetailsRespondentSol[0])));
         }
         return caseDataBuilder.build();
     }
@@ -1108,6 +1158,11 @@ public class GeneralApplicationDetailsBuilder {
         return builder.generalAppType(GAApplicationType.builder()
                         .types(singletonList(SUMMARY_JUDGEMENT))
                         .build())
+                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication
+                                            .CaseLocationCivil.builder()
+                                            .baseLocation("34567")
+                                            .region("4").build())
+                .isCcmccLocation(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())
@@ -1318,6 +1373,91 @@ public class GeneralApplicationDetailsBuilder {
                         .generalAppUrgency(YES)
                         .reasonsForUrgency(STRING_CONSTANT)
                         .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
+                        .build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(getPreferredLoc())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
+    }
+
+    public CaseData getVaryJudgmentWithN245TestData() {
+        return CaseData
+                .builder()
+                .ccdCaseReference(1L)
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .courtLocation(CourtLocation.builder()
+                        .caseLocation(CaseLocationCivil.builder()
+                                .region("2")
+                                .baseLocation("00000")
+                                .build())
+                        .build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(VARY_JUDGEMENT))
+                        .build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                        .hasAgreed(YES)
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppInformOtherParty(GAInformOtherParty.builder()
+                        .isWithNotice(YES)
+                        .reasonsForWithoutNotice(STRING_CONSTANT)
+                        .build())
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(NO)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppN245FormUpload(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
                         .build())
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder()
                         .name(STRING_CONSTANT)

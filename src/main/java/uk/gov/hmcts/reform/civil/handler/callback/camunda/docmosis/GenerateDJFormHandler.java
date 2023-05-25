@@ -11,8 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
     );
     private static final String TASK_ID = "GenerateDJForm";
     private static final String TASK_ID_SPEC = "GenerateDJFormSpec";
+    private final AssignCategoryId assignCategoryId;
 
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     private final ObjectMapper objectMapper;
@@ -85,6 +87,8 @@ public class GenerateDJFormHandler extends CallbackHandler {
         if (caseDocuments.size() > 1) {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(1)));
         }
+        assignCategoryId.assignCategoryIdToCollection(systemGeneratedCaseDocuments, document -> document.getValue().getDocumentLink(),
+                                                 "detailsOfClaim");
         caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }
 

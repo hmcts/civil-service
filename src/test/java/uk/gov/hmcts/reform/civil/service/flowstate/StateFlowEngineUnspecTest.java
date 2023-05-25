@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -42,7 +42,6 @@ public class StateFlowEngineUnspecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
         given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
@@ -124,8 +123,7 @@ public class StateFlowEngineUnspecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), false)
+            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
         );
     }
 
@@ -139,7 +137,7 @@ public class StateFlowEngineUnspecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(4);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE " +
@@ -154,7 +152,7 @@ public class StateFlowEngineUnspecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(7);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(5);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
@@ -164,8 +162,7 @@ public class StateFlowEngineUnspecTest {
         return Stream.of(
             arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isNoticeOfChangeEnabled())),
             arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isGeneralApplicationsEnabled())),
-            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isCertificateOfServiceEnabled())),
-            arguments(FlowFlag.RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isRpaContinuousFeedEnabled()))
+            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isCertificateOfServiceEnabled()))
         );
     }
 

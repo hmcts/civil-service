@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,33 +11,41 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
@@ -69,6 +80,11 @@ public class SealedClaimFormGeneratorForSpecTest {
     private InterestCalculator interestCalculator;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+
+    @Mock
+    private UserService userService;
+    @Mock
+    private SystemUpdateUserConfiguration userConfig;
 
     @BeforeEach
     void setup() {
@@ -218,5 +234,61 @@ public class SealedClaimFormGeneratorForSpecTest {
             .claimFee(Fee.builder()
                           .calculatedAmountInPence(BigDecimal.valueOf(70_00))
                           .build());
+    }
+
+    private CaseData.CaseDataBuilder getCaseDataBuilderWithAllDetails() {
+        List<TimelineOfEvents> timelines = new ArrayList<>();
+        timelines.add(TimelineOfEvents.builder()
+                          .value(TimelineOfEventDetails.builder()
+                                     .timelineDate(LocalDate.now()).timelineDescription("test timeline").build()).build());
+
+        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            .toBuilder()
+            .totalClaimAmount(BigDecimal.valueOf(850_00))
+            .claimFee(Fee.builder()
+                          .calculatedAmountInPence(BigDecimal.valueOf(70_00))
+                          .build())
+            .timelineOfEvents(timelines)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .differentRate(new BigDecimal(100)).differentRateReason("test").build())
+            .interestFromSpecificDate(LocalDate.now())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .breakDownInterestDescription("test breakdown desc");
+    }
+
+    @Test
+    void generateSealedClaimForm1v1WithAllFields() {
+
+        CaseData.CaseDataBuilder caseBuilder = getCaseDataBuilderWithAllDetails();
+        CaseData caseData = caseBuilder
+            .build();
+
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
+            .thenReturn(caseData.getIssueDate().plusDays(17));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
+            .thenReturn(caseData.getIssueDate().plusDays(17));
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
+    }
+
+    @Test
+    void testDownloadDocument() {
+        when(userConfig.getUserName()).thenReturn("test");
+        when(userConfig.getPassword()).thenReturn("test");
+        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
+        when(documentManagementService.downloadDocument(anyString(), anyString())).thenReturn(bytes);
+        byte[] fileArr = sealedClaimFormGenerator.downloadDocument(CASE_DOCUMENT);
+        assertThat(fileArr).isEqualTo(bytes);
     }
 }

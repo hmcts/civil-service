@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -86,12 +87,9 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
-        if (toggleService.isGlobalSearchEnabled()) {
-            CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-            String siteId = ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)
-                ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
-            setSupplementaryData(caseData.getCcdCaseReference(), siteId);
-        }
+        String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
+        setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
         return SubmittedCallbackResponse.builder().build();
     }

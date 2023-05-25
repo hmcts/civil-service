@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -27,20 +25,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-@Api
+@Tag(name = "Cases Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -60,7 +58,7 @@ public class CasesController {
     @GetMapping(path = {
         "/{caseId}",
     })
-    @ApiOperation("get case by id from CCD")
+    @Operation(summary = "get case by id from CCD")
     public ResponseEntity<CaseDetails> getCaseId(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
@@ -77,9 +75,9 @@ public class CasesController {
     }
 
     @PostMapping(path = "/")
-    @ApiOperation("get list of the cases from CCD")
+    @Operation(summary = "get list of the cases from CCD")
     public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                                @RequestBody String searchString) {
+                                                    @RequestBody String searchString) {
 
         log.info("Received getCaseList");
 
@@ -91,10 +89,11 @@ public class CasesController {
     }
 
     @GetMapping(path = "/actors/{actorId}")
-    @ApiOperation("Gets credentials for actorId from RAS")
-    public ResponseEntity<RoleAssignmentServiceResponse>
-        getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
-                                @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    @Operation(summary = "Gets credentials for actorId from RAS")
+    public ResponseEntity<RoleAssignmentServiceResponse> getRoleAssignmentsByActorId(
+        @PathVariable("actorId") String actorId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
 
         log.info("Received ActorId: {}", actorId);
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
@@ -102,10 +101,11 @@ public class CasesController {
     }
 
     @GetMapping(path = "/claimant/{submitterId}")
-    @ApiOperation("Gets basic claim information for claimant")
-    public ResponseEntity<List<DashboardClaimInfo>>
-        getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
-                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    @Operation(summary = "Gets basic claim information for claimant")
+    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(
+        @PathVariable("submitterId") String submitterId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
         List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
             authorization,
             submitterId
@@ -114,10 +114,11 @@ public class CasesController {
     }
 
     @GetMapping(path = "/defendant/{submitterId}")
-    @ApiOperation("Gets basic claim information for defendant")
-    public ResponseEntity<List<DashboardClaimInfo>>
-        getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
-                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    @Operation(summary = "Gets basic claim information for defendant")
+    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForDefendant(
+        @PathVariable("submitterId") String submitterId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
         List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(
             authorization,
             submitterId
@@ -126,15 +127,16 @@ public class CasesController {
     }
 
     @PostMapping(path = "/{caseId}/citizen/{submitterId}/event")
-    @ApiOperation("Submits event")
+    @Operation(summary = "Submits event")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
-    public ResponseEntity<CaseData>
-        submitEvent(@PathVariable("submitterId") String submitterId,
-                    @PathVariable("caseId") String caseId,
-                    @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                    @RequestBody EventDto eventDto) {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<CaseData> submitEvent(
+        @PathVariable("submitterId") String submitterId,
+        @PathVariable("caseId") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @RequestBody EventDto eventDto
+    ) {
         EventSubmissionParams params = EventSubmissionParams
             .builder()
             .authorisation(authorization)
@@ -150,13 +152,10 @@ public class CasesController {
     }
 
     @PostMapping(path = "/response/deadline")
-    @ApiOperation("Calculates extended response deadline")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header")})
+    @Operation(summary = "Calculates extended response deadline")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline) {
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);

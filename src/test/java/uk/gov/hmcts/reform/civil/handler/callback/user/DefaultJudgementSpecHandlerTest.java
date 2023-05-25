@@ -20,11 +20,14 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -35,13 +38,18 @@ import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_HEADER;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_LIP_CASE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -68,6 +76,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
@@ -161,6 +172,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getErrors().contains("Default judgment cannot be applied for while claim is "
                                                          + "in breathing space"));
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(BreathingSpaceInfo.builder().lift(null).build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .build();
+
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).contains("The Claim is not eligible for Default Judgment.");
         }
 
     }
@@ -807,6 +833,88 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £5001.00";
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
         }
+
+        @Test
+        void shouldReturnFixedAmount_whenClaimAmountLessthan5000AndLRvLiP() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(100)
+                );
+            when(feesService.getFeeDataByTotalClaimAmount(any()))
+                .thenReturn(Fee.builder()
+                                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                .version("1")
+                                .code("CODE")
+                                .build());
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .partialPayment(YesOrNo.YES)
+                .paymentSetDate(LocalDate.now().minusDays(15))
+                .partialPaymentAmount("100")
+                .totalClaimAmount(BigDecimal.valueOf(1010))
+                .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                .partialPayment(YesOrNo.YES)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .build())
+                                          .build())
+                .specRespondent1Represented(NO)
+                .respondent1Represented(null)
+
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            String test = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                + "### Claim amount \n"
+                + " £1010.00\n"
+                + " ### Claim interest amount \n"
+                + "£100.00\n"
+                + " ### Fixed cost amount \n"
+                + "£112.00\n"
+                + "### Claim fee amount \n"
+                + " £1.00\n"
+                + " ## Subtotal \n"
+                + " £1223.00\n"
+                + "\n"
+                + " ### Amount already paid \n"
+                + "£1.00\n"
+                + " ## Total still owed \n"
+                + " £1222.00";
+
+            assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+        }
+    }
+
+    @Nested
+    class MidRepaymentTotal {
+
+        private static final String PAGE_ID = "repaymentTotal";
+
+        @Test
+        void shouldGetException_whenIsCalledAndTheOverallIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            assertThrows(NullPointerException.class, () -> {
+                handler.handle(params);
+            });
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        @Test
+        void shouldGenerateDocument_whenIsCalled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess").isNotNull();
+        }
     }
 
     @Nested
@@ -882,6 +990,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                           .build());
         }
 
+        @Test
+        void shouldReturnJudgementRequestedResponse_whenLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1(PartyBuilder.builder().build())
+                .respondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(caseData.isLRvLipOneVOne()).isTrue();
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(
+                                                                              JUDGMENT_REQUESTED_HEADER)
+                                                                          .confirmationBody(String.format(
+                                                                              JUDGMENT_REQUESTED_LIP_CASE))
+                                                                          .build());
+        }
     }
 
 }

@@ -14,9 +14,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
@@ -26,21 +26,21 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -79,9 +79,10 @@ class RpaConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     FeatureToggleService featureToggleService;
-
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
     @MockBean
     private Time time;
 
@@ -98,7 +99,7 @@ class RpaConsumerTest extends BaseRpaTest {
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                           .courtTypeId("10").courtLocationCode("121")
                           .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("127");
     }
 
     @Nested
@@ -940,11 +941,6 @@ class RpaConsumerTest extends BaseRpaTest {
 
     @Nested
     class CreateClaimRpaContinuousFeed {
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
-        }
 
         @Test
         @SneakyThrows

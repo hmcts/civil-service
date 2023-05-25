@@ -7,6 +7,9 @@ xui-webapp:
 
 camunda-bpm:
   enabled: false
+
+aac-manage-case-assignment:
+  enabled: false
 ccd:
   enabled: false
 java:
@@ -47,6 +50,7 @@ java:
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CLAIM_STORE_URL: http://cmc-claim-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    HMC_API_URL: http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CUI_URL: https://civil-citizen-ui.{{ .Values.global.environment }}.platform.hmcts.net
     CUI_URL_RESPOND_TO_CLAIM: https://civil-citizen-ui.{{ .Values.global.environment }}.platform.hmcts.net/first-contact/start
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
@@ -73,7 +77,7 @@ java:
         - cross-access-user-password
         - prd-admin-user-username
         - prd-admin-user-password
-        - appinsights-instrumentation-key
+        - appinsights-connection-string
         - docmosis-api-key
         - cmc-db-password-v11
         - gov-notify-api-key

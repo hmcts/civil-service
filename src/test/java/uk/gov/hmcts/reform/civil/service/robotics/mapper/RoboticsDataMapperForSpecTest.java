@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -71,8 +71,6 @@ public class RoboticsDataMapperForSpecTest {
                            .build())
             .build();
 
-        Mockito.when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
-
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData);
 
         Assertions.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
@@ -129,8 +127,6 @@ public class RoboticsDataMapperForSpecTest {
                     .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
                     .build())
             .build();
-
-        Mockito.when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -191,8 +187,6 @@ public class RoboticsDataMapperForSpecTest {
                     .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
                     .build())
             .build();
-
-        Mockito.when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 

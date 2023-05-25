@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -52,15 +52,6 @@ public class RoboticsNotificationService {
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
-    private boolean canSendEmailSpec() {
-        try {
-            return toggleService.isSpecRpaContinuousFeedEnabled();
-        } catch (Throwable e) {
-            log.error("Exception on launchdarkly check", e);
-            return false;
-        }
-    }
-
     private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty, String authToken) {
 
         log.info(String.format("Start prepareEmailData %s", caseData.getLegacyCaseReference()));
@@ -70,13 +61,9 @@ public class RoboticsNotificationService {
             String triggerEvent;
 
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                if (canSendEmailSpec()) {
-                    RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                    triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
-                    roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
-                } else {
-                    return Optional.empty();
-                }
+                RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
+                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());

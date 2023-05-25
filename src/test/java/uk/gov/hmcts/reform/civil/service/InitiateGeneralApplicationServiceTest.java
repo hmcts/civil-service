@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -29,13 +28,13 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -43,6 +42,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.GA_DOC_CATEGORY_ID;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -80,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
+    public static final String DEFENDANT_EMAIL_ID_CONSTANT = "testUser1@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
@@ -144,7 +147,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(weekdayDate);
 
         when(organisationApi.findUserOrganisation(any(), any()))
-            .thenReturn(uk.gov.hmcts.reform.prd.model.Organisation
+            .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
                             .builder().organisationIdentifier("OrgId1").build());
 
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
@@ -328,39 +331,39 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
             assertThat(service.respondentAssigned(caseData)).isFalse();
         }
+    }
 
-        private List<CaseAssignedUserRole> onlyApplicantSolicitorAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE)
-            );
-        }
+    public List<CaseAssignedUserRole> onlyApplicantSolicitorAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent1SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent1SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent2SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent2SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+        );
+    }
 
-        private List<CaseAssignedUserRole> applicant1Respondent1Respondent2SolAssigned() {
-            return List.of(
-                    getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
-                    getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE),
-                    getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
-            );
-        }
+    public List<CaseAssignedUserRole> applicant1Respondent1Respondent2SolAssigned() {
+        return List.of(
+            getCaseAssignedUserRole("org1Sol1", APPLICANTSOLICITORONE),
+            getCaseAssignedUserRole("org2Sol1", RESPONDENTSOLICITORONE),
+            getCaseAssignedUserRole("org3Sol1", RESPONDENTSOLICITORTWO)
+        );
+    }
 
-        private CaseAssignedUserRole getCaseAssignedUserRole(String userId, CaseRole caseRole) {
-            return CaseAssignedUserRole.builder().caseDataId("1").userId(userId)
-                    .caseRole(caseRole.getFormattedName()).build();
-        }
+    public CaseAssignedUserRole getCaseAssignedUserRole(String userId, CaseRole caseRole) {
+        return CaseAssignedUserRole.builder().caseDataId("1").userId(userId)
+            .caseRole(caseRole.getFormattedName()).build();
     }
 
     public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
@@ -428,7 +431,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
+    void shouldNotPopulateStatementOfTruthAndSetNoticeAndConsentOrderIfConsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
         when(locationRefDataService.getCcmccLocation(any()))
@@ -439,9 +442,13 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
-            .isNull();
+            .isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty()
                        .getReasonsForWithoutNotice()).isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                .getGeneralAppConsentOrder()).isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                .getGeneralAppConsentOrder()).isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getName())
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
@@ -814,6 +821,43 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        builder.applicant1OrganisationPolicy(OrganisationPolicy
+                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+            .id("org1Sol1").build());
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenApplicantIsClaimantAtMainCase() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseData(CaseDataBuilder.builder().build());
+
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        builder.applicant1OrganisationPolicy(OrganisationPolicy
+                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
+
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), UserDetails.builder()
+            .id("org3Sol1").build());
+
+        assertFalse(result);
+    }
+
+    @Test
     void shouldPopulateApplicantDetails() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
@@ -1060,6 +1104,20 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("22222");
+    }
+
+    @Test
+    void shouldCopyN245toEvidenceWithCategoryId_whenCreateVaryApplication() {
+        CaseData caseData = new GeneralApplicationDetailsBuilder()
+                .getVaryJudgmentWithN245TestData();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0)
+                .getValue().getGeneralAppEvidenceDocument()).hasSize(2);
+        assertThat(result.getGeneralApplications().get(0)
+                .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
+                .isEqualTo(GA_DOC_CATEGORY_ID);
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

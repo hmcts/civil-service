@@ -22,15 +22,15 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -69,7 +69,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -124,6 +125,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
 
+    public static final String FEEDBACK_LINK = "<p>%s"
+        + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
+
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
     @Autowired
@@ -131,6 +135,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -261,7 +266,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
         DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
                     + "by the Court (together with the appropriate fee) "
@@ -272,7 +278,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
+            .input("At least 7 days before the disposal hearing, the claimant must file and serve")
             .build();
 
         updatedData.disposalHearingBundle(tempDisposalHearingBundle).build();
@@ -302,7 +308,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
-            .date3(LocalDate.now().plusWeeks(4))
+            .date3(LocalDate.now().plusWeeks(8))
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
@@ -335,11 +341,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
                         + "counter-schedule.")
-            .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                        + "therefore final, no further schedule of loss shall be uploaded without permission to amend. "
-                        + "The defendant shall upload to the Digital Portal an up-to-date counter schedule of loss by "
-                        + "4pm on")
-            .date3(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
@@ -378,7 +379,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
 
         FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("This order has been made without hearing. "
+            .input(String.format(
+                "This order has been made without hearing. "
                     + "Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
@@ -597,15 +599,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date3(LocalDate.now().plusWeeks(8))
             .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
-            .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                        + "available.")
-            .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date5(LocalDate.now().plusWeeks(8))
-            .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
-            .date6(LocalDate.now().plusWeeks(10))
             .input11("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 
@@ -716,6 +709,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (document != null) {
             updatedData.sdoOrderDocument(document);
         }
+        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -771,7 +765,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 hearingInPersonLocation,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )
-            .ifPresent(locationRefData -> LocationRefDataService.updateWithLocation(dataBuilder, locationRefData));
+            .ifPresent(locationRefData -> LocationHelper.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
@@ -780,6 +774,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+        // null/remove preview SDO document, otherwise it will show as duplicate within case file view
+        dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
@@ -819,27 +815,29 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Party applicant2 = caseData.getApplicant2();
         Party respondent2 = caseData.getRespondent2();
 
+        String initialBody = format(
+            CONFIRMATION_SUMMARY_1v1,
+            applicant1Name,
+            respondent1Name
+        );
+
         if (applicant2 != null) {
-            return format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_2v1,
                 applicant1Name,
                 applicant2.getPartyName(),
                 respondent1Name
             );
         } else if (respondent2 != null) {
-            return format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_1v2,
                 applicant1Name,
                 respondent1Name,
                 respondent2.getPartyName()
             );
-        } else {
-            return format(
-                CONFIRMATION_SUMMARY_1v1,
-                applicant1Name,
-                respondent1Name
-            );
         }
+        String body = initialBody + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
+        return body;
     }
 
     private void setCheckList(

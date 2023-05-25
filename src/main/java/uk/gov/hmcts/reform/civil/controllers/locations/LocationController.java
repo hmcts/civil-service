@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.controllers.locations;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.List;
 
-@Api
+@Tag(name = "Location Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -35,10 +35,10 @@ public class LocationController {
     private final CourtLocationUtils courtLocationUtils;
 
     @GetMapping(path = "/courtLocations")
-    @ApiOperation("Gets court locations")
+    @Operation(summary = "Gets court locations")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<List<DynamicListElement>> getCourtLocations(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         return new ResponseEntity<>(courtLocationUtils.getLocationsFromList(

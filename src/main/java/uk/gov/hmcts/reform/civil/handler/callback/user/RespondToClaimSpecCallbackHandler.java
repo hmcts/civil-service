@@ -24,15 +24,20 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -41,16 +46,18 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -61,6 +68,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,7 +129,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -146,6 +156,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1313,6 +1324,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
+        if (respondent2HasSameLegalRep(caseData)) {
+            // if responses are marked as same, copy respondent 1 values into respondent 2
+            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
+                updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
+                updatedData
+                    .respondent2ResponseDate(responseDate);
+            }
+        }
+
         updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
@@ -1323,6 +1343,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+        }
+
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            )) {
+            LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
+            updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                          .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         CaseRole respondentTwoCaseRoleToCheck;
@@ -1428,7 +1459,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
+
+        if (toggleService.isCaseFileViewEnabled()) {
+            // casefileview changes need to assign documents into specific folders, this is help determine
+            // which user is "creating" the document and therefore which folder to move the documents
+            // into, when directions order is generated in GenerateDirectionsQuestionnaireCallbackHandler
+            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            updatedData.respondent2DocumentGeneration(null);
+            if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                         .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                                                           .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+                updatedData.respondent2DocumentGeneration("userRespondent2");
+            }
+        }
+
+        if (toggleService.isHmcEnabled()) {
+            populateWithPartyIds(updatedData);
+
+        }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
@@ -1456,11 +1508,96 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
+        assembleResponseDocumentsSpec(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
+        ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
+        if (respondent1SpecDefenceResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
+            if (respondent1ClaimDocument != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                                          updatedCaseData.build().getRespondent1ResponseDate(),
+                                          DocumentType.DEFENDANT_DEFENCE
+                    ));
+                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
+                                                       "defendant1DefenseDirectionsQuestionnaire");
+            }
+        }
+        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        if (respondent1DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
+            if (respondent1DQDraftDirections != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(
+                        respondent1DQDraftDirections,
+                        "Defendant",
+                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    ));
+                assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
+                                                       "defendant1DefenseDirectionsQuestionnaire");
+            }
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    defendantUploads.add(
+                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                              updatedCaseData.build().getRespondent2ResponseDate(),
+                                              DocumentType.DEFENDANT_DEFENCE
+                        ));
+                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
+                                                           "defendant2DefenseDirectionsQuestionnaire");
+                }
+            }
+        } else {
+            ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
+            if (respondent2SpecDefenceResponseDocument != null) {
+                uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
+                if (respondent2ClaimDocument != null) {
+                    defendantUploads.add(
+                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
+                                              updatedCaseData.build().getRespondent2ResponseDate(),
+                                              DocumentType.DEFENDANT_DEFENCE
+                        ));
+                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
+                                                           "defendant2DefenseDirectionsQuestionnaire");
+                }
+            }
+        }
+        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+        if (respondent2DQ != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
+            if (respondent2DQDraftDirections != null) {
+                defendantUploads.add(
+                    buildElemCaseDocument(
+                        respondent2DQDraftDirections,
+                        "Defendant 2",
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                    ));
+                assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
+                                                       "defendant2DefenseDirectionsQuestionnaire");
+            }
+        }
+        if (!defendantUploads.isEmpty()) {
+            updatedCaseData.defendantResponseDocuments(defendantUploads);
+        }
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (toggleService.isCaseFileViewEnabled()) {
+            updatedCaseData.respondent1SpecDefenceResponseDocument(null);
+            updatedCaseData.respondent2SpecDefenceResponseDocument(null);
+        }
+
     }
 
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
@@ -1484,13 +1621,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
 
             dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
-                                           .getRespondToCourtLocation().toBuilder()
+                                               .getRespondToCourtLocation().toBuilder()
                                                .reasonForHearingAtSpecificCourt(
                                                    caseData.getRespondent1DQ()
                                                        .getRespondToCourtLocation()
                                                        .getReasonForHearingAtSpecificCourt())
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build());
             dq.respondToCourtLocation(RequestedCourt.builder()
                                           .responseCourtLocations(null)
@@ -1524,7 +1661,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
-                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                               .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build())
                 .respondToCourtLocation2(RequestedCourt.builder()
                                              .responseCourtLocations(null)
@@ -1703,4 +1840,5 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         return false;
     }
+
 }

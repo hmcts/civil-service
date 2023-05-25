@@ -14,9 +14,10 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
@@ -27,7 +28,6 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -35,8 +35,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -56,6 +56,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -86,7 +87,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENC
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -109,7 +109,7 @@ public class EventHistoryMapper {
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
     private final Time time;
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
@@ -132,14 +132,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
-                    // Notice of change:
-                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT: {
-                        // this would change in CIV-1620
-                        if (featureToggleService.isNoticeOfChangeEnabled()) {
-                            buildClaimIssued(builder, caseData);
-                        }
-                        break;
-                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
@@ -801,46 +793,34 @@ public class EventHistoryMapper {
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
-                buildMiscellaneousCaseNotesEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
-                buildMiscellaneousCaseNotesEvent(builder, caseData);
-            }
+        if (isNotEmpty(caseData.getCaseNotes())) {
+            buildMiscellaneousCaseNotesEvent(builder, caseData);
         }
 
     }
 
     private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
-            .stream()
-            .map(caseNote ->
-                     Event.builder()
-                         .eventSequence(prepareEventSequence(builder.build()))
-                         .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn())
-                         .eventDetailsText(left((format("case note added: %s", caseNote.getNote())), 250))
-                         .eventDetails(EventDetails.builder()
-                                           .miscText(left((format("case note added: %s", caseNote.getNote())), 250))
-                                           .build())
-                         .build())
-            .collect(Collectors.toList());
+                .stream()
+                .map(caseNote ->
+                        Event.builder()
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseNote.getCreatedOn())
+                                .eventDetailsText(left((format("case note added: %s",
+                                        caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                .eventDetails(EventDetails.builder()
+                                        .miscText(left((format("case note added: %s",
+                                                caseNote.getNote().replaceAll("\\s+", " "))), 250))
+                                        .build())
+                                .build())
+                .collect(Collectors.toList());
         builder.miscellaneous(events);
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
-                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled()
-                && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
-            }
+        if (caseData.getRespondent1LitigationFriendCreatedDate() != null) {
+            buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
         }
     }
 
@@ -860,16 +840,8 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (featureToggleService.isSpecRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
-            }
-        } else {
-            if (featureToggleService.isRpaContinuousFeedEnabled()
-                && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-                buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
-            }
+        if (caseData.getRespondent2LitigationFriendCreatedDate() != null) {
+            buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
         }
     }
 
@@ -889,48 +861,37 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isRpaContinuousFeedEnabled()) {
-            String miscText = "Claim details notified.";
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getClaimDetailsNotificationDate())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
-        }
-    }
+        String miscText = "Claim details notified.";
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getClaimDetailsNotificationDate())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
 
-    private boolean rpaEnabledForClaim(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return featureToggleService.isSpecRpaContinuousFeedEnabled();
-        } else {
-            return featureToggleService.isRpaContinuousFeedEnabled();
-        }
     }
 
     private void buildClaimIssued(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (rpaEnabledForClaim(caseData)) {
-            String miscText = "Claim issued in CCD.";
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseData.getIssueDate().atStartOfDay())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
-        }
+        String miscText = "Claim issued in CCD.";
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {
-        String detailsText = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+        String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1038,11 +999,19 @@ public class EventHistoryMapper {
     }
 
     public String prepareTakenOfflineEventDetails(CaseData caseData) {
-        return left(format(
-            "RPA Reason: Manually moved offline for reason %s on date %s.",
-            prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCaseman()),
-            caseData.getClaimProceedsInCaseman().getDate().format(ISO_DATE)
-        ), 250); // Max chars allowed by Caseman
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return left(format(
+                "RPA Reason: Manually moved offline for reason %s on date %s.",
+                prepareTakenOfflineByStaffReason(caseData.getClaimProceedsInCaseman()),
+                caseData.getClaimProceedsInCaseman().getDate().format(ISO_DATE)
+            ), 250); // Max chars allowed by Caseman
+        } else {
+            return left(format(
+                "RPA Reason: Manually moved offline for reason %s on date %s.",
+                prepareTakenOfflineByStaffReasonSpec(caseData.getClaimProceedsInCasemanLR()),
+                caseData.getClaimProceedsInCasemanLR().getDate().format(ISO_DATE)
+            ), 250); // Max chars allowed by Caseman
+        }
     }
 
     private String prepareTakenOfflineByStaffReason(ClaimProceedsInCaseman claimProceedsInCaseman) {
@@ -1050,6 +1019,13 @@ public class EventHistoryMapper {
             return claimProceedsInCaseman.getOther();
         }
         return claimProceedsInCaseman.getReason().name();
+    }
+
+    private String prepareTakenOfflineByStaffReasonSpec(ClaimProceedsInCasemanLR claimProceedsInCasemanLR) {
+        if (claimProceedsInCasemanLR.getReason() == ReasonForProceedingOnPaper.OTHER) {
+            return claimProceedsInCasemanLR.getOther();
+        }
+        return claimProceedsInCasemanLR.getReason().name();
     }
 
     private void buildClaimantHasNotifiedDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -1118,10 +1094,11 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
-            List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsId(
-                    CallbackParams.Params.BEARER_TOKEN.toString(),
-                    caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+            String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
+                caseData,
+                CallbackParams.Params.BEARER_TOKEN.toString(), true
+            );
+
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1131,21 +1108,12 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode(courtLocations.isEmpty()
-                                                                            ? "" : courtLocations.stream()
-                                                        .filter(id -> id.getCourtTypeId().equals(
-                                                            CIVIL_COURT_TYPE_ID))
-                                                        .collect(Collectors.toList()).get(0)
-                                                        .getCourtLocationCode())
+                                                    .preferredCourtCode(preferredCourtCode)
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      courtLocations.isEmpty() ? "" : courtLocations.stream()
-                                          .filter(id -> id.getCourtTypeId().equals(
-                                              CIVIL_COURT_TYPE_ID))
-                                          .collect(Collectors.toList()).get(0)
-                                          .getCourtLocationCode()
+                                      preferredCourtCode
                                   ))
                                   .build())
                 .collect(Collectors.toList());

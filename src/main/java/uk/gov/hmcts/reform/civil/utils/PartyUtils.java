@@ -8,11 +8,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -29,19 +34,23 @@ public class PartyUtils {
         //NO-OP
     }
 
-    public static String getPartyNameBasedOnType(Party party) {
+    public static String getPartyNameBasedOnType(Party party, boolean omitTitle) {
         switch (party.getType()) {
             case COMPANY:
                 return party.getCompanyName();
             case INDIVIDUAL:
-                return getIndividualName(party);
+                return getIndividualName(party, omitTitle);
             case SOLE_TRADER:
-                return getSoleTraderName(party);
+                return getSoleTraderName(party, omitTitle);
             case ORGANISATION:
                 return party.getOrganisationName();
             default:
                 throw new IllegalArgumentException("Invalid Party type in " + party);
         }
+    }
+
+    public static String getPartyNameBasedOnType(Party party) {
+        return getPartyNameBasedOnType(party, false);
     }
 
     private static String getTitle(String title) {
@@ -80,18 +89,26 @@ public class PartyUtils {
         }
     }
 
-    private static String getSoleTraderName(Party party) {
-        return getTitle(party.getSoleTraderTitle())
+    private static String getSoleTraderName(Party party, boolean omitTitle) {
+        return (omitTitle ? "" : getTitle(party.getSoleTraderTitle()))
             + party.getSoleTraderFirstName()
             + " "
             + party.getSoleTraderLastName();
     }
 
-    private static String getIndividualName(Party party) {
-        return getTitle(party.getIndividualTitle())
+    private static String getSoleTraderName(Party party) {
+        return getSoleTraderName(party, false);
+    }
+
+    private static String getIndividualName(Party party, boolean omitTitle) {
+        return (omitTitle ? "" : getTitle(party.getIndividualTitle()))
             + party.getIndividualFirstName()
             + " "
             + party.getIndividualLastName();
+    }
+
+    private static String getIndividualName(Party party) {
+        return getIndividualName(party, false);
     }
 
     public static String buildPartiesReferences(CaseData caseData) {
@@ -319,4 +336,49 @@ public class PartyUtils {
                           ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
+    private static String createPartyId() {
+        return UUID.randomUUID().toString().substring(0, 16);
+    }
+
+    public static Party appendWithNewPartyId(Party party) {
+        return party != null && party.getPartyID() == null
+            ? party.toBuilder().partyID(createPartyId()).build() : party;
+    }
+
+    public static LitigationFriend appendWithNewPartyId(LitigationFriend litigationFriend) {
+        return litigationFriend != null && litigationFriend.getPartyID() == null
+            ? litigationFriend.toBuilder().partyID(createPartyId()).build() : litigationFriend;
+    }
+
+    public static PartyFlagStructure appendWithNewPartyId(PartyFlagStructure partyFlagStructure) {
+        return partyFlagStructure != null && partyFlagStructure.getPartyID() == null
+            ? partyFlagStructure.toBuilder().partyID(createPartyId()).build() : partyFlagStructure;
+    }
+
+    public static List<Element<PartyFlagStructure>> appendWithNewPartyIds(List<Element<PartyFlagStructure>> partyFlagStructures) {
+        return partyFlagStructures != null ? partyFlagStructures.stream().map(
+            party -> Element.<PartyFlagStructure>builder()
+                .id(party.getId()).value(appendWithNewPartyId(party.getValue())).build()
+        ).collect(Collectors.toList()) : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void populateWithPartyIds(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
+            .applicant1(appendWithNewPartyId(caseData.getApplicant1()))
+            .applicant2(appendWithNewPartyId(caseData.getApplicant2()))
+            .respondent1(appendWithNewPartyId(caseData.getRespondent1()))
+            .respondent2(appendWithNewPartyId(caseData.getRespondent2()))
+            .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
+            .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
+            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
+            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()))
+            .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
+            .respondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
+            .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()))
+            .applicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()))
+            .respondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()))
+            .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
+    }
 }

@@ -22,12 +22,13 @@ public class AdmitProceedConfHeader implements RespondToResponseConfirmationHead
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
+        String claimNumber = caseData.getLegacyCaseReference();
         if (caseData.getApplicant1ProceedsWithClaimSpec() == null
             || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
-            || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || (caseData.hasClaimantAgreedToFreeMediation())) {
             return Optional.empty();
         }
-        String claimNumber = caseData.getLegacyCaseReference();
         return Optional.of(format(
             "# You have submitted your intention to proceed%n## Claim number: %s",
             claimNumber

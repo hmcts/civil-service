@@ -8,12 +8,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
@@ -79,6 +79,11 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
         if (isRespondentSolicitor2Notification(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
+        }
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.isLRvLipOneVOne()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
         if ((isRespondentSolicitor2Notification(callbackParams)

@@ -17,16 +17,17 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,8 +43,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
@@ -51,7 +52,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 @SpringBootTest(classes = {
     GenerateClaimFormCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -71,6 +73,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     private GenerateClaimFormCallbackHandler handler;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final CaseDocument CLAIM_FORM =
@@ -177,6 +181,20 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             verifyNoInteractions(litigantInPersonFormGenerator);
             verifyNoInteractions(civilDocumentStitchingService);
         }
+
+        @Test
+        void shouldGenerateClaimForm_andAssignCategoryId() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("detailsOfClaim");
+
+        }
     }
 
     @Nested
@@ -269,7 +287,8 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     @SpringBootTest(classes = {
         GenerateClaimFormCallbackHandler.class,
         JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+        CaseDetailsConverter.class,
+        AssignCategoryId.class
     })
     class GenerateSealedClaimNoStitch {
 
@@ -284,6 +303,9 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Autowired
         private GenerateClaimFormCallbackHandler handler;
+
+        @Autowired
+        private AssignCategoryId assignCategoryId;
 
         @MockBean
         private FeatureToggleService featureToggleService;
@@ -313,12 +335,15 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     @SpringBootTest(classes = {
         GenerateClaimFormCallbackHandler.class,
         JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+        CaseDetailsConverter.class,
+        AssignCategoryId.class
     })
     class GenerateSealedClaimNoNoC {
 
         @Autowired
         private GenerateClaimFormCallbackHandler handler;
+        @Autowired
+        private AssignCategoryId assignCategoryId;
 
         @BeforeEach
         void setup() {

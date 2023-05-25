@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
-@Api
+@Tag(name = "Upload Document Support Controller")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -33,7 +33,7 @@ public class UploadDocumentSupportController {
     private final DocumentManagementService documentManagementService;
 
     @PostMapping(value = {"/upload/test-document"})
-    @ApiOperation("Upload document")
+    @Operation(summary = "Upload document")
     public Document uploadTestDocument(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
 
         PDF pdf = new PDF("TestFile.pdf", ResourceReader.readBytes("/test_support/TEST_DOCUMENT_1.pdf"), SEALED_CLAIM);

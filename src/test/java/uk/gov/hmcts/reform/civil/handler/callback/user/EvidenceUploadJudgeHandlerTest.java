@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -57,11 +57,28 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void aboutToSubmitCallback_placeholder() {
-            CaseData caseData = CaseDataBuilder.builder().build();
+        void shouldPopulateNoteDateTime_whenNoteIsAddedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteTypeNoteTA("test note")
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("noteAdditionDateTime")).isNotNull();
+
+        }
+
+        @Test
+        void shouldNotPopulateNoteDateTime_whenNoteIsAddedToCase() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteTypeNoteTA(null)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("noteAdditionDateTime")).isNull();
 
         }
     }
@@ -113,7 +130,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentOnly(documentList)
+                .documentAndName(documentList)
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);

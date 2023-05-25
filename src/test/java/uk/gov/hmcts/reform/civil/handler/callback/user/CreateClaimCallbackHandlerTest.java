@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,21 +21,25 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -41,7 +48,8 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -51,19 +59,23 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -72,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -83,6 +96,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbac
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -104,11 +118,13 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     StateFlowEngine.class,
     ValidationAutoConfiguration.class,
     ValidateEmailService.class,
-    OrganisationService.class},
+    OrganisationService.class,
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     @Autowired
     private ObjectMapper objMapper;
@@ -152,8 +168,16 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
+    @Autowired
+    private AssignCategoryId assignCategoryId;
+
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CREATE_CLAIM);
+    }
 
     @Nested
     class AboutToStartCallbackV0 {
@@ -411,6 +435,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(getDynamicList(response))
                 .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+        }
+
+        @Test
+        void shouldSetPBAv3FlagOn_whenPBAv3IsActivated() {
+            // Given
+            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
+            when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+            // Then
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("paymentTypePBA").isEqualTo("PBAv3");
         }
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
@@ -860,6 +898,53 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidPopulateClaimantSolicitor {
+
+        @Test
+        void shouldSetOrganisation_WhenPopulated() {
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+
+            Organisation organisation = Organisation.builder()
+                                                    .organisationIdentifier("1")
+                .companyNumber("1")
+                .name("Organisation1")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "populateClaimantSolicitor");
+
+            when(organisationService.findOrganisation(CallbackParams.Params.BEARER_TOKEN.toString()))
+                .thenReturn(Optional.ofNullable(organisation));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1OrganisationPolicy")
+                .extracting("Organisation")
+                .extracting("OrganisationID")
+                .isEqualTo(organisation.getOrganisationIdentifier());
+        }
+
+    }
+
+    @Nested
+    class MidSetRespondent2SameLegalRepToNo {
+
+        @Test
+        void shouldsetRespondent2SameLegalRepToNo_WhenRespondent1NotRepresented() {
+
+            CaseData caseData = CaseDataBuilder.builder().respondent1Represented(YesOrNo.NO).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "setRespondent2SameLegalRepresentativeToNo");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent2SameLegalRepresentative")
+                .isEqualTo("No");
+        }
+
+    }
+
+    @Nested
     class ValidateEmails {
 
         @Nested
@@ -969,6 +1054,38 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldThrowNoError_whenCourtLocationPopulatedAndCourtLocationDynamicListDisabled() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        String email = "Email";
+        String userId = UUID.randomUUID().toString();
+
+        given(idamClient.getUserDetails(any()))
+            .willReturn(UserDetails.builder().email(email).id(userId).build());
+
+        when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenCourtLocationPopulatedAndCourtLocationDynamicListDisabled() {
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).hasSize(1);
+    }
+
     @Nested
     class AboutToSubmitCallbackV0 {
 
@@ -1001,6 +1118,28 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("allocatedTrack", MULTI_CLAIM.name());
+        }
+
+        @Test
+        void shouldAddPartyIdsToPartyFields_whenInvoked() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
+            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
+        }
+
+        @Test
+        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
+            when(featureToggleService.isHmcEnabled()).thenReturn(false);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("applicant1")
+                .isEqualTo(objMapper.convertValue(caseData.getApplicant1(), HashMap.class));
+            assertThat(response.getData()).extracting("respondent1")
+                .isEqualTo(objMapper.convertValue(caseData.getRespondent1(), HashMap.class));
         }
 
         @Test
@@ -1042,6 +1181,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAddCaseNamePublic_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).containsEntry("caseNamePublic", "'John Rambo' v 'Sole Trader'");
+        }
+
+        @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1058,6 +1204,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+        }
+
+        @Test
+        void shouldCopyRespondent1SolicitorReferenceSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondentSolicitor2Reference = response.getData().get("solicitorReferences");
+            var respondentSolicitor2ServiceAddressRequired = response.getData().get(
+                "respondentSolicitor2ServiceAddressRequired");
+            var respondentSolicitor2ServiceAddress =
+                response.getData().get("respondentSolicitor2ServiceAddress");
+
+            assertThat(respondentSolicitor2Reference)
+                .extracting("respondentSolicitor2Reference").isEqualTo("6789");
+            assertThat(respondentSolicitor2ServiceAddressRequired).isEqualTo("No");
+            assertThat(respondentSolicitor2ServiceAddress).isNull();
         }
 
         @Test
@@ -1126,8 +1296,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName1v2_whenCaseIs1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1140,8 +1309,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName2v1_whenCaseIs2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1154,8 +1322,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
-            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        void shouldAssignCaseName1v1_whenCaseIs1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1517,6 +1684,98 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isNull();
             }
         }
+
+        static Stream<Arguments> caseDataStream() {
+            DocumentWithRegex documentRegex = new DocumentWithRegex(Document.builder()
+                                                                        .documentUrl("fake-url")
+                                                                        .documentFileName("file-name")
+                                                                        .documentBinaryUrl("binary-url")
+                                                                        .build());
+            List<Element<DocumentWithRegex>> documentList = new ArrayList<>();
+            List<Element<Document>> documentList2 = new ArrayList<>();
+            documentList.add(element(documentRegex));
+            documentList2.add(element(Document.builder()
+                                          .documentUrl("fake-url")
+                                          .documentFileName("file-name")
+                                          .documentBinaryUrl("binary-url")
+                                          .build()));
+
+            var documentToUpload = ServedDocumentFiles.builder()
+                .particularsOfClaimDocument(documentList2)
+                .medicalReport(documentList)
+                .scheduleOfLoss(documentList)
+                .certificateOfSuitability(documentList)
+                .other(documentList).build();
+
+            return Stream.of(
+                arguments(CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .uploadParticularsOfClaim(YES)
+                    .servedDocumentFiles(documentToUpload)
+                    .build())
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("caseDataStream")
+        void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            // When
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getMedicalReport().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getOther().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+
+        }
+
+        @Test
+        void shouldNotAssignCategoryIds_whenDocumentNotExist() {
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .uploadParticularsOfClaim(NO)
+                .build();
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            // Then
+            assertThat(response.getData()).extracting("servedDocumentFiles").isNull();
+        }
+
+        @Test
+        void shouldNotAssignCategoryIds_whenDocumentNotExistAndParticularOfClaimTextExists() {
+            //Given
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
+                .particularsOfClaimText("Some string").build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .uploadParticularsOfClaim(YES)
+                .servedDocumentFiles(servedDocumentFiles)
+                .build();
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getMedicalReport()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability()).isNull();
+            assertThat(updatedData.getServedDocumentFiles().getOther()).isNull();
+        }
     }
 
     @Nested
@@ -1616,14 +1875,37 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY_PBA_V3,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
+                            "# Please now pay your claim fee%n# using the link below"
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3AndCOSIsOn() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                Mockito.when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimOneDefendantSolicitor().build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Please now pay your claim fee%n# using the link below"
                         ))
                         .confirmationBody(body)
                         .build());

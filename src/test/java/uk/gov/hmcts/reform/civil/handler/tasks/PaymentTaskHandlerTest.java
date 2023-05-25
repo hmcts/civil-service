@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -87,8 +87,6 @@ class PaymentTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                                                  "RPA_CONTINUOUS_FEED", false,
-                                                  FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                                                   FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                                                   FlowFlag.NOTICE_OF_CHANGE.name(), false,
                                                   FlowFlag.CERTIFICATE_OF_SERVICE.name(), false));

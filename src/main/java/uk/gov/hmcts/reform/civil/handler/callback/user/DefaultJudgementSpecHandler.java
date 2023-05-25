@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -57,29 +60,35 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
     public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
         + "The claim will now progress offline (on paper)";
+    public static final String JUDGMENT_REQUESTED_LIP_CASE = "A request for default judgement has been sent to the court for review." +
+        "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
+    public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
+    private final FeatureToggleService toggleService;
     BigDecimal theOverallTotal;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
-            callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
-            callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec,
-            callbackKey(MID, "claimPartialPayment"), this::partialPayment,
-            callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
-            callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
-            callbackKey(MID, "repaymentValidate"), this::repaymentValidate,
-            callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline,
-            callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility)
+            .put(callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus)
+            .put(callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec)
+            .put(callbackKey(MID, "claimPartialPayment"), this::partialPayment)
+            .put(callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate)
+            .put(callbackKey(V_1, MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate)
+            .put(callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate)
+            .put(callbackKey(MID, "repaymentValidate"), this::repaymentValidate)
+            .put(callbackKey(MID, "claimPaymentDate"), this::validatePaymentDateDeadline)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     @Override
@@ -97,19 +106,21 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent2() != null
+        if (caseData.isLRvLipOneVOne()
+            || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+            .getLabel().startsWith("Both"))) {
             return format(JUDGMENT_REQUESTED_HEADER);
 
         } else {
             return format(JUDGMENT_GRANTED_HEADER);
         }
-
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.getRespondent2() != null
+        if (caseData.isLRvLipOneVOne()) {
+            return format(JUDGMENT_REQUESTED_LIP_CASE);
+        } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both")) {
             return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
@@ -126,7 +137,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getRespondent1ResponseDeadline())
+        if (featureToggleService.isPinInPostEnabled() && caseData.isRespondentResponseBilingual()) {
+            errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
+        } else if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
@@ -166,7 +179,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.bothDefendantsSpec("One");
         // populate the title of next screen if only one defendant chosen
         var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
-            .getValue().getLabel() +  " paid some of the amount owed?");
+            .getValue().getLabel() + " paid some of the amount owed?");
         var currentDefendantName = (caseData.getDefendantDetailsSpec()
             .getValue().getLabel());
         if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
@@ -207,7 +220,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                           + "- if they do not apply, close this page and apply for default judgment when they do");
+                               + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -265,7 +278,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData,
             interest,
             claimFeePounds,
-            fixedCost
+            fixedCost,
+            callbackParams
         );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
@@ -276,7 +290,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost) {
+                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
 
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
@@ -290,17 +304,24 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
-            repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
-                theOverallTotal);
+        if (caseData.isLRvLipOneVOne()
+            && toggleService.isPinInPostEnabled()
+            && V_1.equals(callbackParams.getVersion())) {
+            repaymentBreakdown.append(
+                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
-            repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
-                .getValue().getLabel() + " to pay £").append(
-                theOverallTotal);
+            if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+                repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
+                    theOverallTotal);
+            } else {
+                repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
+                    .getValue().getLabel() + " to pay £").append(
+                    theOverallTotal);
+            }
+            repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
         }
 
-        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
-            .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
+        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));

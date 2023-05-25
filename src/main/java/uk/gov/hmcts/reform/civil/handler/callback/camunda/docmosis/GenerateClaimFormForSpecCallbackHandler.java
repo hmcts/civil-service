@@ -11,16 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,6 +51,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
+    private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -81,11 +84,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
         if (caseData.getSpecClaimDetailsDocumentFiles() != null
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                     caseData.getSpecClaimDetailsDocumentFiles()))
                 .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
@@ -95,11 +100,13 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
                                .build());
         } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
                 caseData.getSpecClaimTemplateDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload(
                 wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
         } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
+            assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), "detailsOfClaim");
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                 caseData.getSpecClaimDetailsDocumentFiles())).build();
             caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
@@ -114,9 +121,17 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 sealedClaim.getDocumentName(),
                 caseData
             );
+            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "detailsOfClaim");
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        }
+
+        // these documents are added servedDocumentFiles, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            caseDataBuilder.specClaimTemplateDocumentFiles(null);
+            caseDataBuilder.specClaimDetailsDocumentFiles(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

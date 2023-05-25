@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -212,6 +212,12 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            when(coreCaseDataService.startUpdate(any(), any()))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
             doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
                 .when(externalTaskService).complete(mockTask);
@@ -702,8 +708,6 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
@@ -715,16 +719,13 @@ class CaseEventTaskHandlerTest {
                 || state.equals(COUNTER_CLAIM)
                 || state.equals(FULL_DEFENCE_PROCEED)
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
-                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                 );
             }
-            return Map.of("RPA_CONTINUOUS_FEED", false,
-                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true,
+            return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
                           FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                     );
@@ -747,7 +748,7 @@ class CaseEventTaskHandlerTest {
                         .respondent2Represented(null);
                     break;
                 case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails()
+                    caseDataBuilder.atStateRespondent1CounterClaimAfterNotifyDetails()
                         .addRespondent2(NO)
                         .respondent2OrgRegistered(null)
                         .respondent2Represented(null);
@@ -791,7 +792,7 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);;
+                        .respondent2OrgRegistered(YES);
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
                     caseDataBuilder.atStateTakenOfflineByStaff()

@@ -15,10 +15,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,10 +42,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
@@ -52,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 @SpringBootTest(classes = {
     GenerateClaimFormForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
 
@@ -64,6 +67,9 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private  AssignCategoryId assignCategoryId;
 
     @MockBean
     private Time time;
@@ -214,6 +220,7 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            specClaimTimelineDocuments.get(0).getDocument().setCategoryID(null);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
@@ -237,6 +244,114 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
         }
+
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvoked() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("detailsOfClaim");
+    }
+
+    @Test
+    void shouldAssignCategoryIdParticulars_whenInvoked() {
+        // Given
+        Document testDocument = new Document("testurl",
+                                             "testBinUrl", "A Fancy Name",
+                                             "hash", null);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specClaimDetailsDocumentFiles(testDocument)
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+    }
+
+    @Test
+    void shouldAssignCategoryIdTimeline_whenInvoked() {
+        // Given
+        Document testDocument = new Document("testurl",
+                                             "testBinUrl", "A Fancy Name",
+                                             "hash", null);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specClaimTemplateDocumentFiles(testDocument)
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getServedDocumentFiles().getTimelineEventUpload().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+    }
+
+    @Test
+    void shouldAssignCategoryIdBothTimelineAndParticulars_whenInvoked() {
+        // Given
+        Document testDocument = new Document("testurl",
+                                             "testBinUrl", "A Fancy Name",
+                                             "hash", null);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specClaimDetailsDocumentFiles(testDocument)
+            .specClaimTemplateDocumentFiles(testDocument)
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+        assertThat(updatedData.getServedDocumentFiles().getTimelineEventUpload().get(0).getValue().getCategoryID()).isEqualTo("detailsOfClaim");
+
+    }
+
+    @Test
+    void shouldNullDocuments_whenInvokedAndCaseFileEnabled() {
+        // Given
+        Document testDocument = new Document("testurl",
+                                             "testBinUrl", "A Fancy Name",
+                                             "hash", null);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .specClaimDetailsDocumentFiles(testDocument)
+            .specClaimTemplateDocumentFiles(testDocument)
+            .specRespondent1Represented(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        // Then
+        assertThat(updatedData.getSpecClaimDetailsDocumentFiles()).isNull();
+        assertThat(updatedData.getSpecClaimTemplateDocumentFiles()).isNull();
+
     }
 
     @Nested
@@ -334,5 +449,10 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimFormForSpec");
+    }
+
+    @Test
+    void testHandledEvents() {
+        assertThat(handler.handledEvents()).contains(GENERATE_CLAIM_FORM_SPEC);
     }
 }
