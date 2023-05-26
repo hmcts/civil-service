@@ -10,8 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 
 import java.util.Collections;
@@ -27,17 +28,19 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private final ObjectMapper objectMapper;
     private final SealedClaimLipResponseFormGenerator formGenerator;
+    private final static List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
-        );
+        return callbackMap;
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
+        return EVENTS;
     }
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {

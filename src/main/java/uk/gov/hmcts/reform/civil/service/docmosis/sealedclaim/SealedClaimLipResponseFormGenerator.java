@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
@@ -23,16 +27,14 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
+
 import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
@@ -376,7 +378,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         return builder.build();
     }
 
-    public CaseDocument generate(CaseData caseData, String authorization) {
+    public CaseDocument generate(final CaseData caseData, final String authorization) {
         SealedClaimLipResponseForm templateData = getTemplateData(caseData);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
@@ -389,7 +391,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
         return documentManagementService.uploadDocument(
             authorization,
-            new PDF(fileName, docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
+            new PDF(fileName, docmosisDocument.getBytes(), DocumentType.DEFENDANT_DEFENCE)
         );
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,8 @@ import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
@@ -73,5 +76,15 @@ public class Party {
 
     public String getPartyTypeDisplayValue() {
         return this.getType().getDisplayValue();
+    }
+
+    @JsonIgnore
+    public boolean isIndividual() {
+        return INDIVIDUAL.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isSoleTrader() {
+        return SOLE_TRADER.equals(getType());
     }
 }

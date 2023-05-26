@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.model.docmosis;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Getter
 @Builder
@@ -22,6 +26,28 @@ public class LipDefenceFormParty {
     private final String phone;
     private final String email;
     private final Address primaryAddress;
-    // TODO get from the CUI fields
     private final Address correspondenceAddress;
+
+    @JsonIgnore
+    public static LipDefenceFormParty from(Party party) {
+        if (party == null) {
+            return null;
+        }
+        LipDefenceFormParty.LipDefenceFormPartyBuilder builder = LipDefenceFormParty.builder()
+            .name(party.getPartyName())
+            .phone(party.getPartyPhone())
+            .email(party.getPartyEmail())
+            .primaryAddress(party.getPrimaryAddress());
+        if (party.isIndividual() || party.isSoleTrader()) {
+            builder.isIndividual(true);
+            Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(builder::dateOfBirth);
+        } else {
+            builder.isIndividual(false);
+        }
+        return builder.build();
+
+    }
 }
