@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.cmc.model.CmcParty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,8 +54,7 @@ public class ClaimStoreServiceTest {
                                                                                             .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .ocmc(true)
-                                                                                            .createdDate(CREATE_DATETIME.atOffset(
-                                                                                                ZoneOffset.UTC))
+                                                                                            .createdDate(CREATE_DATETIME)
                                                                                             .build());
 
     @BeforeEach
