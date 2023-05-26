@@ -20,7 +20,8 @@ public class DeadlineExtensionValidator {
     private final WorkingDayIndicator workingDayIndicator;
 
     public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline,
-                                                 LocalDateTime detailsNotificationDate) {
+                                                 LocalDateTime detailsNotificationDate,
+                                                 boolean hasAcknowledgedClaim) {
         List<String> errors = new ArrayList<>();
         if (!dateToValidate.isAfter(now())) {
             errors.add("The agreed extension date must be a date in the future");
@@ -29,7 +30,11 @@ public class DeadlineExtensionValidator {
         }
 
         if (dateToValidate.isAfter(detailsNotificationDate.plusDays(56).toLocalDate())) {
-            errors.add("The agreed extension date cannot be more than 56 days after the details notification date");
+            if (hasAcknowledgedClaim) {
+                errors.add("The agreed extension date cannot be more than 28 days after the current deadline.");
+            } else {
+                errors.add("The agreed extension date cannot be more than 42 days after the current deadline.");
+            }
         }
 
         return errors;

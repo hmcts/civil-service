@@ -45,12 +45,12 @@ class DeadlineExtensionValidatorTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             Assertions.assertThat(validator.validateProposedDeadline(
-                dateToValidate, responseDeadLine, detailsNotificationDate
+                dateToValidate, responseDeadLine, detailsNotificationDate, true
             )).contains("The agreed extension date must be after the current deadline");
         }
 
         @Test
-        public void shouldBeBefore56Days() {
+        public void shouldBeBefore56Days_withNoAck() {
             LocalDate dateToValidate = NOW.plusDays(50);
             LocalDateTime responseDeadLine = LocalDateTime.now().plusDays(14);
             LocalDateTime detailsNotificationDate = LocalDateTime.now().minusDays(7);
@@ -58,8 +58,21 @@ class DeadlineExtensionValidatorTest {
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             Assertions.assertThat(validator.validateProposedDeadline(
-                dateToValidate, responseDeadLine, detailsNotificationDate
-            )).contains("The agreed extension date cannot be more than 56 days after the details notification date");
+                dateToValidate, responseDeadLine, detailsNotificationDate, false
+            )).contains("The agreed extension date cannot be more than 42 days after the current deadline.");
+        }
+
+        @Test
+        public void shouldBeBefore56Days_withAck() {
+            LocalDate dateToValidate = NOW.plusDays(50);
+            LocalDateTime responseDeadLine = LocalDateTime.now().plusDays(14);
+            LocalDateTime detailsNotificationDate = LocalDateTime.now().minusDays(7);
+
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            Assertions.assertThat(validator.validateProposedDeadline(
+                dateToValidate, responseDeadLine, detailsNotificationDate, true
+            )).contains("The agreed extension date cannot be more than 28 days after the current deadline.");
         }
 
         @Test

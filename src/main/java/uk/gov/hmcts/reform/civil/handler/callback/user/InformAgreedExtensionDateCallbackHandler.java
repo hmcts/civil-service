@@ -70,7 +70,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     public static final String ERROR_EXTENSION_DATE_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
     private static final String ERROR_DEADLINE_PAST =
-        "This action cannot be performed because it is past its deadline";
+        "You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -146,8 +146,17 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.validateProposedDeadline(
                     agreedExtension, currentResponseDeadline,
-                    caseData.getClaimDetailsNotificationDate()))
+                    caseData.getClaimDetailsNotificationDate(),
+                    hasAcknowledge(callbackParams)))
                 .build();
+        }
+    }
+
+    private boolean hasAcknowledge(CallbackParams callbackParams) {
+        if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            return callbackParams.getCaseData().getRespondent2AcknowledgeNotificationDate() != null;
+        } else {
+            return callbackParams.getCaseData().getRespondent1AcknowledgeNotificationDate() != null;
         }
     }
 
