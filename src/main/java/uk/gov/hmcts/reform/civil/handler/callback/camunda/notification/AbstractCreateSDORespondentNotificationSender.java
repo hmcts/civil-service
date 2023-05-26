@@ -70,6 +70,5 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData)
         );
-
     }
 }
