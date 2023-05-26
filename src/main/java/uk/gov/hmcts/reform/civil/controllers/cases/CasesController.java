@@ -161,4 +161,15 @@ public class CasesController {
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
 
+    @GetMapping(path = "/response/agreeddeadline/{caseId}")
+    @Operation(summary = "Return the agreed deadline date")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<LocalDate> getAgreedDeadlineResponseDate(@PathVariable("caseId") Long caseId,
+                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        LocalDate deadlineAgreedDate= deadlineExtensionCalculatorService.getAgreedDeadlineResponseDate(caseId, authorization);
+        return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
+    }
+
 }
