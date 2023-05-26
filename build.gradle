@@ -264,6 +264,13 @@ task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional 
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-noc'
 }
 
+task runHearingsTests(type: Exec, description: 'Runs Hearings Api functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-hearings'
+}
+
 task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:rpa'
 }
@@ -296,7 +303,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
+    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests, runHearingsTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
