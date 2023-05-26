@@ -64,14 +64,18 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         notificationService.sendMail(
             caseData.getRespondent1().getPartyEmail(),
-            caseData.isRespondentResponseBilingual()
-                ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
-                : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate(),
+            setUpEmailTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
+    }
+
+    private String setUpEmailTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
+            : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
     }
 }

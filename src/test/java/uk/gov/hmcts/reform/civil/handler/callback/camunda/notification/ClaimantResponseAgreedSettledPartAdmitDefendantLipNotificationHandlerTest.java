@@ -51,7 +51,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn("spec-lip-template-id");
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn("spec-lip-template-id");
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn("spec-lip-template-bilingual-id");
         }
 
         @Test
@@ -124,7 +124,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                "spec-lip-template-id",
+                "spec-lip-template-bilingual-id",
                 getNotificationDataMap(caseData),
                 "claimant-part-admit-settle-respondent-notification-000DC001"
             );
