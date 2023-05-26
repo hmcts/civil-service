@@ -61,7 +61,6 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
     private static final String TEMPLATE_ID = "template-id";
     private static final String ORG_NAME = "Signer Name";
 
-
     @Nested
     class AboutToSubmitCallback {
 
