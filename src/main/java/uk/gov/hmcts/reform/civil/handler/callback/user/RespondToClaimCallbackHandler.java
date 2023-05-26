@@ -364,6 +364,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         // persist respondent address (ccd issue)
+        //when Respondent1Copy() is null breaks with null pointer. Can it even be null in the real world?
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
