@@ -5,13 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 
@@ -32,6 +28,13 @@ public class DocumentController {
     public CaseDocument uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
         return claimFormService.uploadSealedDocument(authorisation, caseData);
+    }
+
+    @PostMapping("/generateAnyDoc")
+    public CaseDocument uploadAnyDocument(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+                                                @NotNull @ModelAttribute UploadedDocument uploadedDocument) {
+        return claimFormService.uploadAnyDocument(authorisation, uploadedDocument);
     }
 
     @PostMapping(value = "/downloadSealedDoc",
