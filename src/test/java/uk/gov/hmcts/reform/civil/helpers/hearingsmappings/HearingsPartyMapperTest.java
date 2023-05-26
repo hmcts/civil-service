@@ -838,6 +838,6 @@ public class HearingsPartyMapperTest {
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
                                                                    String partyRole,
                                                                    String cftOrganisationID) {
-        return buildExpectedOrganisationPartyObject(null, name, partyRole, cftOrganisationID);
+        return buildExpectedOrganisationPartyObject(cftOrganisationID, name, partyRole, cftOrganisationID);
     }
 }
