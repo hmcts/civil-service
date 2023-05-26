@@ -70,7 +70,8 @@ import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -503,6 +504,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondents() {
             // Given
@@ -657,6 +659,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldValidateExperts_whenMultipartyAndRespondentHasSameLegalRepDiffResponseRespondent2DQIsNull() {
             //Given
@@ -681,6 +684,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldValidateExperts_whenDef2HasSameLRAndDiffResAndRespondent2DQHearingPresent() {
             //Given
@@ -831,7 +835,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateExperts_whenMultipartyAndSolicitorRepresentsOnlyOneOfRespondentsAndResSolTwoRole() {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
-                .thenReturn(false,true);
+                .thenReturn(false, true);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2DQ(Respondent2DQ
@@ -1094,6 +1098,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 () -> handler.handle(params)
             );
         }
+
         @Test
         void shouldValidateWitness_whenMultipartyAndDiffLRepAndRespondent1DQIsNull() {
             //Given
@@ -1110,6 +1115,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 () -> handler.handle(params)
             );
         }
+
         @Test
         void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQAndRespondent1DQIsNull() {
             //Given
@@ -1128,6 +1134,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 () -> handler.handle(params)
             );
         }
+
         @Test
         void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQWitNullAndRespondent1DQIsNull() {
             //Given
@@ -1146,6 +1153,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 () -> handler.handle(params)
             );
         }
+
         @Test
         void shouldValidateWitness_whenMultipartyAndSameLRDiffResponseAndRespondent2DQWitness() {
             //Given
@@ -1433,6 +1441,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsNotTheSameInV1() {
             //Given
@@ -1465,6 +1474,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenSolicitorResponseRepNotTheSameWithNoCourtLocation() {
             //Given
@@ -1497,6 +1507,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2NotPresent() {
             //Given
@@ -1524,6 +1535,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondentIsNull() {
             //Given
@@ -1551,6 +1563,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2Present() {
             //Given
@@ -1578,6 +1591,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseAndClaimNotTheSame() {
             //Given
@@ -1607,6 +1621,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenAtStateClaimSubmitted() {
             //Given
@@ -1985,6 +2000,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneDefendantRepAnsweringToTwoApplicantsInV1() {
             //Given
@@ -2017,6 +2033,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1DefendantRepAnswerTo2ApplicantInV1DiffResponse() {
             //Given
@@ -2057,6 +2074,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1DefendantRepAnswerTo2ApplicantInV1DiffClaim() {
             //Given
@@ -2099,6 +2117,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
+
         @Test
         void shouldNotSetApplicantResponseDeadlineAndSetBusinessProcess_whenRespondentResponseIsNotSet() {
             //Given
@@ -2125,6 +2144,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .doesNotContainEntry("nextDeadline", deadline.toLocalDate().toString());
             assertThat(response.getData()).doesNotHaveToString("respondent2ResponseDate");
         }
+
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenRespondent2CopyIsNull() {
             //Given
@@ -2472,6 +2492,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .extracting("responseCourtLocations").isNull();
 
                 }
+
                 @Test
                 void shouldHandleCourtLocationData_when2ndRespondentResponseCourtLocationIsNotPresent() {
                     //Given
@@ -2499,6 +2520,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .extracting("responseCourtLocations").isNull();
 
                 }
+
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentAnsweringBefore2nd() {
                     //Given
@@ -2547,6 +2569,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .extracting("respondent1DQRequestedCourt")
                         .extracting("responseCourtCode").isEqualTo("312");
                 }
+
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentWithNoDynamicValForCourtLocation() {
                     //Given
@@ -2827,6 +2850,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionv2FullDefence() {
             //Given
@@ -2870,6 +2894,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionSolicitorAndR2ResponseMatch() {
             //Given
@@ -2891,6 +2916,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionSolicitorResponseNotMatch() {
             //Given
@@ -2912,6 +2938,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionFullDefenceForBothDefendants() {
             //Given
@@ -2933,6 +2960,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_WhenFullDefenceForBothDefendantsRes2DiffLegalRep() {
             //Given
@@ -2954,6 +2982,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("FULL_DEFENCE");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionRespondent1ResponseIsMatching() {
             //Given
@@ -2998,6 +3027,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("NOT_FULL_DEFENCE");
         }
+
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmissionRespondent1ResponseNotMatchingAddApp2() {
             //Given
@@ -3052,6 +3082,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly("It is not possible to respond for both defendants with Reject all of the claim. "
                                      + "Please go back and select single response option.");
         }
+
         @Test
         void shouldNotReturnError_WhenNotBothFullDefence() {
             //Given
