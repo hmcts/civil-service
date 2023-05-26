@@ -3,13 +3,14 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Component
 public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
@@ -20,7 +21,10 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
-        LocalDate whenWillYouPay = LocalDate.now().plusDays(5);
+        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
+        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         String applicantName = caseData.getApplicant1().getPartyName();
 
         StringBuilder sb = new StringBuilder();
@@ -29,7 +33,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
             .append("<ul>")
             .append("<li>pay ").append(applicantName).append(" By ")
-            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
+            .append(formattedWhenBePaid).append("</li>")
             .append("<li>keep proof of any payments you make</li>")
             .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
             .append("</ul>")
