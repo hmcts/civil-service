@@ -38,6 +38,16 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 })
 public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandlerTest extends BaseCallbackHandlerTest {
 
+    public static final String targetEmail = "sole.trader@email.com";
+    public static final String template = "spec-lip-template-id";
+    public static final String bilingualTemplate = "spec-lip-template-bilingual-id";
+    public static final String englishLangResponse = "ENGLISH";
+    public static final String bothLangResponse = "BOTH";
+
+    public static final String reference = "claimant-part-admit-settle-respondent-notification-000DC001";
+    public static final String EVENT_ID = "NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED";
+
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
@@ -50,8 +60,8 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn("spec-lip-template-id");
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn("spec-lip-template-bilingual-id");
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
         }
 
         @Test
@@ -62,16 +72,16 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                "spec-lip-template-id",
+                targetEmail,
+                template,
                 getNotificationDataMap(caseData),
-                "claimant-part-admit-settle-respondent-notification-000DC001"
+                reference
             );
         }
 
@@ -83,7 +93,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
             handler.handle(params);
@@ -100,7 +110,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
             handler.handle(params);
@@ -113,20 +123,20 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(bothLangResponse).build()).build())
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                "spec-lip-template-bilingual-id",
+                targetEmail,
+                bilingualTemplate,
                 getNotificationDataMap(caseData),
-                "claimant-part-admit-settle-respondent-notification-000DC001"
+                reference
             );
         }
 
@@ -135,20 +145,20 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(englishLangResponse).build()).build())
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED")
+                CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                "spec-lip-template-id",
+                targetEmail,
+                template,
                 getNotificationDataMap(caseData),
-                "claimant-part-admit-settle-respondent-notification-000DC001"
+                reference
             );
         }
 
