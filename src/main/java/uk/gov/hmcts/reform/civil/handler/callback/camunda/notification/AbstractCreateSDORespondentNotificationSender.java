@@ -41,7 +41,7 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
         }
     }
 
-    private String getSDOTemplate(CaseData caseData){
+    private String getSDOTemplate(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
             return notificationsProperties.getSdoOrderedSpecBilingual();
         } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
