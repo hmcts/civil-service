@@ -28,15 +28,9 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
     void notifyRespondentPartySDOTriggered(CaseData caseData) {
         String email = getRecipientEmail(caseData);
         if (StringUtils.isNotBlank(email)) {
-            String sdoTemplate = notificationsProperties.getSdoOrdered();
-            if (caseData.isRespondentResponseBilingual()) {
-                sdoTemplate = notificationsProperties.getSdoOrderedSpecBilingual();
-            } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-                sdoTemplate = notificationsProperties.getSdoOrderedSpec();
-            }
             notificationService.sendMail(
                 email,
-                sdoTemplate,
+                getSDOTemplate(caseData),
                 addProperties(caseData),
                 getDocReference(caseData)
             );
@@ -45,6 +39,15 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                          + " has no email address for claim "
                          + caseData.getLegacyCaseReference());
         }
+    }
+
+    private String getSDOTemplate(CaseData caseData){
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getSdoOrderedSpecBilingual();
+        } else if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            return notificationsProperties.getSdoOrderedSpec();
+        }
+        return notificationsProperties.getSdoOrdered();
     }
 
     /**

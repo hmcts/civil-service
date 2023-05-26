@@ -55,17 +55,18 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
     private OrganisationService organisationService;
     @Autowired
     private CreateSDORespondent1NotificationHandler handler;
-    private final String defendantEmail = "respondent@example.com";
-    private final String legacyCaseReference = "create-sdo-respondent-1-notification-000DC001";
-    private final String defendantName = "respondent";
+    private static final String DEFENDANT_EMAIL = "respondent@example.com";
+    private static final String LEGACY_CASE_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
+    private static final String DEFENDANT_NAME = "respondent";
+    private static final String TEMPLATE_ID = "template-id";
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
-            when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn("template-id");
+            when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         }
@@ -85,9 +86,9 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
-                "template-id",
+                TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "create-sdo-respondent-1-notification-000DC001"
+                LEGACY_CASE_REFERENCE
             );
         }
 
@@ -114,15 +115,15 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
                     CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                     CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName()
                 ),
-                legacyCaseReference
+                LEGACY_CASE_REFERENCE
             );
         }
 
         @Test
-        void shouldNotifyRespondentLiPWithBilingual_whenInvoked() {
+        void shouldNotifyRespondentLiPWithBilingual_whenDefendantResponseIsBilingual() {
             Party party = PartyBuilder.builder()
-                .individual(defendantName)
-                .partyEmail(defendantEmail)
+                .individual(DEFENDANT_NAME)
+                .partyEmail(DEFENDANT_EMAIL)
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -131,6 +132,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("BOTH").build()).build())
                 .respondent1(party)
+                .legacyCaseReference(LEGACY_CASE_REFERENCE)
                 .build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -144,11 +146,8 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
 
             verify(notificationService).sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                "template-id",
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
-                ),
+                TEMPLATE_ID,
+                getNotificationDataLipMap(caseData),
                 "create-sdo-respondent-1-notification-000DC001"
             );
         }
@@ -158,6 +157,14 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataLipMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
             );
         }
     }
