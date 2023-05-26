@@ -514,7 +514,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
-            //FIXME: Code will never reach inside this loop since we get in the else loop only when respondent2HasSameLegalRep is false
+            //Code will never reach inside this loop since we get in the else loop only when respondent2HasSameLegalRep is false
             if (respondent2HasSameLegalRep(caseData)) { // FIXME: Unreacheable code. Delete this if an its content.
                 // if responses are marked as same, copy respondent 1 values into respondent 2
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
@@ -629,7 +629,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         ResponseDocument respondent1ClaimResponseDocument = caseData.getRespondent1ClaimResponseDocument();
         if (respondent1ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
-            //FIXME: Never Null when respondent1ClaimResponseDocument  is not null. The null check can be removed.
+            //Never Null when respondent1ClaimResponseDocument  is not null. The null check can be removed.
             if (respondent1ClaimDocument != null) {
                 defendantUploads.add(
                     buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
