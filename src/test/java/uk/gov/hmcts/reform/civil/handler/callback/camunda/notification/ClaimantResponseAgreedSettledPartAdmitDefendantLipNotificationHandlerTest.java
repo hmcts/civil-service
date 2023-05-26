@@ -47,7 +47,6 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
     public static final String reference = "claimant-part-admit-settle-respondent-notification-000DC001";
     public static final String EVENT_ID = "NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED";
 
-
     @MockBean
     private NotificationService notificationService;
     @MockBean
