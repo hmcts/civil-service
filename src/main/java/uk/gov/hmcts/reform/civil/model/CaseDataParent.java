@@ -250,6 +250,7 @@ public class CaseDataParent implements MappableObject {
     private FastTrackHearingNotes fastTrackHearingNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
     private final List<FastTrack> fastClaims;
+    private final List<FastTrack> trialAdditionalDirectionsForFastTrack;
     private final FastTrackMethod fastTrackMethod;
     private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
     private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;

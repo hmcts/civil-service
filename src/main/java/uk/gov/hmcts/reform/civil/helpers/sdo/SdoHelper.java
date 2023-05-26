@@ -165,13 +165,12 @@ public class SdoHelper {
 
     public static boolean hasFastAdditionalDirections(CaseData caseData, String additionalDirection) {
         FastTrack additionalDirectionEnum = getFastTrackAdditionalDirectionEnum(additionalDirection);
-        List<FastTrack> fastClaims = caseData.getFastClaims();
+        List<FastTrack> fastClaims = caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            ? caseData.getTrialAdditionalDirectionsForFastTrack() : caseData.getFastClaims();
         boolean hasDirection;
 
         if ((fastClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.fastTrack)
-                && (fastClaims.contains(additionalDirectionEnum));
+            hasDirection = fastClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }
