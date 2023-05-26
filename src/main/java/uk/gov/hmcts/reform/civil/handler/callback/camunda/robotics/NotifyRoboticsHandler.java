@@ -37,7 +37,8 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     protected final FeatureToggleService toggleService;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-        log.info(String.format("rpa notification email enabled", toggleService.isRPAEmailEnabled()));
+        log.info("rpa notification email enabled");
+        log.info(String.valueOf(toggleService.isRPAEmailEnabled()));
         if (toggleService.isRPAEmailEnabled()) {
 
             RoboticsCaseData roboticsCaseData = null;
