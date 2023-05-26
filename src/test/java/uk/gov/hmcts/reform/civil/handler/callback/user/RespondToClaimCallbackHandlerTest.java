@@ -1896,6 +1896,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .asString()
                 .contains("6789, 01234");
         }
+
         @Test
         void shouldNotSetApplicantResponseDeadlineOrTransitionCcdState_when1stRespondentAnsweringBefore2nd() {
             //Given
