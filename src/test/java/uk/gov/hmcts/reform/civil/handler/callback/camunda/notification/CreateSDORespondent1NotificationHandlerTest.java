@@ -56,9 +56,11 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
     @Autowired
     private CreateSDORespondent1NotificationHandler handler;
     private static final String DEFENDANT_EMAIL = "respondent@example.com";
-    private static final String LEGACY_CASE_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
+    private static final String LEGACY_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
     private static final String DEFENDANT_NAME = "respondent";
     private static final String TEMPLATE_ID = "template-id";
+    private static final String ORG_NAME = "Signer Name";
+
 
     @Nested
     class AboutToSubmitCallback {
@@ -68,7 +70,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
         }
 
         @Test
@@ -85,10 +87,10 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+                caseData.getRespondentSolicitor1EmailAddress(),
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                LEGACY_CASE_REFERENCE
+                LEGACY_REFERENCE
             );
         }
 
@@ -110,12 +112,9 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
 
             verify(notificationService).sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                "template-id",
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                    CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName()
-                ),
-                LEGACY_CASE_REFERENCE
+                TEMPLATE_ID,
+                getNotificationDataLipMap1(caseData),
+                LEGACY_REFERENCE
             );
         }
 
@@ -132,7 +131,6 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("BOTH").build()).build())
                 .respondent1(party)
-                .legacyCaseReference(LEGACY_CASE_REFERENCE)
                 .build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -148,7 +146,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
                 caseData.getRespondent1().getPartyEmail(),
                 TEMPLATE_ID,
                 getNotificationDataLipMap(caseData),
-                "create-sdo-respondent-1-notification-000DC001"
+                LEGACY_REFERENCE
             );
         }
 
@@ -156,7 +154,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME
             );
         }
 
@@ -165,6 +163,14 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataLipMap1(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName()
             );
         }
     }
