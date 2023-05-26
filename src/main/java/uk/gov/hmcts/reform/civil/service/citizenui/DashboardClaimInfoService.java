@@ -88,12 +88,12 @@ public class DashboardClaimInfoService {
         return item;
     }
 
-    private OffsetDateTime submittedDateToCreatedDate(CaseData caseData) {
+    private LocalDateTime submittedDateToCreatedDate(CaseData caseData) {
         LocalDateTime createdDate = LocalDateTime.now();
         if (!Objects.isNull(caseData.getSubmittedDate())) {
             createdDate = caseData.getSubmittedDate();
         }
 
-        return createdDate.atOffset(ZoneOffset.UTC);
+        return createdDate;
     }
 }

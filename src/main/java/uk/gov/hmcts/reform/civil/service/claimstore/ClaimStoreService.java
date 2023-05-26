@@ -46,13 +46,13 @@ public class ClaimStoreService {
         ).collect(Collectors.toList());
     }
 
-    private OffsetDateTime createAtToCreateDate(CmcClaim claim) {
+    private LocalDateTime createAtToCreateDate(CmcClaim claim) {
         LocalDateTime createdDate = LocalDateTime.now();
 
         if (claim.getCreatedAt() != null) {
             createdDate = claim.getCreatedAt();
         }
 
-        return createdDate.atOffset(ZoneOffset.UTC);
+        return createdDate;
     }
 }
