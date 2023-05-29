@@ -120,8 +120,8 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
-    public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
-        log.info("Downloading document CUI {}", documentPath);
+    public ResponseEntity<Resource> downloadDocumentByDocumentPath(String authorisation, String documentPath) {
+        log.info("Downloading document by document path {}", documentPath);
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
@@ -133,12 +133,9 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
                 documentPath
             );
 
-            return Optional.ofNullable(responseEntity.getBody())
-                .map(ByteArrayResource.class::cast)
-                .map(ByteArrayResource::getByteArray)
-                .orElseThrow(RuntimeException::new);
+            return responseEntity;
         } catch (Exception ex) {
-            log.error("Failed downloading document {}", documentPath, ex);
+            log.error("Failed downloading by document path {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
     }

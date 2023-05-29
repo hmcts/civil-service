@@ -13,6 +13,8 @@ import java.util.function.Function;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -85,13 +87,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         );
     }
 
-    public byte[] downloadDocument(CaseDocument caseDocument) {
+    public ResponseEntity<Resource> downloadDocumentById(String documentId) {
         String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentBinaryUrl()).getPath();
-        return documentManagementService.downloadDocumentCUI(authorisation, documentPath);
+        String documentPath = String.format("documents/%s/binary", documentId);;
+        return documentManagementService.downloadDocumentByDocumentPath(authorisation, documentPath);
     }
 
-    public byte[] downloadDocument(CaseDocument caseDocument, String authorisation) {
+    public byte[] downloadDocumentById(CaseDocument caseDocument, String authorisation) {
         String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
         byte[] file = documentManagementService.downloadDocument(authorisation, documentPath);
         return file;

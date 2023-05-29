@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -135,7 +134,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
-    public byte[] downloadDocumentCUI(String authorisation, String documentPath) {
+    public ResponseEntity<Resource> downloadDocumentByDocumentPath(String authorisation, String documentPath) {
         log.info("Downloading document CUI {}", documentPath);
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
@@ -147,11 +146,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 userInfo.getUid(),
                 documentPath
             );
-
-            return Optional.ofNullable(responseEntity.getBody())
-                .map(ByteArrayResource.class::cast)
-                .map(ByteArrayResource::getByteArray)
-                .orElseThrow(RuntimeException::new);
+            return responseEntity;
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);

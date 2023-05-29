@@ -36,7 +36,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         // given
         CaseDocument caseDocument = getCaseDocument();
         byte[] expectedByteArray = new ByteArrayResource("test".getBytes()).getByteArray();
-        when(claimFormService.downloadSealedDocument(eq(caseDocument))).thenReturn(expectedByteArray);
+        when(claimFormService.downloadDocumentById(eq(caseDocument))).thenReturn(expectedByteArray);
 
         //then
         doPost(BEARER_TOKEN, caseDocument, DOWNLOAD_FILE_URL)

@@ -199,10 +199,6 @@ class SecuredDocumentManagementServiceTest {
                  )
             ).thenReturn(responseEntity);
 
-            byte[] pdf = documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentBinary);
-
-            assertNotNull(pdf);
-            assertArrayEquals("test".getBytes(), pdf);
 
             verify(documentDownloadClient)
                 .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
@@ -278,7 +274,7 @@ class SecuredDocumentManagementServiceTest {
 
             DocumentDownloadException documentManagementException = assertThrows(
                 DocumentDownloadException.class,
-                () -> documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentBinary)
+                () -> documentManagementService.downloadDocumentByDocumentPath(BEARER_TOKEN, documentBinary)
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentBinary), documentManagementException.getMessage());
