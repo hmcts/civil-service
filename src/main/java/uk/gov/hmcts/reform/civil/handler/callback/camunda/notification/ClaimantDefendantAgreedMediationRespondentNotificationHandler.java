@@ -95,8 +95,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
     }
 
     private String getNotifyRespondentLiPMediationAgreementTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual() ?
-            notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh() :
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh() :
             notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate();
     }
 
