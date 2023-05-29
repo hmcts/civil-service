@@ -260,7 +260,7 @@ public class HearingValuesServiceTest {
             .interpreterLanguage(null)
             .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
-            .vulnerabilityDetails(emptyList())
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(List.of("0123456789"))
             .relatedParties(List.of(RelatedPartiesModel.builder().build()))
@@ -289,7 +289,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID(null)
+            .partyID(cftOrganisationID)
             .partyType(ORG)
             .partyName(name)
             .partyRole("LGRP")
