@@ -48,6 +48,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
+    private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -191,6 +192,16 @@ public class CasesControllerTest extends BaseIntegrationTest {
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnDeadlineExtensionAgreedDate() {
+        LocalDate agreedDate = LocalDate.of(2023, 4, 22);
+        when(deadlineExtensionCalculatorService.getAgreedDeadlineResponseDate(any(), any())).thenReturn(agreedDate);
+        doGet(BEARER_TOKEN, AGREED_RESPONSE_DEADLINE_DATE_URL, 1L)
+            .andExpect(content().json(toJson(agreedDate)))
             .andExpect(status().isOk());
     }
 }
