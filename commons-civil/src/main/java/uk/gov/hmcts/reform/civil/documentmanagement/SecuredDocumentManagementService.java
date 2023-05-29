@@ -135,22 +135,16 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
     public ResponseEntity<Resource> downloadDocumentByDocumentPath(String authorisation, String documentPath) {
-        log.info("Downloading document CUI {}", documentPath);
-        try {
-            UserInfo userInfo = userService.getUserInfo(authorisation);
-            String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-            ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
-                authorisation,
-                authTokenGenerator.generate(),
-                userRoles,
-                userInfo.getUid(),
-                documentPath
-            );
-            return responseEntity;
-        } catch (Exception ex) {
-            log.error("Failed downloading document {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
-        }
+        log.info("Downloading document By Document Path {}", documentPath);
+        UserInfo userInfo = userService.getUserInfo(authorisation);
+        String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
+        return documentDownloadClientApi.downloadBinary(
+            authorisation,
+            authTokenGenerator.generate(),
+            userRoles,
+            userInfo.getUid(),
+            documentPath
+        );
     }
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {
