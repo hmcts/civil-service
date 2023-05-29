@@ -46,6 +46,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Test
     void shouldReturnExpectedGeneratedDocument() throws Exception {
+        // given
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference(REFERENCE_NUMBER)
             .build();
@@ -55,6 +56,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         when(claimFormService.uploadSealedDocument(any(), any()))
             .thenReturn(caseDocument);
 
+        //then
         doPost(BEARER_TOKEN, caseData, GENERATE_DOC_URL)
             .andExpect(content().json(toJson(caseDocument)))
             .andExpect(status().isOk());
