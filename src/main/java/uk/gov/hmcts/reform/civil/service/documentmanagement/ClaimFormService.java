@@ -27,10 +27,6 @@ public class ClaimFormService {
     @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
-    public byte[] downloadDocumentById(String authorisation, CaseDocument caseDocument) {
-        return sealedClaimFormGeneratorForSpec.downloadDocumentById(caseDocument, authorisation);
-    }
-
     public ResponseEntity<Resource> downloadDocumentById(String caseDocumentId) {
         return sealedClaimFormGeneratorForSpec.downloadDocumentById(caseDocumentId);
     }
