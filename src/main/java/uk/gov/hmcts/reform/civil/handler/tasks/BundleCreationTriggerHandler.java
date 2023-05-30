@@ -21,6 +21,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
+        log.info("In BundleCreationTriggerHandler handle task.....");
         List<CaseDetails> cases = bundleCreationTriggerService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 

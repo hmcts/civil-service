@@ -81,9 +81,10 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
      * @param e                   the exception thrown by business logic.
      */
     default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
-
+        log.error("In handleFailure from BaseExternalTaskHandler remainingRetries "+remainingRetries +" task : "+externalTaskService.getClass().getName());
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
