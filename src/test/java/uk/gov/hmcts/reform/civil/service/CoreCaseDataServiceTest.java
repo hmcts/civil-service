@@ -264,7 +264,7 @@ class CoreCaseDataServiceTest {
     }
 
     @Nested
-    class getAgreedDeadlineResponseDate {
+    class GetAgreedDeadlineResponseDate {
 
         @Test
         void shouldReturnRespondentSolicitor1AgreedDeadlineExtension() {
