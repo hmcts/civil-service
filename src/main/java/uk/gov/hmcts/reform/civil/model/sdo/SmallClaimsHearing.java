@@ -23,7 +23,6 @@ public class SmallClaimsHearing {
     private BigDecimal otherHours;
     private BigDecimal otherMinutes;
     private String input2;
-    private List<DateToShowToggle> dateToToggle;
     private LocalDate dateFrom;
     private LocalDate dateTo;
 }

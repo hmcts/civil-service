@@ -557,7 +557,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
-            .dateToToggle(dateToShowTrue)
             .dateFrom(LocalDate.now().plusWeeks(22))
             .dateTo(LocalDate.now().plusWeeks(30))
             .build();

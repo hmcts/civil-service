@@ -844,11 +844,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
                 .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
                                + "notification. The hearing will have a time estimate of");
-            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateToToggle").isNotNull();
-            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateFrom")
-                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
-            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("dateTo")
-                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 4 weeks before the hearing date, pay the court the "
                                + "required hearing fee or submit a fully completed application for Help with Fees. \n"

@@ -137,8 +137,6 @@ public class SdoHelper {
                 return caseData.getSmallClaimsWitnessStatementToggle() != null;
             case "smallClaimsAddNewDirections":
                 return caseData.getSmallClaimsAddNewDirections() != null;
-            case "smallClaimsHearingDateToToggle":
-                return caseData.getSmallClaimsHearing().getDateToToggle() != null;
             default:
                 return false;
         }

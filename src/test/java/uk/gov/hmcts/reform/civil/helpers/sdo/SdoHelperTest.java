@@ -536,21 +536,6 @@ public class SdoHelperTest {
         }
 
         @Test
-        void shouldReturnTrue_whenSmallDateToTogglesExist() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledged()
-                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-                .atStateSdoSmallTrackTrial()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .build();
-
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")).isTrue();
-        }
-
-        @Test
         void shouldReturnTrue_whenFastDateToTogglesExist() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()

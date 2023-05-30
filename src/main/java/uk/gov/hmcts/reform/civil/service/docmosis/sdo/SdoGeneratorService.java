@@ -298,9 +298,6 @@ public class SdoGeneratorService {
             .smallClaimsHearingTime(
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
-            .smallClaimsHearingDateToToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingDateToToggle")
-            )
             // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
             // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
