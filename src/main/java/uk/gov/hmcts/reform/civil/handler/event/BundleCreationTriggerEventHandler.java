@@ -57,6 +57,7 @@ public class BundleCreationTriggerEventHandler {
 
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
         if (bundleCreateResponse != null) {
+            log.info("bundles response : {} ", bundleCreateResponse.getData().getCaseBundles());
             String caseId = event.getCaseId().toString();
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
             CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
