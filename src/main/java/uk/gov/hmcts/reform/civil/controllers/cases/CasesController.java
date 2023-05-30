@@ -168,7 +168,7 @@ public class CasesController {
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<LocalDate> getAgreedDeadlineResponseDate(@PathVariable("caseId") Long caseId,
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        LocalDate deadlineAgreedDate= coreCaseDataService.getAgreedDeadlineResponseDate(caseId, authorization);
+        LocalDate deadlineAgreedDate = coreCaseDataService.getAgreedDeadlineResponseDate(caseId, authorization);
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
     }
 
