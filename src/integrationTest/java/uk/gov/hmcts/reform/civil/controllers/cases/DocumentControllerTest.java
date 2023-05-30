@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,26 +53,28 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         when(claimFormService.downloadDocumentById(eq(documentId))).thenReturn(responseEntityExpected);
 
         //then
-        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId )
+        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
             .andExpect(content().bytes(data))
             .andExpect(status().isOk());
     }
+
     @Test
     void shouldNotFoundException() throws Exception {
         // given
         String documentId = DOCUMENT_ID;
         doThrow(FeignException.NotFound.class).when(claimFormService).downloadDocumentById(documentId);
         //then
-        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId )
+        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
             .andExpect(status().isNotFound());
     }
+
     @Test
     void shouldUnauthorizedException() throws Exception {
         // given
         String documentId = DOCUMENT_ID;
         doThrow(FeignException.Unauthorized.class).when(claimFormService).downloadDocumentById(documentId);
         //then
-        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId )
+        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
             .andExpect(status().isUnauthorized());
     }
 
