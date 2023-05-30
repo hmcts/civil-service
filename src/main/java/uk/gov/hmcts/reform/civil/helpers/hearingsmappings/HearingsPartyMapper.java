@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -285,7 +284,7 @@ public class HearingsPartyMapper {
             .vulnerabilityDetails(getVulnerabilityDetails(flagDetails))
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(getCustodyStatus(flagDetails))
             .build();
 
