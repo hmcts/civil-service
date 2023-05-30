@@ -13,7 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
@@ -31,13 +35,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
@@ -180,28 +179,31 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldDownloadDocumentCuiFromDocumentManagement() throws JsonProcessingException {
-
-            Document document = mapper.readValue(
-                ResourceReader.readString("document-management/download.success.json"),
-                Document.class
-            );
-            String documentBinary = URI.create(document.links.binary.href).getPath().replaceFirst("/", "");
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+        void shouldDownloadDocumentByDocumentPath(){
+            //Given
+            String documentBinary = "test";
+            byte[] data = "Test Resource Data".getBytes();
+            Resource resource = new ByteArrayResource(data);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
+            // Create the ResponseEntity
+            ResponseEntity<Resource> responseEntityExpected = new ResponseEntity<>(resource, headers, HttpStatus.OK);
 
             when(documentDownloadClient.downloadBinary(
                      anyString(),
                      anyString(),
                      eq(USER_ROLES_JOINED),
                      anyString(),
-                     eq(documentBinary)
+                     anyString()
                  )
-            ).thenReturn(responseEntity);
+            ).thenReturn(responseEntityExpected);
 
+            //When
+            ResponseEntity<Resource> expectedResult  = documentManagementService.downloadDocumentByDocumentPath(anyString(), documentBinary);
 
-            verify(documentDownloadClient)
-                .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
+            //Then
+            assertEquals(expectedResult, responseEntityExpected);
+
         }
 
         @Test

@@ -124,7 +124,7 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
         log.info("Downloading document By Document Path {}", documentPath);
         UserInfo userInfo = userService.getUserInfo(authorisation);
         String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-        return  documentDownloadClientApi.downloadBinary(
+        return documentDownloadClientApi.downloadBinary(
             authorisation,
             authTokenGenerator.generate(),
             userRoles,
