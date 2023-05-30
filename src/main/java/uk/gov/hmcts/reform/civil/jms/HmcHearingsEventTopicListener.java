@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.camunda.bpm.engine.exception.cmmn.CaseException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -20,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("hmc-to-hearings-api.enabled")
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
@@ -33,6 +31,7 @@ public class HmcHearingsEventTopicListener {
         containerFactory = "hmcHearingsEventTopicContainerFactory")
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcTopicEventProcessingException {
 
+        log.info("original message {}", message);
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
         String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
