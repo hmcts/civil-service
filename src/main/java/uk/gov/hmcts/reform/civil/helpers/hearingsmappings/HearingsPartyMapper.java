@@ -264,7 +264,10 @@ public class HearingsPartyMapper {
         String orgName = organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
             .orElse("");
-        return buildOrganisationPartyObject(null, orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID, null);
+        return buildOrganisationPartyObject(
+            organisationID, orgName,
+            LEGAL_REP_ROLE.getPartyRoleValue(), organisationID,
+            null);
     }
 
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
