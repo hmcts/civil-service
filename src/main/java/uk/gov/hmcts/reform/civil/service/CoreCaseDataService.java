@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -143,6 +144,11 @@ public class CoreCaseDataService {
 
         return coreCaseDataApi.submitSupplementaryData(systemUpdateUser.getUserToken(), authTokenGenerator.generate(),
                                                        caseId.toString(), supplementaryData);
+    }
+
+    public LocalDate getAgreedDeadlineResponseDate(Long caseId, String authorization) {
+        CaseData caseData = caseDetailsConverter.toCaseData(this.getCase(caseId, authorization));
+        return caseData.getRespondentSolicitor1AgreedDeadlineExtension();
     }
 
 }

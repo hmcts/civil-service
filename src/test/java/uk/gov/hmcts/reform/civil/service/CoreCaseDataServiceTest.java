@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -30,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +67,6 @@ class CoreCaseDataServiceTest {
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private PaymentsConfiguration paymentsConfiguration;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -263,6 +260,25 @@ class CoreCaseDataServiceTest {
 
             verify(coreCaseDataApi).submitSupplementaryData(USER_AUTH_TOKEN,
                                                             SERVICE_AUTH_TOKEN, "1", supplementaryData());
+        }
+    }
+
+    @Nested
+    class getAgreedDeadlineResponseDate {
+
+        @Test
+        void shouldReturnRespondentSolicitor1AgreedDeadlineExtension() {
+            //Given
+            LocalDate agreedDeadlineExpected = LocalDate.now();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
+            CaseDetails caseDetails = CaseDetails.builder().build();
+            caseDetails.setData(caseData.toMap(objectMapper));
+            when(service.getCase(1L, "AUTH"))
+                .thenReturn(caseDetails);
+            //When
+            LocalDate agreedDeadline = service.getAgreedDeadlineResponseDate(1L, "AUTH");
+            //Then
+            assertThat(agreedDeadline).isEqualTo(agreedDeadlineExpected);
         }
     }
 

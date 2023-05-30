@@ -199,7 +199,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnDeadlineExtensionAgreedDate() {
         LocalDate agreedDate = LocalDate.of(2023, 4, 22);
-        when(deadlineExtensionCalculatorService.getAgreedDeadlineResponseDate(any(), any())).thenReturn(agreedDate);
+        when(coreCaseDataService.getAgreedDeadlineResponseDate(any(), any())).thenReturn(agreedDate);
         doGet(BEARER_TOKEN, AGREED_RESPONSE_DEADLINE_DATE_URL, 1L)
             .andExpect(content().json(toJson(agreedDate)))
             .andExpect(status().isOk());

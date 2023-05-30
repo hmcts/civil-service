@@ -5,12 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDate;
 
@@ -27,11 +22,6 @@ public class DeadlineExtensionCalculatorServiceTest {
 
     @InjectMocks
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-
-    @Mock
-    private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
 
     @Test
     void shouldReturnTheSameGivenDateWhenDateIsWorkday() {
@@ -61,19 +51,4 @@ public class DeadlineExtensionCalculatorServiceTest {
         verify(workingDayIndicator).getNextWorkingDay(proposedExtensionDeadline);
     }
 
-    @Test
-    void shouldReturnRespondentSolicitor1AgreedDeadlineExtension() {
-        //Given
-        LocalDate agreedDeadlineExpected = LocalDate.now();
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
-        CaseDetails caseDetails = CaseDetails.builder().build();
-        given(coreCaseDataService.getCase(1L, "AUTH"))
-            .willReturn(caseDetails);
-        given(caseDetailsConverter.toCaseData(caseDetails))
-            .willReturn(caseData);
-        //When
-        LocalDate agreedDeadline = deadlineExtensionCalculatorService.getAgreedDeadlineResponseDate(1L, "AUTH");
-        //Then
-        assertThat(agreedDeadline).isEqualTo(agreedDeadlineExpected);
-    }
 }
