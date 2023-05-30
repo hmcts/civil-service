@@ -268,4 +268,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimBilingualTemplate;
+
+    @NotEmpty
+    private String respondent1LipClaimUpdatedTemplate;
+
 }
