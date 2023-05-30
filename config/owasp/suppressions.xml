@@ -44,6 +44,7 @@
   </suppress>
   <suppress until="2024-04-04">
     <cve>CVE-2022-41881</cve>
+    <cve>CVE-2023-28709</cve>
   </suppress>
   <suppress until="2023-07-24">
     <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
