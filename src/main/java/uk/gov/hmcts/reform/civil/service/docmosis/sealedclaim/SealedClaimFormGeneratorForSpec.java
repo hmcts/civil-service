@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

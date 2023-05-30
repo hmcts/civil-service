@@ -64,6 +64,7 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
+
     @ExceptionHandler(value =  FeignException.NotFound.class)
     public ResponseEntity<Object> feignExceptionNotFound(FeignException exception) {
         log.debug(exception.getMessage(), exception);

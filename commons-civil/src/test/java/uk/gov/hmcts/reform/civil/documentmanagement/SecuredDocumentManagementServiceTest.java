@@ -35,8 +35,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
@@ -179,7 +184,7 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldDownloadDocumentByDocumentPath(){
+        void shouldDownloadDocumentByDocumentPath() {
             //Given
             String documentBinary = "test";
             byte[] data = "Test Resource Data".getBytes();

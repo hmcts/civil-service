@@ -53,8 +53,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
@@ -295,7 +293,6 @@ public class SealedClaimFormGeneratorForSpecTest {
     @Test
     void testDownloadDocumentById() {
         // given
-        String documentId = "documentId";
         String documentBinary = "documents/documentId/binary";
         byte[] data = new ByteArrayResource("test".getBytes()).getByteArray();
         Resource resource = new ByteArrayResource(data);
@@ -306,6 +303,7 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(documentManagementService.downloadDocumentByDocumentPath(anyString(), eq(documentBinary))).thenReturn(responseEntityExpected);
+        String documentId = "documentId";
 
         // when
         ResponseEntity<Resource> expectedResult = sealedClaimFormGenerator.downloadDocumentById(documentId);
