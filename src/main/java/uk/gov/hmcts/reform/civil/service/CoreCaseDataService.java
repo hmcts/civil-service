@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -68,6 +69,9 @@ public class CoreCaseDataService {
             true,
             caseDataContent
         );
+        if (caseDataContent.getEvent().getSummary().equals("bundle created")) {
+            throw new FeignException.UnprocessableEntity("Case data validation failed", null, "test".getBytes());
+        }
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 
