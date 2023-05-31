@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
+import feign.Request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -18,6 +19,8 @@ import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 
 import java.util.Map;
 
+import static feign.Request.HttpMethod.GET;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -72,7 +75,7 @@ public class CoreCaseDataService {
         if (caseDataContent != null && caseDataContent.getEvent() != null
             && caseDataContent.getEvent().getSummary() != null && caseDataContent.getEvent().getSummary().equals(
                 "bundle created")) {
-            throw new FeignException.UnprocessableEntity("Case data validation failed", null, "test".getBytes());
+            throw new FeignException.UnprocessableEntity("Case data validation failed", Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null), "test".getBytes());
         }
         return caseDetailsConverter.toCaseData(caseDetails);
     }
