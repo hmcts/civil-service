@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.docmosis.common;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec.COUNCIL_TAX;
 import static uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec.ELECTRICITY;
