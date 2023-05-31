@@ -551,6 +551,19 @@ public class SdoHelperTest {
         }
 
         @Test
+        void shouldReturnTrue_whenDisposalHearingDateToToggleExist() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .atStateClaimIssuedTrialHearing()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateClaimIssuedTrialSDOInPersonHearing()
+                .atStateClaimIssuedTrialLocationInPerson()
+                .atStateSdoTrialDj()
+                .build();
+
+            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
+        }
+
+        @Test
         void shouldReturnTrue_whenNewDirectionsExist() {
             FastTrackAddNewDirections fastTrackAddNewDirections = FastTrackAddNewDirections.builder()
                 .directionComment("test")
