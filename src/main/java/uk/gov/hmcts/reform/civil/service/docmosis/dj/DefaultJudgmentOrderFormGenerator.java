@@ -180,7 +180,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         if (featureToggleService.isNoticeOfChangeEnabled()) {
             djTrialTemplateBuilder
                 .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
-                .disposalHearingDateToToggle(caseData.getSmallClaimsHearing().getDateToToggle() != null)
+                .disposalHearingDateToToggle(caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
                 .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
                 .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
         }

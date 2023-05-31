@@ -85,7 +85,6 @@ public class SdoGeneratorServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoSmallTrackTrial()
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
