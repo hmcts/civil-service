@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
     FeignClientProperties.FeignClientConfiguration.class)
 public interface BundleApiClient {
 
-    @PostMapping(value = "/api/new-bundle1", consumes = "application/json")
+    @PostMapping(value = "/api/new-bundle", consumes = "application/json")
     BundleCreateResponse createBundleServiceRequest(
         @RequestHeader("Authorization") String authorization,
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
