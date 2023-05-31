@@ -48,7 +48,6 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        log.info("In BundleCreationTriggerEventHandler sendBundleCreationTrigger()");
         boolean isBundleCreated = getIsBundleCreatedForHearingDate(event.getCaseId());
         if (isBundleCreated) {
             log.info("Trial Bundle already exists for case {}", event.getCaseId());
@@ -56,9 +55,8 @@ public class BundleCreationTriggerEventHandler {
         }
 
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
-        if (bundleCreateResponse != null) {
-            log.info("bundles response : {} ", bundleCreateResponse.getData().getCaseBundles());
-            String caseId = event.getCaseId().toString();
+
+        String caseId = event.getCaseId().toString();
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
             CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
 
@@ -69,7 +67,6 @@ public class BundleCreationTriggerEventHandler {
             CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
             coreCaseDataService.submitUpdate(caseId, caseContent);
             coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
-        }
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {

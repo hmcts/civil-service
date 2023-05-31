@@ -49,11 +49,7 @@ public class BundleCreationService {
 
     private BundleCreateResponse createNewBundleRequest(String authorization, String serviceAuthorization,
                                               BundleCreateRequest bundleCreateRequest) {
-        try {
-            return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
-        } catch (Exception e) {
-            log.error("Error in bundle API call", e);
-        }
-        return null;
+
+        return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
     }
 }
