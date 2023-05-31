@@ -95,7 +95,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final int childrenMaintenance;
 
     public String getResponseTypeDisplay() {
-        // TODO localization?
         return responseType.getDisplayedValue();
     }
 
