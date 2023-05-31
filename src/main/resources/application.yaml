@@ -265,6 +265,8 @@ notifications:
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
 
+  mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
+
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
