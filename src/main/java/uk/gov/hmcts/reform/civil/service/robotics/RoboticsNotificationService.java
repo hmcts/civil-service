@@ -124,7 +124,7 @@ public class RoboticsNotificationService {
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
         log.info(String.format("EMAIl:--------- %s", recipient));
-        return recipient;
+        return "Kiyrean.Dyer-Allen@HMCTS.net";
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
