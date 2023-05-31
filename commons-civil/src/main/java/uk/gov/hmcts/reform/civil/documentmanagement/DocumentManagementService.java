@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 
 import java.util.List;

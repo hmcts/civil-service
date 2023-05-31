@@ -34,8 +34,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
-import static org.springframework.http.MediaType.ALL_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.*;
 
 @Slf4j
 @Service("documentManagementService")
