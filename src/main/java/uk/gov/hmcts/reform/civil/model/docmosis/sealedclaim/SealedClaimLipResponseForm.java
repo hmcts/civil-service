@@ -304,27 +304,21 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     @JsonIgnore
     private static List<DebtTemplateData> mapToDebtList(Respondent1DebtLRspec debtLRspec) {
-        if (debtLRspec != null) {
-            List<DebtTemplateData> debtList = new ArrayList<>();
-            Optional.ofNullable(debtLRspec.getDebtDetails())
-                .map(ElementUtils::unwrapElements)
-                .ifPresent(list -> list.stream()
-                    .map(SealedClaimLipResponseForm::mapGeneralDebt)
-                    .forEach(debtList::add));
-
-            Optional.ofNullable(debtLRspec.getLoanCardDebtDetails())
-                .ifPresent(list -> list.stream().map(e -> DebtTemplateData.loanDebtFrom(e.getValue()))
-                    .forEach(debtList::add));
-            return debtList;
-        }
-        return Collections.emptyList();
+        return Optional.ofNullable(debtLRspec).map(debt -> createDebtList(debt)).orElse(Collections.emptyList());
     }
 
     @JsonIgnore
-    private static DebtTemplateData mapGeneralDebt(DebtLRspec debt) {
-        return DebtTemplateData.generalDebtFrom(debt);
+    private static List<DebtTemplateData> createDebtList(Respondent1DebtLRspec debtLRspec) {
+        List<DebtTemplateData> debtList = new ArrayList<>();
+        Optional.ofNullable(debtLRspec.getDebtDetails())
+            .map(ElementUtils::unwrapElements)
+            .ifPresent(list -> list.stream()
+                .map(DebtTemplateData::generalDebtFrom)
+                .forEach(debtList::add));
+
+        Optional.ofNullable(debtLRspec.getLoanCardDebtDetails())
+            .ifPresent(list -> list.stream().map(e -> DebtTemplateData.loanDebtFrom(e.getValue()))
+                .forEach(debtList::add));
+        return debtList;
     }
-
-
-
 }
