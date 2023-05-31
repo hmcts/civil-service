@@ -11,20 +11,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,6 +50,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -77,6 +82,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .thenReturn("spec-respondent-template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+
     }
 
     @Nested
@@ -156,9 +163,20 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             @Test
             void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateNotificationAcknowledged()
-                    .build();
+                     .atStateNotificationAcknowledged()
+                     .build().toBuilder()
+                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                     .respondToClaimAdmitPartLRspec(
+                         RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                     )
+                     .build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
@@ -169,6 +187,111 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
                     ArgumentMatchers.eq("spec-claimant-template-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio2_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio3_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
@@ -411,6 +534,16 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
             );
         }
+
+        private Map<String, String> getNotificationDataMapImmediatelySpec(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                "defendantName", "Mr. Sole Trader",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                "payImmediately", "12 FEBRUARY 2023;"
+
+            );
+        }
     }
 
     @Test
@@ -477,5 +610,179 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerio1_whenCaseEventIsInvoked() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        String formattedDate = formatLocalDate(whenWillPay, DATE);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "Mr. John Rambo")
+            .containsEntry("payImmediately", formattedDate.toUpperCase());
+
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioOne_whenCaseEventIsInvoked() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        String formattedDate = formatLocalDate(whenWillPay, DATE);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "Mr. John Rambo")
+            .containsEntry("payImmediately", formattedDate.toUpperCase());
+
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioTwo_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder().build()
+            )
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "Mr. John Rambo");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioThird_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioFourth_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioFifth_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerioSix_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationScenerio2_whenCaseEventIsInvoked() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        String formattedDate = formatLocalDate(whenWillPay, DATE);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "Mr. John Rambo")
+            .containsEntry("payImmediately", formattedDate.toUpperCase());;
+
     }
 }
