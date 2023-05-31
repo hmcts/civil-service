@@ -69,9 +69,10 @@ public class CoreCaseDataService {
             true,
             caseDataContent
         );
-        if (caseDataContent!=null && caseDataContent.getEvent()!=null
-            && caseDataContent.getEvent().getSummary()!=null && caseDataContent.getEvent().getSummary().equals("bundle created")) {
-                throw new FeignException.UnprocessableEntity("Case data validation failed", null, "test".getBytes());
+        if (caseDataContent != null && caseDataContent.getEvent() != null
+            && caseDataContent.getEvent().getSummary() != null && caseDataContent.getEvent().getSummary().equals(
+                "bundle created")) {
+            throw new FeignException.UnprocessableEntity("Case data validation failed", null, "test".getBytes());
         }
         return caseDetailsConverter.toCaseData(caseDetails);
     }
