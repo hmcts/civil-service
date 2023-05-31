@@ -105,4 +105,28 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
     }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenNoticeOfChangeEnabled() {
+        when(featureToggleService.isFeatureEnabled("notice-of-change")).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOInPersonHearing()
+            .atStateClaimIssuedTrialLocationInPerson()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
 }
