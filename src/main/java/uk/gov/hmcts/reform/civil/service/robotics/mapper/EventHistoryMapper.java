@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
@@ -32,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -74,7 +74,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
@@ -83,7 +82,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
@@ -706,7 +704,6 @@ public class EventHistoryMapper {
         builder.defenceAndCounterClaim(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                 .dateReceived(respondentResponseDate)
                 .litigiousPartyID(respondentID)
                 .build());
@@ -1064,7 +1061,6 @@ public class EventHistoryMapper {
             .mapToObj(index ->
                           Event.builder()
                               .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(REPLY_TO_DEFENCE.getCode())
                               .dateReceived(applicantDetails.get(index).getResponseDate())
                               .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                               .build())
@@ -1966,7 +1962,6 @@ public class EventHistoryMapper {
             builder.defenceAndCounterClaim(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .litigiousPartyID(RESPONDENT_ID)
                     .build()
@@ -1987,7 +1982,6 @@ public class EventHistoryMapper {
                     List.of(
                         Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                             .dateReceived(respondent2ResponseDate)
                             .litigiousPartyID(RESPONDENT2_ID)
                             .build()
@@ -2009,7 +2003,6 @@ public class EventHistoryMapper {
                 List.of(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                         .dateReceived(caseData.getRespondent2ResponseDate())
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build()

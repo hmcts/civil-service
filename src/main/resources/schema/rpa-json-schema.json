@@ -1070,7 +1070,6 @@
         "type": "object",
         "required": [
           "eventSequence",
-          "eventCode",
           "dateReceived",
           "litigiousPartyID",
           "eventDetails",
@@ -1080,12 +1079,6 @@
           "eventSequence": {
             "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventSequence",
             "$ref": "#/definitions/eventSequenceType"
-          },
-          "eventCode": {
-            "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventCode",
-            "type": "string",
-            "const": "52",
-            "description": "The CASEMAN code for the defenceAndCounterClaim event."
           },
           "dateReceived": {
             "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/dateReceived",
@@ -1235,7 +1228,6 @@
         "type": "object",
         "required": [
           "eventSequence",
-          "eventCode",
           "dateReceived",
           "litigiousPartyID",
           "eventDetails",
@@ -1245,12 +1237,6 @@
           "eventSequence": {
             "$id": "#/definitions/replyToDefenceEventType/items/properties/eventSequence",
             "$ref": "#/definitions/eventSequenceType"
-          },
-          "eventCode": {
-            "$id": "#/definitions/replyToDefenceEventType/items/properties/eventCode",
-            "type": "string",
-            "const": "66",
-            "description": "The CASEMAN code for the replyToDefence event."
           },
           "dateReceived": {
             "$id": "#/definitions/replyToDefenceEventType/items/properties/dateReceived",
