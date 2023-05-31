@@ -5,21 +5,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
-import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
+import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
@@ -31,18 +30,17 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
-import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
-import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder(toBuilder = true)
@@ -50,53 +48,9 @@ import java.util.Optional;
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
 
-    private static final List<Pair<IncomeTypeLRspec, String>> INCOME_TYPE_ORDER = List.of(
-        Pair.of(IncomeTypeLRspec.JOB, "Income from your job"),
-        Pair.of(IncomeTypeLRspec.UNIVERSAL_CREDIT, "Universal Credit"),
-        Pair.of(IncomeTypeLRspec.JOBSEEKER_ALLOWANCE_INCOME, "Jobseeker's Allowance (income based)"),
-        Pair.of(IncomeTypeLRspec.JOBSEEKER_ALLOWANCE_CONTRIBUTION, "Jobseeker's Allowance (contribution based)"),
-        Pair.of(IncomeTypeLRspec.INCOME_SUPPORT, "Income support"),
-        Pair.of(IncomeTypeLRspec.WORKING_TAX_CREDIT, "Working Tax Credit"),
-        Pair.of(IncomeTypeLRspec.CHILD_TAX, "Child Tax Credit"),
-        Pair.of(IncomeTypeLRspec.CHILD_BENEFIT, "Child Benefit"),
-        Pair.of(IncomeTypeLRspec.COUNCIL_TAX_SUPPORT, "Council Tax Support"),
-        Pair.of(IncomeTypeLRspec.PENSION, "Pension"),
-        Pair.of(IncomeTypeLRspec.OTHER, "Other: ")
-    );
-    private static final Comparator<RecurringIncomeLRspec> INCOME_COMPARATOR = Comparator
-        .comparing(e1 -> {
-            for (int i = 0; i < INCOME_TYPE_ORDER.size(); i++) {
-                if (INCOME_TYPE_ORDER.get(i).getKey() == e1.getType()) {
-                    return i;
-                }
-            }
-            return -1;
-        });
-    private static final List<Pair<ExpenseTypeLRspec, String>> EXPENSE_TYPE_ORDER = List.of(
-        Pair.of(ExpenseTypeLRspec.MORTGAGE, "Mortgage"),
-        Pair.of(ExpenseTypeLRspec.RENT, "Rent"),
-        Pair.of(ExpenseTypeLRspec.COUNCIL_TAX, "Council Tax"),
-        Pair.of(ExpenseTypeLRspec.GAS, "Gas"),
-        Pair.of(ExpenseTypeLRspec.ELECTRICITY, "Electric"),
-        Pair.of(ExpenseTypeLRspec.WATER, "Water"),
-        Pair.of(ExpenseTypeLRspec.TRAVEL, "Travel (work or school)"),
-        Pair.of(ExpenseTypeLRspec.SCHOOL, "School costs"),
-        Pair.of(ExpenseTypeLRspec.FOOD, "Food and housekeeping"),
-        Pair.of(ExpenseTypeLRspec.TV, "TV and broadband"),
-        Pair.of(ExpenseTypeLRspec.HIRE_PURCHASE, "Hire purchase"),
-        Pair.of(ExpenseTypeLRspec.MOBILE_PHONE, "Mobile phone"),
-        Pair.of(ExpenseTypeLRspec.MAINTENANCE, "Maintenance payments"),
-        Pair.of(ExpenseTypeLRspec.OTHER, "Other")
-    );
-    private static final Comparator<RecurringExpenseLRspec> EXPENSE_COMPARATOR = Comparator
-        .comparing(e1 -> {
-            for (int i = 0; i < EXPENSE_TYPE_ORDER.size(); i++) {
-                if (EXPENSE_TYPE_ORDER.get(i).getKey() == e1.getType()) {
-                    return i;
-                }
-            }
-            return -1;
-        });
+
+
+
 
     private final String claimReferenceNumber;
     private final String claimantReferenceNumber;
@@ -151,8 +105,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     @JsonIgnore
-    public static SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder buildGeneralInformation (final CaseData caseData) {
-        return  SealedClaimLipResponseForm.builder()
+    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
+        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder =  SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -164,17 +118,189 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .selfEmployment(caseData.getSpecDefendant1SelfEmploymentDetails())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()));
+        addSolicitorDetails(caseData, builder);
+        addEmployeeDetails(caseData, builder);
+        addDQ(caseData, builder);
+        return builder.build();
 
     }
 
-    public static SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder addSolicitorDetails (final CaseData caseData, final SealedClaimLipResponseForm form) {
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = form.toBuilder();
+    private static void addSolicitorDetails (final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(references ->
                            builder.claimantReferenceNumber(references.getApplicantSolicitor1Reference())
                                .defendantReferenceNumber(references.getRespondentSolicitor1Reference()));
-        return builder;
     }
+
+    private static void addEmployeeDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+        Optional.ofNullable(caseData.getResponseClaimAdmitPartEmployer())
+            .map(Respondent1EmployerDetailsLRspec::getEmployerDetails)
+            .map(ElementUtils::unwrapElements)
+            .ifPresent(builder::employerDetails);
+
+    }
+
+    private static void addDQ(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+        if (caseData.getRespondent1DQ() != null) {
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream().map(AccountSimpleTemplateData::new).collect(Collectors.toList()))
+                .ifPresent(builder::bankAccountList);
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringIncome())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream()
+                    .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                .ifPresent(builder::incomeList);
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringExpenses())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream()
+                    .map(item ->
+                             ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                .ifPresent(builder::expenseList);
+        }
+
+        Optional.ofNullable(caseData.getRespondent1CourtOrderDetails())
+            .map(ElementUtils::unwrapElements)
+            .ifPresent(builder::courtOrderDetails);
+
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
+            || caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+            Optional.ofNullable(caseData.getRespondent1DQ())
+                .map(Respondent1DQ::getRespondent1DQHomeDetails)
+                .map(HomeDetails::getType)
+                .ifPresent(type -> {
+                    switch (type) {
+                        case OWNED_HOME:
+                            builder.whereTheyLive("Home they own or pay a mortgage on");
+                            break;
+                        case PRIVATE_RENTAL:
+                            builder.whereTheyLive("Private rental");
+                            break;
+                        case ASSOCIATION_HOME:
+                            builder.whereTheyLive("Council or housing association home");
+                            break;
+                        case JOINTLY_OWNED_HOME:
+                            builder.whereTheyLive("Jointly-owned home (or jointly mortgaged home)");
+                            break;
+                        default:
+                            builder.whereTheyLive("Other");
+                            break;
+                    }
+                });
+        }
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION:
+                    fullAdmissionData(caseData, builder, caseData.getTotalClaimAmount());
+                    break;
+                case PART_ADMISSION:
+                    partAdmissionData(caseData, builder);
+                    break;
+                case FULL_DEFENCE:
+                    fullDefenceData(caseData, builder);
+                    break;
+                default:
+                    builder.whyReject("COUNTER_CLAIM");
+                    break;
+            }
+        }
+
+    }
+
+    @JsonIgnore
+    private static void fullAdmissionData(final CaseData caseData,
+                                   SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder,
+                                   BigDecimal totalClaimAmount) {
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
+            builder.payBy(LocalDate.now()
+                              .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
+                .amountToPay(totalClaimAmount + "");
+        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+            builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+                .payBy(caseData.getRespondent1RepaymentPlan()
+                           .finalPaymentBy(totalClaimAmount))
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                .amountToPay(totalClaimAmount + "")
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        }
+    }
+
+
+    @JsonIgnore
+    private static void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                   .map(event ->
+                                            EventTemplateData.builder()
+                                                .date(event.getValue().getTimelineDate())
+                                                .explanation(event.getValue().getTimelineDescription())
+                                                .build()).collect(Collectors.toList()));
+        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(caseData.getDefenceRouteRequired())) {
+            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .orElse(caseData.getRespondToClaim());
+            builder.whyReject("ALREADY_PAID")
+                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                ? respondToClaim.getHowWasThisAmountPaidOther()
+                                : respondToClaim.getHowWasThisAmountPaid()
+                    .getHumanFriendly());
+        } else if (SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+            .equals(caseData.getDefenceRouteRequired())) {
+            builder.whyReject("DISPUTE");
+        }
+    }
+
+    @JsonIgnore
+    private static void partAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+                                   .map(event ->
+                                            EventTemplateData.builder()
+                                                .date(event.getValue().getTimelineDate())
+                                                .explanation(event.getValue().getTimelineDescription())
+                                                .build()).collect(Collectors.toList()));
+        if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
+            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .orElse(caseData.getRespondToClaim());
+            builder.whyReject("ALREADY_PAID")
+                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                                ? respondToClaim.getHowWasThisAmountPaidOther()
+                                : respondToClaim.getHowWasThisAmountPaid()
+                    .getHumanFriendly());
+        } else {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
+                builder.payBy(LocalDate.now()
+                                  .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
+                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
+            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+                builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+                    .payBy(caseData.getRespondent1RepaymentPlan()
+                               .finalPaymentBy(caseData.getRespondToAdmittedClaimOwingAmount()))
+                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+                builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "")
+                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            }
+        }
+    }
+
 
     @JsonIgnore
     private static List<DebtTemplateData> mapToDebtList(Respondent1DebtLRspec debtLRspec) {
