@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -72,7 +73,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -214,10 +218,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion()) && shouldVulnerabilityAppear(caseData)) {
-            setVulnerabilityFlag(caseData, caseDataBuilder);
-        }
-
         setMediationConditionFlag(caseData, caseDataBuilder);
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
 
@@ -237,7 +237,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && caseData.getApplicant1ProceedWithClaim() == YES)
-            || caseData.isClaimantNotSettlePartAdmitClaim();
+            || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
     }
 
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
@@ -322,6 +322,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
         if (featureToggleService.isHmcEnabled()) {
@@ -404,6 +406,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         boolean hasVersion = EnumSet.of(V_1, V_2).contains(callbackParams.getVersion());
 
+        if (isDefendantFullAdmitPayImmediately(caseData)) {
+            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
+        }
+
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
@@ -466,6 +474,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+        } else if (isDefendantFullAdmitPayImmediately(caseData)) {
+            caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
         }
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
@@ -655,6 +665,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+    private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {

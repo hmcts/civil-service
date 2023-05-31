@@ -109,6 +109,9 @@ public class NotificationsProperties {
     private String claimantSolicitorDefendantResponseForSpec;
 
     @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpec;
+
+    @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
 
     @NotEmpty
@@ -161,6 +164,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentDeadlineExtension;
+
+    @NotEmpty
+    private String respondentDeadlineExtensionWelsh;
 
     @NotEmpty
     private String claimantDeadlineExtension;
@@ -228,6 +234,9 @@ public class NotificationsProperties {
     private String respondentCcjNotificationTemplate;
 
     @NotEmpty
+    private String respondentCcjNotificationWelshTemplate;
+
+    @NotEmpty
     private String respondentSolicitorCcjNotificationTemplate;
 
     @NotEmpty
@@ -249,6 +258,15 @@ public class NotificationsProperties {
     private String bundleCreationTemplate;
 
     @NotEmpty
+    private String generateOrderNotificationTemplate;
+
+    @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
+
+    @NotEmpty
+    private String respondent1DefaultJudgmentRequestedTemplate;
+
+    @NotEmpty
+    private String respondent1LipClaimUpdatedTemplate;
 
 }
