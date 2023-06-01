@@ -213,7 +213,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .thenReturn(new UploadResponse(List.of(document)));
 
         MvcResult result = doPost(BEARER_TOKEN, caseData, GENERATE_SEALED_DOC_URL)
-            .andExpect(status().isOk()).andReturn();
+            .andExpect(status().isCreated()).andReturn();
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals(FILE_NAME, jsonReturnedCaseDocument.get("documentName"),
@@ -237,7 +237,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         //then
         MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
-            .andExpect(status().isOk()).andReturn();
+            .andExpect(status().isCreated()).andReturn();
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
