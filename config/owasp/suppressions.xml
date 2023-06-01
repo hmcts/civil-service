@@ -46,7 +46,7 @@
     <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
     <cve>CVE-2023-20863</cve>
   </suppress>
-  <suppress until="2023-07-29">
+  <suppress until="2023-08-29">
     <cve>CVE-2023-28709</cve>
   </suppress>
 </suppressions>

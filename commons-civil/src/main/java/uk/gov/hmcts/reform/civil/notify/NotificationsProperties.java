@@ -271,5 +271,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondent1LipClaimUpdatedTemplate;
+  
+    @NotEmpty
+    private String hearingFeeUnpaidNoc;
 
 }
