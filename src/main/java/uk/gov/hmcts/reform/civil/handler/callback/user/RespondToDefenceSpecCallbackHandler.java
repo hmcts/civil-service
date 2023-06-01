@@ -505,7 +505,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private String getDefaultConfirmationHeader(CaseData caseData) {
         String claimNumber = caseData.getLegacyCaseReference();
-        if (caseData.hasApplicantProceededWithClaim()) {
+        if (caseData.hasApplicantProceededWithClaim() && !caseData.hasClaimantAgreedToFreeMediation()) {
             return format(
                 "# You have decided to proceed with the claim%n## Claim number: %s",
                 claimNumber
