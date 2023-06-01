@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -645,6 +646,23 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean hasDefendantPayedTheAmountClaimed() {
+        return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(getDefenceRouteRequired());
+    }
+
+    @JsonIgnore
+    public boolean isClaimBeingDisputed() {
+        return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+            .equals(getDefenceRouteRequired());
+    }
+
+    @JsonIgnore
     public LocalDate getDateForRepayment() {
         return Optional.ofNullable(respondToClaimAdmitPartLRspec)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
@@ -868,4 +886,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
     }
+
 }

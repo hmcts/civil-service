@@ -8,12 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
@@ -42,15 +40,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
+
 @Getter
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
-
-
-
-
 
     private final String claimReferenceNumber;
     private final String claimantReferenceNumber;
@@ -162,10 +158,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .map(ElementUtils::unwrapElements)
             .ifPresent(builder::courtOrderDetails);
 
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
-            || caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+        if (caseData.isPayByInstallment()
+            || caseData.isPayBySetDate()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .map(Respondent1DQ::getRespondent1DQHomeDetails)
                 .map(HomeDetails::getType)
@@ -193,58 +187,42 @@ public class SealedClaimLipResponseForm implements MappableObject {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_ADMISSION:
-                    fullAdmissionData(caseData, builder, caseData.getTotalClaimAmount());
-                    break;
-                case PART_ADMISSION:
+                case FULL_ADMISSION ->
+                    addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case PART_ADMISSION ->
                     partAdmissionData(caseData, builder);
-                    break;
-                case FULL_DEFENCE:
-                    fullDefenceData(caseData, builder);
-                    break;
-                default:
-                    builder.whyReject("COUNTER_CLAIM");
-                    break;
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
             }
         }
-
     }
 
-    @JsonIgnore
-    private static void fullAdmissionData(final CaseData caseData,
-                                   SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder,
-                                   BigDecimal totalClaimAmount) {
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-            builder.payBy(LocalDate.now()
-                              .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
-                .amountToPay(totalClaimAmount + "");
-        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-            builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
-                .payBy(caseData.getRespondent1RepaymentPlan()
-                           .finalPaymentBy(totalClaimAmount))
-                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-        } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
-            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-                .amountToPay(totalClaimAmount + "")
-                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-        }
+
+
+    private static void addPayBySetDate(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+        builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+        .amountToPay(totalClaimAmount + "")
+        .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+    }
+
+    private static void addPayByDatePayImmediatly(SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+        builder.payBy(LocalDate.now()
+                          .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
+            .amountToPay(totalClaimAmount + "");
+    }
+
+    private static void addRepaymentPlan(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+        builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+            .payBy(caseData.getRespondent1RepaymentPlan()
+                       .finalPaymentBy(totalClaimAmount))
+            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
 
 
     @JsonIgnore
     private static void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
-        builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
-                                   .map(event ->
-                                            EventTemplateData.builder()
-                                                .date(event.getValue().getTimelineDate())
-                                                .explanation(event.getValue().getTimelineDescription())
-                                                .build()).collect(Collectors.toList()));
-        if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(caseData.getDefenceRouteRequired())) {
+        addDetailsOnWhyClaimIsRejected(caseData, builder);
+        if (caseData.hasDefendantPayedTheAmountClaimed()) {
             RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .orElse(caseData.getRespondToClaim());
             builder.whyReject("ALREADY_PAID")
@@ -254,14 +232,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                 ? respondToClaim.getHowWasThisAmountPaidOther()
                                 : respondToClaim.getHowWasThisAmountPaid()
                     .getHumanFriendly());
-        } else if (SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(caseData.getDefenceRouteRequired())) {
+        } else if (caseData.isClaimBeingDisputed()) {
             builder.whyReject("DISPUTE");
         }
     }
 
-    @JsonIgnore
-    private static void partAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+    private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
                                    .map(event ->
@@ -269,6 +245,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                                 .date(event.getValue().getTimelineDate())
                                                 .explanation(event.getValue().getTimelineDescription())
                                                 .build()).collect(Collectors.toList()));
+    }
+
+    @JsonIgnore
+    private static void partAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .orElse(caseData.getRespondToClaim());
@@ -280,23 +261,17 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                 : respondToClaim.getHowWasThisAmountPaid()
                     .getHumanFriendly());
         } else {
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
-                builder.payBy(LocalDate.now()
-                                  .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
-                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "");
-            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-                builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
-                    .payBy(caseData.getRespondent1RepaymentPlan()
-                               .finalPaymentBy(caseData.getRespondToAdmittedClaimOwingAmount()))
-                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-            } else if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
-                == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
-                builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-                    .amountToPay(caseData.getRespondToAdmittedClaimOwingAmount() + "")
-                    .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-            }
+            addRepaymentMethod(caseData, builder, caseData.getRespondToAdmittedClaimOwingAmount());
+        }
+    }
+
+    private static void addRepaymentMethod(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalAmount) {
+        if (caseData.isPayImmediately()) {
+            addPayByDatePayImmediatly(builder, totalAmount);
+        } else if (caseData.isPayByInstallment()) {
+            addRepaymentPlan(caseData, builder, totalAmount);
+        } else if (caseData.isPayBySetDate()) {
+            addPayBySetDate(caseData, builder, totalAmount);
         }
     }
 
