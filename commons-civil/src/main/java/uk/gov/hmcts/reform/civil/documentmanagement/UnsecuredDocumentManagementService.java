@@ -103,8 +103,7 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
         try {
             MultipartFile file
                 = new InMemoryMultipartFile(FILES_NAME, originalFileName, MULTIPART_FORM_DATA_VALUE,
-                                            uploadedDocument.getBytes()
-            );
+                                            uploadedDocument.getFile().getBytes());
 
             UserInfo userInfo = userService.getUserInfo(authorisation);
             UploadResponse response = documentUploadClientApi.upload(

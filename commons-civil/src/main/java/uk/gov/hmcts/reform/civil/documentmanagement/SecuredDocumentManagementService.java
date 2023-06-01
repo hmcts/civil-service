@@ -108,8 +108,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
         try {
             MultipartFile file
-                = new InMemoryMultipartFile(FILES_NAME, originalFileName, ALL_VALUE, uploadedDocument.getBytes()
-            );
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, ALL_VALUE, uploadedDocument.getFile().getBytes());
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
                 Classification.RESTRICTED.toString(),

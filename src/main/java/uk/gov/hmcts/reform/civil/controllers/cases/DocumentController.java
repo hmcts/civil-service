@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,22 +37,23 @@ public class DocumentController {
     private final DocumentManagementService documentManagementService;
 
     @PostMapping("/generateSealedDoc")
-    public CaseDocument uploadSealedDocument(
+    public ResponseEntity<CaseDocument> uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
-        return claimFormService.uploadSealedDocument(authorisation, caseData);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(claimFormService.uploadSealedDocument(authorisation, caseData));
     }
 
     @PostMapping(value = "/generateAnyDoc")
     @Operation(summary = "Upload document")
-    public CaseDocument uploadAnyDocument(
+    public ResponseEntity<CaseDocument> uploadAnyDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestParam("file")MultipartFile file) {
-        try {
-            UploadedDocument uploadedDocument = new UploadedDocument(file.getOriginalFilename(), file.getBytes());
-            return documentManagementService.uploadDocument(authorisation, uploadedDocument);
-        } catch (Exception e) {
-            throw new DocumentUploadException(file.getOriginalFilename());
-        }
+
+        UploadedDocument uploadedDocument = new UploadedDocument(file.getOriginalFilename(), file);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(documentManagementService.uploadDocument(authorisation, uploadedDocument));
     }
 
     @PostMapping(value = "/downloadSealedDoc",
