@@ -44,7 +44,7 @@ public class HearingsJmsConfig {
         DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(hmcHearingJmsConnectionFactory);
-        factory.setReceiveTimeout(1L);
+        factory.setReceiveTimeout(receiveTimeout);
         factory.setSubscriptionDurable(Boolean.TRUE);
         factory.setSessionTransacted(Boolean.TRUE);
         factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
@@ -59,10 +59,9 @@ public class HearingsJmsConfig {
         log.info("connectionpostfix {}", connectionPostfix);
         log.info("username {}", username);
         log.info("password {}", password);
-        String blabla = "hmc-servicebus-demo.servicebus.windows.net";
-        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, blabla, 3600000L);
+        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
-        jmsConnectionFactory.setUsername("SendAndListenSharedAccessKey");
+        jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
         jmsConnectionFactory.setClientID(clientId);
 
