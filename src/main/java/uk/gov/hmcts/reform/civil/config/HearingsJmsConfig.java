@@ -44,7 +44,7 @@ public class HearingsJmsConfig {
         DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(hmcHearingJmsConnectionFactory);
-        factory.setReceiveTimeout(receiveTimeout);
+        factory.setReceiveTimeout(1L);
         factory.setSubscriptionDurable(Boolean.TRUE);
         factory.setSessionTransacted(Boolean.TRUE);
         factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
@@ -57,11 +57,13 @@ public class HearingsJmsConfig {
     public ConnectionFactory hmcHearingJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
         log.info("Namespace {}", namespace);
         log.info("connectionpostfix {}", connectionPostfix);
+        log.info("username {}", username);
+        log.info("password {}", password);
         String blabla = "hmc-servicebus-demo.servicebus.windows.net";
-        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, blabla, idleTimeout);
+        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, blabla, 3600000L);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
-        jmsConnectionFactory.setUsername(username);
-        jmsConnectionFactory.setPassword(password);
+        jmsConnectionFactory.setUsername("SendAndListenSharedAccessKey");
+        jmsConnectionFactory.setPassword("9Isk6+X2uFthblaSRCBiRT+EbODsQJPOFBr9x5LvmRc=");
         jmsConnectionFactory.setClientID(clientId);
 
         return new CachingConnectionFactory(jmsConnectionFactory);
