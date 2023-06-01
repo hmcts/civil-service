@@ -8,18 +8,22 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +57,22 @@ public class BundleCreationTriggerEventHandler {
             log.info("Trial Bundle already exists for case {}", event.getCaseId());
             return;
         }
-
-        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+        uk.gov.hmcts.reform.civil.model.bundle.Bundle bundleTest =
+            uk.gov.hmcts.reform.civil.model.bundle.Bundle.builder().value(BundleDetails.builder().title(
+            "Trial Bundle").id("111")
+                                                                                   .stitchStatus("new")
+                                                                                   .stitchedDocument(null)
+                                                                                   .fileName("Trial Bundle.pdf")
+                                                                                   .description("This is trial bundle")
+                                                                                   .bundleHearingDate(LocalDate.of(2023, 6, 12))
+                                                                                   .stitchedDocument(Document.builder().documentUrl("").documentFileName("Test").build())
+                                                                                   .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
+                                                                                   .build()).build();
+        List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> bundlesList = new ArrayList<>();
+        bundlesList.add(bundleTest);
+        //BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+        BundleCreateResponse bundleCreateResponse = BundleCreateResponse.builder()
+            .data(BundleData.builder().caseBundles(bundlesList).build()).documentTaskId(100).build();
 
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
