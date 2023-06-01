@@ -138,6 +138,7 @@ class SecuredDocumentManagementServiceTest {
 
         @Test
         void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            //given
             UploadedDocument document = new UploadedDocument("0000-claim.pdf", "test".getBytes());
 
             uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
@@ -145,10 +146,12 @@ class SecuredDocumentManagementServiceTest {
                 uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
             );
 
+            //when
             when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
                 .thenReturn(uploadResponse);
 
             CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+            //then
             assertNotNull(caseDocument.getDocumentLink());
             Assertions.assertEquals(
                 uploadResponse.getDocuments().get(0).links.self.href,
@@ -160,6 +163,7 @@ class SecuredDocumentManagementServiceTest {
 
         @Test
         void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            //given
             UploadedDocument document = new UploadedDocument("0000-failed-claim.pdf", "failed-test".getBytes());
 
             UploadResponse uploadResponse = mapper.readValue(
@@ -167,9 +171,11 @@ class SecuredDocumentManagementServiceTest {
                 UploadResponse.class
             );
 
+            //when
             when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
                 .thenReturn(uploadResponse);
 
+            //then
             DocumentUploadException documentManagementException = assertThrows(
                 DocumentUploadException.class,
                 () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)

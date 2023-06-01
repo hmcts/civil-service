@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,8 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -48,6 +51,7 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -219,22 +223,46 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Test
     void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
 
+        //given
+        MockMultipartFile file = new MockMultipartFile("file",
+                                                       "TestFile.png",
+                                                       "image/png",
+                                                       "This is a dummy file content".getBytes());
+
+        //when
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
             .thenReturn(ResponseEntity.of(Optional.of(bytes)));
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 
-        MockMultipartFile file = new MockMultipartFile("file",
-                                                   "TestFile.png",
-                                                   "image/png",
-                                                   "This is a dummy file content".getBytes());
-
+        //then
         MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
             .andExpect(status().isOk()).andReturn();
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
                      "Document file names should match");
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowExceptionAnyDocument() throws Exception {
+
+        //given
+        MockMultipartFile file = new MockMultipartFile("file",
+                                                       "TestFile.png",
+                                                       "image/png",
+                                                       "This is a dummy file content".getBytes());
+
+        //when
+        when(documentManagementService.uploadDocument(anyString(), any(UploadedDocument.class)))
+            .thenThrow(DocumentUploadException.class);
+
+        //then
+        assertThrows(
+            DocumentUploadException.class,
+            () -> documentController.uploadAnyDocument(BEARER_TOKEN, file)
+        );
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {

@@ -169,12 +169,12 @@ class UnsecuredDocumentManagementServiceTest {
 
         @Test
         void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
-            PDF document = new PDF("0000-claim.pdf", "test".getBytes(), SEALED_CLAIM);
+            UploadedDocument document = new UploadedDocument("0000-claim.pdf", "test".getBytes());
 
             List<MultipartFile> files = List.of(new InMemoryMultipartFile(
                 FILES_NAME,
                 document.getFileBaseName(),
-                APPLICATION_PDF_VALUE,
+                MULTIPART_FORM_DATA_VALUE,
                 document.getBytes()
             ));
 
@@ -204,6 +204,7 @@ class UnsecuredDocumentManagementServiceTest {
 
         @Test
         void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            //given
             UploadedDocument document =
                 new UploadedDocument("0000-failed-claim.pdf", "failed-test".getBytes());
 
@@ -214,6 +215,7 @@ class UnsecuredDocumentManagementServiceTest {
                 document.getBytes()
             ));
 
+            //when
             when(documentUploadClient.upload(
                      anyString(),
                      anyString(),
@@ -225,6 +227,7 @@ class UnsecuredDocumentManagementServiceTest {
             ).thenReturn(mapper.readValue(
                 ResourceReader.readString("document-management/response.failure.json"), UploadResponse.class));
 
+            //then
             DocumentUploadException documentManagementException = assertThrows(
                 DocumentUploadException.class,
                 () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
