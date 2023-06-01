@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -27,7 +25,6 @@ import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
@@ -35,20 +32,15 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 public class AssignCaseToUserHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
-        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
 
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
-    public static final String TASK_ID_SPEC = "CaseAssignmentToApplicantSolicitor1ForSpec";
-
     private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ObjectMapper objectMapper;
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsConfiguration paymentsConfiguration;
-    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,14 +53,10 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-
-        switch (caseEvent) {
-            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1:
-                return TASK_ID;
-            case ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC:
-                return TASK_ID_SPEC;
-            default:
-                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
+        if (ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)) {
+            return TASK_ID;
+        } else {
+            throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
         }
     }
 
