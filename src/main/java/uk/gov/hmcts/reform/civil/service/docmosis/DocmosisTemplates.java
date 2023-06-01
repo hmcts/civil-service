@@ -39,7 +39,7 @@ public enum DocmosisTemplates {
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
     SDO_HNL_DISPOSAL("CV-UNS-STD-ENG-01260.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01229.docx", "Order_disposal_%s.pdf"),
-    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01278.docx", "%s_response_sealed_form.pdf"),
+    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01281.docx", "%s_response_sealed_form.pdf"),
     CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01279.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01271.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01269.docx", "%s_directions_questionnaire_form_%s.pdf"),
