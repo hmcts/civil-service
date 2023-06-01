@@ -30,8 +30,8 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
-import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Slf4j
 @Service("documentManagementService")
@@ -102,7 +102,8 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
 
         try {
             MultipartFile file
-                = new InMemoryMultipartFile(FILES_NAME, originalFileName, ALL_VALUE, uploadedDocument.getBytes()
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, MULTIPART_FORM_DATA_VALUE,
+                                            uploadedDocument.getBytes()
             );
 
             UserInfo userInfo = userService.getUserInfo(authorisation);

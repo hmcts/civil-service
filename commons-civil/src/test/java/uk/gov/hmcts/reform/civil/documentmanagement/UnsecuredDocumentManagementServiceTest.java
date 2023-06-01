@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -43,6 +44,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
@@ -164,6 +166,79 @@ class UnsecuredDocumentManagementServiceTest {
             verify(documentUploadClient)
                 .upload(anyString(), anyString(), anyString(), eq(USER_ROLES), any(Classification.class), eq(files));
         }
+
+        @Test
+        void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            PDF document = new PDF("0000-claim.pdf", "test".getBytes(), SEALED_CLAIM);
+
+            List<MultipartFile> files = List.of(new InMemoryMultipartFile(
+                FILES_NAME,
+                document.getFileBaseName(),
+                APPLICATION_PDF_VALUE,
+                document.getBytes()
+            ));
+
+            UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/response.success.json"), UploadResponse.class);
+
+            when(documentUploadClient.upload(
+                     anyString(),
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES),
+                     any(Classification.class),
+                     eq(files)
+                 )
+            ).thenReturn(uploadResponse);
+
+            CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+            assertNotNull(caseDocument.getDocumentLink());
+            Assertions.assertEquals(
+                uploadResponse.getEmbedded().getDocuments().get(0).links.self.href,
+                caseDocument.getDocumentLink().getDocumentUrl()
+            );
+
+            verify(documentUploadClient)
+                .upload(anyString(), anyString(), anyString(), eq(USER_ROLES), any(Classification.class), eq(files));
+        }
+
+        @Test
+        void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            UploadedDocument document =
+                new UploadedDocument("0000-failed-claim.pdf", "failed-test".getBytes());
+
+            List<MultipartFile> files = List.of(new InMemoryMultipartFile(
+                FILES_NAME,
+                document.getFileBaseName(),
+                MULTIPART_FORM_DATA_VALUE,
+                document.getBytes()
+            ));
+
+            when(documentUploadClient.upload(
+                     anyString(),
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES),
+                     any(Classification.class),
+                     eq(files)
+                 )
+            ).thenReturn(mapper.readValue(
+                ResourceReader.readString("document-management/response.failure.json"), UploadResponse.class));
+
+            DocumentUploadException documentManagementException = assertThrows(
+                DocumentUploadException.class,
+                () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
+            );
+
+            assertEquals(
+                "Unable to upload document 0000-failed-claim.pdf to document management.",
+                documentManagementException.getMessage()
+            );
+
+            verify(documentUploadClient)
+                .upload(anyString(), anyString(), anyString(), eq(USER_ROLES), any(Classification.class), eq(files));
+        }
+
     }
 
     @Nested

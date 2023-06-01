@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -49,7 +50,7 @@ public class DocumentController {
             UploadedDocument uploadedDocument = new UploadedDocument(file.getOriginalFilename(), file.getBytes());
             return documentManagementService.uploadDocument(authorisation, uploadedDocument);
         } catch (Exception e) {
-            return null;
+            throw new DocumentUploadException(file.getOriginalFilename());
         }
     }
 

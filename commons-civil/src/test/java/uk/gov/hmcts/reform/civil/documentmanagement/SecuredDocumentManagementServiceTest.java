@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -113,6 +114,53 @@ class SecuredDocumentManagementServiceTest {
         @Test
         void shouldThrow_whenUploadDocumentFails() throws JsonProcessingException {
             PDF document = new PDF("0000-failed-claim.pdf", "failed-test".getBytes(), SEALED_CLAIM);
+
+            UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.failure.json"),
+                UploadResponse.class
+            );
+
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            DocumentUploadException documentManagementException = assertThrows(
+                DocumentUploadException.class,
+                () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
+            );
+
+            assertEquals(
+                "Unable to upload document 0000-failed-claim.pdf to document management.",
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
+
+        @Test
+        void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            UploadedDocument document = new UploadedDocument("0000-claim.pdf", "test".getBytes());
+
+            uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.success.json"),
+                uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
+            );
+
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+            assertNotNull(caseDocument.getDocumentLink());
+            Assertions.assertEquals(
+                uploadResponse.getDocuments().get(0).links.self.href,
+                caseDocument.getDocumentLink().getDocumentUrl()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
+
+        @Test
+        void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            UploadedDocument document = new UploadedDocument("0000-failed-claim.pdf", "failed-test".getBytes());
 
             UploadResponse uploadResponse = mapper.readValue(
                 ResourceReader.readString("document-management/secured.response.failure.json"),
