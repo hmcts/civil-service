@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isClaimantNotSettlePartAdmitClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.noticeOfChangeEnabled;
@@ -125,6 +126,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -379,7 +381,7 @@ public class StateFlowEngine {
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED)
-                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)))
+                    .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
                 .transitionTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .onlyIf(awaitingResponsesFullDefenceReceived
                         .and(not(notificationAcknowledged)).and(not(respondentTimeExtension))
@@ -390,6 +392,7 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimDetailsNotified)
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotified)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf((respondentTimeExtension).and(allResponsesReceived))
@@ -526,6 +529,7 @@ public class StateFlowEngine {
             .state(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
             .state(COUNTER_CLAIM)
             .state(FULL_DEFENCE_PROCEED)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
@@ -570,6 +574,7 @@ public class StateFlowEngine {
             .state(FULL_ADMIT_PAY_IMMEDIATELY)
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
             .state(IN_MEDIATION)
+            .state(IN_HEARING_READINESS)
             .build();
     }
 
