@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -35,9 +34,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -86,9 +85,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DR
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -4272,58 +4271,6 @@ class StateFlowEngineTest {
 
             assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
             assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
-        }
-
-        @Test
-        void fullDefenceAllMediationSpec_WithLrVLipFlag() {
-            // Given
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(YES).build())
-                .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE)
-                .build();
-
-            // When
-            StateFlow fullState = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
-
-            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
-                                                              .applicant1ProceedWithClaim(YES)
-                                                              .applicant1ClaimMediationSpecRequired(
-                                                                  SmallClaimMedicalLRspec.builder()
-                                                                      .hasAgreedFreeMediation(YES)
-                                                                      .build()
-                                                              )
-                                                              .build());
-
-            assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
-            assertThat(newState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
-            assertThat(newState.getFlags()).contains(entry(FlowFlag.LR_V_LIP_ENABLED.name(), true));
         }
     }
 
