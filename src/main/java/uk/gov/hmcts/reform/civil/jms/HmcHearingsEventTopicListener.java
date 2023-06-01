@@ -26,8 +26,8 @@ public class HmcHearingsEventTopicListener {
     private final CoreCaseDataService coreCaseDataService;
 
     @JmsListener(
-        destination = "${azure.service-bus.hmc-to-hearings-api.topicName}",
-        subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
+        destination = "hmc-to-cft-demo",
+        subscription = "hmc-to-civil-subscription-demo",
         containerFactory = "hmcHearingsEventTopicContainerFactory")
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcTopicEventProcessingException {
 
