@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -29,10 +30,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -4462,4 +4462,82 @@ class StateFlowEngineTest {
             assertThat(fullState.getFlags()).contains(entry(FlowFlag.SDO_ENABLED.name(), true));
         }
     }
+
+    @Test
+    void shouldReturnInHearingReadiness_whenTransitionedFromCaseDetailsNotified() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .hearingReferenceNumber("11111111")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .build();
+
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(IN_HEARING_READINESS.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(8)
+            .extracting(State::getName)
+            .containsExactly(
+                DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                CLAIM_DETAILS_NOTIFIED.fullName(), IN_HEARING_READINESS.fullName()
+            );
+
+        assertThat(stateFlow.getFlags()).hasSize(4).contains(
+            entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+        );
+    }
+
+    @Test
+    void shouldReturnInHearingReadiness_whenTransitionedFromFullDefenseProceed() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .submittedDate(LocalDateTime.now())
+            .respondent1Represented(YES)
+            .paymentSuccessfulDate(LocalDateTime.now())
+            .issueDate(LocalDate.now())
+            .respondent1OrgRegistered(YES)
+            .claimNotificationDeadline(LocalDateTime.now())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .claimNotificationDate(LocalDateTime.now())
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .responseClaimMediationSpecRequired(YES)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1ClaimMediationSpecRequired(
+                SmallClaimMedicalLRspec.builder()
+                    .hasAgreedFreeMediation(NO)
+                    .build())
+            .hearingReferenceNumber("11111111")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .build();
+
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(IN_HEARING_READINESS.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(8)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(),  FULL_DEFENCE.fullName(),
+                FULL_DEFENCE_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
+            );
+
+    }
+
 }
