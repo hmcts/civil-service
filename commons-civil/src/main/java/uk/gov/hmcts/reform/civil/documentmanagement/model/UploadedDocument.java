@@ -7,5 +7,4 @@ public class UploadedDocument {
 
     private final String fileBaseName;
     private final byte[] bytes;
-    private final DocumentType documentType;
 }

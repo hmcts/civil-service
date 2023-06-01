@@ -11,7 +11,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -28,8 +27,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
@@ -129,7 +126,6 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
                                   .documentFileName(originalFileName)
                                   .build())
                 .documentName(originalFileName)
-                .documentType(uploadedDocument.getDocumentType())
                 .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
                                                                  .toInstant()
                                                                  .atZone(ZoneId.systemDefault())

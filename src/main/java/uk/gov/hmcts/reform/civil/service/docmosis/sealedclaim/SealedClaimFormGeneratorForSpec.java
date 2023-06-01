@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;

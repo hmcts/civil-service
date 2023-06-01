@@ -4,8 +4,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 
-import java.util.List;
-
 public interface DocumentManagementService {
 
     CaseDocument uploadDocument(String authorisation, PDF pdf);

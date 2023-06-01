@@ -6,17 +6,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.*;
-import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 
 import javax.validation.constraints.NotNull;
-
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
 @Tag(name = "Document Controller")
 @Slf4j
@@ -41,11 +45,10 @@ public class DocumentController {
     public CaseDocument uploadAnyDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestParam("file")MultipartFile file) {
-        try{
-            UploadedDocument uploadedDocument = new UploadedDocument(file.getName(), file.getBytes(),
-                                                                     SEALED_CLAIM);
+        try {
+            UploadedDocument uploadedDocument = new UploadedDocument(file.getOriginalFilename(), file.getBytes());
             return documentManagementService.uploadDocument(authorisation, uploadedDocument);
-        } catch(Exception e) {
+        } catch (Exception e) {
             return null;
         }
     }

@@ -15,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -33,7 +34,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
@@ -75,6 +78,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
+    private DocumentUploadClientApi documentUploadClientApi;
+    @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
     @Autowired
@@ -93,7 +98,9 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         .documentType(SEALED_CLAIM)
         .build();
     private static final String BASE_URL = "/case/document";
-    private static final String GENERATE_DOC_URL = BASE_URL + "/generateSealedDoc";
+    private static final String GENERATE_SEALED_DOC_URL = BASE_URL + "/generateSealedDoc";
+
+    private static final String GENERATE_ANY_DOC_URL = BASE_URL + "/generateAnyDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
 
     private Document document;
@@ -190,7 +197,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnExpectedGeneratedDocument() throws Exception {
+    void shouldReturnExpectedGeneratedSealedDocument() throws Exception {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
@@ -201,11 +208,32 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
 
-        MvcResult result = doPost(BEARER_TOKEN, caseData, GENERATE_DOC_URL)
+        MvcResult result = doPost(BEARER_TOKEN, caseData, GENERATE_SEALED_DOC_URL)
             .andExpect(status().isOk()).andReturn();
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals(FILE_NAME, jsonReturnedCaseDocument.get("documentName"),
+                     "Document file names should match");
+    }
+
+    @Test
+    void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
+            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
+        when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
+            .thenReturn(new UploadResponse(List.of(document)));
+
+        MockMultipartFile file = new MockMultipartFile("file",
+                                                   "TestFile.png",
+                                                   "image/png",
+                                                   "This is a dummy file content".getBytes());
+
+        MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
+            .andExpect(status().isOk()).andReturn();
+
+        JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
+        assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
                      "Document file names should match");
     }
 
