@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -74,6 +74,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
@@ -82,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
@@ -114,6 +116,7 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
 
     public EventHistory buildEvents(CaseData caseData) {
+        System.out.println("now its inside buildEvents class ");
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
@@ -701,9 +704,11 @@ public class EventHistoryMapper {
                                              CaseData caseData,
                                              LocalDateTime respondentResponseDate,
                                              String respondentID) {
+        System.out.println("inside buildDefenceAndCounterClaim ");
         builder.defenceAndCounterClaim(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                 .dateReceived(respondentResponseDate)
                 .litigiousPartyID(respondentID)
                 .build());
@@ -1061,6 +1066,7 @@ public class EventHistoryMapper {
             .mapToObj(index ->
                           Event.builder()
                               .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(REPLY_TO_DEFENCE.getCode())
                               .dateReceived(applicantDetails.get(index).getResponseDate())
                               .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                               .build())
@@ -1958,10 +1964,12 @@ public class EventHistoryMapper {
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
+            System.out.println("  inside buildRespondentCounterClaim 11    ");
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.defenceAndCounterClaim(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .litigiousPartyID(RESPONDENT_ID)
                     .build()
@@ -1975,6 +1983,7 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                System.out.println("  inside buildRespondentCounterClaim 22    ");
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
@@ -1982,6 +1991,7 @@ public class EventHistoryMapper {
                     List.of(
                         Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                             .dateReceived(respondent2ResponseDate)
                             .litigiousPartyID(RESPONDENT2_ID)
                             .build()
@@ -1998,11 +2008,13 @@ public class EventHistoryMapper {
             }
         }
         if (defendant2ResponseExists.test(caseData)) {
+            System.out.println("  inside buildRespondentCounterClaim 33    ");
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.defenceAndCounterClaim(
                 List.of(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
                         .dateReceived(caseData.getRespondent2ResponseDate())
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build()
