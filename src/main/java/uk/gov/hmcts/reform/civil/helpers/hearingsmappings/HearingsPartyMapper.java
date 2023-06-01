@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -264,7 +263,10 @@ public class HearingsPartyMapper {
         String orgName = organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
             .orElse("");
-        return buildOrganisationPartyObject(null, orgName, LEGAL_REP_ROLE.getPartyRoleValue(), organisationID, null);
+        return buildOrganisationPartyObject(
+            organisationID, orgName,
+            LEGAL_REP_ROLE.getPartyRoleValue(), organisationID,
+            null);
     }
 
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
@@ -285,7 +287,7 @@ public class HearingsPartyMapper {
             .vulnerabilityDetails(getVulnerabilityDetails(flagDetails))
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(getCustodyStatus(flagDetails))
             .build();
 

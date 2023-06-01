@@ -98,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -703,6 +704,39 @@ public class FlowStateAllowedEventService {
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL
             )
+        ),
+        entry(
+            IN_HEARING_READINESS.fullName(),
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION,
+                NotSuitable_SDO,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                HEARING_SCHEDULED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                SERVICE_REQUEST_RECEIVED,
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION
+            )
         )
     );
 
@@ -1089,6 +1123,37 @@ public class FlowStateAllowedEventService {
             List.of(
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL
+            )
+        ),
+        entry(
+            IN_HEARING_READINESS.fullName(),
+            List.of(
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                ENTER_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_SPEC,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN,
+                AMEND_PARTY_DETAILS,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                HEARING_SCHEDULED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                REFER_TO_JUDGE,
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION
             )
         )
     );
