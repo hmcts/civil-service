@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PartySelected;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -498,6 +499,9 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantSolOrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent1SolOrgIndividuals;
     private final List<Element<PartyFlagStructure>> applicant1SolOrgIndividuals;
+
+    private final DynamicList partyOptions;
+    private final PartySelected partySelected;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
