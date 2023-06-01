@@ -1324,6 +1324,19 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                    .value(pdfDocument).build()))
+            .build();
+    }
+
     public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
@@ -1350,6 +1363,19 @@ public class GeneralApplicationDetailsBuilder {
                                 .build())
             .consentOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                                                       .value(pdfDocument).build()))
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDraftStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                    .value(pdfDocument).build()))
             .build();
     }
 
