@@ -26,11 +26,6 @@ public class ClaimFormService {
         return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
-    public CaseDocument uploadAnyDocument(
-        String authorisation, UploadedDocument uploadedDocument) {
-        return documentManagementService.uploadDocument(authorisation, uploadedDocument);
-    }
-
     @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
