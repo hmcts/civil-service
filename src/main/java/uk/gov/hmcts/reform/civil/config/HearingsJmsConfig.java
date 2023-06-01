@@ -63,7 +63,7 @@ public class HearingsJmsConfig {
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, blabla, 3600000L);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername("SendAndListenSharedAccessKey");
-        jmsConnectionFactory.setPassword("9Isk6+X2uFthblaSRCBiRT+EbODsQJPOFBr9x5LvmRc=");
+        jmsConnectionFactory.setPassword(password);
         jmsConnectionFactory.setClientID(clientId);
 
         return new CachingConnectionFactory(jmsConnectionFactory);
