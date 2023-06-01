@@ -44,6 +44,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,10 +66,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
@@ -255,7 +259,8 @@ class CaseEventTaskHandlerTest {
             names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
                 "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
-                "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED", "TAKEN_OFFLINE_BY_STAFF"})
+                "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED", "TAKEN_OFFLINE_BY_STAFF", "CLAIM_DETAILS_NOTIFIED",
+                "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION"})
         void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, state.fullName());
@@ -718,7 +723,9 @@ class CaseEventTaskHandlerTest {
                 || state.equals(PART_ADMISSION)
                 || state.equals(COUNTER_CLAIM)
                 || state.equals(FULL_DEFENCE_PROCEED)
-                || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
+                || state.equals(FULL_DEFENCE_NOT_PROCEED)
+                || state.equals(CLAIM_DETAILS_NOTIFIED)
+                || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
@@ -799,6 +806,15 @@ class CaseEventTaskHandlerTest {
                         .addRespondent2(NO)
                         .respondent2Represented(null)
                         .respondent2OrgRegistered(null);
+                    break;
+                case CLAIM_DETAILS_NOTIFIED:
+                    caseDataBuilder.atStateClaimDetailsNotified1v1()
+                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                    break;
+                case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
+                    caseDataBuilder.atStateNotificationAcknowledgedRespondent1TimeExtension()
+                        .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
+                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
