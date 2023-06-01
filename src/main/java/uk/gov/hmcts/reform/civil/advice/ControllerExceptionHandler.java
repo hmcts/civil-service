@@ -37,7 +37,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DocumentUploadException.class)
     public ResponseEntity<Object> documentUploadException(DocumentUploadException documentUploadException) {
         log.error(documentUploadException.getMessage());
-        return new ResponseEntity<>(documentUploadException.getMessage(),
-                                    new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }
