@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 
 public class FlowPredicate {
 
@@ -874,4 +875,10 @@ public class FlowPredicate {
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
+
+    public static final Predicate<CaseData> isInHearingReadiness = caseData ->
+        caseData.getHearingReferenceNumber() != null
+        && caseData.getListingOrRelisting() != null
+        && caseData.getListingOrRelisting().equals(LISTING);
+
 }

@@ -262,6 +262,8 @@ notifications:
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
 
+  hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
+
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
 
 sendgrid:
