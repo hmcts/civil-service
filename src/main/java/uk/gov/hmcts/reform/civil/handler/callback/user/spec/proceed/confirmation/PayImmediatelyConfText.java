@@ -27,7 +27,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
-        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
+        String formattedWhenBePaid = whenBePaid != null ? formatLocalDate(whenBePaid, DATE) : "";
         return Optional.of(format(
             "They must make sure you have the money by %s. "
                 + "Any cheques or transfers should be clear in your account"
@@ -47,6 +47,6 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            && null == caseData.getApplicant1ProceedWithClaim();
+            && null == caseData.getApplicant1ProceedWithClaim() && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null;
     }
 }
