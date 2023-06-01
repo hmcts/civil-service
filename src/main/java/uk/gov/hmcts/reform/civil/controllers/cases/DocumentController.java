@@ -42,7 +42,7 @@ public class DocumentController {
     public @ResponseBody
     ResponseEntity<Resource> downloadDocumentById(
         @NotNull @PathVariable String documentId) {
-        return claimFormService.downloadDocumentById(documentId);
+        return ResponseEntity.ok(claimFormService.downloadDocumentById(documentId));
     }
 
 }
