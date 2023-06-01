@@ -38,8 +38,6 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
 
-        log.info("Is RPA Email is on " + toggleService.isRPAEmailEnabled());
-
         if (toggleService.isRPAEmailEnabled()) {
 
             RoboticsCaseData roboticsCaseData = null;
