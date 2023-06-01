@@ -57,7 +57,8 @@ public class HearingsJmsConfig {
     public ConnectionFactory hmcHearingJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
         log.info("Namespace {}", namespace);
         log.info("connectionpostfix {}", connectionPostfix);
-        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
+        String blabla = "hmc-servicebus-demo.servicebus.windows.net";
+        String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, blabla, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
