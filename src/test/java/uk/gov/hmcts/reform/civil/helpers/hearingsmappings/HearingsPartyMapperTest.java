@@ -10,11 +10,14 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
+import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingsPartyMapper.buildPartyObjectForHearingPayload;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
@@ -43,7 +47,9 @@ public class HearingsPartyMapperTest {
     private static final String RESPONDENT_ONE_ORG_ID = "QWERTY R";
     private static final String RESPONDENT_TWO_ORG_ID = "QWERTY R2";
 
+    private static final String APPLICANT_PARTY_ID = "app1-party-id";
     private static final String APPLICANT_COMPANY_NAME = "Applicant Company";
+    private static final String RESPONDENT_ONE_PARTY_ID = "res1-party-id";
     private static final String RESPONDENT_ONE_ORG_NAME = "Respondent 1 Organisation";
 
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
@@ -69,13 +75,42 @@ public class HearingsPartyMapperTest {
                                         .build()));
     }
 
+    private String getLocalDateInString(LocalDate date) {
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    private UnavailabilityRangeModel buildUnavailabilityDateRange(LocalDate from, LocalDate to) {
+        return  UnavailabilityRangeModel.builder()
+            .unavailabilityType(ALL_DAY)
+            .unavailableFromDate(getLocalDateInString(from))
+            .unavailableToDate(getLocalDateInString(to))
+            .build();
+    }
+
+    private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+        caseData = builder.build();
+        return caseData;
+    }
+
+    private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        caseData = builder.build();
+        return caseData;
+    }
+
     @Test
     void shouldBuildIndividualDetails_whenClaimantIsIndividualRespondentSoleTrader() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .applicant1DQWithUnavailableDate()
             .build();
+        caseData = rollUpUnavailableDateApplicant(caseData);
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -84,6 +119,8 @@ public class HearingsPartyMapperTest {
             "0123456789"
         );
 
+        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
+
         PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
             APPLICANT_LR_ORG_NAME,
             LEGAL_REP_ROLE,
@@ -91,6 +128,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -122,19 +160,25 @@ public class HearingsPartyMapperTest {
     void shouldBuildOrganisationDetails_whenClaimantIsCompanyRespondentOrganisation() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .respondent1DQWithUnavailableDateRange()
             .build()
             .toBuilder()
             .applicant1(Party.builder()
+                            .partyID(APPLICANT_PARTY_ID)
                             .companyName(APPLICANT_COMPANY_NAME)
                             .type(COMPANY)
                             .build())
             .respondent1(Party.builder()
+                             .partyID(RESPONDENT_ONE_PARTY_ID)
                              .organisationName(RESPONDENT_ONE_ORG_NAME)
                              .type(ORGANISATION)
                              .build())
             .build();
 
+        caseData = rollUpUnavailableDateRespondent(caseData);
+
         PartyDetailsModel applicantPartyDetails = buildExpectedOrganisationPartyObject(
+            APPLICANT_PARTY_ID,
             APPLICANT_COMPANY_NAME,
             CLAIMANT_ROLE,
             null
@@ -147,10 +191,12 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedOrganisationPartyObject(
+            RESPONDENT_ONE_PARTY_ID,
             RESPONDENT_ONE_ORG_NAME,
             DEFENDANT_ROLE,
             null
         );
+        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
 
         PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
             RESPONDENT_ONE_LR_ORG_NAME,
@@ -182,6 +228,7 @@ public class HearingsPartyMapperTest {
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -197,6 +244,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantExpert = buildExpectedIndividualPartyDetails(
+            "app-1-expert-party-id",
             "Applicant",
             "Expert",
             "Applicant Expert",
@@ -206,6 +254,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantWitness = buildExpectedIndividualPartyDetails(
+            "app-1-witness-party-id",
             "Applicant",
             "Witness",
             "Applicant Witness",
@@ -215,6 +264,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantLitFriend = buildExpectedIndividualPartyDetails(
+            "app-1-litfriend-party-id",
             "Applicant",
             "Litigation Friend",
             "Applicant Litigation Friend",
@@ -224,6 +274,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -239,6 +290,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Expert = buildExpectedIndividualPartyDetails(
+            "res-1-expert-party-id",
             "Respondent",
             "Expert",
             "Respondent Expert",
@@ -248,6 +300,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Witness = buildExpectedIndividualPartyDetails(
+            "res-1-witness-party-id",
             "Respondent",
             "Witness",
             "Respondent Witness",
@@ -257,6 +310,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1LitFriend = buildExpectedIndividualPartyDetails(
+            "res-1-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -297,6 +351,7 @@ public class HearingsPartyMapperTest {
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -312,6 +367,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicant2PartyDetails = buildExpectedIndividualPartyDetails(
+            "app-2-party-id",
             "Jason",
             "Rambo",
             "Mr. Jason Rambo",
@@ -321,6 +377,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantExpert = buildExpectedIndividualPartyDetails(
+            "app-2-expert-party-id",
             "Applicant Two",
             "Expert",
             "Applicant Two Expert",
@@ -330,6 +387,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantWitness = buildExpectedIndividualPartyDetails(
+            "app-2-witness-party-id",
             "Applicant Two",
             "Witness",
             "Applicant Two Witness",
@@ -339,6 +397,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantLitFriend = buildExpectedIndividualPartyDetails(
+            "app-1-litfriend-party-id",
             "Applicant",
             "Litigation Friend",
             "Applicant Litigation Friend",
@@ -348,6 +407,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicant2LitFriend = buildExpectedIndividualPartyDetails(
+            "app-2-litfriend-party-id",
             "Applicant Two",
             "Litigation Friend",
             "Applicant Two Litigation Friend",
@@ -357,6 +417,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -372,6 +433,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Expert = buildExpectedIndividualPartyDetails(
+            "res-1-expert-party-id",
             "Respondent",
             "Expert",
             "Respondent Expert",
@@ -381,6 +443,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Witness = buildExpectedIndividualPartyDetails(
+            "res-1-witness-party-id",
             "Respondent",
             "Witness",
             "Respondent Witness",
@@ -390,6 +453,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1LitFriend = buildExpectedIndividualPartyDetails(
+            "res-1-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -433,6 +497,7 @@ public class HearingsPartyMapperTest {
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -448,6 +513,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantExpert = buildExpectedIndividualPartyDetails(
+            "app-1-expert-party-id",
             "Applicant",
             "Expert",
             "Applicant Expert",
@@ -457,6 +523,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantWitness = buildExpectedIndividualPartyDetails(
+            "app-1-witness-party-id",
             "Applicant",
             "Witness",
             "Applicant Witness",
@@ -466,6 +533,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantLitFriend = buildExpectedIndividualPartyDetails(
+            "app-1-litfriend-party-id",
             "Applicant",
             "Litigation Friend",
             "Applicant Litigation Friend",
@@ -475,6 +543,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -490,6 +559,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Expert = buildExpectedIndividualPartyDetails(
+            "res-1-expert-party-id",
             "Respondent",
             "Expert",
             "Respondent Expert",
@@ -499,6 +569,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1Witness = buildExpectedIndividualPartyDetails(
+            "res-1-witness-party-id",
             "Respondent",
             "Witness",
             "Respondent Witness",
@@ -508,6 +579,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1LitFriend = buildExpectedIndividualPartyDetails(
+            "res-1-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -517,6 +589,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2PartyDetails = buildExpectedIndividualPartyDetails(
+            "res-2-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -532,6 +605,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2Expert = buildExpectedIndividualPartyDetails(
+            "res-2-expert-party-id",
             "Respondent Two",
             "Expert",
             "Respondent Two Expert",
@@ -541,6 +615,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2Witness = buildExpectedIndividualPartyDetails(
+            "res-2-witness-party-id",
             "Respondent Two",
             "Witness",
             "Respondent Two Witness",
@@ -550,6 +625,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2LitFriend = buildExpectedIndividualPartyDetails(
+            "res-2-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -594,6 +670,7 @@ public class HearingsPartyMapperTest {
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -609,6 +686,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicantLitFriend = buildExpectedIndividualPartyDetails(
+            "app-1-litfriend-party-id",
             "Applicant",
             "Litigation Friend",
             "Applicant Litigation Friend",
@@ -618,6 +696,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
             "Sole",
             "Trader",
             "Mr. Sole Trader",
@@ -633,6 +712,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent1LitFriend = buildExpectedIndividualPartyDetails(
+            "res-1-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -642,6 +722,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2PartyDetails = buildExpectedIndividualPartyDetails(
+            "res-2-party-id",
             "John",
             "Rambo",
             "Mr. John Rambo",
@@ -651,6 +732,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2Expert = buildExpectedIndividualPartyDetails(
+            "res-2-expert-party-id",
             "Respondent Two",
             "Expert",
             "Respondent Two Expert",
@@ -660,6 +742,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2Witness = buildExpectedIndividualPartyDetails(
+            "res-2-witness-party-id",
             "Respondent Two",
             "Witness",
             "Respondent Two Witness",
@@ -669,6 +752,7 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel respondent2LitFriend = buildExpectedIndividualPartyDetails(
+            "res-2-litfriend-party-id",
             "Litigation",
             "Friend",
             "Litigation Friend",
@@ -696,7 +780,7 @@ public class HearingsPartyMapperTest {
         assertThat(actualPartyDetailsModel).isEqualTo(expected);
     }
 
-    private PartyDetailsModel buildExpectedIndividualPartyDetails(String firstName, String lastName,
+    private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
                                                                   String partyName, String partyRole,
                                                                   String email, String phone) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
@@ -710,12 +794,12 @@ public class HearingsPartyMapperTest {
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(null)
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(partyId)
             .partyType(IND)
             .partyName(partyName)
             .partyRole(partyRole)
@@ -727,17 +811,18 @@ public class HearingsPartyMapperTest {
             .build();
     }
 
-    private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
-                                                                 String partyRole,
-                                                                 String cftOrganisationID) {
+    private PartyDetailsModel buildExpectedOrganisationPartyObject(String partyId,
+                                                                   String name,
+                                                                   String partyRole,
+                                                                   String cftOrganisationID) {
         OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
             .name(name)
-            .organisationType(null)
+            .organisationType(ORG.getLabel())
             .cftOrganisationID(cftOrganisationID)
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID("")
+            .partyID(partyId)
             .partyType(ORG)
             .partyName(name)
             .partyRole(partyRole)
@@ -747,5 +832,11 @@ public class HearingsPartyMapperTest {
             .unavailabilityRange(null)
             .hearingSubChannel(null)
             .build();
+    }
+
+    private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
+                                                                   String partyRole,
+                                                                   String cftOrganisationID) {
+        return buildExpectedOrganisationPartyObject(cftOrganisationID, name, partyRole, cftOrganisationID);
     }
 }

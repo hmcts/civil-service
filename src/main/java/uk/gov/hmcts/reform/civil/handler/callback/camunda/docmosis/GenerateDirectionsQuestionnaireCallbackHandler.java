@@ -16,15 +16,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -40,6 +43,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,7 +58,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     public void generateDQ1v2SameSol(CallbackParams callbackParams, String sol) {
-
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument directionsQuestionnaire =
@@ -63,21 +66,16 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 sol
             );
+        assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
-        }
     }
 
     /**
-     * Next version for prepareDirectionsQuestionnaire. The main difference is storing the generated document
-     * not only in the generated documents list but also in respondent1GeneratedResponseDocument, so we can use
-     * easily locate it in intention to proceed journey.
-     *
+     * Next version for prepareDirectionsQuestionnaire.
      * @param callbackParams parameters of the callback
      * @return response of the callback
      */
@@ -107,7 +105,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
             ArrayList<Element<CaseDocument>> updatedDocuments =
                 new ArrayList<>(caseData.getSystemGeneratedCaseDocuments());
-
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null
                 && (caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -121,7 +118,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "ONE"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                    caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
+                    assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
                 });
             }
 
@@ -138,7 +136,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseDataBuilder.respondent2GeneratedResponseDocument(document);
+                    caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
+                    assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
                 });
             }
 
@@ -191,11 +190,24 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             bearerToken
         );
 
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+            }
+            if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+            }
+        }
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+            }
         }
     }
 

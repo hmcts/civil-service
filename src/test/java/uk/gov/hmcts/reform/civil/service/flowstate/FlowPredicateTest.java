@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -73,8 +75,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
@@ -88,8 +92,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pinInPostEnabledAndLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
@@ -97,13 +101,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 
 class FlowPredicateTest {
@@ -2556,7 +2560,7 @@ class FlowPredicateTest {
         @Test
         public void whenUnspec_false() {
             CaseData caseData = CaseData.builder().build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2564,7 +2568,7 @@ class FlowPredicateTest {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2589,12 +2593,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2622,12 +2622,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2660,12 +2656,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[2])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2698,13 +2690,27 @@ class FlowPredicateTest {
                     .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                                .hasAgreedFreeMediation(whoAgrees[2])
                                                                .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
+        }
+
+        @Test
+        void shouldReturnFalse_whenClaimantAgreedToLipMediation() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(MediationDecision.Yes)
+                                                                              .build())
+                                 .build())
+                .build();
+            //When
+            boolean result = FlowPredicate.allAgreedToLrMediationSpec.test(caseData);
+            //Then
+            assertFalse(result);
         }
     }
 
@@ -2795,5 +2801,44 @@ class FlowPredicateTest {
 
             assertFalse(contactDetailsChange.test(caseData));
         }
+    }
+
+    @Nested
+    class OneVOneResponseFlag {
+
+        @Test
+        void shouldReturnFalse_whenShowOneVOneResponseFlagExist() {
+            CaseData caseData = CaseData.builder().build();
+
+            assertFalse(isOneVOneResponseFlagSpec.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenShowOneVOneResponseFlagNotExist() {
+            CaseData caseData = CaseData.builder()
+                .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).build();
+
+            assertTrue(isOneVOneResponseFlagSpec.test(caseData));
+        }
+    }
+
+    @Test
+    public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("11111")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .build();
+
+        assertTrue(isInHearingReadiness.test(caseData));
+    }
+
+    @Test
+    public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("11111")
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .build();
+
+        assertFalse(isInHearingReadiness.test(caseData));
     }
 }

@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -59,11 +60,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -83,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.ge
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
 @Service
@@ -97,12 +99,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
 
-    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
-        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>"
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is "
         + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
         + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
-        + "when you first notify the Defendant legal representative of the claim.";
+        + "when you first notify the Defendant legal representative of the claim. <br/>[Pay your claim fee](%s)";
 
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
@@ -141,8 +143,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
-
+    private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -486,11 +489,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
         }
+        //assign category ids to documents uploaded as part of particulars of claim
+        assignParticularOfClaimCategoryIds(caseData);
 
         dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
+
+        if (toggleService.isHmcEnabled()) {
+            populateWithPartyIds(dataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -530,7 +539,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
@@ -540,6 +548,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private String getHeader(CaseData caseData) {
 
         if (areRespondentsRepresentedAndRegistered(caseData)) {
+            if (toggleService.isPbaV3Enabled()) {
+                return format("# Please now pay your claim fee%n# using the link below");
+            }
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
 
@@ -572,29 +583,31 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private String getBody(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
-            return format(
-                areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary()
-                    : LIP_CONFIRMATION_BODY_COS,
-                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-                claimIssueConfiguration.getResponsePackLink()
-            ) + exitSurveyContentService.applicantSurvey();
+            return
+                (areRespondentsRepresentedAndRegistered(caseData)
+                    ? getConfirmationSummary(caseData)
+                    : format(LIP_CONFIRMATION_BODY_COS,
+                format(caseDocLocation, caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()))
+                + exitSurveyContentService.applicantSurvey();
         } else {
-            return format(
-                areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary()
-                    : LIP_CONFIRMATION_BODY,
-                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-                claimIssueConfiguration.getResponsePackLink()
-            ) + exitSurveyContentService.applicantSurvey();
+            return
+                (areRespondentsRepresentedAndRegistered(caseData)
+                    ? getConfirmationSummary(caseData)
+                    : format(LIP_CONFIRMATION_BODY,
+                format(caseDocLocation, caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()))
+                + exitSurveyContentService.applicantSurvey();
         }
     }
 
-    private String getConfirmationSummary() {
+    private String getConfirmationSummary(CaseData caseData) {
         if (toggleService.isPbaV3Enabled()) {
-            return CONFIRMATION_SUMMARY_PBA_V3;
+            return format(CONFIRMATION_SUMMARY_PBA_V3,
+                          format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
         } else {
-            return CONFIRMATION_SUMMARY;
+            return format(CONFIRMATION_SUMMARY,
+                   format(caseDocLocation, caseData.getCcdCaseReference()));
         }
     }
 
@@ -651,7 +664,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams), courtLocations);
-        if (Objects.nonNull(courtLocation)) {
+        if (nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
                 .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
@@ -661,6 +674,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());
+        }
+    }
+
+    private void assignParticularOfClaimCategoryIds(CaseData caseData) {
+        if (YES.equals(caseData.getUploadParticularsOfClaim())) {
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+                                                     Element::getValue, "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
+            assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
+                                                     document -> document.getValue().getDocument(), "particularsOfClaim");
         }
     }
 }

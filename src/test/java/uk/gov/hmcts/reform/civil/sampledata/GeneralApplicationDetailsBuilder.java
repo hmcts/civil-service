@@ -57,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -1310,6 +1311,19 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithConsentOrderPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .consentOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                      .value(pdfDocument).build()))
+            .build();
+    }
+
     public CaseData getTestCaseDataWithDirectionOrderStaffPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
@@ -1324,6 +1338,19 @@ public class GeneralApplicationDetailsBuilder {
                 .directionOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                         .value(pdfDocument).build()))
                 .build();
+    }
+
+    public CaseData getTestCaseDataWithConsentOrderStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .consentOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                      .value(pdfDocument).build()))
+            .build();
     }
 
     public CaseData getTestCaseDataWithHearingNoticeDocumentPDFDocument(CaseData caseData) {
@@ -1372,6 +1399,91 @@ public class GeneralApplicationDetailsBuilder {
                         .generalAppUrgency(YES)
                         .reasonsForUrgency(STRING_CONSTANT)
                         .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
+                        .build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(getPreferredLoc())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
+    }
+
+    public CaseData getVaryJudgmentWithN245TestData() {
+        return CaseData
+                .builder()
+                .ccdCaseReference(1L)
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .courtLocation(CourtLocation.builder()
+                        .caseLocation(CaseLocationCivil.builder()
+                                .region("2")
+                                .baseLocation("00000")
+                                .build())
+                        .build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyReference(STRING_CONSTANT).build())
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(VARY_JUDGEMENT))
+                        .build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                        .hasAgreed(YES)
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppInformOtherParty(GAInformOtherParty.builder()
+                        .isWithNotice(YES)
+                        .reasonsForWithoutNotice(STRING_CONSTANT)
+                        .build())
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(NO)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppN245FormUpload(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
                         .build())
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder()
                         .name(STRING_CONSTANT)
