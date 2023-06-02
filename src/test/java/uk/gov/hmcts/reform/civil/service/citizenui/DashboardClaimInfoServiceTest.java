@@ -50,9 +50,9 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
-    private static final OffsetDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
-    private static final OffsetDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
-    private static final OffsetDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
+    private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
+    private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
+    private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
         Arrays.asList(DashboardClaimInfo.builder()
                           .ocmc(true)
@@ -60,11 +60,11 @@ public class DashboardClaimInfoServiceTest {
                           .build());
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
-        .createdDate(DATE_IN_2021.toLocalDateTime())
+        .createdDate(DATE_IN_2021)
         .build();
     private static final CaseDetails CASE_DETAILS_2 = CaseDetails.builder()
         .id(2L)
-        .createdDate(DATE_IN_2022.toLocalDateTime())
+        .createdDate(DATE_IN_2022)
         .build();
 
     private static final List<DashboardClaimInfo> ORDERED_CASES =
@@ -164,7 +164,7 @@ public class DashboardClaimInfoServiceTest {
                                                                                             .statementOfValueInPennies(
                                                                                                 new BigDecimal("100000"))
                                                                                             .build())
-                                                                            .respondent1ResponseDeadline(DATE_IN_2025.toLocalDateTime())
+                                                                            .respondent1ResponseDeadline(DATE_IN_2025)
                                                                             .build());
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
