@@ -27,7 +27,7 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2("CV-SPC-HRN-ENG-01276.docx", "%s_response_sealed_form.pdf"),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     SDO_DISPOSAL("CV-UNS-STD-ENG-01264.docx", "disposal_hearing_sdo_%s.pdf"),
-    DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01283.docx", "Order_disposal_%s.pdf"),
+    DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01288.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01285.docx", "Order_trial_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01275.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-UNS-STD-ENG-01265.docx", "small_claims_sdo_%s.pdf"),
