@@ -11,29 +11,30 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler extends CallbackHandler implements NotificationData {
-
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED);
-    public static final String TASK_ID = "ClaimantAgreedSettledPartAdmitNotifyLip";
-    private static final String REFERENCE_TEMPLATE = "claimant-part-admit-settle-respondent-notification-%s";
+public class TranslatedDocumentUploadedClaimantNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED);
+    private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-claimant-notification-%s";
+    public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
+    final  OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantForPartAdmitClaimSettled
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimant
         );
     }
 
@@ -49,33 +50,29 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
         return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
         );
     }
 
-    private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.isLRvLipOneVOne() || caseData.getRespondent1().getPartyEmail() == null) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
 
         notificationService.sendMail(
-            caseData.getRespondent1().getPartyEmail(),
-            setUpEmailTemplate(caseData),
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String setUpEmailTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
-            : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
+    public String getApplicantLegalOrganizationName(CaseData caseData) {
+        String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
