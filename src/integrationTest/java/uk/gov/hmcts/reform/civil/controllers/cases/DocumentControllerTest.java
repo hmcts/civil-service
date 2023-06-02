@@ -221,6 +221,34 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @SneakyThrows
+    void shouldThrowExceptionSealedDocument() throws Exception {
+
+        //given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .totalClaimAmount(BigDecimal.ONE)
+            .issueDate(DATE)
+            .build();
+
+        //when
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
+            .thenReturn(ResponseEntity.of(Optional.of(bytes)));
+        when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
+            .thenThrow(DocumentUploadException.class);
+
+        MvcResult result = doPost(BEARER_TOKEN, caseData, GENERATE_SEALED_DOC_URL)
+            .andExpect(status().isBadRequest()).andReturn();
+
+        assertEquals("Document upload unsuccessful", result.getResponse().getContentAsString());
+        //then
+        assertThrows(
+            DocumentUploadException.class,
+            () -> claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData)
+        );
+    }
+
+    @Test
     void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
 
         //given
@@ -258,6 +286,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         when(documentManagementService.uploadDocument(anyString(), any(UploadedDocument.class)))
             .thenThrow(DocumentUploadException.class);
 
+        MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
+                            .andExpect(status().isBadRequest()).andReturn();
+
+        assertEquals("Document upload unsuccessful", result.getResponse().getContentAsString());
         //then
         assertThrows(
             DocumentUploadException.class,

@@ -144,7 +144,6 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .build();
 
         } catch (Exception ex) {
-            log.error("Failed uploading file {}", originalFileName, ex);
             throw new DocumentUploadException(originalFileName, ex);
         }
 
