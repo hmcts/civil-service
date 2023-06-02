@@ -270,6 +270,9 @@ notifications:
 
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
+  notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
