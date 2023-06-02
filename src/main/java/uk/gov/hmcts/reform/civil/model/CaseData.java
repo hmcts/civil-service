@@ -877,7 +877,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public String getOrganisationId() {
+    public String getApplicantOrganisationId() {
         return Optional.ofNullable(getApplicant1OrganisationPolicy())
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
