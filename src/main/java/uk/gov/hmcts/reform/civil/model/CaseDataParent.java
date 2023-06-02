@@ -427,12 +427,15 @@ public class CaseDataParent implements MappableObject {
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidence;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidence;
+    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidence;
+    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
