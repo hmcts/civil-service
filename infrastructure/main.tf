@@ -14,3 +14,12 @@ data "azurerm_user_assigned_identity" "app_mi" {
     module.key-vault
   ]
 }
+
+data "azurerm_key_vault" "civil_key_vault" {
+  name                = local.azureVaultName
+  resource_group_name = local.azureVaultName
+}
+
+locals {
+  azureVaultName = "civil-${var.env}"
+}
