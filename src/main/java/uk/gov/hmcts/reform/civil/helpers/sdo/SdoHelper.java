@@ -135,6 +135,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsDocumentsToggle() != null;
             case "smallClaimsWitnessStatementToggle":
                 return caseData.getSmallClaimsWitnessStatementToggle() != null;
+            case "smallClaimsNumberOfWitnessesToggle":
+                return caseData.getSmallClaimsWitnessStatement().getSmallClaimsNumberOfWitnessesToggle() != null;
             case "smallClaimsAddNewDirections":
                 return caseData.getSmallClaimsAddNewDirections() != null;
             default:
