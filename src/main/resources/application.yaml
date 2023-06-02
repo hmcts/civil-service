@@ -265,6 +265,8 @@ notifications:
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
+  notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
+  notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
 
