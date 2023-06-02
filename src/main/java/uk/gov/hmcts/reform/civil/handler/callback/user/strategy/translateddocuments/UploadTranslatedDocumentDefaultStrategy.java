@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -29,7 +31,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocument(
             callbackParams);
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
-            updatedDocumentList).build();
+            updatedDocumentList)
+            .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(AWAITING_APPLICANT_INTENTION.name())
             .data(updatedCaseData.toMap(objectMapper))
