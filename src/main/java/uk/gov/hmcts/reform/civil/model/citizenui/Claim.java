@@ -54,4 +54,18 @@ public interface Claim {
 
     boolean isHearingFormGenerated();
 
+    boolean sdoBeenDrawn();
+    boolean beforeHearing();
+
+
+    boolean isMoreDetailsRequired();
+    boolean isMediationSuccessful();
+    boolean isMediationUnsuccessful();
+    boolean isMediationPending();
+    boolean isCourtReviewing();
+    boolean isClaimEnded();
+    boolean claimSentToClaimant();
+    boolean claimantAcceptOffer();
+    boolean claimantRejectOffer();
+    boolean isPartialAdmissionRejected();
 }

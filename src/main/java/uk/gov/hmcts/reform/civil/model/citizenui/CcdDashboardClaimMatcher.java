@@ -160,4 +160,63 @@ public class CcdDashboardClaimMatcher implements Claim {
         return !caseData.getHearingDocuments().isEmpty();
     }
 
+    @Override
+    public boolean sdoBeenDrawn() {
+        return false;
+    }
+
+    @Override
+    public boolean beforeHearing() {
+        return false;
+    }
+
+    @Override
+    public boolean isMoreDetailsRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationSuccessful() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationUnsuccessful() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationPending() {
+        return false;
+    }
+
+    @Override
+    public boolean isCourtReviewing() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimEnded() {
+        return false;
+    }
+
+    @Override
+    public boolean claimSentToClaimant() {
+        return false;
+    }
+
+    @Override
+    public boolean claimantAcceptOffer() {
+        return false;
+    }
+
+    @Override
+    public boolean claimantRejectOffer() {
+        return false;
+    }
+
+    @Override
+    public boolean isPartialAdmissionRejected() {
+        return false;
+    }
 }

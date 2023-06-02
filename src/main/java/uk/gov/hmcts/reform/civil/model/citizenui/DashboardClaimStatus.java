@@ -80,7 +80,37 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-    NO_STATUS(c -> false);
+    NO_STATUS(c -> false),
+    MORE_DETAILS_REQUIRED(
+        Claim::isMoreDetailsRequired
+    ),
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
+    IN_MEDIATION(
+        Claim::isMediationPending
+    ),
+    WAITING_COURT_REVIEW(
+        Claim::isCourtReviewing
+    ),
+    CLAIM_ENDED(
+        Claim::isClaimEnded
+    ),
+    CLAIM_SENT_TO_CLAIMANT(
+        Claim::claimSentToClaimant
+    ),
+    CLAIMANT_REJECT_OFFER(
+        Claim::claimantRejectOffer
+    ),
+    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
+        Claim::claimantAcceptOffer
+    ),
+    CLAIMANT_REJECT_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionRejected
+    );
 
     @Getter
     private final Predicate<Claim> claimMatcher;
