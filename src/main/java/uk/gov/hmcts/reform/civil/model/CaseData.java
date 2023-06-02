@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -530,6 +531,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocRespondentSol;
     private final List<Element<CaseDocument>> generalOrderDocRespondentSolTwo;
 
+    private final List<Element<CaseDocument>> consentOrderDocument;
+    private final List<Element<CaseDocument>> consentOrderDocStaff;
+    private final List<Element<CaseDocument>> consentOrderDocClaimant;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSol;
+    private final List<Element<CaseDocument>> consentOrderDocRespondentSolTwo;
+
     private final List<Element<Document>> generalAppEvidenceDocument;
 
     private final List<Element<Document>> gaEvidenceDocStaff;
@@ -867,5 +874,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && ((hasClaimantNotAgreedToFreeMediation()
             || hasDefendantNotAgreedToFreeMediation())
             || isFastTrackClaim());
+    }
+
+    @JsonIgnore
+    public String getApplicantOrganisationId() {
+        return Optional.ofNullable(getApplicant1OrganisationPolicy())
+            .map(OrganisationPolicy::getOrganisation)
+            .map(Organisation::getOrganisationID)
+            .orElse("");
     }
 }
