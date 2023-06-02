@@ -12,10 +12,9 @@ import java.util.function.Function;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -86,7 +85,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         );
     }
 
-    public ResponseEntity<Resource> downloadDocumentById(String documentId) {
+    public DocumentResponse downloadDocumentById(String documentId) {
         String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String documentPath = String.format("documents/%s/binary", documentId);
         return documentManagementService.downloadDocumentByDocumentPath(authorisation, documentPath);

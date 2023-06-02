@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
+
 
 @Slf4j
 @Service
@@ -27,7 +27,7 @@ public class ClaimFormService {
     @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
-    public ResponseEntity<Resource> downloadDocumentById(String caseDocumentId) {
+    public DocumentResponse downloadDocumentById(String caseDocumentId) {
         return sealedClaimFormGeneratorForSpec.downloadDocumentById(caseDocumentId);
     }
 }

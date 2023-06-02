@@ -11,6 +11,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -120,17 +121,18 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
-    public ResponseEntity<Resource> downloadDocumentByDocumentPath(String authorisation, String documentPath) {
+    public DocumentResponse downloadDocumentByDocumentPath(String authorisation, String documentPath) {
         log.info("Downloading document By Document Path {}", documentPath);
         UserInfo userInfo = userService.getUserInfo(authorisation);
         String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-        return documentDownloadClientApi.downloadBinary(
+        ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
             authorisation,
             authTokenGenerator.generate(),
             userRoles,
             userInfo.getUid(),
             documentPath
         );
+        return new DocumentResponse(responseEntity.getBody(), responseEntity.getHeaders());
     }
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {

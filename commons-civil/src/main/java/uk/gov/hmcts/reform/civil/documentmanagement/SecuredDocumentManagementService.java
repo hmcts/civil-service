@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -134,17 +136,18 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
-    public ResponseEntity<Resource> downloadDocumentByDocumentPath(String authorisation, String documentPath) {
+    public DocumentResponse downloadDocumentByDocumentPath(String authorisation, String documentPath) {
         log.info("Downloading document By Document Path {}", documentPath);
         UserInfo userInfo = userService.getUserInfo(authorisation);
         String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-        return documentDownloadClientApi.downloadBinary(
+        ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
             authorisation,
             authTokenGenerator.generate(),
             userRoles,
             userInfo.getUid(),
             documentPath
         );
+        return new DocumentResponse(responseEntity.getBody(), responseEntity.getHeaders());
     }
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {
@@ -166,4 +169,5 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
+
 }

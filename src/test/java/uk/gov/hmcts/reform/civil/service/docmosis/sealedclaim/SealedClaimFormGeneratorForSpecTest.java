@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -299,16 +300,16 @@ public class SealedClaimFormGeneratorForSpecTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
         // Create the ResponseEntity
-        ResponseEntity<Resource> responseEntityExpected = new ResponseEntity<>(resource, headers, HttpStatus.OK);
+        DocumentResponse documentResponseExpected = new DocumentResponse(resource, headers);
 
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocumentByDocumentPath(anyString(), eq(documentBinary))).thenReturn(responseEntityExpected);
+        when(documentManagementService.downloadDocumentByDocumentPath(anyString(), eq(documentBinary))).thenReturn(documentResponseExpected);
         String documentId = "documentId";
 
         // when
-        ResponseEntity<Resource> expectedResult = sealedClaimFormGenerator.downloadDocumentById(documentId);
+        DocumentResponse expectedResult = sealedClaimFormGenerator.downloadDocumentById(documentId);
         //Then
-        assertEquals(expectedResult, responseEntityExpected);
+        assertEquals(expectedResult, documentResponseExpected);
     }
 
 }

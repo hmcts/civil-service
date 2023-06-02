@@ -21,6 +21,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
@@ -227,8 +228,8 @@ class UnsecuredDocumentManagementServiceTest {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
             // Create the ResponseEntity
-            ResponseEntity<Resource> responseEntityExpected = new ResponseEntity<>(resource, headers, HttpStatus.OK);
-
+            ResponseEntity<Resource> responseEntity = new ResponseEntity<>(resource, headers, HttpStatus.OK);
+            DocumentResponse documentResponseExpected = new DocumentResponse(responseEntity.getBody(), headers);
             when(documentDownloadClient.downloadBinary(
                      anyString(),
                      anyString(),
@@ -236,13 +237,13 @@ class UnsecuredDocumentManagementServiceTest {
                      anyString(),
                      anyString()
                  )
-            ).thenReturn(responseEntityExpected);
+            ).thenReturn(responseEntity);
 
             //When
-            ResponseEntity<Resource> expectedResult  = documentManagementService.downloadDocumentByDocumentPath(anyString(), documentBinary);
+            DocumentResponse expectedResult  = documentManagementService.downloadDocumentByDocumentPath(anyString(), documentBinary);
 
             //Then
-            assertEquals(expectedResult, responseEntityExpected);
+            assertEquals(expectedResult, documentResponseExpected);
 
         }
 

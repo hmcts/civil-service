@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
@@ -48,9 +49,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         Resource resource = new ByteArrayResource(data);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
-        // Create the ResponseEntity
-        ResponseEntity<Resource> responseEntityExpected = new ResponseEntity<>(resource, headers, HttpStatus.OK);
-        when(claimFormService.downloadDocumentById(eq(documentId))).thenReturn(responseEntityExpected);
+        DocumentResponse documentResponseExpected = new DocumentResponse(resource, headers);
+        when(claimFormService.downloadDocumentById(eq(documentId))).thenReturn(documentResponseExpected);
 
         //then
         doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
