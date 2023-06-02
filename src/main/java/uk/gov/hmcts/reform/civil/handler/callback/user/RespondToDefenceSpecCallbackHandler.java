@@ -332,12 +332,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             putCaseStateInJudicialReferral(caseData, response);
         }
 
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            if (isOneVOne(caseData)
-                && caseData.hasClaimantAgreedToFreeMediation()) {
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)) {
+            if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            } else if (caseData.isPartAdmitClaimSettled()) {
+                response.state(CaseState.CASE_SETTLED.name());
             }
         }
         return response.build();
