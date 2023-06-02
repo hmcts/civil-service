@@ -264,6 +264,7 @@ notifications:
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
+  respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
