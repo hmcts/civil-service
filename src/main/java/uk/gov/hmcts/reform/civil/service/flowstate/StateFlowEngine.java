@@ -477,7 +477,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isSdoEnabled()) {
                     flags.put(FlowFlag.SDO_ENABLED.name(), true);
                 }
-                })
+            })
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
