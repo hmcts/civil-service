@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -260,10 +259,10 @@ public class HearingValuesServiceTest {
             .interpreterLanguage(null)
             .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
-            .vulnerabilityDetails(emptyList())
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(List.of("0123456789"))
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(null)
             .build();
 
@@ -289,7 +288,7 @@ public class HearingValuesServiceTest {
             .build();
 
         return PartyDetailsModel.builder()
-            .partyID(null)
+            .partyID(cftOrganisationID)
             .partyType(ORG)
             .partyName(name)
             .partyRole("LGRP")

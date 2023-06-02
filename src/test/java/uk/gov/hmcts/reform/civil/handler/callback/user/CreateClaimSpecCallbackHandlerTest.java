@@ -93,7 +93,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
@@ -175,6 +175,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private PostcodeValidator postcodeValidator;
+
+    @MockBean
+    private InterestCalculator interestCalculator;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -912,6 +915,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000)).build();
 
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
 
             // When
@@ -921,8 +925,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
                 " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0.00 | \n" +
-                " | Total amount | £ 1000.00 |");
+                " | Interest amount | £ 0 | \n" +
+                " | Total amount | £ 1000 |");
         }
     }
 
@@ -937,7 +941,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -953,7 +957,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1037,7 +1041,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
-
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "spec-fee");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1751,7 +1755,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             // Given
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_2).request(
-                    CallbackRequest.builder().eventId(CREATE_SERVICE_REQUEST.name()).build())
+                    CallbackRequest.builder().eventId(CREATE_SERVICE_REQUEST_CLAIM.name()).build())
                 .build();
 
             // When
@@ -2018,6 +2022,40 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1DoesNotHaveRepresentationAndPinPostEnabled() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+                    .legacyCaseReference("000MC001")
+                    .addRespondent2(NO)
+                    .addApplicant2(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                Mockito.when(toggleService.isPinInPostEnabled()).thenReturn(true);
+
+                // When
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                // Then
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
         }
 
         @Nested
@@ -2069,15 +2107,13 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     SPEC_CONFIRMATION_SUMMARY_PBA_V3,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
                 // Then
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"
                         ))
                         .confirmationBody(body)
                         .build());
@@ -2124,15 +2160,14 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY_PBA_V3,
-                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
                 // Then
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format(
-                            "# Your claim has been received%n## Claim number: %s",
-                            REFERENCE_NUMBER
+                            "# Please now pay your claim fee%n# using the link below"
                         ))
                         .confirmationBody(body)
                         .build());

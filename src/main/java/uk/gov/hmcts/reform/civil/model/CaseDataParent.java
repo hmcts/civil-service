@@ -570,6 +570,12 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSol;
     private final List<Element<CaseDocument>> hearingNoticeDocRespondentSolTwo;
 
+    private final List<Element<Document>> gaRespDocument;
+    private final List<Element<Document>> gaRespDocStaff;
+    private final List<Element<Document>> gaRespDocClaimant;
+    private final List<Element<Document>> gaRespDocRespondentSol;
+    private final List<Element<Document>> gaRespDocRespondentSolTwo;
+
     /* Final Orders */
 
     private YesOrNo finalOrderMadeSelection;

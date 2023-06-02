@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -16,14 +17,16 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 
 @Component
 @RequiredArgsConstructor
-public class PayImmidietelyConfText implements RespondToResponseConfirmationTextGenerator {
+public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (!isdefendatFullAdmitPayImmidietely(caseData)) {
+        if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
         String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
         return Optional.of(format(
             "They must make sure you have the money by %s. "
@@ -40,7 +43,7 @@ public class PayImmidietelyConfText implements RespondToResponseConfirmationText
         ));
     }
 
-    private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
+    private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
