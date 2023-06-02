@@ -77,4 +77,5 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final boolean smallClaimsMethodToggle;
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
+    private final boolean smallClaimsNumberOfWitnessesToggle;
 }

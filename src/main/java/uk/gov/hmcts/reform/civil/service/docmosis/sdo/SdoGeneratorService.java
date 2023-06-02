@@ -327,6 +327,9 @@ public class SdoGeneratorService {
             .smallClaimsWitnessStatementToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
             )
+            .smallClaimsNumberOfWitnessesToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
+            )
             .build();
     }
 }
