@@ -42,6 +42,7 @@ public class HearingFeesService {
             .queryParam(JURISDICTION1, feesConfiguration.getJurisdiction1())
             .queryParam(JURISDICTION2, feesConfiguration.getJurisdiction2())
             .queryParam(SERVICE, feesConfiguration.getService())
+            .queryParam(KEYWORD, feesConfiguration.getSmallClaimHrgKey())
             .queryParam(AMOUNT, amount);
 
         return getRespond(builder);

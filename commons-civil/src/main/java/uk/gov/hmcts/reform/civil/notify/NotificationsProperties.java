@@ -267,6 +267,33 @@ public class NotificationsProperties {
     private String notifyDefendantLipWelshTemplate;
 
     @NotEmpty
+    private String mediationUnsuccessfulClaimantLRTemplate;
+
+    @NotEmpty
+    private String mediationUnsuccessfulDefendantLIPTemplate;
+
+    @NotEmpty
     private String respondent1DefaultJudgmentRequestedTemplate;
+
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimBilingualTemplate;
+
+    @NotEmpty
+    private String notifyClaimantTranslatedDocumentUploaded;
+
+    @NotEmpty
+    private String notifyDefendantTranslatedDocumentUploaded;
+
+    @NotEmpty
+    private String respondent1LipClaimUpdatedTemplate;
+
+    @NotEmpty
+    private String hearingFeeUnpaidNoc;
+
+    @NotEmpty
+    private String notifyApplicantLRMediationSuccessfulTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplate;
 
 }
