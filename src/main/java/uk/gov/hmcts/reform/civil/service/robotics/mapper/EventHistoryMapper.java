@@ -1966,7 +1966,6 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                System.out.println("inside buildRespondentCounterClaim method 22 ");
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
