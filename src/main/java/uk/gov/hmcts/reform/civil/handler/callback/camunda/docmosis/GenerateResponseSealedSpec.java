@@ -65,7 +65,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("CaseData: " + caseData);
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         CaseDocument sealedForm = formGenerator.generate(

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -16,24 +17,22 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler extends CallbackHandler implements NotificationData {
-
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED);
-    public static final String TASK_ID = "ClaimantAgreedSettledPartAdmitNotifyLip";
-    private static final String REFERENCE_TEMPLATE = "claimant-part-admit-settle-respondent-notification-%s";
+public class TranslatedDocumentUploadedDefendantNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED);
+    private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-defendant-notification-%s";
+    public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToDefendant";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantForPartAdmitClaimSettled
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendant
         );
     }
 
@@ -49,33 +48,26 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+
         return Map.of(
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
-    private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.isLRvLipOneVOne() || caseData.getRespondent1().getPartyEmail() == null) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
+
+        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
         }
-
-        notificationService.sendMail(
-            caseData.getRespondent1().getPartyEmail(),
-            setUpEmailTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
-    }
-
-    private String setUpEmailTemplate(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
-            : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
+
+
