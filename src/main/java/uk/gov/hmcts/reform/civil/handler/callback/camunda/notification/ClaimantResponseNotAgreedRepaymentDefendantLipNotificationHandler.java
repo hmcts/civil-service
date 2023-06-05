@@ -77,7 +77,11 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
     }
 
     private String addTemplate(CaseData caseData) {
-        return notificationsProperties.getNotifyDefendantLipTemplate();
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLipWelshTemplate();
+        } else {
+            return notificationsProperties.getNotifyDefendantLipTemplate();
+        }
     }
 
     public boolean isRespondentNotRepresented(CaseData caseData) {
