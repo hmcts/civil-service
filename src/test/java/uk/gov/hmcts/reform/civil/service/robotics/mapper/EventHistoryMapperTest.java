@@ -4769,8 +4769,8 @@ class EventHistoryMapperTest {
 
                     var eventHistory = mapper.buildEvents(caseData);
                     assertThat(eventHistory).isNotNull();
-                     assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
-                        .asList().containsExactlyInAnyOrder(
+                    assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
+                         .asList().containsExactlyInAnyOrder(
                             expectedDirectionsQuestionnaireRespondent,
                             expectedDirectionsQuestionnaireApplicant);
                     assertThat(eventHistory).extracting("miscellaneous").asList()
