@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,13 +44,13 @@ public class ClaimStoreService {
         ).collect(Collectors.toList());
     }
 
-    private OffsetDateTime createAtToCreateDate(CmcClaim claim) {
+    private LocalDateTime createAtToCreateDate(CmcClaim claim) {
         LocalDateTime createdDate = LocalDateTime.now();
 
         if (claim.getCreatedAt() != null) {
             createdDate = claim.getCreatedAt();
         }
 
-        return createdDate.atOffset(ZoneOffset.UTC);
+        return createdDate;
     }
 }

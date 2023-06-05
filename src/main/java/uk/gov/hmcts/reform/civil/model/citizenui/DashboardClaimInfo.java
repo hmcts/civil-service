@@ -53,9 +53,9 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime ccjRequestedDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private OffsetDateTime createdDate;
+    private LocalDateTime createdDate;
     private DashboardClaimStatus status;
 
     @JsonGetter("numberOfDays")

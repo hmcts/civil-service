@@ -43,11 +43,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment.AssignCaseToUserHandler.TASK_ID_SPEC;
 
 @SpringBootTest(classes = {
     AssignCaseToUserHandler.class,
@@ -107,7 +105,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC.name(), CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
@@ -298,27 +296,19 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
-                                                                     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
+        assertThat(assignCaseToUserHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     }
 
     @Test
-    void shouldReturnUnSpecCamundaTask_whenUnSpecEvent() {
+    void shouldReturnCorrectCamundaTaskID() {
         assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
                                                                  .request(CallbackRequest.builder().eventId(
             "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
     }
 
-    @Test
-    void shouldReturnSpecCamundaTask_whenSpecEvent() {
-        assertThat(assignCaseToUserHandler.camundaActivityId(CallbackParamsBuilder.builder()
-                                                                 .request(CallbackRequest.builder().eventId(
-            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC").build()).build())).isEqualTo(TASK_ID_SPEC);
-    }
-
     @ParameterizedTest
     @EnumSource(value = CaseEvent.class,
-        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1", "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC" }, mode = EnumSource.Mode.EXCLUDE
+        names = { "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1" }, mode = EnumSource.Mode.EXCLUDE
     )
     void shouldThrowExceptionWhenCaseEventIsInvalid(CaseEvent caseEvent) {
         // Given: an invalid event id
