@@ -78,24 +78,26 @@ public class AddressLinesMapper {
         if (!overflowAllowed) {
             int addLineLen = StringUtils.length(addressLine);
             String addressLineCandidate = StringUtils.defaultString(overflow)
-                .concat(addressLine);
+                .concat(StringUtils.defaultString(addressLine));
             String returnAddress = StringUtils.length(addressLineCandidate) > LINE_LIMIT
-                ? (addLineLen >= LINE_LIMIT ? addressLine.substring(0, LINE_LIMIT - 1) :
-                    overflow.substring(0, LINE_LIMIT - 3 - addLineLen).concat(STRING_COMMA_SPACE)
-                        .concat(addressLine))
-                    : addressLineCandidate;
+                ? (addLineLen >= LINE_LIMIT ? addressLine.substring(0, LINE_LIMIT - 1)
+                : overflow.substring(0, LINE_LIMIT - 3 - addLineLen).concat(STRING_COMMA_SPACE)
+                .concat(addressLine))
+                : addressLineCandidate;
             return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
         }
-        if (StringUtils.length(overflow) + StringUtils.length(addressLine) > LINE_LIMIT) {
+
+        if (StringUtils.length(StringUtils.defaultString(overflow)) + StringUtils.length(addressLine) > LINE_LIMIT) {
             retained = STRING_EMPTY;
             Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
-                .splitToList(StringUtils.defaultString(overflow).concat(addressLine)));
+                                                              .splitToList(StringUtils.defaultString(overflow).concat(
+                                                                  addressLine)));
             while (addressParts.isEmpty() || retained.concat(STRING_SPACE).concat(addressParts.peek())
                 .length() <= LINE_LIMIT) {
                 retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
             }
             if (StringUtils.isEmpty(retained)) {
-                retained = addressLine;
+                retained = StringUtils.defaultString(addressLine);
                 overflow = STRING_EMPTY;
             } else {
                 String overflowStr = String.join(STRING_SPACE, addressParts);
@@ -103,7 +105,7 @@ public class AddressLinesMapper {
                                                   ? STRING_SPACE : STRING_COMMA_SPACE);
             }
         } else {
-            retained = overflow.concat(addressLine);
+            retained = StringUtils.defaultString(overflow).concat(StringUtils.defaultString(addressLine));
             overflow = STRING_EMPTY;
         }
         return new LinkedList<>(List.of(retained.trim(), overflow));
