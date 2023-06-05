@@ -287,10 +287,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
-
+        
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  WE ARE HERE FIRST "+!AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack));
         if (v1 && featureToggleService.isSdoEnabled()
             && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-            log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  WE ARE HERE");
+            log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  THEN WE ARE SECOND");
             if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
@@ -317,6 +318,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     .build();
             }
         } else {
+            log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  WE ARE HERE LAST "+!AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack));
             response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
