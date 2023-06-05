@@ -290,6 +290,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         if (v1 && featureToggleService.isSdoEnabled()
             && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  WE ARE HERE");
             if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
