@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -371,5 +373,32 @@ public class CaseDataTest {
         //When
         //Then
         assertTrue(caseData.isRejectWithNoMediation());
+    }
+
+    @Test
+    void shouldGetApplicantOrganisationId_whenOrganisationDetailsArePresent() {
+        //Given
+        String organisationId = "1245";
+        CaseData caseData = CaseData.builder()
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(organisationId)
+                                                                .build())
+                                              .build())
+            .build();
+        //When
+        String result = caseData.getApplicantOrganisationId();
+        //Then
+        assertThat(result).isEqualTo(organisationId);
+    }
+
+    @Test
+    void shouldReturnEmptyString_whenNoOrganisationDetailsArePresent() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        String result = caseData.getApplicantOrganisationId();
+        //Then
+        assertThat(result).isEqualTo("");
     }
 }

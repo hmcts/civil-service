@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -111,7 +110,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
@@ -905,90 +903,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(new ObjectMapper().convertValue(res2witnesses, new TypeReference<>() {
                 }));
         }
-    }
-
-    @Nested
-    class AboutToSubmitTestsV1 {
-
-        @BeforeEach
-        void setup() {
-        }
-
-        @Test
-        void updateRespondent1AddressWhenUpdated() {
-            // Given
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-
-            // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            // Then
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
-            assertThat(response.getData())
-                .extracting("respondent1").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
-        }
-
-        @Test
-        void updateRespondent2AddressWhenUpdated() {
-            // Given
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-
-            // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            // Then
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo("address line 1");
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo("address line 2");
-            assertThat(response.getData())
-                .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo("address line 3");
-        }
 
         @Nested
         class HandleLocations {
@@ -1001,7 +915,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .listItems(locationValues.getListItems())
                     .value(locationValues.getListItems().get(0))
                     .build();
-                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
                 Party defendant1 = Party.builder()
                     .type(Party.Type.COMPANY)
                     .companyName("company")
@@ -1025,7 +938,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
                     ))
                     .build();
-                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 List<LocationRefData> locations = List.of(LocationRefData.builder().build());
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1074,7 +987,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .listItems(locationValues.getListItems())
                     .value(locationValues.getListItems().get(0))
                     .build();
-                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
                 Party defendant1 = Party.builder()
                     .type(Party.Type.COMPANY)
                     .companyName("company")
@@ -1112,7 +1024,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                     ))
                     .build();
-                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 List<LocationRefData> locations = List.of(LocationRefData.builder().build());
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1160,7 +1072,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .listItems(locationValues.getListItems())
                     .value(locationValues.getListItems().get(0))
                     .build();
-                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
                 Party defendant1 = Party.builder()
                     .type(Party.Type.COMPANY)
                     .companyName("company")
@@ -1195,7 +1106,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                     ))
                     .build();
-                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 List<LocationRefData> locations = List.of(LocationRefData.builder().build());
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1949,13 +1860,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateCourtLocations() {
             // Given
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                           .build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .thenReturn(locations);
-            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
