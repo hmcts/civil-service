@@ -472,12 +472,12 @@ public class StateFlowEngine {
                 }
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).or(declinedMediation))
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
+            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).and(applicantOutOfTime.negate()).or(declinedMediation))
+            .set(flags -> {
+                if (featureToggleService.isSdoEnabled()) {
+                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                }
+            })
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
