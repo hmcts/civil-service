@@ -1065,17 +1065,6 @@ public class EventHistoryMapper {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
-        List<Event> replyDefenceForProceedingApplicants = IntStream.range(0, applicantDetails.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(REPLY_TO_DEFENCE.getCode())
-                              .dateReceived(applicantDetails.get(index).getResponseDate())
-                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                              .build())
-            .collect(Collectors.toList());
-        builder.replyToDefence(replyDefenceForProceedingApplicants);
-
         CaseCategory claimType = caseData.getCaseAccessCategory();
         if (SPEC_CLAIM.equals(claimType)) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
@@ -1965,17 +1954,11 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        System.out.println("inside buildRespondentCounterClaim method 11 coming here Indu");
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.defenceAndCounterClaim(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
-            ).miscellaneous(Event.builder()
+            builder.miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent1ResponseDate())
@@ -1985,19 +1968,11 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                System.out.println("inside buildRespondentCounterClaim method 22 ");
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.defenceAndCounterClaim(
-                    List.of(
-                        Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                            .dateReceived(respondent2ResponseDate)
-                            .litigiousPartyID(RESPONDENT2_ID)
-                            .build()
-                    )
-                ).miscellaneous(Event.builder()
+                builder.miscellaneous(Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
                                     .eventCode(MISCELLANEOUS.getCode())
                                     .dateReceived(respondent2ResponseDate)
@@ -2010,16 +1985,7 @@ public class EventHistoryMapper {
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.defenceAndCounterClaim(
-                List.of(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(caseData.getRespondent2ResponseDate())
-                        .litigiousPartyID(RESPONDENT2_ID)
-                        .build()
-                )
-            ).miscellaneous(Event.builder()
+            builder.miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent2ResponseDate())
