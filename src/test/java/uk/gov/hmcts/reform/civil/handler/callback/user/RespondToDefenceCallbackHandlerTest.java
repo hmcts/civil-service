@@ -18,7 +18,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -534,33 +533,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class,
-            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
-            mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                CaseDataBuilder.builder().atState(flowState).build(),
-                ABOUT_TO_SUBMIT
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("businessProcess")
-                .extracting("status", "camundaEvent")
-                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
-
-            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
-        }
-
         @Test
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1() {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceState() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .build();
             var params = callbackParamsOf(
-                CallbackVersion.V_1,
                 caseData.toBuilder()
                     .applicant2(Party.builder()
                                     .companyName("company")
@@ -587,9 +565,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = FlowState.Main.class,
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1ForSDO(FlowState.Main flowState) {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateForSDO(FlowState.Main flowState) {
             var params = callbackParamsOf(
-                CallbackVersion.V_1,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -608,10 +585,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = FlowState.Main.class,
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1ForSdoMP(FlowState.Main flowState) {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateForSdoMP(FlowState.Main flowState) {
 
             var params = callbackParamsOf(
-                CallbackVersion.V_1,
                 CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                     .multiPartyClaimTwoDefendantSolicitorsForSdoMP().build(),
                 ABOUT_TO_SUBMIT
@@ -767,10 +743,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class UpdateRequestedCourt {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-            }
 
             @Test
             void updateApplicant1DQRequestedCourt() {
