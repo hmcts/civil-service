@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -25,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @Slf4j
 @Service
@@ -44,14 +48,13 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        log.info("In BundleCreationTriggerEventHandler sendBundleCreationTrigger() event {}", event.getCaseId());
         boolean isBundleCreated = getIsBundleCreatedForHearingDate(event.getCaseId());
         if (isBundleCreated) {
             log.info("Trial Bundle already exists for case {}", event.getCaseId());
             return;
         }
-        log.info("Bundle not created for {}", event.getCaseId());
-        /* BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+
+        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
 
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
@@ -63,7 +66,7 @@ public class BundleCreationTriggerEventHandler {
             ).collect(Collectors.toList()));
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
-        coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION); */
+        coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {
