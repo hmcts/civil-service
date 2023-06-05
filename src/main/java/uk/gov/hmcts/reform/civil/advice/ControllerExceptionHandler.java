@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotWhiteListedException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
@@ -30,6 +31,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PinNotMatchException.class)
     public ResponseEntity<Object> pinNotMatchedUnauthorised(PinNotMatchException pinNotMatchException) {
         log.error(pinNotMatchException.getMessage());
+        return new ResponseEntity<>("BAD_REQUEST", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CaseNotWhiteListedException.class)
+    public ResponseEntity<Object> caseNotWhiteListed(CaseNotWhiteListedException exception) {
+        log.error(exception.getMessage());
         return new ResponseEntity<>("BAD_REQUEST", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

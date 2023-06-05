@@ -72,4 +72,8 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
+    public boolean isLocationWhiteListedForCaseProgression(String location) {
+        return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location,
+                                                            true);
+    }
 }

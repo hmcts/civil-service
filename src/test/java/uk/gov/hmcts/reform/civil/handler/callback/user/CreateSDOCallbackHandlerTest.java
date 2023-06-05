@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -61,6 +63,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -144,6 +147,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
 
             given(time.now()).willReturn(submittedDate);
         }
@@ -319,6 +324,32 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @ParameterizedTest
+        @CsvSource({"true, CASE_PROGRESSION", "false, PROCEEDS_IN_HERITAGE_SYSTEM"})
+        void shouldSetExpectedState_dependingOnLocationIsWhiteListed(boolean isWhiteListed, String expectedState) {
+            given(featureToggleService.isLocationWhiteListedForCaseProgression("000000")).willReturn(isWhiteListed);
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .smallClaimsMethodInPerson(options)
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(expectedState);
         }
 
         @Test

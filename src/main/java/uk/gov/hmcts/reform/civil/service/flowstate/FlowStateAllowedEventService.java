@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CASE_FLAGS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
@@ -142,7 +144,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -154,6 +158,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -166,6 +172,8 @@ public class FlowStateAllowedEventService {
             List.of(NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     ADD_CASE_NOTE,
+                    CREATE_CASE_FLAGS,
+                    MANAGE_CASE_FLAGS,
                     INITIATE_GENERAL_APPLICATION,
                     CREATE_SDO,
                     NotSuitable_SDO,
@@ -190,6 +198,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -217,6 +227,8 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -244,6 +256,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -282,6 +296,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 DEFAULT_JUDGEMENT,
                 STANDARD_DIRECTION_ORDER_DJ,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -312,6 +328,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
@@ -340,6 +358,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -370,6 +390,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -393,6 +415,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -415,6 +439,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -432,6 +458,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -450,6 +478,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 NotSuitable_SDO,
@@ -468,6 +498,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -496,6 +528,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -529,6 +563,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -542,6 +578,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -606,6 +644,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -730,12 +770,16 @@ public class FlowStateAllowedEventService {
             List.of(NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     ADD_CASE_NOTE,
+                    CREATE_CASE_FLAGS,
+                    MANAGE_CASE_FLAGS,
                     INITIATE_GENERAL_APPLICATION,
                     CREATE_SDO,
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+                    CREATE_CLAIM_AFTER_PAYMENT,
+                    CREATE_CASE_FLAGS,
+                    MANAGE_CASE_FLAGS
             )
         ),
 
@@ -751,7 +795,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -765,6 +811,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
                 ADD_CASE_NOTE,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS,
                 AMEND_PARTY_DETAILS,
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -792,7 +840,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
         entry(
@@ -827,7 +877,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
         entry(
@@ -847,7 +899,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -867,7 +921,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -889,7 +945,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                DEFAULT_JUDGEMENT_SPEC
+                DEFAULT_JUDGEMENT_SPEC,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -910,7 +968,9 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -930,7 +990,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                DEFAULT_JUDGEMENT_SPEC
+                DEFAULT_JUDGEMENT_SPEC,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -955,7 +1017,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -987,7 +1051,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
 
@@ -1005,7 +1071,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
         entry(
@@ -1067,12 +1135,14 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
+                ADD_CASE_NOTE, CREATE_CASE_FLAGS, MANAGE_CASE_FLAGS,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
         entry(
@@ -1081,7 +1151,9 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                migrateCase
+                migrateCase,
+                CREATE_CASE_FLAGS,
+                MANAGE_CASE_FLAGS
             )
         ),
         entry(

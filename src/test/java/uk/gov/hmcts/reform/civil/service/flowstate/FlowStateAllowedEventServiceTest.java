@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CASE_FLAGS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
@@ -189,7 +191,9 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        migrateCase
+                        migrateCase,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                     }
                 ),
                 of(
@@ -200,6 +204,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -212,6 +218,8 @@ class FlowStateAllowedEventServiceTest {
                         NOC_REQUEST,
                         APPLY_NOC_DECISION,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -235,6 +243,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -261,6 +271,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -287,6 +299,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -324,6 +338,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -353,6 +369,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -380,6 +398,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INFORM_AGREED_EXTENSION_DATE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
@@ -409,6 +429,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -431,6 +453,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -451,6 +475,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         TAKE_CASE_OFFLINE,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -468,6 +494,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -485,6 +513,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -502,6 +532,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -528,6 +560,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -560,6 +594,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -573,6 +609,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -632,6 +670,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
+                        CREATE_CASE_FLAGS,
+                        MANAGE_CASE_FLAGS,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,

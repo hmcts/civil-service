@@ -1993,6 +1993,7 @@ public class CaseDataBuilder {
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        caseManagementLocation = CaseLocationCivil.builder().region("1").baseLocation("000000").build();
         return this;
     }
 

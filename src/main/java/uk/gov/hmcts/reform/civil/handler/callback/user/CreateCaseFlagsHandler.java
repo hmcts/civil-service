@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 
@@ -26,9 +28,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 public class CreateCaseFlagsHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =  List.of(CREATE_CASE_FLAGS);
+    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::createUrgentFlag);
+    private Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_START), this::aboutToStart,
+        callbackKey(ABOUT_TO_SUBMIT), this::createUrgentFlag);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -38,6 +43,17 @@ public class CreateCaseFlagsHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        var errors = !featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())
+            ? List.of("Case location is not whitelisted for this feature.") : null;
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
     }
 
     private CallbackResponse createUrgentFlag(CallbackParams callbackParams) {

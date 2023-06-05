@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotWhiteListedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
@@ -83,6 +85,10 @@ public class HearingValuesServiceTest {
     private OrganisationService organisationService;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -95,6 +101,35 @@ public class HearingValuesServiceTest {
     private static final String RESPONDENT_ONE_LR_ORG_NAME = "Respondent 1 LR Org name";
     private static final String BASE_LOCATION_ID = "1234";
     private static final String WELSH_REGION_ID = "7";
+
+    @SneakyThrows
+    @Test
+    void shouldThrowCaseNotWhiteListedExceptionWhenWhiteListingReturnsFalse() {
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
+            .build();
+        Long caseId = 1L;
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(objectMapper))
+            .id(caseId).build();
+
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(false);
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
+        assertThrows(
+            CaseNotWhiteListedException.class,
+            () -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
+    }
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
@@ -115,6 +150,7 @@ public class HearingValuesServiceTest {
             .data(caseData.toMap(objectMapper))
             .id(caseId).build();
 
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
@@ -207,6 +243,8 @@ public class HearingValuesServiceTest {
     @Test
     @SneakyThrows
     void shouldReturnExpectedHearingValuesWhenCaseDataIs() {
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
+
         var caseId = 1L;
 
         doThrow(new NotFoundException("", new RestException("", new Exception())))

@@ -39,6 +39,10 @@ public class FeatureToggleApi {
         return internalClient.boolVariation(feature, user, defaultValue);
     }
 
+    public boolean isFeatureEnabledForLocation(String feature, String location, boolean defaultValue) {
+        return internalClient.boolVariation(feature, createLDUser().custom("location", location).build(), defaultValue);
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))

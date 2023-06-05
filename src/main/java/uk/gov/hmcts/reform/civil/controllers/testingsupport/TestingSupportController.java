@@ -113,6 +113,14 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
+    @GetMapping("/testing-support/feature-toggle/case-progression-location-whitelist/location/{location}")
+    @Operation(summary = "Check if noc feature toggle is enabled")
+    public ResponseEntity<FeatureToggleInfo> checkIsWhiteListedForCaseProgression(@PathVariable String location) {
+        boolean featureEnabled = featureToggleService.isLocationWhiteListedForCaseProgression(location);
+        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
+        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
+    }
+
     @Data
     private static class BusinessProcessInfo {
         private BusinessProcess businessProcess;

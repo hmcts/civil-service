@@ -59,11 +59,41 @@ class FeatureToggleApiTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectState_whenUserWithLocationIsProvided(Boolean toggleState) {
+        LDUser ldUSer = new LDUser.Builder("civil-service")
+            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
+            .custom("environment", FAKE_ENVIRONMENT)
+            .custom("location", "000000")
+            .build();
+        givenToggle(FAKE_FEATURE, toggleState);
+
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, ldUSer)).isEqualTo(toggleState);
+
+        verify(ldClient).boolVariation(
+            FAKE_FEATURE,
+            ldUSer,
+            false
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectState_whenDefaultServiceUser(Boolean toggleState) {
         givenToggle(FAKE_FEATURE, toggleState);
 
         assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE)).isEqualTo(toggleState);
         verifyBoolVariationCalled(FAKE_FEATURE, List.of("timestamp", "environment"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectState_whenLocationIsProvided(Boolean toggleState) {
+        var location = "000000";
+        when(ldClient.boolVariation(eq(FAKE_FEATURE), any(LDUser.class), eq(toggleState)))
+            .thenReturn(toggleState);
+
+        assertThat(featureToggleApi.isFeatureEnabledForLocation(FAKE_FEATURE, location, true)).isEqualTo(toggleState);
+        verifyBoolVariationCalled(FAKE_FEATURE, List.of("timestamp", "environment", "location"));
     }
 
     private void givenToggle(String feature, boolean state) {

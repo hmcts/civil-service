@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotWhiteListedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
@@ -58,9 +60,14 @@ public class HearingValuesService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final OrganisationService organisationService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final FeatureToggleService featureToggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
         CaseData caseData = retrieveCaseData(caseId);
+
+        if (!featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
+            throw new CaseNotWhiteListedException();
+        }
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
 
