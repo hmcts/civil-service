@@ -1954,7 +1954,6 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        System.out.println("inside buildRespondentCounterClaim method 11 coming here Indu");
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
