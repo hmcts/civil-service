@@ -31,6 +31,7 @@ public class ExternalTaskListenerConfiguration {
             .asyncResponseTimeout(29000)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
             .baseUrl(baseUrl)
+            .maxTasks(1)
             .build();
     }
 

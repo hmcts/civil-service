@@ -48,6 +48,7 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
+        log.info("In sendBundleCreationTrigger caseId{}", event.getCaseId());
         boolean isBundleCreated = getIsBundleCreatedForHearingDate(event.getCaseId());
         if (isBundleCreated) {
             log.info("Trial Bundle already exists for case {}", event.getCaseId());

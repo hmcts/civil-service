@@ -26,6 +26,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
+                log.info("In es search caseid {}", caseDetails.getId());
                 applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
