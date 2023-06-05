@@ -79,6 +79,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -339,7 +340,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
-            .date3(LocalDate.now().plusWeeks(4))
+            .date3(LocalDate.now().plusWeeks(8))
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
@@ -416,7 +417,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
                     + "on %s.",
-                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime.now())
                     .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
             ))
             .build();

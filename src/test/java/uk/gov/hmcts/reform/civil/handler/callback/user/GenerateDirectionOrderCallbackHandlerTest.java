@@ -67,7 +67,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
-
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
         + "any party affected by the order may apply to set aside, vary or stay the order. Any such application must "
         + "be made by 4pm on";

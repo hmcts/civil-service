@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM_SPEC;
 
 @SpringBootTest(classes = {
     ProceedOfflineForSpecCallbackHandler.class,
@@ -33,5 +35,18 @@ class ProceedOfflineForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+    }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("ProceedOfflineForSpec");
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(PROCEEDS_IN_HERITAGE_SYSTEM_SPEC);
     }
 }

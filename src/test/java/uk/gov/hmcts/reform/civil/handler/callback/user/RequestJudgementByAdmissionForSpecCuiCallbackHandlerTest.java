@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -330,5 +331,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(REQUEST_JUDGEMENT_ADMISSION_SPEC);
     }
 }

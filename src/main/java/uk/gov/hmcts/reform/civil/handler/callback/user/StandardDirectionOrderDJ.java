@@ -389,7 +389,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                  + " copies of those documents on which they wish to rely"
                                                                  + " at trial")
                                                      .input5("by 4pm on")
-                                                     .date3(LocalDate.now().plusWeeks(4))
+                                                     .date3(LocalDate.now().plusWeeks(8))
                                                      .build());
 
         caseDataBuilder
