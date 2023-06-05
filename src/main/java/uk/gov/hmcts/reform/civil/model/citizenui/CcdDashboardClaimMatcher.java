@@ -199,8 +199,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isCourtReviewing() {
-        return !sdoBeenDrawn() &&
-            caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.YES)
+        return !sdoBeenDrawn()
+            && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.YES)
             && caseData.isRespondentResponseFullDefence()
             && caseData.hasApplicantRejectedRepaymentPlan();
     }
