@@ -114,6 +114,7 @@ public class EventHistoryMapper {
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
     public static final String BS_END_DATE = "actual end date";
+    public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -220,6 +221,10 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_AFTER_SDO:
                         buildClaimTakenOfflineAfterSDO(builder, caseData);
+                        break;
+                    case PART_ADMIT_REJECT_REPAYMENT:
+                    case FULL_ADMIT_REJECT_REPAYMENT:
+                        buildSpecAdmitRejectRepayment(builder, caseData);
                         break;
                     default:
                         break;
@@ -2208,4 +2213,20 @@ public class EventHistoryMapper {
 
     }
 
+    private void buildSpecAdmitRejectRepayment(EventHistory.EventHistoryBuilder builder,
+                                               CaseData caseData) {
+
+        if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText(RPA_REASON_MANUAL_DETERMINATION)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(RPA_REASON_MANUAL_DETERMINATION)
+                                      .build())
+                    .build());
+        }
+    }
 }
