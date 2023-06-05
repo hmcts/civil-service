@@ -270,8 +270,14 @@ public class NotificationsProperties {
     private String respondentLipPartAdmitSettleClaimBilingualTemplate;
 
     @NotEmpty
+    private String notifyClaimantTranslatedDocumentUploaded;
+
+    @NotEmpty
+    private String notifyDefendantTranslatedDocumentUploaded;
+
+    @NotEmpty
     private String respondent1LipClaimUpdatedTemplate;
-  
+
     @NotEmpty
     private String hearingFeeUnpaidNoc;
 
