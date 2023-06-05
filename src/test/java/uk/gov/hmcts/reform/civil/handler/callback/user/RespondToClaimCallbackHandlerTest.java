@@ -15,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -329,8 +328,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldHandleCourtLocationData() {
                 //Given
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
                     .thenReturn(Collections.singletonList(
                         LocationRefData.builder()
@@ -349,7 +346,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                        .build())
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_START);
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_START);
                 //When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
@@ -369,8 +366,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldHandleCourtLocationData_ForRespondent2() {
                 //Given
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
@@ -379,7 +374,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .multiPartyClaimOneDefendantSolicitor()
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_START);
                 //When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
@@ -1445,7 +1440,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1v2SameSolicitorResponseIsNotTheSameInV1() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
@@ -1459,7 +1453,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -1478,7 +1472,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenSolicitorResponseRepNotTheSameWithNoCourtLocation() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
@@ -1492,7 +1485,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -1511,7 +1504,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2NotPresent() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -1520,7 +1512,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -1539,7 +1531,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondentIsNull() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -1548,7 +1539,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -1567,7 +1558,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2Present() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -1576,7 +1566,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -2005,7 +1995,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenOneDefendantRepAnsweringToTwoApplicantsInV1() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -2018,7 +2007,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -2038,7 +2027,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1DefendantRepAnswerTo2ApplicantInV1DiffResponse() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
@@ -2059,7 +2047,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -2079,7 +2067,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1DefendantRepAnswerTo2ApplicantInV1DiffClaim() {
             //Given
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
 
             Hearing hearing = Hearing.builder()
@@ -2102,7 +2089,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -2228,10 +2215,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class HandleCourtLocation {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-            }
 
             @Nested
             class OneVOne {
@@ -2259,7 +2242,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2315,7 +2298,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2378,7 +2361,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2446,7 +2429,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2483,7 +2466,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When No dynamic values provided
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
@@ -2511,7 +2494,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When No Response court locations is present
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
@@ -2552,7 +2535,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2591,7 +2574,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2615,7 +2598,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
@@ -2647,7 +2630,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
                     //Then
