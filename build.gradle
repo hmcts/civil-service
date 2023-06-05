@@ -249,10 +249,6 @@ task runHearingsTests(type: Exec, description: 'Runs Hearings Api functional tes
   commandLine '/usr/bin/yarn', '--silent', 'test:api-hearings'
 }
 
-task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:rpa'
-}
-
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
