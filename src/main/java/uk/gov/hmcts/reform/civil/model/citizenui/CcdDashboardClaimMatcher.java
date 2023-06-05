@@ -3,11 +3,15 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDate;
 
 @AllArgsConstructor
 public class CcdDashboardClaimMatcher implements Claim {
@@ -167,56 +171,66 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean beforeHearing() {
-        return false;
+        return caseData.getHearingDate().isAfter(LocalDateTime.now().toLocalDate());
     }
 
     @Override
     public boolean isMoreDetailsRequired() {
-        return false;
+        return sdoBeenDrawn() && beforeHearing();
     }
 
     @Override
     public boolean isMediationSuccessful() {
-        return false;
+        return !sdoBeenDrawn() && caseData.getMediation().getMediationSuccessful() != null;
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
-        return false;
+        return !sdoBeenDrawn() && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
     }
 
     @Override
     public boolean isMediationPending() {
-        return false;
+        return caseData.getMediation().getMediationSuccessful() != null &&
+            caseData.getCcdState().equals(CaseState.IN_MEDIATION) &&
+            caseData.getMediation().getMediationSuccessful().getMediationAgreement() == null;
     }
 
     @Override
     public boolean isCourtReviewing() {
-        return false;
+        return !sdoBeenDrawn() &&
+            caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.YES) &&
+            caseData.isRespondentResponseFullDefence() &&
+            caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override
     public boolean isClaimEnded() {
-        return false;
+        return caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO) &&
+            caseData.isRespondentResponseFullDefence();
     }
 
     @Override
     public boolean claimSentToClaimant() {
-        return false;
+        return caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE) &&
+            caseData.getRespondent1CourtOrderPayment() != null &&
+            (caseData.isSettlementDeclinedByClaimant() ||
+            caseData.isClaimantRejectsClaimAmount());
     }
 
     @Override
     public boolean claimantAcceptOffer() {
-        return false;
+        return caseData.hasApplicantAcceptedRepaymentPlan() ||
+            caseData.hasApplicantProceededWithClaim();
     }
 
     @Override
     public boolean claimantRejectOffer() {
-        return false;
+        return caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return false;
+        return caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec().equals(YesOrNo.NO);
     }
 }

@@ -304,7 +304,7 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isMoreDetailsRequired() {
-        return false;
+        return sdoBeenDrawn() && beforeHearing();
     }
 
     @Override
