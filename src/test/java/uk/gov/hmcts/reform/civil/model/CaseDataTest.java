@@ -404,8 +404,9 @@ public class CaseDataTest {
         //Then
         assertThat(result).isEqualTo("");
     }
-  
-      void isTranslatedDocumentUploaded_thenFalse() {
+    
+    @Test
+    void isTranslatedDocumentUploaded_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
