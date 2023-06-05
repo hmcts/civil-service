@@ -37,6 +37,7 @@ fees:
     keywords:
       fastTrackHrg: FastTrackHrg
       multiTrackHrg: MultiTrackHrg
+      smallClaimHrg: HearingSmallClaims
 
 pin-in-post:
   cui-respond-to-claim:
