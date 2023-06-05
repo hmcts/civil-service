@@ -275,4 +275,10 @@ public class NotificationsProperties {
     @NotEmpty
     private String hearingFeeUnpaidNoc;
 
+    @NotEmpty
+    private String notifyApplicantLRMediationSuccessfulTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplate;
+
 }
