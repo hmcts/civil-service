@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec.COUNCIL_TAX;
 import static uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec.ELECTRICITY;
 import static uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec.FOOD;
@@ -57,20 +58,19 @@ public class ReasonMoneyTemplateData {
     );
 
     @JsonIgnore
-    private static final Map<ExpenseTypeLRspec, String> EXPENSE_TYPE_LIP_RESPONSE = Map.of(
-        MORTGAGE, "Mortgage",
-        RENT, "Rent",
-        COUNCIL_TAX, "Council Tax",
-        GAS, "Gas",
-        ELECTRICITY, "Electric",
-        WATER, "Water",
-        TRAVEL, "Travel (work or school)",
-        SCHOOL, "School costs",
-        FOOD, "Food and housekeeping",
-        TV, "TV and broadband",
-        HIRE_PURCHASE, "Hire purchase",
-        MOBILE_PHONE, "Mobile phone",
-        MAINTENANCE, "Maintenance payments"
+    private static final Map<ExpenseTypeLRspec, String> EXPENSE_TYPE_LIP_RESPONSE = Map.ofEntries(
+        entry(MORTGAGE, "Mortgage"),
+        entry(RENT, "Rent"), entry(COUNCIL_TAX, "Council Tax"),
+        entry(GAS, "Gas"),
+        entry(ELECTRICITY, "Electric"),
+        entry(WATER, "Water"),
+        entry(TRAVEL, "Travel (work or school)"),
+        entry(SCHOOL, "School costs"),
+        entry(FOOD, "Food and housekeeping"),
+        entry(TV, "TV and broadband"),
+        entry(HIRE_PURCHASE, "Hire purchase"),
+        entry(MOBILE_PHONE, "Mobile phone"),
+        entry(MAINTENANCE, "Maintenance payments")
     );
 
     private String type;

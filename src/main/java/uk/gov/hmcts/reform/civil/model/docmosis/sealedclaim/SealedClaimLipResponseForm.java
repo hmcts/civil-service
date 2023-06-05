@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 
 @Getter
-@SuperBuilder(toBuilder = true)
+@Builder
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
@@ -115,7 +116,21 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
-        addDQ(caseData, builder);
+        Optional.ofNullable(caseData.getRespondent1CourtOrderDetails())
+            .map(ElementUtils::unwrapElements)
+            .ifPresent(builder::courtOrderDetails);
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION ->
+                    addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case PART_ADMISSION ->
+                    partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+            }
+        }
         return builder.build();
 
     }
@@ -134,69 +149,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(builder::employerDetails);
 
     }
-
-    private static void addDQ(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
-        if (caseData.getRespondent1DQ() != null) {
-            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
-                .map(ElementUtils::unwrapElements)
-                .map(list -> list.stream().map(AccountSimpleTemplateData::new).collect(Collectors.toList()))
-                .ifPresent(builder::bankAccountList);
-            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringIncome())
-                .map(ElementUtils::unwrapElements)
-                .map(list -> list.stream()
-                    .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
-                .ifPresent(builder::incomeList);
-            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringExpenses())
-                .map(ElementUtils::unwrapElements)
-                .map(list -> list.stream()
-                    .map(item ->
-                             ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
-                .ifPresent(builder::expenseList);
-        }
-
-        Optional.ofNullable(caseData.getRespondent1CourtOrderDetails())
-            .map(ElementUtils::unwrapElements)
-            .ifPresent(builder::courtOrderDetails);
-
-        if (caseData.isPayByInstallment()
-            || caseData.isPayBySetDate()) {
-            Optional.ofNullable(caseData.getRespondent1DQ())
-                .map(Respondent1DQ::getRespondent1DQHomeDetails)
-                .map(HomeDetails::getType)
-                .ifPresent(type -> {
-                    switch (type) {
-                        case OWNED_HOME:
-                            builder.whereTheyLive("Home they own or pay a mortgage on");
-                            break;
-                        case PRIVATE_RENTAL:
-                            builder.whereTheyLive("Private rental");
-                            break;
-                        case ASSOCIATION_HOME:
-                            builder.whereTheyLive("Council or housing association home");
-                            break;
-                        case JOINTLY_OWNED_HOME:
-                            builder.whereTheyLive("Jointly-owned home (or jointly mortgaged home)");
-                            break;
-                        default:
-                            builder.whereTheyLive("Other");
-                            break;
-                    }
-                });
-        }
-
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
-            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_ADMISSION ->
-                    addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
-                case PART_ADMISSION ->
-                    partAdmissionData(caseData, builder);
-                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
-                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
-            }
-        }
-    }
-
 
 
     private static void addPayBySetDate(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
