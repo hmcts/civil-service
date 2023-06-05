@@ -16,10 +16,6 @@ data "azurerm_user_assigned_identity" "app_mi" {
 }
 
 data "azurerm_key_vault" "civil_key_vault" {
-  name                = local.azureVaultName
-  resource_group_name = local.azureVaultName
-}
-
-locals {
-  azureVaultName = "civil-service-${var.env}"
+  name                = "civil-${var.env}"
+  resource_group_name = "civil-service-${var.env}"
 }
