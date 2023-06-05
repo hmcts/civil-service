@@ -17,6 +17,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSdoEnabled() {
+        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA "+this.featureToggleApi.isFeatureEnabled("enableSDO"));
         return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
