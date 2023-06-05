@@ -21,5 +21,5 @@ data "azurerm_key_vault" "civil_key_vault" {
 }
 
 locals {
-  azureVaultName = "civil-${var.env}"
+  azureVaultName = "civil-service-${var.env}"
 }
