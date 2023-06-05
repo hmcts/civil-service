@@ -35,10 +35,10 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
-
+        String workerId = externalTask.getWorkerId();
         try {
-            log.info("External task '{}' started with processInstanceId '{}'",
-                     topicName, processInstanceId);
+            log.info("External task '{}' started with processInstanceId '{}' workerId {}",
+                     topicName, processInstanceId, workerId);
             handleTask(externalTask);
             completeTask(externalTask, externalTaskService);
         } catch (BpmnError e) {
@@ -70,6 +70,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         } catch (Exception e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
+            log.error("Error in completing task workerId{}", externalTask.getWorkerId());
         }
     }
 
