@@ -28,14 +28,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
 
-    public boolean isHearingAndListingSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-sdo");
-    }
-
-    public boolean isHearingAndListingLegalRepEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
-    }
-
     public boolean isCourtLocationDynamicListEnabled() {
         return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
