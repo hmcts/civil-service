@@ -76,7 +76,7 @@ public class AddressLinesMapper {
             }
         }
         if (!overflowAllowed) {
-            int addLineLen = StringUtils.length(addressLine);
+            int addLineLen = addressLine != null ? StringUtils.length(addressLine) : 0;
             String addressLineCandidate = StringUtils.defaultString(overflow)
                 .concat(StringUtils.defaultString(addressLine));
             String returnAddress;
@@ -85,7 +85,7 @@ public class AddressLinesMapper {
                     returnAddress = addressLine.substring(0, LINE_LIMIT - 1);
                 } else {
                     String overflowSubstring = overflow != null ? overflow.substring(0, LINE_LIMIT - 3 - addLineLen) : "";
-                    returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(addressLine);
+                    returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(StringUtils.defaultString(addressLine));
                 }
             } else {
                 returnAddress = addressLineCandidate;
