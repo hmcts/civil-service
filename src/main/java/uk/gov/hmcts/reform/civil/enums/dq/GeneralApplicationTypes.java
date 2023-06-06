@@ -15,7 +15,7 @@ public enum GeneralApplicationTypes {
     SET_ASIDE_JUDGEMENT("Set aside judgment"),
     SETTLE_OR_DISCONTINUE_CONSENT("Settle or Discontinue by consent"),
     VARY_ORDER("Vary order"),
-    ADJOURN_VACATE_HEARING("Adjourn or vacate a hearing"),
+    ADJOURN_VACATE_HEARING("Adjourn a hearing"),
     UNLESS_ORDER("Unless order"),
     OTHER("Other"),
     VARY_JUDGEMENT("Vary judgment");
