@@ -48,13 +48,6 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        log.info("In sendBundleCreationTrigger caseId{}", event.getCaseId());
-        boolean isBundleCreated = getIsBundleCreatedForHearingDate(event.getCaseId());
-        if (isBundleCreated) {
-            log.info("Trial Bundle already exists for case {}", event.getCaseId());
-            return;
-        }
-
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
 
         String caseId = event.getCaseId().toString();
@@ -68,16 +61,6 @@ public class BundleCreationTriggerEventHandler {
         CaseDataContent caseContent = prepareCaseContent(caseBundles, startEventResponse);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         coreCaseDataService.triggerEvent(event.getCaseId(), BUNDLE_CREATION_NOTIFICATION);
-    }
-
-    boolean getIsBundleCreatedForHearingDate(Long caseId) {
-        boolean isBundleCreated = false;
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId).getData());
-        List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        isBundleCreated =
-            !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
-            .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
-        return isBundleCreated;
     }
 
     IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
