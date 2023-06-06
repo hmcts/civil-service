@@ -288,8 +288,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 
-        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  WE ARE HERE FIRST " + !AllocatedTrack.MULTI_CLAIM.equals(
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB1111  AllocatedTrack.MULTI_CLAIM.equals(\n" +
+                     "            allocatedTrack) " + AllocatedTrack.MULTI_CLAIM.equals(
             allocatedTrack));
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB22222 v1 " + v1);
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB33333  featureToggleService.isSdoEnabled() "+
+                     featureToggleService.isSdoEnabled());
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB44444 whole thing" + (v1 && featureToggleService.isSdoEnabled()
+                     && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)));
         if (v1 && featureToggleService.isSdoEnabled()
             && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
             log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  THEN WE ARE SECOND");
