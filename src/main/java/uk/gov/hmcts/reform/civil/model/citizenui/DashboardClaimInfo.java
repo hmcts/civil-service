@@ -55,6 +55,7 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
     private DashboardClaimStatus status;
+    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
