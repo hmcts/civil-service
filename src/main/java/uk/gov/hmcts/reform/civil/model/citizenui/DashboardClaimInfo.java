@@ -57,23 +57,23 @@ public class DashboardClaimInfo {
     private DashboardClaimStatus status;
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
-        pub       return Optional.ofNullable(responseDea
+    @JsonGetter("numberOfDays")
+    public long getNumberOfDays() {
+        return Optional.ofNullable(responseDeadline)
+                .filter(deadline -> deadline.isAfter(LocalDate.now()))
+                .map(deadline -> LocalDate.now().until(
+                        deadline,
+                        ChronoUnit.DAYS))
+                .orElse(0L);
+    }
 
-            .filter(deadline ->
-                       deadline.isAfter(LocalDate.now()))
-            .map(deadline ->
-                         LocalDate.   deadline,
-                             Chr ))
-                        
-                        
-                ter("numberOfDaysOverdue")
+    @JsonGetter("numberOfDaysOverdue")
     public long numberOfDaysOverdue() {
         return Optional.ofNullable(responseDeadline)
-            .filter(deadline ->
-                        deadline.isBefore(LocalDate.now()))
-            .map(deadline ->
-                         deadline.u  LocalDate.now(),
-                             Chr ))
-                        
-                        
-                
+                .filter(deadline -> deadline.isBefore(LocalDate.now()))
+                .map(deadline -> deadline.until(
+                        LocalDate.now(),
+                        ChronoUnit.DAYS))
+                .orElse(0L);
+    }
+}
