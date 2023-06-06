@@ -34,7 +34,6 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                log.info("In es search caseid {}", caseDetails.getId());
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));

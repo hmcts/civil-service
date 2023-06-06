@@ -17,7 +17,6 @@ public class BundleCreationTriggerHandlerExternalTaskListener {
     private BundleCreationTriggerHandlerExternalTaskListener(BundleCreationTriggerHandler  bundleCreationTriggerHandler,
                                                            ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC).lockDuration(600000);
-        log.info("In BundleCreationTriggerHandlerExternalTaskListener {}", client.isActive());
         subscriptionBuilder.handler(bundleCreationTriggerHandler).open();
     }
 }
