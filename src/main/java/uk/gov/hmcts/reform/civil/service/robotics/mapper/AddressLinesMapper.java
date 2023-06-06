@@ -67,7 +67,7 @@ public class AddressLinesMapper {
 
     private Queue<String> resolveAddressLine(String addressLine, String overflow, boolean overflowAllowed) {
         String retained;
-        addressLine = addressLine != null ? StringUtils.normalizeSpace(addressLine) : STRING_EMPTY;
+        addressLine = StringUtils.defaultString(addressLine);
         if (StringUtils.isEmpty(addressLine)) {
             if (StringUtils.isEmpty(overflow)) {
                 return new LinkedList<>(Arrays.asList(null, STRING_EMPTY));
