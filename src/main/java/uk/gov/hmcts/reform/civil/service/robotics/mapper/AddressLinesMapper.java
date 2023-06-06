@@ -82,9 +82,9 @@ public class AddressLinesMapper {
             String returnAddress;
             if (addressLineCandidate.length() > LINE_LIMIT) {
                 if (addLineLen >= LINE_LIMIT) {
-                    returnAddress = addressLine.substring(0, LINE_LIMIT - 1);
+                    returnAddress = addressLine != null ? addressLine.substring(0, Math.min(addressLine.length(), LINE_LIMIT - 1)) : "";
                 } else {
-                    String overflowSubstring = overflow != null ? overflow.substring(0, LINE_LIMIT - 3 - addLineLen) : "";
+                    String overflowSubstring = overflow != null ? overflow.substring(0, Math.max(0, LINE_LIMIT - 3 - addLineLen)) : "";
                     returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(StringUtils.defaultString(addressLine));
                 }
             } else {
