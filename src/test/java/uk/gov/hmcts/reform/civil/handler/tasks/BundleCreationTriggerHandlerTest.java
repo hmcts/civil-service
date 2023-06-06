@@ -31,7 +31,6 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -86,8 +85,7 @@ class BundleCreationTriggerHandlerTest {
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
@@ -168,10 +166,10 @@ class BundleCreationTriggerHandlerTest {
         caseData.setHearingDate(LocalDate.of(2023, 10, 12));
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(handler.getIsBundleCreatedForHearingDate(1L), false);
+        Assertions.assertEquals(handler.getIsBundleCreatedForHearingDate(caseDetails), false);
     }
 
     @Test
@@ -180,11 +178,10 @@ class BundleCreationTriggerHandlerTest {
 
         caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(false, handler.getIsBundleCreatedForHearingDate(1L));
+        Assertions.assertEquals(false, handler.getIsBundleCreatedForHearingDate(caseDetails));
     }
 
     @Test
@@ -205,11 +202,10 @@ class BundleCreationTriggerHandlerTest {
             .build()));
         caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.of(2023, 12, 12)).build();
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(1L));
+        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(caseDetails));
     }
 
     @Test
@@ -223,10 +219,9 @@ class BundleCreationTriggerHandlerTest {
         //Given : caseData with hearing date same as caseBundles hearing date
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return true indicating that bundle is already created for this hearingDate
-        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(1L));
+        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(caseDetails));
     }
 }
