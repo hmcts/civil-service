@@ -26,12 +26,11 @@ public class HearingDetailsMapper {
     }
 
     public static String getHearingType() {
-        return EMPTY_STRING;
+        return null;
     }
 
     public static HearingWindowModel getHearingWindow() {
-        return HearingWindowModel.builder()
-            .build();
+        return null;
     }
 
     public static Integer getDuration() {
@@ -114,7 +113,7 @@ public class HearingDetailsMapper {
     }
 
     public static PanelRequirementsModel getPanelRequirements() {
-        return PanelRequirementsModel.builder().build();
+        return null;
     }
 
     public static String getLeadJudgeContractType() {

@@ -36,9 +36,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJRespondentReceivedNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_EMAIL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_EMAIL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -68,6 +71,8 @@ public class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
+                .thenReturn("test-template-requested-id");
+            when(notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate())
                 .thenReturn("test-template-requested-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
@@ -142,11 +147,12 @@ public class DJRespondentReceivedNotificationHandlerTest {
         }
 
         @Test
-        void shouldReturn_whenInvokedAnd1v1AndLRvLiP() {
+        void shouldReturn_whenInvokedAnd1v1AndLRvLiP_NoEmail() {
             //send Received email
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(null)
+                .respondent1(PartyBuilder.builder().company().partyEmail(null).build())
                 .addRespondent2(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .build();
@@ -155,6 +161,37 @@ public class DJRespondentReceivedNotificationHandlerTest {
             handler.handle(params);
 
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldGenerateEmail_whenInvokedAnd1v1AndLRvLiP() {
+            //send Received email
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1Represented(null)
+                .respondent1(PartyBuilder.builder().company().build())
+                .addRespondent2(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_1).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "company@email.com",
+                "test-template-requested-id",
+                getNotificationDataMapLRvLip(caseData),
+                "default-judgment-respondent-requested-notification-000DC001"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapLRvLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_NUMBER_INTERIM, LEGACY_CASE_REFERENCE,
+                DEFENDANT_NAME_INTERIM, "Company ltd",
+                APPLICANT_ONE_NAME, "Mr. John Rambo"
+            );
         }
 
         @NotNull

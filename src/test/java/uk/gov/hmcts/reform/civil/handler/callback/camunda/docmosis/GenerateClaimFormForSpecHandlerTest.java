@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
@@ -448,5 +449,10 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimFormForSpec");
+    }
+
+    @Test
+    void testHandledEvents() {
+        assertThat(handler.handledEvents()).contains(GENERATE_CLAIM_FORM_SPEC);
     }
 }

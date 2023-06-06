@@ -100,6 +100,32 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
+    public LocalDate getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime fromDateTime) {
+        LocalDate fromDate = is4pmOrAfter(fromDateTime) ? fromDateTime.toLocalDate().plusDays(1)
+            : fromDateTime.toLocalDate();
+        while (workingDayIndicator.isWeekend(fromDate)) {
+            fromDate = fromDate.plusDays(1);
+        }
+
+        LocalDate deadline = fromDate.plusDays(7);
+        while (workingDayIndicator.isWeekend(deadline)) {
+            deadline = deadline.plusDays(1);
+        }
+
+        return deadline;
+    }
+
+    public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
+        LocalDateTime dateTime = responseDate;
+        LocalDate checkingIfWorkingday;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        int daysToAdd = 5;
+        dateTime = dateTime.plusDays(daysToAdd);
+        return workingDayIndicator.getNextWorkingDay(dateTime.toLocalDate());
+    }
+
     public LocalDate getSlaStartDate(CaseData caseData) {
         var caseIssueDate = caseData.getIssueDate();
         if (caseIssueDate == null) {

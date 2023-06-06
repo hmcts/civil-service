@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -96,6 +95,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "requestForInformation");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepSequential");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepConcurrent");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "consentOrder");
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -103,8 +103,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    private int checkIfDocumentExists(List<Element<CaseDocument>> civilCaseDocumentList,
-                                      List<Element<CaseDocument>> gaCaseDocumentlist) {
+    protected int checkIfDocumentExists(List<Element<?>> civilCaseDocumentList,
+                                      List<Element<?>> gaCaseDocumentlist) {
         return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
               .parallelStream().anyMatch(gaDocument -> gaDocument.getId().equals(civilDocument.getId())))
             .collect(Collectors.toList()).size();
@@ -171,11 +171,11 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                         CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(fromGaList));
-        List<Element<CaseDocument>> gaDocs =
-                (List<Element<CaseDocument>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        List<Element<?>> gaDocs =
+                (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(toCivilList));
-        List<Element<CaseDocument>> civilDocs =
-                (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+        List<Element<?>> civilDocs =
+                (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                         .orElse(newArrayList());
 
         if (gaDocs != null

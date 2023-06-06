@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.HearingLength;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -48,10 +49,12 @@ class Applicant1DQTest extends DQTest {
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
             UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.of(2020, 5, 2))
                 .who("who 1")
                 .build(),
             UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.DATE_RANGE)
                 .fromDate(LocalDate.of(2020, 5, 2))
                 .toDate(LocalDate.of(2020, 6, 2))
                 .who("who 2")
@@ -76,6 +79,7 @@ class Applicant1DQTest extends DQTest {
         for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
             UnavailableDate expected = lrDates.get(i).getValue();
             UnavailableDate actual = hearing.getUnavailableDates().get(i).getValue();
+            assertThat(actual.getUnavailableDateType()).isEqualTo(expected.getUnavailableDateType());
             assertThat(actual.getWho()).isEqualTo(expected.getWho());
             assertThat(actual.getDate()).isEqualTo(expected.getDate());
             assertThat(actual.getFromDate()).isEqualTo(expected.getFromDate());
@@ -88,10 +92,12 @@ class Applicant1DQTest extends DQTest {
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
             UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.of(2020, 5, 2))
                 .who("who 1")
                 .build(),
             UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.DATE_RANGE)
                 .fromDate(LocalDate.of(2020, 5, 2))
                 .toDate(LocalDate.of(2020, 6, 2))
                 .who("who 2")
@@ -110,6 +116,7 @@ class Applicant1DQTest extends DQTest {
         for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
             UnavailableDate expected = lrDates.get(i).getValue();
             UnavailableDate actual = hearing.getUnavailableDates().get(i).getValue();
+            assertThat(actual.getUnavailableDateType()).isEqualTo(expected.getUnavailableDateType());
             assertThat(actual.getWho()).isEqualTo(expected.getWho());
             assertThat(actual.getDate()).isEqualTo(expected.getDate());
             assertThat(actual.getFromDate()).isEqualTo(expected.getFromDate());

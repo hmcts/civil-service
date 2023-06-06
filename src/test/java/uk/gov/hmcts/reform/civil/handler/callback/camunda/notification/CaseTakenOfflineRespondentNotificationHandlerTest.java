@@ -149,5 +149,11 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
+
+        @Test
+        void handleEventsReturnsTheExpectedCallbackEvent() {
+            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE);
+            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_TAKEN_OFFLINE);
+        }
     }
 }
