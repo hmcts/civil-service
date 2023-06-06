@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -179,9 +180,13 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                 (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                         .orElse(newArrayList());
 
-        if (gaDocs != null
-                && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
-            civilDocs.addAll(gaDocs);
+        if (gaDocs != null) {
+            List<UUID> ids = civilDocs.stream().map(Element::getId).collect(Collectors.toList());
+            for (Element gaDoc : gaDocs) {
+                if (!ids.contains(gaDoc.getId())) {
+                    civilDocs.add(gaDoc);
+                }
+            }
         }
 
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
