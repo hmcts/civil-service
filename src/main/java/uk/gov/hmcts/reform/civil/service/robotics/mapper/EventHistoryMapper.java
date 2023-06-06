@@ -262,7 +262,6 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
-        buildMiscellaneousCcjEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -2161,22 +2160,6 @@ public class EventHistoryMapper {
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
                                       .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                                      .build())
-                    .build());
-        }
-    }
-
-    private void buildMiscellaneousCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String miscText = "RPA Reason: Judgement by Admission requested and claim moved offline.";
-        if (caseData.getCcjPaymentDetails() != null) {
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
                                       .build())
                     .build());
         }
