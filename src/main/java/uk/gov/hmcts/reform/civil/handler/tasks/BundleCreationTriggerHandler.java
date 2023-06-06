@@ -51,9 +51,11 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
         boolean isBundleCreated = false;
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId).getData());
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
-        isBundleCreated =
-            !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
-                .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
+        if (caseBundles != null) {
+            isBundleCreated =
+                !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
+                    .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
+        }
         return isBundleCreated;
     }
 
