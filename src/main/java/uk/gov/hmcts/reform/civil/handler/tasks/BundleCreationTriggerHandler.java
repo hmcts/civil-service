@@ -35,7 +35,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
         cases.forEach(caseDetails -> {
             try {
                 log.info("In es search caseid {}", caseDetails.getId());
-                boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails);
+                boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
                 } else {
@@ -47,9 +47,9 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
         });
     }
 
-    boolean getIsBundleCreatedForHearingDate(CaseDetails caseDetails) {
+    boolean getIsBundleCreatedForHearingDate(Long caseId) {
         boolean isBundleCreated = false;
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId).getData());
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
         if (caseBundles != null) {
             isBundleCreated =
