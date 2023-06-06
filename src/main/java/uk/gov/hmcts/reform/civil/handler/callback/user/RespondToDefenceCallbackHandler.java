@@ -292,7 +292,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                      "            allocatedTrack) " + AllocatedTrack.MULTI_CLAIM.equals(
             allocatedTrack));
         log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB22222 v1 " + v1);
-        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB33333  featureToggleService.isSdoEnabled() "+
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB33333  featureToggleService.isSdoEnabled() " +
                      featureToggleService.isSdoEnabled());
         log.info("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB44444 whole thing" + (v1 && featureToggleService.isSdoEnabled()
                      && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)));
