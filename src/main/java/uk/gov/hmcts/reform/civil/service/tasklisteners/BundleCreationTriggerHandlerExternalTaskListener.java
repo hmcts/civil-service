@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.tasklisteners;
 
-import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
