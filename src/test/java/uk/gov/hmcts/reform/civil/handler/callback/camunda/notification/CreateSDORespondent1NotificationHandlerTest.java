@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -68,6 +69,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         void setup() {
             when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
         }
@@ -98,6 +100,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .respondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -126,6 +129,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .respondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .caseDataLiP(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("BOTH").build()).build())
