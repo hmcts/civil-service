@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.Response;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
