@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.tasks.BundleCreationTriggerHandler;
 
 @Component
-@Slf4j
 public class BundleCreationTriggerHandlerExternalTaskListener {
 
     private static final String TOPIC = "BUNDLE_CREATION_CHECK";
