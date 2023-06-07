@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +17,12 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -129,5 +136,26 @@ class PollingEventEmitterHandlerTest {
             .camundaEvent(camundaEvent)
             .status(READY)
             .build();
+    }
+
+    @Test
+    public void doesNotRepeatEventClaim() {
+        when(searchService.getCases()).thenReturn(List.of(caseDetails1, caseDetails2, caseDetails3, caseDetails3));
+        pollingEventEmitterHandler.execute(externalTask, externalTaskService);
+
+        Stream.of(caseDetails1, caseDetails2, caseDetails3).forEach(
+            c ->
+                verify(eventEmitterService).emitBusinessProcessCamundaEvent(
+                    ArgumentMatchers.argThat(a ->
+                                                 a.getBusinessProcess().getCamundaEvent().equals(
+                                                     ((BusinessProcess)c.getData().get(
+                                                         "businessProcess")).getCamundaEvent())
+                                                     && a.getCcdCaseReference().equals(
+                                                     c.getId())
+                    ),
+                    ArgumentMatchers.eq(true)
+                )
+        );
+        verifyNoMoreInteractions(eventEmitterService);
     }
 }
