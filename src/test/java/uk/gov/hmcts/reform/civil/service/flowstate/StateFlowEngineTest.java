@@ -4445,6 +4445,7 @@ class StateFlowEngineTest {
                 .responseClaimMediationSpecRequired(NO)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .reasonNotSuitableSDO(new ReasonNotSuitableSDO("test"))
+                .takenOfflineDate(LocalDateTime.now())
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .build();
 
