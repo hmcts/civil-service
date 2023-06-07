@@ -41,9 +41,13 @@ public class DashboardClaimInfoService {
     }
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
+        log.info("-----------getClaimsForDefendant() started-------------");
+        log.info("-----------calling ocmc getClaimsForDefendant()-------------");
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
+        log.info("-----------ocmcClaims received-------------size " + ocmcClaims.size());
+        log.info("-----------calling ccd getCases-------------");
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-
+        log.info("-----------ccdCases received-------------size " + ccdCases.size());
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
             .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
             .collect(Collectors.toList());
