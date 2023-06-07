@@ -206,6 +206,40 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
+    void shouldGetThePartPaymentImmediateValue() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .claimValue(ClaimValue
+                                            .builder()
+                                            .statementOfValueInPennies(
+                                                new BigDecimal("100000"))
+                                            .build())
+                            .respondToAdmittedClaimOwingAmountPounds(new BigDecimal("500"))
+                            .respondToClaimAdmitPartLRspec(
+                                RespondToClaimAdmitPartLRspec
+                                    .builder()
+                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(new BigDecimal("500"));
+    }
+    
+    @Test
     void shouldReturnCasesInProperOrder() {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
