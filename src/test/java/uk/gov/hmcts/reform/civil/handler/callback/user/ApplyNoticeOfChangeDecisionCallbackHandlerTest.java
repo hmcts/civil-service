@@ -538,7 +538,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("status", "camundaEvent")
-                .containsOnly("READY", "APPLY_NOC_DECISION");
+                .contains("READY", "APPLY_NOC_DECISION");
 
         }
     }
