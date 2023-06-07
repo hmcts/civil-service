@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
         );
         CaseData updatedCaseData = caseData.builder()
             .respondent1ClaimResponseDocumentSpec(sealedForm)
+            .systemGeneratedCaseDocuments(wrapElements(sealedForm))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
