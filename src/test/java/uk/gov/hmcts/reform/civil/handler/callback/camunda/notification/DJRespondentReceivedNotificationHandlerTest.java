@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -96,8 +98,11 @@ public class DJRespondentReceivedNotificationHandlerTest {
             );
         }
 
+        /**
+         * 1v2 same solicitor
+         */
         @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2AndBothSelected() {
+        void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2SSAndBothSelected() {
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -117,6 +122,56 @@ public class DJRespondentReceivedNotificationHandlerTest {
                 "respondentsolicitor@example.com",
                 "test-template-received-id",
                 getNotificationDataMap1v2(caseData),
+                "default-judgment-respondent-received-notification-000DC001"
+            );
+        }
+
+        /**
+         * 1v2 different solicitor
+         */
+        @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2DSAndBothSelected() {
+            //send Received email
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .respondentSolicitor2EmailAddress("solicitor2@example.com")
+                .respondent2OrganisationPolicy(
+                    OrganisationPolicy.builder()
+                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                          .organisationID("org2Id").build())
+                        .build()
+                )
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            when(organisationService.findOrganisationById("org2Id"))
+                .thenReturn(Optional.of(
+                    Organisation.builder()
+                        .name("Organisation 2")
+                        .build()
+                ));
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "test-template-received-id",
+                getNotificationDataMap1v2(caseData),
+                "default-judgment-respondent-received-notification-000DC001"
+            );
+            Map<String, String> dataFor2 = new HashMap<>(getNotificationDataMap1v2(caseData));
+            dataFor2.put(DEFENDANT_EMAIL, "Organisation 2");
+            dataFor2.put(DEFENDANT_NAME, "Mr. John Rambo");
+            verify(notificationService).sendMail(
+                "solicitor2@example.com",
+                "test-template-received-id",
+                dataFor2,
                 "default-judgment-respondent-received-notification-000DC001"
             );
         }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -101,7 +103,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
                     caseData.getRespondent1().getPartyEmail(),
                     emailTemplate.template,
                     addProperties1v1LRvLip(caseData),
-                    String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference()));
+                    String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
+                );
             }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
@@ -116,8 +119,15 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
                 addProperties1v2FirstDefendant(caseData),
                 String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
             );
+            String emailAddress;
+            if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
+                || StringUtils.isBlank(caseData.getRespondentSolicitor2EmailAddress())) {
+                emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+            } else {
+                emailAddress = caseData.getRespondentSolicitor2EmailAddress();
+            }
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                emailAddress,
                 emailTemplate.template,
                 addProperties1v2SecondDefendant(caseData),
                 String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
@@ -177,21 +187,30 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                          .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                         .getOrganisation()
+                                                         .getOrganisationID(), caseData)
         );
     }
 
     public Map<String, String> addProperties1v2SecondDefendant(CaseData caseData) {
+        String legalOrganizationName;
+        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
+            || caseData.getRespondent2OrganisationPolicy() == null) {
+            legalOrganizationName = getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
+                                                                 .getOrganisation()
+                                                                 .getOrganisationID(), caseData);
+        } else {
+            legalOrganizationName = getLegalOrganizationName(caseData.getRespondent2OrganisationPolicy()
+                                                                 .getOrganisation()
+                                                                 .getOrganisationID(), caseData);
+        }
         return Map.of(
-            DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
-                                                              .getOrganisation()
-                                                              .getOrganisationID(), caseData),
+            DEFENDANT_EMAIL, legalOrganizationName,
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                          .getOrganisation()
-                                                          .getOrganisationID(), caseData)
+                                                         .getOrganisation()
+                                                         .getOrganisationID(), caseData)
         );
     }
 
