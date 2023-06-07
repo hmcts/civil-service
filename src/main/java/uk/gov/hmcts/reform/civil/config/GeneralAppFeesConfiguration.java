@@ -17,7 +17,6 @@ public class GeneralAppFeesConfiguration {
     private final String event;
     private final String withNoticeKeyword;
     private final String consentedOrWithoutNoticeKeyword;
-    private final String freeKeyword;
     private final String appnToVaryOrSuspend;
 
     public GeneralAppFeesConfiguration(
@@ -30,7 +29,6 @@ public class GeneralAppFeesConfiguration {
             @Value("${genApp.fee.event}") String event,
             @Value("${genApp.fee.keywords.withNotice}") String withNoticeKeyword,
             @Value("${genApp.fee.keywords.consentedOrWithoutNotice}") String consentedOrWithoutNoticeKeyword,
-            @Value("${genApp.fee.keywords.free}") String freeKeyword,
             @Value("${genApp.fee.keywords.appnToVaryOrSuspend}") String appnToVaryOrSuspend) {
         this.url = url;
         this.endpoint = endpoint;
@@ -41,7 +39,6 @@ public class GeneralAppFeesConfiguration {
         this.event = event;
         this.withNoticeKeyword = withNoticeKeyword;
         this.consentedOrWithoutNoticeKeyword = consentedOrWithoutNoticeKeyword;
-        this.freeKeyword = freeKeyword;
         this.appnToVaryOrSuspend = appnToVaryOrSuspend;
     }
 }
