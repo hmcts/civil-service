@@ -14,3 +14,8 @@ data "azurerm_user_assigned_identity" "app_mi" {
     module.key-vault
   ]
 }
+
+data "azurerm_key_vault" "civil_key_vault" {
+  name                = "civil-${var.env}"
+  resource_group_name = "civil-service-${var.env}"
+}

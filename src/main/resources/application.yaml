@@ -254,6 +254,7 @@ notifications:
 
   notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
+  notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
   notifyApplicantLRMediationAgreementTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
   notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
@@ -263,6 +264,9 @@ notifications:
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
+
+  mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
   notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
@@ -412,6 +416,7 @@ robotics:
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
     specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    lipJRecipient: civilmoneyclaimsdemo@gmail.com
 
 notification:
   caseworker:
