@@ -99,7 +99,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
         }
 
         /**
-         * 1v2 same solicitor
+         * 1v2 same solicitor.
          */
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2SSAndBothSelected() {
@@ -127,7 +127,7 @@ public class DJRespondentReceivedNotificationHandlerTest {
         }
 
         /**
-         * 1v2 different solicitor
+         * 1v2 different solicitor.
          */
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedAnd1v2DSAndBothSelected() {
