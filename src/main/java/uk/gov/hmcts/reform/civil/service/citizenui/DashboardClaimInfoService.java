@@ -60,6 +60,8 @@ public class DashboardClaimInfoService {
         do {
             Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases);
             claims = coreCaseDataService.searchCases(query, authorisation);
+            log.info("-----------ccdCases received-------------total " + claims.getTotal());
+            log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
             dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
             totalCases += claims.getCases().size();
         } while (totalCases < claims.getTotal());
