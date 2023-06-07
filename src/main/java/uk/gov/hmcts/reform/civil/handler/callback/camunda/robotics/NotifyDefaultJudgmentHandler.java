@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_DJ_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_DJ_UNSPEC;
@@ -53,7 +55,6 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-
         return isSpecHandler(callbackParams) ? TASK_ID_SPEC : TASK_ID;
 
     }
@@ -61,6 +62,17 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    @Override
+    protected void sendNotifications(CallbackParams callbackParams, CaseData caseData, boolean multiPartyScenario) {
+        if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
+            roboticsNotificationService.notifyJudgementLip(caseData);
+        } else {
+            roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
+                                                       callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+        }
     }
 
     private boolean isSpecHandler(CallbackParams callbackParams) {
