@@ -61,11 +61,19 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
         if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getRespondentLipResponseSubmissionTemplate(),
+                addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String addTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getRespondentLipResponseSubmissionBilingualTemplate();
+        } else {
+            return notificationsProperties.getRespondentLipResponseSubmissionTemplate();
+        }
     }
 }
