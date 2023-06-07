@@ -67,6 +67,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
