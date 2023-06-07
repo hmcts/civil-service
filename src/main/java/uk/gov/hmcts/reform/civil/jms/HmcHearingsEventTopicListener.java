@@ -19,19 +19,12 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
     private final PaymentsConfiguration paymentsConfiguration;
     private final CoreCaseDataService coreCaseDataService;
-
-    public HmcHearingsEventTopicListener(ObjectMapper objectMapper,
-                                         PaymentsConfiguration paymentsConfiguration,
-                                         CoreCaseDataService coreCaseDataService) {
-        this.objectMapper = objectMapper;
-        this.coreCaseDataService = coreCaseDataService;
-        this.paymentsConfiguration = paymentsConfiguration;
-    }
 
     @JmsListener(
         destination = "${azure.service-bus.hmc-to-hearings-api.topicName}",
