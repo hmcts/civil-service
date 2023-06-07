@@ -124,6 +124,9 @@ public class NotificationsProperties {
     private String sdoOrderedSpec;
 
     @NotEmpty
+    private String sdoOrderedSpecBilingual;
+
+    @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
 
     @NotEmpty
