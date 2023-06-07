@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.jms;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.message.JmsBytesMessage;
@@ -18,16 +19,23 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
     private final PaymentsConfiguration paymentsConfiguration;
     private final CoreCaseDataService coreCaseDataService;
 
+    public HmcHearingsEventTopicListener(ObjectMapper objectMapper,
+                                         PaymentsConfiguration paymentsConfiguration,
+                                         CoreCaseDataService coreCaseDataService) {
+        this.objectMapper = objectMapper;
+        this.coreCaseDataService = coreCaseDataService;
+        this.paymentsConfiguration = paymentsConfiguration;
+    }
+
     @JmsListener(
-        destination = "hmc-to-cft-demo",
-        subscription = "hmc-to-civil-subscription-demo",
+        destination = "${azure.service-bus.hmc-to-hearings-api.topicName}",
+        subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
         containerFactory = "hmcHearingsEventTopicContainerFactory")
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcTopicEventProcessingException {
 
