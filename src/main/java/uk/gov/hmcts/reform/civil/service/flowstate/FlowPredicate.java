@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 
 public class FlowPredicate {
 
@@ -856,17 +858,17 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.hasApplicantAcceptedRepaymentPlan();
+    public static final Predicate<CaseData> acceptRepaymentPlan =
+        CaseData::hasApplicantAcceptedRepaymentPlan;
 
-    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.hasApplicantRejectedRepaymentPlan();
+    public static final Predicate<CaseData> rejectRepaymentPlan =
+        CaseData::hasApplicantRejectedRepaymentPlan;
 
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
-        caseData.isRespondentResponseBilingual();
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
+        CaseDataParent::isRespondentResponseBilingual;
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
-        caseData.isPartAdmitClaimSettled();
+    public static final Predicate<CaseData> agreePartAdmitSettle =
+        CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
         CaseData::isClaimantNotSettlePartAdmitClaim;
@@ -874,4 +876,10 @@ public class FlowPredicate {
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
+
+    public static final Predicate<CaseData> isInHearingReadiness = caseData ->
+        caseData.getHearingReferenceNumber() != null
+        && caseData.getListingOrRelisting() != null
+        && caseData.getListingOrRelisting().equals(LISTING);
+
 }
