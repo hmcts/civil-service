@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,8 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitUnsuccessfulMediation
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::submitUnsuccessfulMediation,
+            callbackKey(CallbackType.SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -38,8 +41,11 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitUnsuccessfulMediation(CallbackParams callbackParams) {
+        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            .businessProcess(BusinessProcess.ready(MEDIATION_UNSUCCESSFUL))
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(callbackParams.getCaseData().toMap(objectMapper))
+            .data(caseDataUpdated.toMap(objectMapper))
             .state(CaseState.JUDICIAL_REFERRAL.name())
             .build();
     }
