@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 
 @AllArgsConstructor
 public class CcdDashboardClaimMatcher implements Claim {
@@ -165,7 +165,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoBeenDrawn() {
-        return false;
+        return Objects.isNull(caseData.getOrderSDODocumentDJ());
     }
 
     @Override
@@ -181,20 +181,20 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isMediationSuccessful() {
         return !sdoBeenDrawn()
-            && caseData.getMediation().getMediationSuccessful() != null;
+            && !Objects.isNull(caseData.getMediation().getMediationSuccessful());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
         return !sdoBeenDrawn()
-            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
+            && caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
     }
 
     @Override
     public boolean isMediationPending() {
-        return caseData.getMediation().getMediationSuccessful() != null
+        return !Objects.isNull(caseData.getMediation().getMediationSuccessful())
             && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
-            && caseData.getMediation().getMediationSuccessful().getMediationAgreement() == null;
+            && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
@@ -213,8 +213,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean claimSentToClaimant() {
-        return caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
-            && caseData.getRespondent1CourtOrderPayment() != null
+        return caseData.isRespondentResponseFullDefence()
+            && !Objects.isNull(caseData.getRespondent1CourtOrderPayment())
             && (caseData.isSettlementDeclinedByClaimant()
             || caseData.isClaimantRejectsClaimAmount());
     }

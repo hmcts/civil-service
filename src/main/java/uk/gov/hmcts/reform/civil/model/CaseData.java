@@ -314,7 +314,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmount;
     /**
-     * money amount in pounds.
+     * money amount in pounds
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds;
