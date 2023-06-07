@@ -67,7 +67,7 @@ public class AddressLinesMapper {
 
     private Queue<String> resolveAddressLine(String addressLine, String overflow, boolean overflowAllowed) {
         String retained;
-        addressLine = addressLine != null ? StringUtils.normalizeSpace(addressLine) : STRING_EMPTY;
+        addressLine = StringUtils.defaultString(addressLine);
         if (StringUtils.isEmpty(addressLine)) {
             if (StringUtils.isEmpty(overflow)) {
                 return new LinkedList<>(Arrays.asList(null, STRING_EMPTY));
@@ -76,14 +76,20 @@ public class AddressLinesMapper {
             }
         }
         if (!overflowAllowed) {
-            int addLineLen = StringUtils.length(addressLine);
+            int addLineLen = addressLine != null ? StringUtils.length(addressLine) : 0;
             String addressLineCandidate = StringUtils.defaultString(overflow)
                 .concat(StringUtils.defaultString(addressLine));
-            String returnAddress = StringUtils.length(addressLineCandidate) > LINE_LIMIT
-                ? (addLineLen >= LINE_LIMIT ? addressLine.substring(0, LINE_LIMIT - 1)
-                : overflow.substring(0, LINE_LIMIT - 3 - addLineLen).concat(STRING_COMMA_SPACE)
-                .concat(addressLine))
-                : addressLineCandidate;
+            String returnAddress;
+            if (addressLineCandidate.length() > LINE_LIMIT) {
+                if (addLineLen >= LINE_LIMIT) {
+                    returnAddress = addressLine != null ? addressLine.substring(0, Math.min(addressLine.length(), LINE_LIMIT - 1)) : "";
+                } else {
+                    String overflowSubstring = overflow != null ? overflow.substring(0, Math.max(0, LINE_LIMIT - 3 - addLineLen)) : "";
+                    returnAddress = overflowSubstring.concat(STRING_COMMA_SPACE).concat(StringUtils.defaultString(addressLine));
+                }
+            } else {
+                returnAddress = addressLineCandidate;
+            }
             return new LinkedList<>(Arrays.asList(returnAddress, STRING_EMPTY));
         }
 
