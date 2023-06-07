@@ -29,9 +29,6 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
-    SETTLED(
-        Claim::isSettled
-    ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
@@ -80,7 +77,6 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-    NO_STATUS(c -> false),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
@@ -102,15 +98,19 @@ public enum DashboardClaimStatus {
     CLAIM_SENT_TO_CLAIMANT(
         Claim::claimSentToClaimant
     ),
-    CLAIMANT_REJECT_OFFER(
-        Claim::claimantRejectOffer
-    ),
     CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
         Claim::claimantAcceptOffer
     ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
-    );
+    ),
+    CLAIMANT_REJECT_OFFER(
+        Claim::claimantRejectOffer
+    ),
+    SETTLED(
+        Claim::isSettled
+    ),
+    NO_STATUS(c -> false);
 
     @Getter
     private final Predicate<Claim> claimMatcher;

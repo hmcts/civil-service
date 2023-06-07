@@ -5,17 +5,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 
+import javax.print.attribute.standard.Media;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -205,6 +211,137 @@ class CcdClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
     }
 
+    @Test
+    void given_hearingDateIsDue_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+        CaseData claim = CaseData.builder()
+            .hearingDate(LocalDate.now().plusDays(10))
+            .respondent1ResponseDate(LocalDateTime.now())
+            .orderSDODocumentDJ(Document.builder().build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
+    }
+
+    @Test
+    void given_mediation_whenGetSatus_mediationSuccessful() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .mediation(Mediation.builder()
+                           .mediationSuccessful(MediationSuccessful.builder()
+                                                    .mediationAgreement(MediationAgreementDocument.builder().build())
+                                                    .build())
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_SUCCESSFUL);
+    }
+
+    @Test
+    void given_mediation_whenGetStatus_mediationUnsuccessful() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .mediation(Mediation.builder()
+                           .unsuccessfulMediationReason("this is a reason")
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_UNSUCCESSFUL);
+    }
+
+    @Test
+    void given_mediation_whenGetStatus_mediationPending() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .ccdState(CaseState.IN_MEDIATION)
+            .mediation(Mediation.builder()
+                           .mediationSuccessful(MediationSuccessful.builder()
+                                                    .build())
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.IN_MEDIATION);
+    }
+
+    @Test
+    void given_court_whenGetStatus_courtReview() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndApplicantNotProceedsWithClaim_whenGetStatus_claimEnded() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndSettlementDeclinedByClaimantOrClaimantRejectClaimAmount_whenGetStatus_claimSentToClaimant() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SENT_TO_CLAIMANT);
+    }
+
+    @Test
+    void given_applicantRejectRepaymentPlan_whenGetStatus_rejectOffer() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_OFFER);
+    }
+
+    @Test
+    void given_applicantRejectPartialAdmit_whenGetStatus_rejectOffer() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
+    }
+
+    @Test
+    void given_applicantAcceptRepaymentPlan_whenGetStatus_acceptOffer() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_SETTLE_IN_COURT);
+    }
+
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
@@ -214,5 +351,4 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
         return claim;
     }
-
 }

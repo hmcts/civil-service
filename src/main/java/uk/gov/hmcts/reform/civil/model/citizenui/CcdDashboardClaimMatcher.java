@@ -79,7 +79,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSettled() {
-        return caseData.respondent1PaidInFull() || caseData.isResponseAcceptedByClaimant();
+        return caseData.respondent1PaidInFull()
+            || caseData.isResponseAcceptedByClaimant();
     }
 
     @Override
@@ -165,7 +166,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoBeenDrawn() {
-        return Objects.isNull(caseData.getOrderSDODocumentDJ());
+        return !Objects.isNull(caseData.getOrderSDODocumentDJ());
     }
 
     @Override
@@ -181,25 +182,32 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isMediationSuccessful() {
         return !sdoBeenDrawn()
-            && !Objects.isNull(caseData.getMediation().getMediationSuccessful());
+            && !Objects.isNull(caseData.getMediation())
+            && !Objects.isNull(caseData.getMediation().getMediationSuccessful())
+            && !Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
         return !sdoBeenDrawn()
-            && caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
+            && !Objects.isNull(caseData.getMediation())
+            && !Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
+            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
     }
 
     @Override
     public boolean isMediationPending() {
-        return !Objects.isNull(caseData.getMediation().getMediationSuccessful())
+        return !Objects.isNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
+            && !Objects.isNull(caseData.getMediation())
+            && !Objects.isNull(caseData.getMediation().getMediationSuccessful())
             && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isCourtReviewing() {
         return !sdoBeenDrawn()
+            && !Objects.isNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.YES)
             && caseData.isRespondentResponseFullDefence()
             && caseData.hasApplicantRejectedRepaymentPlan();
@@ -207,7 +215,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isClaimEnded() {
-        return caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
+        return !Objects.isNull(caseData.getApplicant1ProceedsWithClaimSpec())
+            && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
             && caseData.isRespondentResponseFullDefence();
     }
 
@@ -232,6 +241,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec().equals(YesOrNo.NO);
+        return !Objects.isNull(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())
+            && caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec().equals(YesOrNo.NO);
     }
 }
