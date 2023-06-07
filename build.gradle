@@ -126,7 +126,7 @@ allprojects {
       // Solves CVE-2020-17521
       dependencySet(
         group: 'org.codehaus.groovy',
-        version: '2.4.21'
+        version: '2.5.22'
       ) {
         entry 'groovy-all'
       }
