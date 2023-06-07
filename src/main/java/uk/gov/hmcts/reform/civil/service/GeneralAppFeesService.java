@@ -40,6 +40,9 @@ public class GeneralAppFeesService {
     private static final String JURISDICTION2 = "jurisdiction2";
     private static final String SERVICE = "service";
     private static final String KEYWORD = "keyword";
+    public static final String FREE_REF = "FREE";
+    private static final Fee FREE_FEE = Fee.builder()
+            .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
             = Arrays.asList(GeneralApplicationTypes.VARY_JUDGEMENT,
@@ -121,7 +124,7 @@ public class GeneralAppFeesService {
 
     private Fee getDefaultFee(CaseData caseData) {
         if (isFreeApplication(caseData)) {
-            return getFeeForGA(feesConfiguration.getFreeKeyword(), "copies", "insolvency");
+            return FREE_FEE;
         } else {
             return getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
         }
