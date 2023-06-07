@@ -30,8 +30,6 @@ public class HmcHearingsEventTopicListener {
         subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
         containerFactory = "hmcHearingsEventTopicContainerFactory")
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcTopicEventProcessingException {
-
-        log.info("original message {}", message);
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
         String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
