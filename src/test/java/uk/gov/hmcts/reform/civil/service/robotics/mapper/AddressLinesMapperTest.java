@@ -278,7 +278,7 @@ class AddressLinesMapperTest {
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
             Address address = Address.builder()
                 .addressLine1("1234567890 1234567890")
-                .addressLine2("I am the    second   line")
+                .addressLine2("I am the second line")
                 .addressLine3("abcdefghijk 1234567890   1234567890 1234567899,zxcvbnmzxcvbnm 12345")
                 .build();
 
