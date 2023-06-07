@@ -13,15 +13,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -58,7 +52,6 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -92,9 +85,6 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
-    private static final String HEARING_CHANNEL = "HearingChannel";
-    private static final String SPEC_SERVICE_ID = "AAA6";
-    private static final String UNSPEC_SERVICE_ID = "AAA7";
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
@@ -108,7 +98,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
-    private final CategoryService categoryService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -202,22 +191,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         DynamicList locationsList = getLocationsFromList(locations);
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
-
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-            .getListItems()
-            .stream()
-            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .collect(Collectors.toList());
-        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
-
-        caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
-        caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
@@ -672,7 +645,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        CaseData caseData = mapHearingMethodFields(callbackParams.getCaseData());
+        CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
@@ -689,34 +662,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private CaseData mapHearingMethodFields(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
-        if (caseData.getHearingMethodValuesDisposalHearingDJ() != null
-            && caseData.getHearingMethodValuesDisposalHearingDJ().getValue() != null) {
-            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearingDJ().getValue().getLabel();
-            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
-                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
-            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
-                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
-            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
-                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
-            }
-        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null
-            && caseData.getHearingMethodValuesTrialHearingDJ().getValue() != null) {
-            String trialHearingMethodLabel = caseData.getHearingMethodValuesTrialHearingDJ().getValue().getLabel();
-            if (trialHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
-                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
-            } else if (trialHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
-                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
-            } else if (trialHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
-                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
-            }
-        }
-
-        return updatedData.build();
     }
 
     private CaseData fillDisposalToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
