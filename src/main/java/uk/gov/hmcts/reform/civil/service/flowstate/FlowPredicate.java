@@ -372,7 +372,7 @@ public class FlowPredicate {
 
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-            && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+            && caseData.getTakenOfflineDate() != null;
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
 
@@ -380,7 +380,7 @@ public class FlowPredicate {
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getReasonNotSuitableSDO() == null && caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
