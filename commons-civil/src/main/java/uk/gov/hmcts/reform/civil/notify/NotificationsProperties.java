@@ -124,6 +124,9 @@ public class NotificationsProperties {
     private String sdoOrderedSpec;
 
     @NotEmpty
+    private String sdoOrderedSpecBilingual;
+
+    @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
 
     @NotEmpty
@@ -210,6 +213,9 @@ public class NotificationsProperties {
     private String respondentLipResponseSubmissionTemplate;
 
     @NotEmpty
+    private String respondentLipResponseSubmissionBilingualTemplate;
+
+    @NotEmpty
     private String hearingListedFeeClaimantLrTemplate;
 
     @NotEmpty
@@ -252,6 +258,9 @@ public class NotificationsProperties {
     private String notifyRespondentLiPMediationAgreementTemplate;
 
     @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplateWelsh;
+
+    @NotEmpty
     private String notifyRespondentLRMediationAgreementTemplate;
 
     @NotEmpty
@@ -262,6 +271,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLipWelshTemplate;
 
     @NotEmpty
     private String mediationUnsuccessfulClaimantLRTemplate;
