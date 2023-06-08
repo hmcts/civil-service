@@ -78,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COU
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -262,6 +263,7 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
+        buildCcjEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -456,6 +458,27 @@ public class EventHistoryMapper {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (caseData.getCcjPaymentDetails() != null && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null) {
+            builder.judgementByAdmission((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
+                .litigiousPartyID("001")
+                .dateReceived(LocalDateTime.now())
+                .build()));
+
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(LocalDateTime.now())
+                .eventDetailsText("RPA Reason: Judgement by Admission requested and claim moved offline.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Judgement by Admission requested and claim moved offline.")
+                                  .build())
+                .build()));
         }
     }
 
@@ -991,6 +1014,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthLifted(), currentSequence);
         currentSequence = getCurrentSequence(history.getStatesPaid(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getJudgementByAdmission(), currentSequence);
         return currentSequence + 1;
     }
 
