@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.hearings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_PARTY_IDS;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getDuration;
@@ -44,6 +47,8 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearings
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getPublicCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMapper.getVocabulary;
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 @Slf4j
@@ -58,9 +63,28 @@ public class HearingValuesService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final OrganisationService organisationService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ObjectMapper mapper;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
         CaseData caseData = retrieveCaseData(caseId);
+
+        // We only really need to check the applicant field to understand if
+        // the partyIds need recreating
+        if (caseData.getApplicant1().getPartyID() == null) {
+            var builder = caseData.toBuilder();
+            // Even if party ids creation is released and cases are
+            // in an inconsistent state where app/res fields have no party ids
+            // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
+            // as it was created to not overwrite partyId fields if they exist.
+            populateWithPartyIds(builder);
+            caseData = builder.build();
+            try {
+                caseDataService.triggerEvent(caseId, UPDATE_PARTY_IDS, builder.build().toMap(mapper));
+            } catch (FeignException e) {
+                log.error(String.format("Updating case data with party ids failed: %s", e.contentUTF8()));
+                throw e;
+            }
+        }
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
 
