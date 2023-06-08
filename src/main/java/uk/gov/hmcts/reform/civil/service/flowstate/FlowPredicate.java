@@ -1,12 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -376,6 +371,9 @@ public class FlowPredicate {
             && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
+
+    public static final Predicate<CaseData> partAdmitPayImmediately = caseData ->
+        getPredicateForPartAdmitPayImmediately(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
         caseData.getTakenOfflineDate() != null;
@@ -777,6 +775,13 @@ public class FlowPredicate {
             }
         }
         return predicate;
+    }
+
+    private static boolean getPredicateForPartAdmitPayImmediately(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.isPartAdmitPayImmediatelyAccepted();
+        }
+        return false;
     }
 
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
