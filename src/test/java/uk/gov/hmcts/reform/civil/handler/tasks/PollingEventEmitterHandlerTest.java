@@ -135,10 +135,23 @@ class PollingEventEmitterHandlerTest {
 
     @Test
     public void doesNotRepeatEventClaim() {
-        when(searchService.getCases()).thenReturn(List.of(caseDetails1, caseDetails2, caseDetails3, caseDetails3));
+        // case with repeated id, different event
+        CaseDetails caseDetails4 = CaseDetails.builder().id(3L).data(
+            Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT4"))).build();
+        // case with repeated event, different id
+        CaseDetails caseDetails5 = CaseDetails.builder().id(4L).data(
+            Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build();
+
+        // Given a collection of cases with a duplicate in it (3)
+        when(searchService.getCases()).thenReturn(List.of(
+            caseDetails1, caseDetails2, caseDetails3,
+            caseDetails3, caseDetails4, caseDetails5));
+
+        // when the pollingEventEmitterHandler is called
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
-        Stream.of(caseDetails1, caseDetails2, caseDetails3).forEach(
+        // then each case that do not repeat the pair id-event is fired
+        Stream.of(caseDetails1, caseDetails2, caseDetails3, caseDetails4, caseDetails5).forEach(
             c ->
                 verify(eventEmitterService).emitBusinessProcessCamundaEvent(
                     ArgumentMatchers.argThat(a ->
@@ -151,6 +164,7 @@ class PollingEventEmitterHandlerTest {
                     ArgumentMatchers.eq(true)
                 )
         );
+        // and only those cases are fired (the duplicate is not fired)
         verifyNoMoreInteractions(eventEmitterService);
     }
 }

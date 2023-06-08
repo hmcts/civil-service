@@ -39,11 +39,11 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
                     mappedCase.getCcdCaseReference(),
                     mappedCase.getBusinessProcess().getCamundaEvent()
                 ))) {
-                    log.info(format(
-                        "Emitting %s camunda event for case through poller: %d",
+                    log.info(
+                        "Emitting {} camunda event for case through poller: {}",
                         mappedCase.getBusinessProcess().getCamundaEvent(),
                         mappedCase.getCcdCaseReference()
-                    ));
+                    );
                     eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
                 } else {
                     log.info(
