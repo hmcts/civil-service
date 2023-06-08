@@ -29,17 +29,18 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
-import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 
@@ -191,7 +192,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .timelineEventList(caseData.getSpecResponseTimelineOfEvents().stream()
+            .timelineEventList(Optional.ofNullable(caseData.getSpecResponseTimelineOfEvents()).map(Collection::stream)
+                                   .orElseGet(Stream::empty)
                                    .map(event ->
                                             EventTemplateData.builder()
                                                 .date(event.getValue().getTimelineDate())

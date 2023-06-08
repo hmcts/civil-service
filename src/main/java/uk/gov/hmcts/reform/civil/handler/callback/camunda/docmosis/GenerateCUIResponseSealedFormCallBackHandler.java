@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 
 import java.util.Collections;
@@ -29,6 +30,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private final ObjectMapper objectMapper;
     private final SealedClaimLipResponseFormGenerator formGenerator;
+    private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final static List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
@@ -50,9 +52,9 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData updatedCaseData = caseData.builder()
+        CaseData updatedCaseData = caseData.toBuilder()
             .respondent1ClaimResponseDocumentSpec(sealedForm)
-            .systemGeneratedCaseDocuments(wrapElements(sealedForm))
+            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(sealedForm, caseData))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
