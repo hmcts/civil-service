@@ -269,7 +269,7 @@ class CoreCaseDataServiceTest {
         @Test
         void shouldReturnRespondentSolicitor1AgreedDeadlineExtension() {
             //Given
-            LocalDate agreedDeadlineExpected = LocalDate.now();
+            LocalDate agreedDeadlineExpected = LocalDate.now().plusDays(14);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
             CaseDetails caseDetails = CaseDetails.builder().build();
             caseDetails.setData(caseData.toMap(objectMapper));
