@@ -94,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -153,8 +154,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
+            .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -185,25 +188,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
 
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-            .getListItems()
-            .stream()
-            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .collect(Collectors.toList());
-        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
-        DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
-            .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
-        hearingMethodList.setValue(hearingMethodInPerson);
-        updatedData.hearingMethodValuesFastTrack(hearingMethodList);
-        updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
-        updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
+        if (V_1.equals(callbackParams.getVersion())) {
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+            Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+                authToken, HEARING_CHANNEL, serviceId
+            );
+            DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+            List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+                .getListItems()
+                .stream()
+                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+                .collect(Collectors.toList());
+            hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+            DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+                .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
+            hearingMethodList.setValue(hearingMethodInPerson);
+            updatedData.hearingMethodValuesFastTrack(hearingMethodList);
+            updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
+            updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
+        }
 
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
         updatedData.disposalHearingMethodInPerson(locationsList);
@@ -730,7 +735,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
-        CaseData caseData = mapHearingMethodFields(callbackParams.getCaseData());
+        CaseData caseData = V_1.equals(callbackParams.getVersion())
+            ? mapHearingMethodFields(callbackParams.getCaseData())
+            : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         CaseDocument document = sdoGeneratorService.generate(
