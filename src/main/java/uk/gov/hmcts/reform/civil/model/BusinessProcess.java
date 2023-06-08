@@ -41,6 +41,7 @@ public class BusinessProcess {
     public BusinessProcess start() {
         this.status = BusinessProcessStatus.STARTED;
         this.activityId = null;
+        this.readyOn = null;
         return this;
     }
 
@@ -61,6 +62,7 @@ public class BusinessProcess {
         this.activityId = null;
         this.processInstanceId = null;
         this.status = BusinessProcessStatus.FINISHED;
+        this.readyOn = null;
         return this;
     }
 
