@@ -148,8 +148,9 @@ public class CoreCaseDataService {
 
     public LocalDate getAgreedDeadlineResponseDate(Long caseId, String authorization) {
         CaseData caseData = caseDetailsConverter.toCaseData(this.getCase(caseId, authorization));
-        if(caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null)
+        if (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null) {
             return caseData.getRespondent1ResponseDeadline().toLocalDate();
+        }
         return null;
     }
 }
