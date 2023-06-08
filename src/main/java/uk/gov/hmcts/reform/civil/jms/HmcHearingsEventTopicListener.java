@@ -42,7 +42,7 @@ public class HmcHearingsEventTopicListener {
                                    message.getClass().getName());
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            throw  new HmcTopicEventProcessingException("first try block %s", e);
         }
 
         // byte[] messageBytes = new byte[(int) message.getBodyLength()];
