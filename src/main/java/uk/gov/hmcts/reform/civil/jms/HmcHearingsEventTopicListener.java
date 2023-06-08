@@ -45,9 +45,9 @@ public class HmcHearingsEventTopicListener {
             e.printStackTrace();
         }
 
-//        byte[] messageBytes = new byte[(int) message.getBodyLength()];
-//        message.readBytes(messageBytes);
-//        String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
+        // byte[] messageBytes = new byte[(int) message.getBodyLength()];
+        // message.readBytes(messageBytes);
+        // String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
         if (msg != null) {
             String convertedMessage = msg.getText();
             log.info("Message received {}", convertedMessage);
