@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +44,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final IdamClient idamClient;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -78,8 +81,17 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+
+        boolean isJudge = false;
+
+        if (userDetails.getRoles() != null) {
+            isJudge = userDetails.getRoles().stream()
+                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        }
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
+            .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
@@ -136,7 +148,16 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
         String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
             ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+
+        boolean isJudge = false;
+
+        if (userDetails.getRoles() != null) {
+            isJudge = userDetails.getRoles().stream()
+                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        }
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
+            .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .trialBuildingDispute(caseData.getTrialBuildingDispute())

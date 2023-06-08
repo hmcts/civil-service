@@ -126,6 +126,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
-
+    private final boolean writtenByJudge;
 
 }
