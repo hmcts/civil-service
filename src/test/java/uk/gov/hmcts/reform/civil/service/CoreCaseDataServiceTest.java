@@ -280,6 +280,20 @@ class CoreCaseDataServiceTest {
             //Then
             assertThat(agreedDeadline).isEqualTo(agreedDeadlineExpected);
         }
+
+        @Test
+        void shouldReturnUndefined_RespondentSolicitor1AgreedDeadlineExtension() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CaseDetails caseDetails = CaseDetails.builder().build();
+            caseDetails.setData(caseData.toMap(objectMapper));
+            when(service.getCase(1L, "AUTH"))
+                .thenReturn(caseDetails);
+            //When
+            LocalDate agreedDeadline = service.getAgreedDeadlineResponseDate(1L, "AUTH");
+            //Then
+            assertThat(agreedDeadline).isNull();
+        }
     }
 
     private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
