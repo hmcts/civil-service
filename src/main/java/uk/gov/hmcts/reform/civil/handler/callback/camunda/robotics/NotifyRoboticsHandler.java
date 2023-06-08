@@ -30,16 +30,14 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
-    private final RoboticsNotificationService roboticsNotificationService;
+    protected final RoboticsNotificationService roboticsNotificationService;
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    private final FeatureToggleService toggleService;
+    protected final FeatureToggleService toggleService;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
-
         if (toggleService.isRPAEmailEnabled()) {
-
             RoboticsCaseData roboticsCaseData = null;
             RoboticsCaseDataSpec roboticsCaseDataSpec = null;
             Set<ValidationMessage> errors = null;
@@ -63,9 +61,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
                 if (errors == null || errors.isEmpty()) {
                     log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
-                    roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
-                                                               callbackParams.getParams().get(BEARER_TOKEN).toString()
-                    );
+                    sendNotifications(callbackParams, caseData, multiPartyScenario);
                 } else {
                     throw new JsonSchemaValidationException(
                         format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
@@ -75,5 +71,11 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    protected void sendNotifications(CallbackParams callbackParams, CaseData caseData, boolean multiPartyScenario) {
+        roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
+                                                   callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
     }
 }
