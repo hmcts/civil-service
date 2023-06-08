@@ -16,6 +16,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import static uk.gov.hmcts.reform.hmc.model.jms.HmcStatus.EXCEPTION;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -35,30 +37,22 @@ public class HmcHearingsEventTopicListener {
         try {
             if (message instanceof TextMessage) {
                 msg = (TextMessage) message;
-                log.info("MESSAGE BEAN: Message received: " +
-                                msg.getText());
+                if (msg != null) {
+                    String convertedMessage = msg.getText();
+                    log.info("Message received {}", convertedMessage);
+                    HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
+                    if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                        log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering event for WA",
+                                 hmcMessage.getHearingId(), hmcMessage.getCaseId());
+                    }
+                }
             } else {
                 log.info("Message of wrong type: " +
                                    message.getClass().getName());
             }
-        } catch (Throwable e) {
-            throw  new HmcTopicEventProcessingException("first try block %s", e);
-        }
-
-        // byte[] messageBytes = new byte[(int) message.getBodyLength()];
-        // message.readBytes(messageBytes);
-        // String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
-        if (msg != null) {
-            String convertedMessage = msg.getText();
-            log.info("Message received {}", convertedMessage);
-
-            try {
-                log.info("try block");
-                HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
-            }  catch (JsonProcessingException | CaseException ex) {
-                throw new HmcTopicEventProcessingException(String.format("Unable to successfully deliver HMC message: %s",
-                                                                         ""), ex);
-            }
+        } catch (JsonProcessingException | CaseException e) {
+            throw  new HmcTopicEventProcessingException(String.format("Unable to successfully deliver HMC message: %s",
+                                                                      ""), e);
         }
     }
 
