@@ -172,23 +172,23 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     @SuppressWarnings("unchecked")
     protected void updateDocCollection(Map<String, Object> output, CaseData generalAppCaseData, String fromGaList,
                         CaseData civilCaseData, String toCivilList) throws Exception {
-        Method gaGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(fromGaList));
-        List<Element<?>> gaDocs =
-                (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
-        Method civilGetter = ReflectionUtils.findMethod(CaseData.class, "get" + StringUtils.capitalize(toCivilList));
-        List<Element<?>> civilDocs =
-                (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
-                        .orElse(newArrayList());
-
+        Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                     "get" + StringUtils.capitalize(fromGaList));
+        List<Element> gaDocs =
+            (List<Element>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
+                                                        "get" + StringUtils.capitalize(toCivilList));
+        List<Element> civilDocs =
+            (List<Element>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+                .orElse(newArrayList());
         if (gaDocs != null) {
-            List<UUID> ids = civilDocs.stream().map(Element::getId).collect(Collectors.toList());
+            List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
                 }
             }
         }
-
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
 
