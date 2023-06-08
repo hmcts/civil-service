@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -546,6 +547,46 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+        }
+
+        @Test
+        void shouldPopulateDynamicLists() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing().build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            DynamicList hearingMethodValuesDisposalHearingDJ = getHearingMethodValuesDisposalHearingDJ(response);
+            DynamicList hearingMethodValuesTrialHearingDJ = getHearingMethodValuesTrialHearingDJ(response);
+
+            List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
+            assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
+        }
+
+        private DynamicList getHearingMethodValuesDisposalHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(responseCaseData);
+            return responseCaseData.getHearingMethodValuesDisposalHearingDJ();
+        }
+
+        private DynamicList getHearingMethodValuesTrialHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(responseCaseData);
+            return responseCaseData.getHearingMethodValuesTrialHearingDJ();
         }
     }
 
