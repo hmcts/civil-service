@@ -121,6 +121,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(V_1, MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(MID, "create-order"), this::createOrderScreen)
+            .put(callbackKey(V_1, MID, "create-order"), this::createOrderScreen)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
