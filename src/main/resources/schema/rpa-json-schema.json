@@ -337,7 +337,8 @@
         "breathingSpaceMentalHealthEntered",
         "breathingSpaceMentalHealthLifted",
         "interlocutoryJudgment",
-        "defaultJudgment"
+        "defaultJudgment",
+        "judgementByAdmission"
       ],
       "properties": {
         "miscellaneous": {
@@ -524,6 +525,18 @@
           "anyOf": [
             {
               "$ref": "#/definitions/defaultJudgmentEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "judgementByAdmission": {
+          "$id": "#/properties/events/properties/judgementByAdmission",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/judgementByAdmissionEventType"
             },
             {
               "$ref": "#/definitions/nullEventType"
@@ -1887,6 +1900,61 @@
               "string",
               "null"
             ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "judgementByAdmissionEventType": {
+      "$id": "#/definitions/judgementByAdmissionEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/judgementByAdmissionEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "240",
+            "description": "The CASEMAN code for the judgementByAdmission event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/judgementByAdmissionEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
