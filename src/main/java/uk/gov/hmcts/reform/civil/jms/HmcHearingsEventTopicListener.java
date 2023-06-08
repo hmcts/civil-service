@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.exception.cmmn.CaseException;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.exception.HmcTopicEventProcessingException;
@@ -16,6 +19,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 import static uk.gov.hmcts.reform.hmc.model.jms.HmcStatus.EXCEPTION;
 
 @Slf4j
@@ -32,19 +36,15 @@ public class HmcHearingsEventTopicListener {
         subscription = "${azure.service-bus.hmc-to-hearings-api.subscriptionName}",
         containerFactory = "hmcHearingsEventTopicContainerFactory")
     public void onMessage(Message message) throws JMSException, HmcTopicEventProcessingException {
-        TextMessage msg = null;
-
+        TextMessage msg;
         try {
             if (message instanceof TextMessage) {
                 msg = (TextMessage) message;
-                if (msg != null) {
-                    String convertedMessage = msg.getText();
-                    log.info("Message received {}", convertedMessage);
-                    HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
-                    if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                        log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering event for WA",
-                                 hmcMessage.getHearingId(), hmcMessage.getCaseId());
-                    }
+                String convertedMessage = msg.getText();
+                log.info("Message received {}", convertedMessage);
+                HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
+                if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                    triggerReviewHearingExceptionEvent(hmcMessage);
                 }
             } else {
                 log.info("Message of wrong type: " +
@@ -54,6 +54,27 @@ public class HmcHearingsEventTopicListener {
             throw  new HmcTopicEventProcessingException(String.format("Unable to successfully deliver HMC message: %s",
                                                                       ""), e);
         }
+    }
+
+    private void triggerReviewHearingExceptionEvent(HmcMessage hmcMessage) {
+        Long caseId = hmcMessage.getCaseId();
+        String hearingId = hmcMessage.getHearingId();
+        log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering event for WA",
+                 hearingId, caseId
+        );
+
+        // trigger event for WA
+        StartEventResponse startEventResponse =
+            coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
+        CaseDataContent caseDataContent = CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(startEventResponse.getCaseDetails().getData())
+            .build();
+        coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+        log.info(
+            "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
+            caseId, hearingId);
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
