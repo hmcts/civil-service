@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -115,6 +116,15 @@ public abstract class BaseIntegrationTest {
                 .header(HttpHeaders.AUTHORIZATION, auth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
+    }
+
+    @SneakyThrows
+    protected <T> ResultActions doFilePost(String auth, MockMultipartFile file, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.multipart(urlTemplate, uriVars)
+                .file(file)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE));
     }
 
     @SneakyThrows
