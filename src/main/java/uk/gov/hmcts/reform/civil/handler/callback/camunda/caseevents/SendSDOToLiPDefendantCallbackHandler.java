@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.lo
 @Service
 @RequiredArgsConstructor
 public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
+
     private static final List<CaseEvent> EVENTS = List.of(SEND_SDO_ORDER_TO_LiP_DEFENDANT);
     private static final String LETTER_TYPE = "SDO_ORDER";
     public static final String TASK_ID = "SendSDOToDefendantLip";
@@ -49,18 +50,17 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
 
-        if(systemGeneratedCaseDocuments.size() > 0 ) {
-            log.info("caseDoc size: {} ",systemGeneratedCaseDocuments.size());
+        if (systemGeneratedCaseDocuments.size() > 0) {
+            log.info("caseDoc size: {} ", systemGeneratedCaseDocuments.size());
             CaseDocument caseDocument = systemGeneratedCaseDocuments.stream()
-                .filter(systemGeneratedCaseDocument-> systemGeneratedCaseDocument.getValue().getDocumentType().equals(DocumentType.SDO_ORDER)).findAny().get().getValue();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue().getDocumentType().equals(DocumentType.SDO_ORDER)).findAny().get().getValue();
 
-            if(caseDocument != null) {
-                log.info("caseDoc name: {}",caseDocument.getDocumentName());
-                 byte[] letter = sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument);
-                 log.info("letter content : {}", letter);
-                 //print the pip letter
-                  bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-                                             caseData.getLegacyCaseReference(), LETTER_TYPE);
+            if (caseDocument != null) {
+                log.info("caseDoc name: {}", caseDocument.getDocumentName());
+                byte[] letter = sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument);
+                log.info("letter content : {}", letter);
+                //print the pip letter
+                bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(), caseData.getLegacyCaseReference(), LETTER_TYPE);
             }
         }
 
