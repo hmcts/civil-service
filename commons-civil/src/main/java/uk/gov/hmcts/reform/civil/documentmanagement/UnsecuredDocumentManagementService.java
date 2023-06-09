@@ -11,6 +11,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -30,6 +31,7 @@ import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Slf4j
 @Service("documentManagementService")
@@ -86,9 +88,56 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
                 .createdBy(CREATED_BY)
                 .build();
         } catch (Exception ex) {
+            throw new DocumentUploadException(originalFileName, ex);
+        }
+    }
+
+    @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
+    @Override
+    public CaseDocument uploadDocument(String authorisation, UploadedDocument uploadedDocument) {
+
+        String originalFileName = uploadedDocument.getFileBaseName();
+        log.info("Uploading file {}", originalFileName);
+
+        try {
+            MultipartFile file
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, MULTIPART_FORM_DATA_VALUE,
+                                            uploadedDocument.getFile().getBytes());
+
+            UserInfo userInfo = userService.getUserInfo(authorisation);
+            UploadResponse response = documentUploadClientApi.upload(
+                authorisation,
+                authTokenGenerator.generate(),
+                userInfo.getUid(),
+                documentManagementConfiguration.getUserRoles(),
+                Classification.RESTRICTED,
+                singletonList(file)
+            );
+
+            Document document = response.getEmbedded().getDocuments().stream()
+                .findFirst()
+                .orElseThrow(() -> new DocumentUploadException(originalFileName));
+
+            return CaseDocument.builder()
+                .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
+                                  .documentUrl(document.links.self.href)
+                                  .documentBinaryUrl(document.links.binary.href)
+                                  .documentFileName(originalFileName)
+                                  .build())
+                .documentName(originalFileName)
+                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
+                                                                 .toInstant()
+                                                                 .atZone(ZoneId.systemDefault())
+                                                                 .toLocalDateTime()))
+                .documentSize(document.size)
+                .createdBy(CREATED_BY)
+                .build();
+
+        } catch (Exception ex) {
             log.error("Failed uploading file {}", originalFileName, ex);
             throw new DocumentUploadException(originalFileName, ex);
         }
+
     }
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))

@@ -19,6 +19,7 @@ public class HearingFeeConfiguration {
     private final String hearingEvent;
     private final String fastTrackHrgKey;
     private final String multiClaimKey;
+    private final String smallClaimHrgKey;
 
     public HearingFeeConfiguration(@Value("${fees.api.url}") String url,
                                    @Value("${fees.api.endpoint}") String endpoint,
@@ -30,7 +31,8 @@ public class HearingFeeConfiguration {
                                    @Value("${fees.api.event}") String event,
                                    @Value("${fees.api.hearingEvent}") String hearingEvent,
                                    @Value("${fees.api.keywords.fastTrackHrg}") String fastTrackHrgKey,
-                                   @Value("${fees.api.keywords.multiTrackHrg}") String multiClaimKey) {
+                                   @Value("${fees.api.keywords.multiTrackHrg}") String multiClaimKey,
+                                   @Value("${fees.api.keywords.smallClaimHrg}") String smallClaimHrgKey) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
@@ -42,5 +44,6 @@ public class HearingFeeConfiguration {
         this.hearingEvent = hearingEvent;
         this.fastTrackHrgKey = fastTrackHrgKey;
         this.multiClaimKey = multiClaimKey;
+        this.smallClaimHrgKey = smallClaimHrgKey;
     }
 }
