@@ -4538,6 +4538,7 @@ class StateFlowEngineTest {
 
     @Nested
     class TakenOfflineSdoNotDrawn {
+
         @Test
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedSdoEnabled() {
             // Given
@@ -4571,6 +4572,7 @@ class StateFlowEngineTest {
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
         }
+
         @Test
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedSdoNotEnabled() {
             // Given
