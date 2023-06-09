@@ -368,10 +368,89 @@ public class FlowPredicate {
         getPredicateForPayImmediately(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
-
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
             && caseData.getTakenOfflineDate() != null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() != null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension = caseData ->
+        caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1ResponseDate() == null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() == null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+        };
+    }
+
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
 
