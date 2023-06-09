@@ -606,11 +606,13 @@ public class FlowPredicate {
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && (caseData.getRespondent1TimeExtensionDate() != null
-                    || caseData.getRespondent2TimeExtensionDate() != null);
+                    || caseData.getRespondent2TimeExtensionDate() != null)
+                    && caseData.getReasonNotSuitableSDO() == null;
             default:
                 return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
                     && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null;
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getReasonNotSuitableSDO() == null;
         }
     };
 
