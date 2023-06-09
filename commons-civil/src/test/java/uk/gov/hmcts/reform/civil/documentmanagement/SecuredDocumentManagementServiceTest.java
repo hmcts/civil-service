@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -122,6 +124,61 @@ class SecuredDocumentManagementServiceTest {
             when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
                 .thenReturn(uploadResponse);
 
+            DocumentUploadException documentManagementException = assertThrows(
+                DocumentUploadException.class,
+                () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
+            );
+
+            assertEquals(
+                "Unable to upload document 0000-failed-claim.pdf to document management.",
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
+
+        @Test
+        void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            //given
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document = new UploadedDocument("0000-claim.pdf", file);
+
+            uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.success.json"),
+                uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
+            );
+
+            //when
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+            //then
+            assertNotNull(caseDocument.getDocumentLink());
+            Assertions.assertEquals(
+                uploadResponse.getDocuments().get(0).links.self.href,
+                caseDocument.getDocumentLink().getDocumentUrl()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
+
+        @Test
+        void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            //given
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document = new UploadedDocument("0000-failed-claim.pdf", file);
+
+            UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.failure.json"),
+                UploadResponse.class
+            );
+
+            //when
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            //then
             DocumentUploadException documentManagementException = assertThrows(
                 DocumentUploadException.class,
                 () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
