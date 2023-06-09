@@ -174,12 +174,12 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                         CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
                                                      "get" + StringUtils.capitalize(fromGaList));
-        List<Element> gaDocs =
-            (List<Element>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        List<Element<?>> gaDocs =
+            (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
                                                         "get" + StringUtils.capitalize(toCivilList));
-        List<Element> civilDocs =
-            (List<Element>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+        List<Element<?>> civilDocs =
+            (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
         if (gaDocs != null) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
