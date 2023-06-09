@@ -38,6 +38,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
     private static final String civilDocRespondentSolTwoSuffix = "DocRespondentSolTwo";
+    private static final String draft_document_type = "gaDraft";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -181,13 +182,15 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         List<Element<?>> civilDocs =
             (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
-        if (gaDocs != null) {
+        if (gaDocs != null && !(fromGaList.contains(draft_document_type))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
                 }
             }
+        } else if (gaDocs != null && fromGaList.contains(draft_document_type)) {
+            civilDocs.addAll(gaDocs);
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
     }
