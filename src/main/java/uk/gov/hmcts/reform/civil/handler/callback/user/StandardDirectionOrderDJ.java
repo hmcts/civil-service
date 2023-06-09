@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -118,7 +119,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
+            .put(callbackKey(V_1, MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(MID, "create-order"), this::createOrderScreen)
+            .put(callbackKey(V_1, MID, "create-order"), this::createOrderScreen)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -203,21 +206,23 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
 
-        String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
-            ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
-        Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-            authToken, HEARING_CHANNEL, serviceId
-        );
-        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-            .getListItems()
-            .stream()
-            .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
-            .collect(Collectors.toList());
-        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+        if (V_1.equals(callbackParams.getVersion())) {
+            String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+            Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+                authToken, HEARING_CHANNEL, serviceId
+            );
+            DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+            List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+                .getListItems()
+                .stream()
+                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+                .collect(Collectors.toList());
+            hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
 
-        caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
-        caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
+            caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
+            caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
+        }
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
@@ -672,7 +677,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        CaseData caseData = mapHearingMethodFields(callbackParams.getCaseData());
+        CaseData caseData = V_1.equals(callbackParams.getVersion())
+            ? mapHearingMethodFields(callbackParams.getCaseData())
+            : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
