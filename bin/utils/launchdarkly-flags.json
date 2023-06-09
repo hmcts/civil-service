@@ -1,32 +1,6 @@
 {
   "segments": {},
   "flags": {
-    "multiparty": {
-      "key": "multiparty",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": true,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "cb64ab8d483e47999884b82d31a44362",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "general_applications_enabled": {
       "key": "general_applications_enabled",
       "on": false,

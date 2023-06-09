@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -23,6 +24,8 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -77,6 +80,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -7708,6 +7713,162 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
 
+        }
+
+    }
+
+    @Nested
+    class RejectPaymentPlan {
+
+        @Test
+        public void shouldGenerateRPA_PartAdmitRejectPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .addRespondent2(NO)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
+        }
+
+        @Test
+        public void shouldGenerateRPA_FullAdmitRejectPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .addRespondent2(NO)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
+        }
+    }
+
+    @Nested
+    class ClaimInMediation {
+        @Test
+        public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .responseClaimMediationSpecRequired(YES)
+                .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+                    ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
+                .addRespondent2(NO)
+                .build();
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediation() {
+            final String partyID = "002";
+            BigDecimal claimValue = BigDecimal.valueOf(1000);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .responseClaimMediationSpecRequired(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent1AcknowledgeNotificationDate(null)
+                .totalClaimAmount(claimValue)
+                .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+                    ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
+                .respondent1DQ(
+                Respondent1DQ.builder()
+                    .respondToCourtLocation(
+                        RequestedCourt.builder()
+                            .responseCourtLocations(preferredCourt)
+                            .reasonForHearingAtSpecificCourt("Reason")
+                            .build()
+                    )
+                    .build()
+            )
+                .build().toBuilder()
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(BigDecimal.valueOf(100000))
+                                    .build())
+                .build();
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(2)
+                .eventCode("49")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID(partyID)
+                .build();
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(3)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build(),
+                        Event.builder()
+                            .eventSequence(5)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(
+                                                  mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build()
+                );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
         }
 
     }
