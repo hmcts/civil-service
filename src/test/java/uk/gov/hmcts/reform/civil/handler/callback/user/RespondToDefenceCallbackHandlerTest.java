@@ -553,7 +553,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -571,7 +570,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")
@@ -593,7 +591,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_SUBMIT
             );
 
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")
@@ -605,7 +602,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
             var caseData = CaseDataBuilder.builder()
@@ -621,7 +617,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             when(featureToggleService.isHmcEnabled()).thenReturn(false);
 
             var objectMapper = new ObjectMapper();
