@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.DebtTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -45,7 +46,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import javax.validation.constraints.NotNull;
@@ -62,9 +62,9 @@ import java.util.List;
 public class SealedClaimLipResponseFormGeneratorTest {
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
-    @MockBean
     private DocumentGeneratorService documentGeneratorService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
 
@@ -83,7 +83,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void admitPayInstalments() throws JsonProcessingException {
+    public void admitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))
@@ -105,7 +105,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void admitPayByDate() throws JsonProcessingException {
+    public void admitPayByDate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -125,7 +125,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayImmediate() throws JsonProcessingException {
+    public void partAdmitPayImmediate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -144,7 +144,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayInstalments() throws JsonProcessingException {
+    public void partAdmitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))

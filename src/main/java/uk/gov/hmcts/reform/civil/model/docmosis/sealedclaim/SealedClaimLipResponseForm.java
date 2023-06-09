@@ -198,7 +198,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                             EventTemplateData.builder()
                                                 .date(event.getValue().getTimelineDate())
                                                 .explanation(event.getValue().getTimelineDescription())
-                                                .build()).collect(Collectors.toList()));
+                                                .build()).collect(Collectors.toList()))
+            .evidenceList(Optional.ofNullable(caseData.getSpecResponselistYourEvidenceList()).map(Collection::stream)
+                              .orElseGet(Stream::empty)
+                              .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
+                              .toList());
     }
 
     @JsonIgnore
