@@ -47,7 +47,6 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 addTemplate(caseData),
-                //notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         }
