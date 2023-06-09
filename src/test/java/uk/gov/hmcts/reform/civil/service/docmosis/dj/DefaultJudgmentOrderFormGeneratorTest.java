@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -79,7 +81,9 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
         when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -103,7 +107,9 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
         when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
                                                                eq(DJ_SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));

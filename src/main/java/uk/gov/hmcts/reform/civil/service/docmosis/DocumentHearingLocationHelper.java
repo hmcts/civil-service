@@ -59,17 +59,6 @@ public class DocumentHearingLocationHelper {
                     return sameLocation.get(0);
                 }
             }).orElse(null);
-        if (locationRefData == null) {
-            if (caseData.getCaseManagementLocation() == null) {
-                log.info("Case management location is empty for " + caseData.getLegacyCaseReference());
-            } else {
-                log.info("Case management location for " + caseData.getLegacyCaseReference()
-                             + " couldn't be found in court service");
-            }
-        } else {
-            log.info("Case location for " + caseData.getLegacyCaseReference()
-                         + " found in CaseManagementLocation, is " + locationRefData.getSiteName());
-        }
         return locationRefData;
     }
 

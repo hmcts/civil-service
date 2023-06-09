@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +64,41 @@ public class DocumentHearingLocationHelperTest {
                              authorisation,
                              caseData.getCaseManagementLocation().getBaseLocation()
                          )).thenReturn(Collections.singletonList(location1));
+        LocationRefData location = hearingLocationHelper.getHearingLocation(
+            fromForm,
+            caseData,
+            authorisation
+        );
+
+        Assertions.assertEquals(location, location1);
+    }
+
+    @Test
+    void whenSeveralLocations_thenDefaultToFirst() {
+        String fromForm = "label from form";
+        CaseData caseData = CaseData.builder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("base location")
+                                        .region("region")
+                                        .build())
+            .build();
+        String authorisation = "authorisation";
+
+        LocationRefData location1 = LocationRefData.builder()
+            .regionId(caseData.getCaseManagementLocation().getRegion())
+            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
+            .build();
+        Mockito.when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
+            .thenReturn(Optional.empty());
+        Mockito.when(locationRefDataService
+                         .getCourtLocationsByEpimmsIdAndCourtType(
+                             authorisation,
+                             caseData.getCaseManagementLocation().getBaseLocation()
+                         )).thenReturn(List.of(location1,
+                                               LocationRefData.builder()
+                                                   .regionId("region 2")
+                                                   .epimmsId("location 2")
+                                                   .build()));
         LocationRefData location = hearingLocationHelper.getHearingLocation(
             fromForm,
             caseData,
