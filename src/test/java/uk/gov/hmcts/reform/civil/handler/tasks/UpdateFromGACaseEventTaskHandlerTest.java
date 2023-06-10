@@ -586,11 +586,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void checkIfDocumentExists() {
-        Element same = Element.builder().id(UUID.randomUUID())
-                .value(CaseDocument.builder().build()).build();
-        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        Element<CaseDocument> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
+            .value(CaseDocument.builder().build()).build();
+        List<Element<CaseDocument>> civilCaseDocumentList = new ArrayList<>();
         civilCaseDocumentList.add(same);
-        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<CaseDocument>> gaDocumentList = new ArrayList<>();
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
         gaDocumentList.add(same);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);

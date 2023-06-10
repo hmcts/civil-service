@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,12 +22,11 @@ import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
+import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
@@ -38,7 +38,6 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
     private static final String civilDocRespondentSolTwoSuffix = "DocRespondentSolTwo";
-    private static final String draft_document_type = "gaDraft";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -106,11 +105,11 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    protected int checkIfDocumentExists(List<Element<?>> civilCaseDocumentList,
-                                      List<Element<?>> gaCaseDocumentlist) {
+    protected int checkIfDocumentExists(List<Element<CaseDocument>> civilCaseDocumentList,
+                                      List<Element<CaseDocument>> gaCaseDocumentlist) {
         return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
-              .parallelStream().anyMatch(gaDocument -> gaDocument.getId().equals(civilDocument.getId())))
-            .collect(Collectors.toList()).size();
+              .parallelStream().anyMatch(gaDocument -> gaDocument.getId()
+                    .equals(civilDocument.getId()))).toList().size();
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
@@ -175,21 +174,21 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                         CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
                                                      "get" + StringUtils.capitalize(fromGaList));
-        List<Element<?>> gaDocs =
-            (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        List<Element<CaseDocument>> gaDocs =
+            (List<Element<CaseDocument>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
                                                         "get" + StringUtils.capitalize(toCivilList));
-        List<Element<?>> civilDocs =
-            (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+        List<Element<CaseDocument>> civilDocs =
+            (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
-        if (gaDocs != null && !(fromGaList.contains(draft_document_type))) {
+        if (gaDocs != null && !(fromGaList.contains("gaDraft"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
-            for (Element gaDoc : gaDocs) {
+            for (Element<CaseDocument> gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && fromGaList.contains(draft_document_type)) {
+        } else if (gaDocs != null && fromGaList.contains("gaDraft") && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
             civilDocs.addAll(gaDocs);
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
@@ -197,7 +196,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
     protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
-        if (Objects.isNull(gaAppDetails)) {
+        if (isNull(gaAppDetails)) {
             return false;
         }
         return gaAppDetails.stream()
@@ -212,7 +211,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         } else {
             gaAppDetails = civilCaseData.getRespondentSolGaAppDetails();
         }
-        if (Objects.isNull(gaAppDetails)) {
+        if (isNull(gaAppDetails)) {
             return false;
         }
         return gaAppDetails.stream()
