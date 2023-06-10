@@ -955,7 +955,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
                 .isEqualTo("This claim will be listed for final disposal before a judge on the first available date "
                                + "after");
-            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateFrom")
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
             assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
                 .isEqualTo(String.format("This order has been made without hearing. "

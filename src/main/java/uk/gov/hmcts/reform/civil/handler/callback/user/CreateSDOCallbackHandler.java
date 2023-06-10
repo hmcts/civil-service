@@ -262,7 +262,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             DisposalHearingHearingTime.builder()
                 .input(
                     "This claim will be listed for final disposal before a judge on the first available date after")
-                .dateFrom(LocalDate.now().plusWeeks(16))
+                .dateTo(LocalDate.now().plusWeeks(16))
                 .build();
 
         updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
@@ -558,8 +558,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
             .input2(HEARING_TIME_TEXT_AFTER)
-            .dateFrom(LocalDate.now().plusWeeks(22))
-            .dateTo(LocalDate.now().plusWeeks(30))
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
