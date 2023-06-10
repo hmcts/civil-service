@@ -38,6 +38,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
     private static final String civilDocRespondentSolTwoSuffix = "DocRespondentSolTwo";
+    private static final String gaDraft = "gaDraft";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -97,7 +98,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepSequential");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepConcurrent");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "consentOrder");
-            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaDraft");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, gaDraft);
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -181,14 +182,14 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         List<Element<CaseDocument>> civilDocs =
             (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
-        if (gaDocs != null && !(fromGaList.contains("gaDraft"))) {
+        if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<CaseDocument> gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && fromGaList.contains("gaDraft") && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+        } else if (gaDocs != null && gaDocs.size()==1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
             civilDocs.addAll(gaDocs);
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
