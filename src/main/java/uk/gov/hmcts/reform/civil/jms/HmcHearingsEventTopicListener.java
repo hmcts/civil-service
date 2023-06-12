@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.hmc.model.jms.HmcMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
+
+import java.nio.charset.StandardCharsets;
 
 import static uk.gov.hmcts.reform.hmc.model.jms.HmcStatus.EXCEPTION;
 
@@ -33,10 +36,23 @@ public class HmcHearingsEventTopicListener {
     public void onMessage(Message message) throws JMSException, HmcTopicEventProcessingException {
         log.info("message received");
         TextMessage msg;
+        JmsBytesMessage jmsMessage;
         try {
             if (message instanceof TextMessage) {
                 msg = (TextMessage) message;
                 String convertedMessage = msg.getText();
+                log.info("Message received {}", convertedMessage);
+                HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
+                if (isMessageRelevantForService(hmcMessage)) {
+                    if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                        triggerReviewHearingExceptionEvent(hmcMessage);
+                    }
+                }
+            } else if (message instanceof JmsBytesMessage) {
+                jmsMessage = (JmsBytesMessage) message;
+                byte[] messageBytes = new byte[(int) jmsMessage.getBodyLength()];
+                jmsMessage.readBytes(messageBytes);
+                String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
                 log.info("Message received {}", convertedMessage);
                 HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
                 if (isMessageRelevantForService(hmcMessage)) {

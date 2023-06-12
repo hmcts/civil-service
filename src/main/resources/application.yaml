@@ -45,10 +45,6 @@ spring:
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
-logging:
-  level:
-    ROOT: TRACE
-
 cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
