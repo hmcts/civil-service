@@ -91,7 +91,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
 
     private String addTemplate(CaseData caseData, CallbackParams callbackParams) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (caseData.isPartAdmitPayImmediatelyAccepted()){
+            if (caseData.isPartAdmitPayImmediatelyAccepted()) {
                 return notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec();
             } else {
                 return isCcNotification(callbackParams)
@@ -112,7 +112,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
-        if (caseData.isPartAdmitPayImmediatelyAccepted()){
+        if (caseData.isPartAdmitPayImmediatelyAccepted()) {
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
