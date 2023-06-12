@@ -18,9 +18,6 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
-    TRANSFERRED(
-        Claim::isSentToCourt
-    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
 
     REQUESTED_CCJ_BY_REDETERMINATION(
@@ -52,9 +49,6 @@ public enum DashboardClaimStatus {
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
-    ),
-    DEFENDANT_PART_ADMIT(
-        Claim::defendantRespondedWithPartAdmit
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -92,23 +86,29 @@ public enum DashboardClaimStatus {
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
-    CLAIM_ENDED(
-        Claim::isClaimEnded
-    ),
-    CLAIM_SENT_TO_CLAIMANT(
-        Claim::claimSentToClaimant
-    ),
-    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
-        Claim::claimantAcceptOffer
-    ),
-    CLAIMANT_REJECT_PARTIAL_ADMISSION(
-        Claim::isPartialAdmissionRejected
+    SETTLED(
+        Claim::isSettled
     ),
     CLAIMANT_REJECT_OFFER(
         Claim::claimantRejectOffer
     ),
-    SETTLED(
-        Claim::isSettled
+    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
+        Claim::claimantAcceptOffer
+    ),
+    CLAIM_SENT_TO_CLAIMANT(
+        Claim::claimSentToClaimant
+    ),
+    CLAIMANT_REJECT_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionRejected
+    ),
+    TRANSFERRED(
+        Claim::isSentToCourt
+    ),
+    CLAIM_ENDED(
+        Claim::isClaimEnded
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
     ),
     NO_STATUS(c -> false);
 
