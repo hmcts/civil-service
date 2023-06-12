@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -180,7 +181,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .orElse(caseData.getRespondToClaim());
             builder.whyReject("ALREADY_PAID")
-                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
+                .howMuchWasPaid(MonetaryConversions.poundsToPennies(respondToClaim.getHowMuchWasPaid()) + "")
                 .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
                 .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
                                 ? respondToClaim.getHowWasThisAmountPaidOther()
