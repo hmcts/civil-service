@@ -311,4 +311,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyRespondentLiPMediationSuccessfulTemplate;
 
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplateWelsh;
+
 }
