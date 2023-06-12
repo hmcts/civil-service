@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
@@ -303,7 +304,7 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isMoreDetailsRequired() {
-        return sdoBeenDrawn() && beforeHearing();
+        return false;
     }
 
     @Override
@@ -328,26 +329,37 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimEnded() {
-        return false;
+        return response.isFullDefence()
+            || claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 
     @Override
     public boolean claimSentToClaimant() {
-        return false;
+        return response.isFullDefence()
+            || isSentToCourt()
+            || Objects.isNull(claimantResponse);
     }
 
     @Override
     public boolean claimantAcceptOffer() {
-        return false;
+        return response.isFullDefence()
+            || isSentToCourt()
+            || !Objects.isNull(claimantResponse)
+            || claimantResponse.getType().equals(ClaimantResponseType.ACCEPTATION);
     }
 
     @Override
     public boolean claimantRejectOffer() {
-        return false;
+        return response.isFullDefence()
+            || isSentToCourt()
+            || !Objects.isNull(claimantResponse)
+            || claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return false;
+        return response.isPartAdmit()
+            || !Objects.isNull(claimantResponse)
+            || claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 }
