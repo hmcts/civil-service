@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -166,7 +167,10 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoBeenDrawn() {
-        return !Objects.isNull(caseData.getOrderSDODocumentDJ());
+        return caseData.getSystemGeneratedCaseDocuments().stream()
+            .anyMatch(systemGeneratedCaseDocument -> systemGeneratedCaseDocument
+                .getValue()
+                .getDocumentType().equals(DocumentType.SDO_ORDER));
     }
 
     @Override
