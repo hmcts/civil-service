@@ -349,7 +349,6 @@ public class CmcClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
 
-
     private CmcClaim getFullAdmitClaim(PaymentOption paymentOption) {
         return CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
@@ -361,9 +360,5 @@ public class CmcClaimStatusDashboardFactoryTest {
                           .build())
             .build();
     }
-
-
-
-
 
 }
