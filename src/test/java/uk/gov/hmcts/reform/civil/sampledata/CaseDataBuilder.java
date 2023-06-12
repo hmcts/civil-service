@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -438,6 +439,7 @@ public class CaseDataBuilder {
     private YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
+    private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5440,6 +5442,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder showResponseOneVOneFlag(ResponseOneVOneShowTag showResponseOneVOneFlag) {
+        this.showResponseOneVOneFlag = showResponseOneVOneFlag;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5700,6 +5707,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartEmploymentTypeRequired(defenceAdmitPartEmploymentTypeRequired)
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
+            .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .build();
     }
 }
