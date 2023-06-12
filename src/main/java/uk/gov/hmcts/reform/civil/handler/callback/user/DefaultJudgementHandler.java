@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -210,21 +210,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
             LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
-        List<String> listData = new ArrayList<>();
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
-        if (nonNull(caseData.getRespondent2())) {
-            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
-            listData.add("Both Defendants");
-            caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
-        }
-        caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
+        List<String> defendants = DefaultJudgmentUtils.getDefendants(caseData);
+        caseDataBuilder.defendantDetails(DynamicList.fromList(defendants));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

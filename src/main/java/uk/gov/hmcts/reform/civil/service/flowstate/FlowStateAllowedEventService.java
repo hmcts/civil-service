@@ -374,6 +374,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                DEFAULT_JUDGEMENT,
+                DEFAULT_JUDGEMENT_SPEC,
                 NotSuitable_SDO,
                 migrateCase
             )
@@ -397,6 +399,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                DEFAULT_JUDGEMENT,
+                DEFAULT_JUDGEMENT_SPEC,
                 NotSuitable_SDO,
                 migrateCase
             )
@@ -1105,6 +1109,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                DEFAULT_JUDGEMENT,
+                DEFAULT_JUDGEMENT_SPEC,
                 NotSuitable_SDO,
                 migrateCase
             )

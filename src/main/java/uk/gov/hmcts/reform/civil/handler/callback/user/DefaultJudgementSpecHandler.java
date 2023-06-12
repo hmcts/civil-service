@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -47,7 +48,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -133,9 +133,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (featureToggleService.isPinInPostEnabled() && caseData.isRespondentResponseBilingual()) {
             errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
@@ -155,16 +153,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.remove(BREATHING_SPACE);
         }
 
-        List<String> listData = new ArrayList<>();
-
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
-        if (nonNull(caseData.getRespondent2())) {
-            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
-            listData.add("Both Defendants");
-            caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
-        }
-
-        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
+        List<String> defendants = DefaultJudgmentUtils.getDefendants(caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(defendants));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.size() == 0

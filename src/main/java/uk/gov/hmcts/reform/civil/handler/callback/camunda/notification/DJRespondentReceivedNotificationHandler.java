@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
@@ -138,7 +139,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
             "Both")))) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                isNull(caseData.getRespondent2ResponseDate()) && caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.NO)
+                    ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondentSolicitor1EmailAddress(),
                 emailTemplate.template,
                 addProperties2(caseData),
                 String.format(emailTemplate.templateReference, caseData.getLegacyCaseReference())
