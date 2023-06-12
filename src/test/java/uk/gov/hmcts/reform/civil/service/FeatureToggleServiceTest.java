@@ -62,15 +62,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
-        var courtLocationDynamicListKey = "court-location-dynamic-list";
-        givenToggle(courtLocationDynamicListKey, toggleStat);
-
-        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "case-flags";
         givenToggle(caseFlagsKey, toggleStat);
@@ -94,15 +85,6 @@ class FeatureToggleServiceTest {
         givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
-        var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, toggleStat);
-
-        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

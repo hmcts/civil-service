@@ -15,12 +15,15 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 
 @Service
 @Slf4j
@@ -37,17 +40,24 @@ public class DashboardClaimInfoService {
     }
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
+        log.info("-----------getClaimsForDefendant() started-------------");
+        log.info("-----------calling ocmc getClaimsForDefendant()-------------");
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
+        log.info("-----------ocmcClaims received-------------size " + ocmcClaims.size());
+        log.info("-----------calling ccd getCases-------------");
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-        return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).collect(Collectors.toList());
+        log.info("-----------ccdCases received-------------size " + ccdCases.size());
+        return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
+            .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
+            .collect(Collectors.toList());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
+        SearchResult claims;
         Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
-        SearchResult claims = coreCaseDataService.searchCases(query, authorisation);
-        if (claims.getTotal() == 0) {
-            return Collections.emptyList();
-        }
+        claims = coreCaseDataService.searchCases(query, authorisation);
+        log.info("-----------ccdCases received-------------total " + claims.getTotal());
+        log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
         return translateSearchResultToDashboardItems(claims);
     }
 
@@ -58,12 +68,12 @@ public class DashboardClaimInfoService {
 
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
         DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
+            .createdDate(submittedDateToCreatedDate(caseData))
             .claimNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendantName(caseData.getRespondent1().getPartyName())
-            .claimAmount(caseData.getTotalClaimAmount())
+            .claimantName(nonNull(caseData.getApplicant1()) ? caseData.getApplicant1().getPartyName() : null)
+            .defendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
+            .claimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
             .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData)))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
@@ -73,5 +83,14 @@ public class DashboardClaimInfoService {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
         return item;
+    }
+
+    private LocalDateTime submittedDateToCreatedDate(CaseData caseData) {
+        LocalDateTime createdDate = LocalDateTime.now();
+        if (!Objects.isNull(caseData.getSubmittedDate())) {
+            createdDate = caseData.getSubmittedDate();
+        }
+
+        return createdDate;
     }
 }
