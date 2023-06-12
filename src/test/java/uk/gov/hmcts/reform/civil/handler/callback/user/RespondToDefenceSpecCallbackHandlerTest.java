@@ -123,6 +123,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
     LocationHelper.class,
+    LocationRefDataService.class,
     JudgementService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -180,35 +181,12 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateInitialDataV1() {
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                CaseData.builder()
-                    .respondent1(Party.builder()
-                                     .type(Party.Type.COMPANY)
-                                     .companyName("company name")
-                                     .build())
-                    .build(),
-                ABOUT_TO_START
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("respondent1Copy")
-                .isNotNull();
-            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
-                .isNotNull();
-        }
-
-        // TODO my test
-        @Test
         void shouldPopulateCourtLocations() {
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             when(courtLocationUtils.getLocationsFromList(any()))
                 .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -705,9 +683,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = FlowState.Main.class,
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV2(FlowState.Main flowState) {
             var params = callbackParamsOf(
-                CallbackVersion.V_1,
+                CallbackVersion.V_2,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -747,7 +725,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -864,10 +841,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class HandleCourtLocation {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-            }
 
             @Test
             void shouldHandleCourtLocationData() {
@@ -879,6 +852,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
@@ -886,7 +860,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build()).build())
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                 assertThat(response.getData())
@@ -1546,6 +1520,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetVulnerability_whenGivenConditionMeets() {
+            given(respondentMediationService.setMediationRequired(any())).willReturn(DefendantResponseShowTag.VULNERABILITY);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSpec1v1ClaimSubmitted()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)

@@ -231,41 +231,15 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
 }
 
-task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-spec'
+task runProdApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
-task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
+task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-sdo'
-}
-
-task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-unspec'
-}
-
-task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-dj'
-}
-
-task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-cos'
-}
-
-task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-noc'
-}
-
-task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:rpa'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
@@ -273,10 +247,6 @@ task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nig
     return System.env.NIGHTLY_RUN == 'true'
   }
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nightly-prod'
-}
-
-task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:AATFunctional'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
@@ -296,7 +266,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
+    runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -335,8 +305,8 @@ jacocoTestReport.dependsOn {
 }
 
 def versions = [
-  junit              : '5.7.0',
-  junitPlatform      : '1.8.1',
+  junit              : '5.9.3',
+  junitPlatform      : '1.9.3',
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.2.0',
@@ -439,6 +409,7 @@ dependencies {
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
@@ -466,8 +437,8 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.9.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.9.3')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath

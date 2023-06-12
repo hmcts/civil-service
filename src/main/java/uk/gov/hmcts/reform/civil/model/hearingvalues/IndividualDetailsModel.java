@@ -24,7 +24,7 @@ public class IndividualDetailsModel {
     private String interpreterLanguage;
     private List<String> reasonableAdjustments;
     private boolean vulnerableFlag;
-    private List<String> vulnerabilityDetails;
+    private String vulnerabilityDetails;
     private List<String> hearingChannelEmail;
     private List<String> hearingChannelPhone;
     private List<RelatedPartiesModel> relatedParties;

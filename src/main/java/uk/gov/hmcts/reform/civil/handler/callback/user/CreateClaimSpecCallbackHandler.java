@@ -76,7 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -415,14 +415,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (toggleService.isCourtLocationDynamicListEnabled()) {
-            dataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
-        }
+        dataBuilder
+            .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1())
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
-
-        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         //assign case management category to the case and caseNameHMCTSinternal
         dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -531,7 +529,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             if (!featureToggleService.isPbaV3Enabled()) {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
             } else {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
             }
         }
 

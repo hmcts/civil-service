@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -792,10 +791,10 @@ public class HearingsPartyMapperTest {
             .interpreterLanguage(null)
             .reasonableAdjustments(emptyList())
             .vulnerableFlag(false)
-            .vulnerabilityDetails(emptyList())
+            .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(null)
             .build();
 
@@ -838,6 +837,6 @@ public class HearingsPartyMapperTest {
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
                                                                    String partyRole,
                                                                    String cftOrganisationID) {
-        return buildExpectedOrganisationPartyObject(null, name, partyRole, cftOrganisationID);
+        return buildExpectedOrganisationPartyObject(cftOrganisationID, name, partyRole, cftOrganisationID);
     }
 }
