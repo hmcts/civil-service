@@ -61,12 +61,8 @@ public class HearingsJmsConfig {
 
     @Bean
     public ConnectionFactory hmcHearingJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
-        log.info("Namespace {}", namespace);
-        log.info("connectionpostfix {}", connectionPostfix);
-        log.info("username {}", username);
-        log.info("password {}", password);
-        log.info("topicName {}", topicName);
-        log.info("subscriptionName {}", subscriptionName);
+        log.info("idleTimeout {}", idleTimeout);
+        log.info("receiveTimeout {}", receiveTimeout);
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
