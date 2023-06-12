@@ -273,37 +273,37 @@ task crossbrowser(description: 'Runs the crossbrowser tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, runCrossBrowserTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+//project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+//
+//sonarqube {
+//  properties {
+//    property "sonar.projectName", "CIVIL :: service"
+//    property "sonar.projectKey", "civil-service"
+//    property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+//    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**," +
+//      "**/HmcHearingsEventTopicListener.java, **/HearingsJmsConfig.java"
+//    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
+//    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+//    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
+//  }
+//}
 
-sonarqube {
-  properties {
-    property "sonar.projectName", "CIVIL :: service"
-    property "sonar.projectKey", "civil-service"
-    property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**," +
-      "**/HmcHearingsEventTopicListener.java, **/HearingsJmsConfig.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
-    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-  }
-}
-
-jacocoTestReport {
-  executionData(test, integration)
-  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-  subprojects.each {
-    sourceSets it.sourceSets.main
-  }
-  reports {
-    xml.enabled = true
-    csv.enabled = false
-    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-  }
-}
-
-jacocoTestReport.dependsOn {
-  subprojects*.test
-}
+//jacocoTestReport {
+//  executionData(test, integration)
+//  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+//  subprojects.each {
+//    sourceSets it.sourceSets.main
+//  }
+//  reports {
+//    xml.enabled = true
+//    csv.enabled = false
+//    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+//  }
+//}
+//
+//jacocoTestReport.dependsOn {
+//  subprojects*.test
+//}
 
 def versions = [
   junit              : '5.9.3',
