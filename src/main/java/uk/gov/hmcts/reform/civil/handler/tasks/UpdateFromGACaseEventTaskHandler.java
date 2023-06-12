@@ -189,7 +189,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (gaDocs != null && gaDocs.size()==1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
+        } else if (gaDocs != null && gaDocs.size() == 1 && checkIfDocumentExists(civilDocs, gaDocs) < 1) {
             civilDocs.addAll(gaDocs);
         }
         output.put(toCivilList, civilDocs.isEmpty() ? null : civilDocs);
