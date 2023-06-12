@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfText;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmidietelyConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.ProposePaymentPlanConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithMediationConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.RejectWithoutMediationConfText;
@@ -43,7 +43,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         Class<? extends RespondToResponseConfirmationTextGenerator>>>
         getCasesToExpectedImplementation() {
         return List.of(
-            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmidietelyConfText.class),
+            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), PayImmediatelyConfText.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfText.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfText.class),

@@ -11,12 +11,12 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 @Component
-public class PayImmidietelyHeader implements RespondToResponseConfirmationHeaderGenerator {
+public class PayImmediatelyHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         String claimNumber = caseData.getLegacyCaseReference();
-        if (!isdefendatFullAdmitPayImmidietely(caseData)) {
+        if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
         return Optional.of(format(
@@ -25,7 +25,7 @@ public class PayImmidietelyHeader implements RespondToResponseConfirmationHeader
         ));
     }
 
-    private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
+    private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));

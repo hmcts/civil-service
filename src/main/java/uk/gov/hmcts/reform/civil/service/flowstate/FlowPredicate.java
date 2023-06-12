@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
@@ -32,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 
 public class FlowPredicate {
 
@@ -366,8 +365,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
 
-    public static final Predicate<CaseData> fullAdmitPayImmidiately = caseData ->
-        getPredicateForPayImmidiately(caseData);
+    public static final Predicate<CaseData> fullAdmitPayImmediately = caseData ->
+        getPredicateForPayImmediately(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
 
@@ -768,7 +767,7 @@ public class FlowPredicate {
         return predicate;
     }
 
-    private static boolean getPredicateForPayImmidiately(CaseData caseData) {
+    private static boolean getPredicateForPayImmediately(CaseData caseData) {
         boolean predicate = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (getMultiPartyScenario(caseData) == ONE_V_ONE) {
@@ -833,7 +832,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
         caseData.getRespondent1PinToPostLRspec() != null;
 
-    public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+    public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
         boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
@@ -847,12 +846,7 @@ public class FlowPredicate {
                 .filter(YesOrNo.NO::equals).isPresent()
                 || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
-                .filter(MediationDecision.No::equals).isPresent()) {
+                .filter(YesOrNo.NO::equals).isPresent() || caseData.hasClaimantAgreedToFreeMediation()) {
                 result = false;
             } else {
                 result = true;
@@ -864,17 +858,17 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.hasApplicantAcceptedRepaymentPlan();
+    public static final Predicate<CaseData> acceptRepaymentPlan =
+        CaseData::hasApplicantAcceptedRepaymentPlan;
 
-    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.hasApplicantRejectedRepaymentPlan();
+    public static final Predicate<CaseData> rejectRepaymentPlan =
+        CaseData::hasApplicantRejectedRepaymentPlan;
 
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
-        caseData.isRespondentResponseBilingual();
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
+        CaseDataParent::isRespondentResponseBilingual;
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
-        caseData.isPartAdmitClaimSettled();
+    public static final Predicate<CaseData> agreePartAdmitSettle =
+        CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
         CaseData::isClaimantNotSettlePartAdmitClaim;
@@ -882,4 +876,10 @@ public class FlowPredicate {
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
+
+    public static final Predicate<CaseData> isInHearingReadiness = caseData ->
+        caseData.getHearingReferenceNumber() != null
+        && caseData.getListingOrRelisting() != null
+        && caseData.getListingOrRelisting().equals(LISTING);
+
 }

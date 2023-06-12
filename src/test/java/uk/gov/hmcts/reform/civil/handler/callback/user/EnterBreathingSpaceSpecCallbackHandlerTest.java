@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+
 public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -143,5 +146,23 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         SubmittedCallbackResponse response =
             (SubmittedCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));
+    }
+
+    @Test
+    void testAboutToSubmitCallback() {
+        CaseData caseData = CaseData.builder().build();
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .build();
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+        Assertions.assertTrue(response.getData().containsKey("businessProcess"));
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(callbackHandler.handledEvents()).containsOnly(ENTER_BREATHING_SPACE_SPEC);
     }
 }

@@ -109,6 +109,9 @@ public class NotificationsProperties {
     private String claimantSolicitorDefendantResponseForSpec;
 
     @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpec;
+
+    @NotEmpty
     private String respondentSolicitorDefendantResponseForSpec;
 
     @NotEmpty
@@ -119,6 +122,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrderedSpec;
+
+    @NotEmpty
+    private String sdoOrderedSpecBilingual;
 
     @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
@@ -207,6 +213,9 @@ public class NotificationsProperties {
     private String respondentLipResponseSubmissionTemplate;
 
     @NotEmpty
+    private String respondentLipResponseSubmissionBilingualTemplate;
+
+    @NotEmpty
     private String hearingListedFeeClaimantLrTemplate;
 
     @NotEmpty
@@ -231,6 +240,9 @@ public class NotificationsProperties {
     private String respondentCcjNotificationTemplate;
 
     @NotEmpty
+    private String respondentCcjNotificationWelshTemplate;
+
+    @NotEmpty
     private String respondentSolicitorCcjNotificationTemplate;
 
     @NotEmpty
@@ -246,6 +258,9 @@ public class NotificationsProperties {
     private String notifyRespondentLiPMediationAgreementTemplate;
 
     @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplateWelsh;
+
+    @NotEmpty
     private String notifyRespondentLRMediationAgreementTemplate;
 
     @NotEmpty
@@ -253,8 +268,44 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String generateOrderNotificationTemplate;
-  
+
     @NotEmpty
     private String respondentLipPartAdmitSettleClaimTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLipWelshTemplate;
+
+    @NotEmpty
+    private String mediationUnsuccessfulClaimantLRTemplate;
+
+    @NotEmpty
+    private String mediationUnsuccessfulDefendantLIPTemplate;
+
+    @NotEmpty
+    private String respondent1DefaultJudgmentRequestedTemplate;
+
+    @NotEmpty
+    private String respondentLipPartAdmitSettleClaimBilingualTemplate;
+
+    @NotEmpty
+    private String notifyClaimantTranslatedDocumentUploaded;
+
+    @NotEmpty
+    private String notifyDefendantTranslatedDocumentUploaded;
+
+    @NotEmpty
+    private String respondent1LipClaimUpdatedTemplate;
+
+    @NotEmpty
+    private String hearingFeeUnpaidNoc;
+
+    @NotEmpty
+    private String notifyApplicantLRMediationSuccessfulTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplateWelsh;
 
 }
