@@ -109,8 +109,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     protected int checkIfDocumentExists(List<Element<CaseDocument>> civilCaseDocumentList,
                                       List<Element<CaseDocument>> gaCaseDocumentlist) {
         return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
-              .parallelStream().anyMatch(gaDocument -> gaDocument.getId()
-                    .equals(civilDocument.getId()))).toList().size();
+              .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentLink()
+                    .equals(civilDocument.getValue().getDocumentLink()))).toList().size();
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
