@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.LipDefenceFormParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
@@ -192,6 +193,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .timelineComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getTimeLineComment).orElse(""))
             .timelineEventList(Optional.ofNullable(caseData.getSpecResponseTimelineOfEvents()).map(Collection::stream)
                                    .orElseGet(Stream::empty)
                                    .map(event ->
@@ -199,6 +201,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                                 .date(event.getValue().getTimelineDate())
                                                 .explanation(event.getValue().getTimelineDescription())
                                                 .build()).collect(Collectors.toList()))
+            .evidenceComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getEvidenceComment).orElse(""))
             .evidenceList(Optional.ofNullable(caseData.getSpecResponselistYourEvidenceList()).map(Collection::stream)
                               .orElseGet(Stream::empty)
                               .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))

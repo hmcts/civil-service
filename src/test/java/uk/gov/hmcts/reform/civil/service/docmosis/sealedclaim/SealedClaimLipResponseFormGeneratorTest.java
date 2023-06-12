@@ -69,7 +69,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     private SealedClaimLipResponseFormGenerator generator;
 
     @Test
-    public void admitPayImmediate() throws JsonProcessingException {
+    public void admitPayImmediate() {
         CaseData caseData = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
