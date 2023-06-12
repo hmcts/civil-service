@@ -31,13 +31,13 @@ jar {
   enabled = true
 }
 
-//tasks.withType(Test) {
-//  useJUnitPlatform()
-//
-//  testLogging {
-//    exceptionFormat = 'full'
-//  }
-//}
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'

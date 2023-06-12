@@ -6,6 +6,7 @@ plugins {
   id 'org.springframework.boot' version '2.5.14'
   id 'org.owasp.dependencycheck' version '8.1.2'
   id 'com.github.ben-manes.versions' version '0.46.0'
+  id 'org.sonarqube' version '3.4.0.2513'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
   id "org.flywaydb.flyway" version "9.0.1"
@@ -182,13 +183,13 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
-//tasks.withType(Test) {
-//  useJUnitPlatform()
-//
-//  testLogging {
-//    exceptionFormat = 'full'
-//  }
-//}
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
 test {
   failFast = true
@@ -272,37 +273,37 @@ task crossbrowser(description: 'Runs the crossbrowser tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, runCrossBrowserTests))
 }
 
-//project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
-//
-//sonarqube {
-//  properties {
-//    property "sonar.projectName", "CIVIL :: service"
-//    property "sonar.projectKey", "civil-service"
-//    property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-//    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**," +
-//      "**/HmcHearingsEventTopicListener.java, **/HearingsJmsConfig.java"
-//    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
-//    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
-//    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
-//  }
-//}
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 
-//jacocoTestReport {
-//  executionData(test, integration)
-//  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-//  subprojects.each {
-//    sourceSets it.sourceSets.main
-//  }
-//  reports {
-//    xml.enabled = true
-//    csv.enabled = false
-//    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-//  }
-//}
-//
-//jacocoTestReport.dependsOn {
-//  subprojects*.test
-//}
+sonarqube {
+  properties {
+    property "sonar.projectName", "CIVIL :: service"
+    property "sonar.projectKey", "civil-service"
+    property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**," +
+      "**/HmcHearingsEventTopicListener.java, **/HearingsJmsConfig.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+    property "sonar.host.url", "https://sonar.reform.hmcts.net/"
+  }
+}
+
+jacocoTestReport {
+  executionData(test, integration)
+  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+  subprojects.each {
+    sourceSets it.sourceSets.main
+  }
+  reports {
+    xml.enabled = true
+    csv.enabled = false
+    xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+  }
+}
+
+jacocoTestReport.dependsOn {
+  subprojects*.test
+}
 
 def versions = [
   junit              : '5.9.3',
