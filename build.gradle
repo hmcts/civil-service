@@ -288,6 +288,8 @@ task crossbrowser(description: 'Runs the crossbrowser tests.') {
 //  }
 //}
 
+sonarqube {}
+
 //jacocoTestReport {
 //  executionData(test, integration)
 //  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
