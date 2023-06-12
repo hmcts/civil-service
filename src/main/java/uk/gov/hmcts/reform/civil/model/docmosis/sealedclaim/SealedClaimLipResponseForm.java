@@ -181,7 +181,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .orElse(caseData.getRespondToClaim());
             builder.whyReject("ALREADY_PAID")
-                .howMuchWasPaid(MonetaryConversions.poundsToPennies(respondToClaim.getHowMuchWasPaid()) + "")
+                .howMuchWasPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "")
                 .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
                 .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
                                 ? respondToClaim.getHowWasThisAmountPaidOther()
