@@ -54,6 +54,7 @@ public class HearingsJmsConfig {
         factory.setSubscriptionDurable(Boolean.TRUE);
         factory.setSessionTransacted(Boolean.TRUE);
         factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
+        factory.setConcurrency("5-10");
 
         configurer.configure(factory, hmcHearingJmsConnectionFactory);
         return factory;
