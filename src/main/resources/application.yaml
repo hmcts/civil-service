@@ -30,7 +30,6 @@ spring:
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
 
-
   security:
     oauth2:
       client:
@@ -337,8 +336,8 @@ azure:
       namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:}
       topicName: ${HMC_HEARINGS_TOPIC_NAME:}
       subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
-      receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
-      idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+      receiveTimeout: 1
+      idleTimeout: 3600000
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
 
