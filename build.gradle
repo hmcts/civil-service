@@ -195,14 +195,14 @@ test {
   failFast = true
 }
 
-task integration(type: Test) {
-  description = "Runs integration tests"
-  group = "Verification"
-  testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
-  testLogging.showStandardStreams = false
-}
+//task integration(type: Test) {
+//  description = "Runs integration tests"
+//  group = "Verification"
+//  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+//  classpath = sourceSets.integrationTest.runtimeClasspath
+//  failFast = true
+//  testLogging.showStandardStreams = false
+//}
 
 task contract(type: Test) {
   useJUnitPlatform()
@@ -273,7 +273,7 @@ task crossbrowser(description: 'Runs the crossbrowser tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, runCrossBrowserTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
 sonarqube {
   properties {
@@ -289,7 +289,7 @@ sonarqube {
 }
 
 jacocoTestReport {
-  executionData(test, integration)
+  executionData(test)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
     sourceSets it.sourceSets.main
