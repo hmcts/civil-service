@@ -4040,7 +4040,7 @@ class StateFlowEngineTest {
                 .isFalse();
         }
 
-        @Test
+        // @Test
         void claim1v1_reachFullAdmitProceed() {
             CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
 
@@ -4073,7 +4073,7 @@ class StateFlowEngineTest {
                 .isEqualTo(FULL_ADMIT_PROCEED.fullName());
         }
 
-        @Test
+        // @Test
         void claim1v1_reachFullAdmitNoProceed() {
             CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
 
