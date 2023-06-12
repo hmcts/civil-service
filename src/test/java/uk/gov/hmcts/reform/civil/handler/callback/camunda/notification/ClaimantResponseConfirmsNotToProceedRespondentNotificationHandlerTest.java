@@ -64,6 +64,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     @Nested
     class AboutToSubmitCallback {
 
+        public static final String LEGACY_CASE_REFERENCE = "000DC001";
+
         @BeforeEach
         void setup() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
