@@ -183,13 +183,13 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
-tasks.withType(Test) {
-  useJUnitPlatform()
-
-  testLogging {
-    exceptionFormat = 'full'
-  }
-}
+//tasks.withType(Test) {
+//  useJUnitPlatform()
+//
+//  testLogging {
+//    exceptionFormat = 'full'
+//  }
+//}
 
 test {
   failFast = true
@@ -469,12 +469,12 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-//task runAndPublishConsumerPactTests(type: Test){
-//  logger.lifecycle("Runs pact Tests")
-//  testClassesDirs = sourceSets.contractTest.output.classesDirs
-//  classpath = sourceSets.contractTest.runtimeClasspath
-//
-//}
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+
+}
 
 runAndPublishConsumerPactTests.dependsOn contract
 
