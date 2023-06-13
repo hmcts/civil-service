@@ -38,12 +38,6 @@ public class HearingsJmsConfig {
     @Value("${azure.service-bus.hmc-to-hearings-api.idleTimeout}")
     private Long idleTimeout;
 
-    @Value("${azure.service-bus.hmc-to-hearings-api.topicName}")
-    private String topicName;
-
-    @Value("${azure.service-bus.hmc-to-hearings-api.subscriptionName}")
-    private String subscriptionName;
-
     @Bean
     public JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(
         ConnectionFactory hmcHearingJmsConnectionFactory,
@@ -65,7 +59,6 @@ public class HearingsJmsConfig {
         log.info("receiveTimeout {}", receiveTimeout);
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix);
         log.info("connection String {}", connection);
-//        connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, 3600000L);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
