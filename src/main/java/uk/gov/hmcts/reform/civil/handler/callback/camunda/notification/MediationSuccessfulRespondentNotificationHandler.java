@@ -46,7 +46,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
         if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate(),
+                addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         }
@@ -66,6 +66,12 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh() :
+            notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate();
     }
 
 }
