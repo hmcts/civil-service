@@ -13,14 +13,16 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     SendSDOBulkPrintService.class,
     JacksonAutoConfiguration.class
 })
-public class SendSDOBulkPrintServiceTest {
+class SendSDOBulkPrintServiceTest {
 
     @MockBean
     private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
@@ -49,5 +51,31 @@ public class SendSDOBulkPrintServiceTest {
                 caseData.getLegacyCaseReference(),
                 SDO_ORDER_PACK_LETTER_TYPE
             );
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenNull() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(null).build();
+
+        // When
+        sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
+
+        // Then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenSDOOrderAbsent() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build())).build();
+
+        // When
+        sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
+
+        // Then
+        verifyNoInteractions(bulkPrintService);
     }
 }

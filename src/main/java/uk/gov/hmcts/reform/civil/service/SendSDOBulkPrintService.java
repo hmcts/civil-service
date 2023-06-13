@@ -18,8 +18,8 @@ public class SendSDOBulkPrintService {
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
     public void sendSDOToDefendantLIP(CaseData caseData) {
-        if (caseData.getSystemGeneratedCaseDocuments() != null && caseData.getSystemGeneratedCaseDocuments().size() > 0) {
-            Optional<Element<CaseDocument>> caseDocument = caseData.getSDOOrderDocument();
+        if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
+            Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
 
             if (caseDocument.isPresent()) {
                 byte[] letterContent = sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument.get().getValue());

@@ -20,7 +20,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
@@ -447,9 +446,9 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         //When
-        Optional<Element<CaseDocument>> caseDocument = caseData.getSDOOrderDocument();
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
-        assertThat(caseDocument.get().getValue().getDocumentType().equals(SDO_ORDER));
+        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
     }
 
     @Test
@@ -457,8 +456,8 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .systemGeneratedCaseDocuments(null).build();
         //When
-        Optional<Element<CaseDocument>> caseDocument = caseData.getSDOOrderDocument();
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
-        assertNull(caseDocument);
+        assertTrue(caseDocument.isEmpty());
     }
 }

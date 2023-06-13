@@ -888,12 +888,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<Element<CaseDocument>> getSDOOrderDocument() {
+    public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
                    .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
-        return null;
+        return Optional.empty();
     }
 }
