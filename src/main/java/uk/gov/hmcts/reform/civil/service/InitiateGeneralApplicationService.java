@@ -156,10 +156,15 @@ public class InitiateGeneralApplicationService {
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                     && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+
+                GAStatementOfTruth gaStatementOfTruth = ofNullable(caseData.getGeneralAppStatementOfTruth())
+                    .map(GAStatementOfTruth::toBuilder)
+                    .orElse(GAStatementOfTruth.builder())
+                    .build();
                 applicationBuilder
                         .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                         .generalAppConsentOrder(NO)
-                        .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+                        .generalAppStatementOfTruth(gaStatementOfTruth);
             } else {
                 applicationBuilder
                         .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
