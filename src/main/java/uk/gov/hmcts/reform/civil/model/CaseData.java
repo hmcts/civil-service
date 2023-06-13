@@ -885,4 +885,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(Organisation::getOrganisationID)
             .orElse("");
     }
+
+   @JsonIgnore
+   public LocalDate getPaymentDateAdmittedClaim() {
+       if (this.getRespondToClaimAdmitPartLRspec() != null
+           && this.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
+           return this.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+       }
+       if (this.getRespondToAdmittedClaim() != null
+           && this.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
+           return this.getRespondToAdmittedClaim().getWhenWasThisAmountPaid();
+       }
+       if (this.getRespondent1ResponseDate() != null) {
+           return this.getRespondent1ResponseDate().plusDays(5).toLocalDate();
+       }
+       return null;
+   }
 }
