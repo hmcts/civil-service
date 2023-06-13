@@ -53,7 +53,7 @@ public class HearingsJmsConfig {
         factory.setReceiveTimeout(receiveTimeout);
         factory.setSubscriptionDurable(Boolean.TRUE);
         factory.setSessionTransacted(Boolean.TRUE);
-        factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
+        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
 
         configurer.configure(factory, hmcHearingJmsConnectionFactory);
         return factory;
