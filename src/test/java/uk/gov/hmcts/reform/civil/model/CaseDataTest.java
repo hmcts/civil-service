@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -404,7 +404,7 @@ public class CaseDataTest {
         //Then
         assertThat(result).isEqualTo("");
     }
-    
+
     @Test
     void isTranslatedDocumentUploaded_thenFalse() {
         //Given
@@ -433,5 +433,60 @@ public class CaseDataTest {
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
+    }
+
+    @Test
+    void shouldGetWhenWillThisAmountBePaid_whenWhenWillThisAmountBePaidArePresent() {
+        //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData caseData = CaseData.builder()
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
+        //When
+        LocalDate payDate = caseData.getPaymentDateAdmittedClaim();
+        //Then
+        assertThat(payDate).isEqualTo(whenWillPay);
+    }
+
+    @Test
+    void shouldGetWhenWasThisAmountPaid_whenWhenWasThisAmountPaidArePresent() {
+        //Given
+        LocalDate whenWasPaid = LocalDate.now().plusDays(-5);
+        CaseData caseData = CaseData.builder()
+            .respondToAdmittedClaim(RespondToClaim.builder()
+                                        .whenWasThisAmountPaid(whenWasPaid).build()
+            )
+            .build();
+        //When
+        LocalDate result = caseData.getPaymentDateAdmittedClaim();
+        //Then
+        assertThat(result).isEqualTo(whenWasPaid);
+    }
+
+    @Test
+    void shouldReturRespondent1ResponseDatePlus5Days_whenRespondent1ResponseDateArePresent() {
+        //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .build();
+        //When
+        LocalDate result = caseData.getPaymentDateAdmittedClaim();
+        //Then
+        assertThat(result).isEqualTo(whenWillPay);
+    }
+
+    @Test
+    void shouldReturNull_whenAnythingIsSettled() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        LocalDate result = caseData.getPaymentDateAdmittedClaim();
+        //Then
+        assertThat(result).isNull();
     }
 }
