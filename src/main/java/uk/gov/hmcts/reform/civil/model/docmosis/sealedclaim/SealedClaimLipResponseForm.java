@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
@@ -72,7 +73,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final RepaymentPlanLRspec repaymentPlan;
 
     private final RespondentResponseTypeSpec responseType;
-    // TODO enum, ALREADY_PAID, DISPUTE, COUNTER_CLAIM
     private final String whyReject;
     private final String freeTextWhyReject;
     private final LipDefenceFormParty claimant1;
@@ -92,7 +92,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<DebtTemplateData> debtList;
     private final List<ReasonMoneyTemplateData> incomeList;
     private final List<ReasonMoneyTemplateData> expenseList;
-    private final int childrenMaintenance;
 
     public String getResponseTypeDisplay() {
         return responseType.getDisplayedValue();
@@ -101,6 +100,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
             || selfEmployment != null && selfEmployment.getAnnualTurnover() != null;
+    }
+
+    public int getNumberOfChildren() {
+        return Optional.ofNullable(partnerAndDependent).map(PartnerAndDependentsLRspec::getHowManyChildrenByAgeGroup)
+            .map(ChildrenByAgeGroupLRspec::getTotalChildren).orElse(0);
     }
 
     @JsonIgnore
@@ -160,7 +164,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
         .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
 
-    private static void addPayByDatePayImmediatly(SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
+    private static void addPayByDatePayImmediately(SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
         builder.payBy(LocalDate.now()
                           .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
             .amountToPay(totalClaimAmount + "");
@@ -228,12 +232,13 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     private static void addRepaymentMethod(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalAmount) {
+        BigDecimal totalAmountInPounds = MonetaryConversions.penniesToPounds(totalAmount);
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediatly(builder, totalAmount);
+            addPayByDatePayImmediately(builder, totalAmountInPounds);
         } else if (caseData.isPayByInstallment()) {
-            addRepaymentPlan(caseData, builder, totalAmount);
+            addRepaymentPlan(caseData, builder, totalAmountInPounds);
         } else if (caseData.isPayBySetDate()) {
-            addPayBySetDate(caseData, builder, totalAmount);
+            addPayBySetDate(caseData, builder, totalAmountInPounds);
         }
     }
 
