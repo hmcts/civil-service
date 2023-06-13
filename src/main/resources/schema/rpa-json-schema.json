@@ -337,7 +337,8 @@
         "breathingSpaceMentalHealthEntered",
         "breathingSpaceMentalHealthLifted",
         "interlocutoryJudgment",
-        "defaultJudgment"
+        "defaultJudgment",
+        "judgmentByAdmission"
       ],
       "properties": {
         "miscellaneous": {
@@ -524,6 +525,18 @@
           "anyOf": [
             {
               "$ref": "#/definitions/defaultJudgmentEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "judgmentByAdmission": {
+          "$id": "#/properties/events/properties/judgmentByAdmission",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/judgmentByAdmissionEventType"
             },
             {
               "$ref": "#/definitions/nullEventType"
@@ -1884,6 +1897,152 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/defaultJudgmentEventType/items/properties/eventDetailsText",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "judgmentByAdmissionEventType": {
+      "$id": "#/definitions/judgmentByAdmissionEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/judgmentByAdmissionEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "240",
+            "description": "The CASEMAN code for the judgmentByAdmission event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "amountOfJudgment",
+              "paymentInFullDate"
+            ],
+            "properties": {
+              "amountOfJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountOfJudgment",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 999999999999,
+                "description": ""
+              },
+              "amountOfCosts": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountOfCosts",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 99999999,
+                "description": ""
+              },
+              "amountPaidBeforeJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountPaidBeforeJudgment",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 999999999999,
+                "description": ""
+              },
+              "isJudgmentForthwith": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/isJudgmentForthwith",
+                "type": "boolean",
+                "default": "true"
+              },
+              "paymentInFullDate": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/paymentInFullDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "installmentAmount": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/installmentAmount",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 99999999999,
+                "description": ""
+              },
+              "installmentPeriod": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/installmentPeriod",
+                "type": "string",
+                "enum": [
+                  "FOR",
+                  "FUL",
+                  "FW",
+                  "MTH",
+                  "WK",
+                  null
+                ],
+                "default": null,
+                "description": ""
+              },
+              "firstInstallmentDate": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/firstInstallmentDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "dateOfJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/dateOfJudgment",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "jointJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/jointJudgment",
+                "type": "boolean",
+                "default": "false",
+                "description": ""
+              },
+              "judgmentToBeRegistered": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/judgmentToBeRegistered",
+                "type": "boolean",
+                "default": "true",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/miscText",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 250,
+                "description": ""
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetailsText",
             "type": [
               "string",
               "null"
