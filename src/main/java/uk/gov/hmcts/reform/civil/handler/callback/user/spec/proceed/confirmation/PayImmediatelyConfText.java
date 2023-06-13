@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -23,9 +22,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
-            .orElse(null);
+        LocalDate whenBePaid = caseData.getPaymentDateAdmittedClaim();
         if (whenBePaid == null) {
             throw new IllegalStateException("Unable to format the payment date.");
         }

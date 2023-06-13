@@ -397,7 +397,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
-            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            LocalDate whenBePaid = caseData.getPaymentDateAdmittedClaim();
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
