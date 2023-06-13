@@ -4540,43 +4540,8 @@ class StateFlowEngineTest {
     class TakenOfflineSdoNotDrawn {
 
         @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedSdoEnabled() {
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotified() {
             // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE)
-                .build();
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(8)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
-                );
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), true)
-            );
-        }
-
-        @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedSdoNotEnabled() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE)
                 .build();
@@ -4607,43 +4572,8 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedTimeExtensionSdoEnambled() {
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension().build();
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
-                    TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
-                );
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), true)
-            );
-        }
-
-        @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedTimeExtensionSdoNotEnambled() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension().build();
 
@@ -4674,50 +4604,8 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeSdoEnabled() {
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledge() {
             // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE)
-                .build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(9)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                    TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
-                );
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), true)
-            );
-        }
-
-        @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeSdoNotEnabled() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE)
                 .build();
@@ -4755,50 +4643,8 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtensionSdoEnabled() {
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
             // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE)
-                .build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
-
-            // When
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            // Then
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(10)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
-                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
-                );
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), true)
-            );
-        }
-
-        @Test
-        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtensionSdoNotEnabled() {
-            // Given
-            when(featureToggleService.isSdoEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE)
                 .build();

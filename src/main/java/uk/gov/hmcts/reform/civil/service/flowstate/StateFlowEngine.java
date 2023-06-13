@@ -398,11 +398,6 @@ public class StateFlowEngine {
                     .onlyIf(caseDismissedAfterDetailNotified)
                 .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterClaimDetailsNotified)
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
             .state(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                 .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf((respondentTimeExtension).and(allResponsesReceived))
@@ -415,11 +410,6 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterDetailNotifiedExtension)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension)
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
             .state(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .transitionTo(ALL_RESPONSES_RECEIVED).onlyIf(allResponsesReceived)
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED).onlyIf(takenOfflineAfterClaimDetailsNotified)
@@ -464,11 +454,6 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledged)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterNotificationAcknowledged)
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
             .state(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)
                 .transitionTo(ALL_RESPONSES_RECEIVED)
                     .onlyIf(notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived))
@@ -484,11 +469,6 @@ public class StateFlowEngine {
                 .transitionTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension)
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
             .state(FULL_DEFENCE)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                 .transitionTo(FULL_DEFENCE_PROCEED)
