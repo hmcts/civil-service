@@ -64,6 +64,10 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
     POLLING_EVENT_EMITTER_ENABLED: false
+    HMC_HEARINGS_TOPIC_NAMESPACE: 'hmc-servicebus-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_NAME: 'hmc-to-cft-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
 
   keyVaults:
     civil:
@@ -87,6 +91,7 @@ java:
         - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipj
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
         - name: hmc-servicebus-shared-access-key-tf
