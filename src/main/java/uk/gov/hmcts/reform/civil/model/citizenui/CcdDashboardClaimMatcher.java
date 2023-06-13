@@ -233,8 +233,9 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean claimantAcceptOffer() {
-        return caseData.hasApplicantAcceptedRepaymentPlan()
+    public boolean claimantAcceptRepayment() {
+        return !Objects.isNull(caseData.getRespondent1CourtOrderPayment())
+            || caseData.hasApplicantAcceptedRepaymentPlan()
             || caseData.hasApplicantProceededWithClaim();
     }
 

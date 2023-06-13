@@ -86,29 +86,29 @@ public enum DashboardClaimStatus {
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
-    SETTLED(
-        Claim::isSettled
-    ),
-    CLAIMANT_REJECT_OFFER(
-        Claim::claimantRejectOffer
-    ),
-    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
-        Claim::claimantAcceptOffer
-    ),
     CLAIM_SENT_TO_CLAIMANT(
         Claim::claimSentToClaimant
+    ),
+    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
+        Claim::claimantAcceptRepayment
     ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
-    TRANSFERRED(
-        Claim::isSentToCourt
+    CLAIMANT_REJECT_OFFER(
+        Claim::claimantRejectOffer
     ),
     CLAIM_ENDED(
         Claim::isClaimEnded
     ),
+    TRANSFERRED(
+        Claim::isSentToCourt
+    ),
     DEFENDANT_PART_ADMIT(
         Claim::defendantRespondedWithPartAdmit
+    ),
+    SETTLED(
+        Claim::isSettled
     ),
     NO_STATUS(c -> false);
 

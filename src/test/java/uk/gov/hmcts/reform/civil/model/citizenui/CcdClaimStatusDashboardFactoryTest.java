@@ -6,8 +6,10 @@ import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
 import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
+import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -24,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -211,10 +215,14 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingDateIsDue_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+                                                       CaseDocument.builder()
+                                                           .documentType(DocumentType.SDO_ORDER)
+                                                           .build());
         CaseData claim = CaseData.builder()
             .hearingDate(LocalDate.now().plusDays(10))
             .respondent1ResponseDate(LocalDateTime.now())
-            .orderSDODocumentDJ(Document.builder().build())
+            .systemGeneratedCaseDocuments(List.of(document))
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
@@ -283,8 +291,6 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .applicant1ProceedWithClaim(YesOrNo.NO)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
@@ -333,6 +339,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_applicantAcceptRepaymentPlan_whenGetStatus_acceptOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(

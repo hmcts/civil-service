@@ -341,7 +341,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean claimantAcceptOffer() {
+    public boolean claimantAcceptRepayment() {
         return response.isFullDefence()
             && isSentToCourt()
             && !Objects.isNull(claimantResponse)

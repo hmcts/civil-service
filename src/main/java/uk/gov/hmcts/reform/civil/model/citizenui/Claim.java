@@ -72,7 +72,7 @@ public interface Claim {
 
     boolean claimSentToClaimant();
 
-    boolean claimantAcceptOffer();
+    boolean claimantAcceptRepayment();
 
     boolean claimantRejectOffer();
 
