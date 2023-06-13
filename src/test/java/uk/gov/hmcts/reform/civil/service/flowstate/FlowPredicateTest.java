@@ -2732,10 +2732,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
         }
 
         @Test
@@ -2749,10 +2757,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
         }
 
         @Test
@@ -2766,10 +2782,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
         }
 
         @Test
@@ -2783,10 +2807,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
         }
 
         @Test
@@ -2800,10 +2832,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
         }
 
         @Test
@@ -2817,10 +2857,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
         }
 
         @Test
@@ -2834,10 +2882,18 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
                 .build();
             assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
         }
 
         @Test

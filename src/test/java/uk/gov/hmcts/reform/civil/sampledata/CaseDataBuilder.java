@@ -4221,7 +4221,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario) {
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
@@ -4234,28 +4234,28 @@ public class CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
+            .input(isReason ? "unforeseen complexities" : "")
             .build();
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
     }
 
-    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension() {
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(boolean isReason) {
         atStateClaimDetailsNotified1v1();
         respondent1TimeExtensionDate = LocalDateTime.now();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
+            .input(isReason ? "unforeseen complexities" : "")
             .build();
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
     }
 
-    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario) {
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
@@ -4268,14 +4268,14 @@ public class CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
+            .input(isReason ? "unforeseen complexities" : "")
             .build();
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
     }
 
-    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario) {
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
@@ -4290,7 +4290,7 @@ public class CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
+            .input(isReason ? "unforeseen complexities" : "")
             .build();
         unsuitableSDODate = LocalDateTime.now();
 

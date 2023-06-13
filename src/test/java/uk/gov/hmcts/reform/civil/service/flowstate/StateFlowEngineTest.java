@@ -4543,7 +4543,7 @@ class StateFlowEngineTest {
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotified() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
 
             // When
@@ -4575,7 +4575,7 @@ class StateFlowEngineTest {
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension().build();
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true).build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4607,7 +4607,7 @@ class StateFlowEngineTest {
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledge() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -4646,7 +4646,7 @@ class StateFlowEngineTest {
         void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE)
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
