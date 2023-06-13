@@ -53,7 +53,7 @@ public class HearingsJmsConfig {
         factory.setReceiveTimeout(receiveTimeout);
         factory.setSubscriptionDurable(Boolean.TRUE);
         factory.setSessionTransacted(Boolean.TRUE);
-        factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+        factory.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
 
         configurer.configure(factory, hmcHearingJmsConnectionFactory);
         return factory;
@@ -64,6 +64,8 @@ public class HearingsJmsConfig {
         log.info("idleTimeout {}", idleTimeout);
         log.info("receiveTimeout {}", receiveTimeout);
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
+        log.info("connection String {}", connection);
+        connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, 3600000L);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
