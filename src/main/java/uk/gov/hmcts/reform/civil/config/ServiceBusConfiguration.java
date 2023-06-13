@@ -53,7 +53,6 @@ public class ServiceBusConfiguration {
     // @Value("${thread.count}")
     // private int threadCount;
 
-
     private static Logger log = LoggerFactory.getLogger(ServiceBusConfiguration.class);
 
     @Bean
