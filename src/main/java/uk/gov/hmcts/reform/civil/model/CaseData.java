@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -884,5 +885,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .orElse("");
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getSDOOrderDocument() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+        }
+        return null;
     }
 }
