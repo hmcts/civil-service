@@ -427,12 +427,15 @@ public class CaseDataParent implements MappableObject {
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidence;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidence;
+    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidence;
+    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
@@ -572,6 +575,12 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaRespDocClaimant;
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> gaDraftDocument;
+    private final List<Element<CaseDocument>> gaDraftDocStaff;
+    private final List<Element<CaseDocument>> gaDraftDocClaimant;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     /* Final Orders */
 
@@ -713,5 +722,10 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
     }
 }

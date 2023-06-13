@@ -70,6 +70,8 @@ public interface NotificationData {
     String HEARING_OR_TRIAL = "hearing/trial";
     String CLAIMANT_DEFENDANT_REFERENCE = "claimant/defendantReferenceNumber";
     String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
+    String COURT_LOCATION = "courtlocation";
+    String LEGAL_ORG_NAME = "LegalOrgName";
 
     //NoC
     String CASE_NAME = "case name";

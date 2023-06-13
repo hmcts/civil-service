@@ -19,6 +19,7 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipj
         - robotics-notification-multipartyrecipient
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
@@ -41,6 +42,7 @@ java:
     LAUNCH_DARKLY_ENV: service-staging
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
+    STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
   postgresql:
     enabled: true
