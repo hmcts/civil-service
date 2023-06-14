@@ -273,12 +273,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream().map(AccountSimpleTemplateData::new).collect(Collectors.toList()))
                 .ifPresent(builder::bankAccountList);
-            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringIncome())
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringIncomeFA())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
                     .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
                 .ifPresent(builder::incomeList);
-            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringExpenses())
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringExpensesFA())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
                     .map(item ->
