@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -50,6 +52,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         @BeforeEach
         void setup() {
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn("template-id");
+            given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh()).willReturn("template-id-welsh");
         }
 
         @Test
@@ -74,6 +77,34 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-successful-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyBilingualRespondent_whenInvoked() {
+            //Given
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id-welsh",
                 getNotificationDataMapSpec(caseData),
                 "mediation-successful-respondent-notification-000DC001"
             );
