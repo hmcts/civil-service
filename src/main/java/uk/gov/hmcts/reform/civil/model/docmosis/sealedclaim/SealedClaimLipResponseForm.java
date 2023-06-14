@@ -110,12 +110,15 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     @JsonIgnore
     public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder =  SealedClaimLipResponseForm.builder()
+        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimant1(LipDefenceFormParty.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipDefenceFormParty.toLipDefenceParty(caseData.getRespondent1(), caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1LiPCorrespondenceAddress()))
+            .defendant1(LipDefenceFormParty.toLipDefenceParty(
+                caseData.getRespondent1(),
+                caseData.getRespondent1CorrespondanceAddress()
+            ))
             .defendant2(LipDefenceFormParty.toLipDefenceParty(caseData.getRespondent2()))
             .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
@@ -132,10 +135,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_ADMISSION ->
-                    addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
-                case PART_ADMISSION ->
-                    partAdmissionData(caseData, builder);
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
                 case FULL_DEFENCE -> fullDefenceData(caseData, builder);
                 case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
             }
@@ -144,7 +145,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     }
 
-    private static void addSolicitorDetails (final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addSolicitorDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(references ->
                            builder.claimantReferenceNumber(references.getApplicantSolicitor1Reference())
@@ -162,8 +163,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     private static void addPayBySetDate(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
         builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-        .amountToPay(totalClaimAmount + "")
-        .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            .amountToPay(totalClaimAmount + "")
+            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
 
     private static void addPayByDatePayImmediately(SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
@@ -200,7 +201,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .timelineComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getTimeLineComment).orElse(""))
+            .timelineComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getTimeLineComment).orElse(
+                ""))
             .timelineEventList(Optional.ofNullable(caseData.getSpecResponseTimelineOfEvents()).map(Collection::stream)
                                    .orElseGet(Stream::empty)
                                    .map(event ->
@@ -208,7 +210,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
                                                 .date(event.getValue().getTimelineDate())
                                                 .explanation(event.getValue().getTimelineDescription())
                                                 .build()).collect(Collectors.toList()))
-            .evidenceComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getEvidenceComment).orElse(""))
+            .evidenceComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getEvidenceComment).orElse(
+                ""))
             .evidenceList(Optional.ofNullable(caseData.getSpecResponselistYourEvidenceList()).map(Collection::stream)
                               .orElseGet(Stream::empty)
                               .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
@@ -266,8 +269,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     @JsonIgnore
-    private static void addFinancialDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder){
-        if(caseData.getRespondent1DQ() != null){
+    private static void addFinancialDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+        if (caseData.getRespondent1DQ() != null) {
             builder.whereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
             Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
                 .map(ElementUtils::unwrapElements)
