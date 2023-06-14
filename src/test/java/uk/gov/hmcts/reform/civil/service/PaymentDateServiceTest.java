@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +20,7 @@ public class PaymentDateServiceTest {
     @Mock
     private DeadlinesCalculator calculator;
 
+    @InjectMocks
     private PaymentDateService paymentDateService;
 
     @Test
