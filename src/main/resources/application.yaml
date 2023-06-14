@@ -59,10 +59,6 @@ serviceRequest:
     site_id : AAA7
     service : CIVIL
 
-logging:
-  level:
-    ROOT: TRACE
-
 serviceRequestClaimIssued:
   api:
     callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
