@@ -277,7 +277,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 
-        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+        if (!AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .state(CaseState.JUDICIAL_REFERRAL.name())
