@@ -18,8 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
 @Configuration
+@Slf4j
 public class ServiceBusConfiguration {
 
     public static final String AMQP_CONNECTION_STRING_TEMPLATE = "amqps://%1s";
@@ -53,12 +53,16 @@ public class ServiceBusConfiguration {
     // @Value("${thread.count}")
     // private int threadCount;
 
-    private static Logger log = LoggerFactory.getLogger(ServiceBusConfiguration.class);
-
     @Bean
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
+        log.info("namespace: {}", namespace);
+        log.info("connectionPostfix: {}", connectionPostfix);
+        log.info("topicName: {}", topicName);
+        log.info("subscriptionName: {}", subscriptionName);
+        log.info("username: {}", username);
         URI endpoint = new URI("sb://" + namespace + connectionPostfix);
+        log.info("endpoint: {}", endpoint);
 
         String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
 

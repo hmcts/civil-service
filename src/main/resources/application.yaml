@@ -334,8 +334,8 @@ azure:
       subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
       receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
       idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
-      username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
-      password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+      username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:SendAndListenSharedAccessKey}
+      password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:dummy}
 
 ---
 
