@@ -36,9 +36,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.PENSION;
 import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.UNIVERSAL_CREDIT;
 import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.WORKING_TAX_CREDIT;
 
-/**
- * just a pair of values String - amount in pounds to use in templates.
- */
 @Builder
 @Data
 public class ReasonMoneyTemplateData {
