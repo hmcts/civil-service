@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +41,9 @@ public class CaseDataToTextGeneratorTest {
         new RespondToResponseConfirmationHeaderGeneratorTest(),
         new RespondToResponseConfirmationTextGeneratorTest()
     );
+
+    @Mock
+    private PaymentDateService paymentDateService;
 
     /**
      * ensures that each instance of CaseDataToTextGenerator is checked.
@@ -147,7 +152,7 @@ public class CaseDataToTextGeneratorTest {
         List<Pair<CaseData, Class<? extends T>>> getCasesToExpectedImplementation();
     }
 
-    private final PayImmediatelyConfText generatorConf = new PayImmediatelyConfText();
+    private final PayImmediatelyConfText generatorConf = new PayImmediatelyConfText(paymentDateService);
     private final PartialAdmitPayImmediatelyConfirmationText generatorHeader = new PartialAdmitPayImmediatelyConfirmationText();
 
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {

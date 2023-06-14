@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,12 +18,14 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
+    private final PaymentDateService paymentDateService;
+
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = caseData.getPaymentDateAdmittedClaim();
+        LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         if (whenBePaid == null) {
             throw new IllegalStateException("Unable to format the payment date.");
         }

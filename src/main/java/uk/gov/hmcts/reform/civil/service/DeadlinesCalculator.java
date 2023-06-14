@@ -74,6 +74,14 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
+    public LocalDate calculateRespondentPaymentDateAdmittedClaim(LocalDateTime responseDate) {
+        LocalDateTime dateTime = responseDate;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        return calculateFirstWorkingDay(dateTime.toLocalDate().plusDays(5));
+    }
+
     public LocalDate calculateFirstWorkingDay(LocalDate date) {
         while (!workingDayIndicator.isWorkingDay(date)) {
             date = date.plusDays(1);
