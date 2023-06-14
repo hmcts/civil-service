@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Getter
 @Builder
 @EqualsAndHashCode
 public record LipDefenceFormParty(String name, boolean isIndividual,
