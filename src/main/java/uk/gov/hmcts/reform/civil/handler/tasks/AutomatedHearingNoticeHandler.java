@@ -45,6 +45,12 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
     @SuppressWarnings("unchecked")
     public void handleTask(ExternalTask externalTask) {
         if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
+            runtimeService.setVariables(
+                externalTask.getProcessInstanceId(),
+                HearingNoticeSchedulerVars.builder()
+                    .totalNumberOfUnnotifiedHearings(0)
+                    .build().toMap(mapper)
+            );
             return;
         }
 

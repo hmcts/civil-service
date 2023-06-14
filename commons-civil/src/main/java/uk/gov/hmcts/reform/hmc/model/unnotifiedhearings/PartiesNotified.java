@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class PartiesNotified {
 
-    @JsonProperty("serviceData")
     private PartiesNotifiedServiceData serviceData;
 }
