@@ -126,7 +126,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CourtLocationUtils.class,
     LocationHelper.class,
     LocationRefDataService.class,
-    JudgementService.class
+    JudgementService.class,
+    PaymentDateService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
