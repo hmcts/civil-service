@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.docmosis;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -12,7 +11,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Builder
-@EqualsAndHashCode
 public record LipDefenceFormParty(String name, boolean isIndividual,
                                   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
                                   String phone, String email, Address primaryAddress, Address correspondenceAddress) {
