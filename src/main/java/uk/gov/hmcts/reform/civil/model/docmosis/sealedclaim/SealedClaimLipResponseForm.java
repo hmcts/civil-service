@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -43,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -126,7 +124,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
-        addWhereTheyLive(caseData, builder);
+        addFinancialDetails(caseData, builder);
         Optional.ofNullable(caseData.getRespondent1CourtOrderDetails())
             .map(ElementUtils::unwrapElements)
             .ifPresent(builder::courtOrderDetails);
@@ -268,9 +266,24 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     @JsonIgnore
-    private static void addWhereTheyLive(CaseData caseData, SealedClaimLipResponseFormBuilder builder){
+    private static void addFinancialDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder){
         if(caseData.getRespondent1DQ() != null){
             builder.whereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream().map(AccountSimpleTemplateData::new).collect(Collectors.toList()))
+                .ifPresent(builder::bankAccountList);
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringIncome())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream()
+                    .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                .ifPresent(builder::incomeList);
+            Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1DQRecurringExpenses())
+                .map(ElementUtils::unwrapElements)
+                .map(list -> list.stream()
+                    .map(item ->
+                             ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                .ifPresent(builder::expenseList);
         }
     }
 }
