@@ -75,9 +75,11 @@ withPipeline(type, product, component) {
     }
   }
   onMaster {
+    env.ENVIRONMENT = "aat"
     loadVaultSecrets(secrets)
   }
   onDemo {
+    env.ENVIRONMENT = "demo"
     loadVaultSecrets(secrets)
   }
   
