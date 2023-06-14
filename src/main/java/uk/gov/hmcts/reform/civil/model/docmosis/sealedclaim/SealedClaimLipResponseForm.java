@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.LipDefenceFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,7 +86,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<EvidenceTemplateData> evidenceList;
     private final String evidenceComments;
     private final boolean mediation;
-    private final String whereTheyLive;
+    private final AccommodationTemplate whereTheyLive;
     private final PartnerAndDependentsLRspec partnerAndDependent;
     private final List<EmployerDetailsLRspec> employerDetails;
     private final Respondent1SelfEmploymentLRspec selfEmployment;
@@ -123,6 +126,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
+        addWhereTheyLive(caseData, builder);
         Optional.ofNullable(caseData.getRespondent1CourtOrderDetails())
             .map(ElementUtils::unwrapElements)
             .ifPresent(builder::courtOrderDetails);
@@ -261,5 +265,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(list -> list.stream().map(e -> DebtTemplateData.loanDebtFrom(e.getValue()))
                 .forEach(debtList::add));
         return debtList;
+    }
+
+    @JsonIgnore
+    private static void addWhereTheyLive(CaseData caseData, SealedClaimLipResponseFormBuilder builder){
+        if(caseData.getRespondent1DQ() != null){
+            builder.whereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
+        }
     }
 }

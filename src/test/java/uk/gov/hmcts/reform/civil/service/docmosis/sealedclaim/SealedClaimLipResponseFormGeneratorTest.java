@@ -194,7 +194,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitAlreadyPaid() throws JsonProcessingException {
+    public void partAdmitAlreadyPaid(){
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -216,7 +216,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseAlreadyPaid() throws JsonProcessingException {
+    public void fullDefenseAlreadyPaid(){
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -238,7 +238,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseDispute() throws JsonProcessingException {
+    public void fullDefenseDispute(){
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -255,7 +255,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void counterClaim() throws JsonProcessingException {
+    public void counterClaim(){
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -297,7 +297,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     private static CaseData.CaseDataBuilder<?, ?> financialDetails(CaseData.CaseDataBuilder<?, ?> builder) {
         return builder.respondent1DQ(Respondent1DQ.builder()
                                          .respondent1DQHomeDetails(
-                                             new HomeDetails(HomeTypeOptionLRspec.OWNED_HOME, null))
+                                             HomeDetails.builder().type(HomeTypeOptionLRspec.OWNED_HOME).build())
                                          .respondent1BankAccountList(ElementUtils.wrapElements(
                                              account(AccountType.CURRENT, YesOrNo.YES, BigDecimal.valueOf(2000)),
                                              account(AccountType.ISA, YesOrNo.NO, BigDecimal.valueOf(500))
