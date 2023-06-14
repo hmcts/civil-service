@@ -44,6 +44,7 @@ public class ClaimStoreServiceTest {
     private static final LocalDate RESPONSE_DEADLINE = LocalDate.of(2021, 1, 1);
     private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
     private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
+    private static final LocalDateTime intentionToProceedDeadline = LocalDateTime.now().minusDays(1);
     private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT = Arrays.asList(DashboardClaimInfo.builder()
                                                                                             .claimNumber(
                                                                                                 REFERENCE_NUMBER)
@@ -55,37 +56,76 @@ public class ClaimStoreServiceTest {
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .ocmc(true)
                                                                                             .createdDate(CREATE_DATETIME)
-                                                                                            .build());
+                                                                                            .intentionToProceedDeadline(
+                                                                                                intentionToProceedDeadline)
+                                                                                            .build(),
+                                                                                        DashboardClaimInfo.builder()
+                                                                                            .claimNumber(
+                                                                                                REFERENCE_NUMBER)
+                                                                                            .claimAmount(TOTAL_AMOUNT)
+                                                                                            .claimantName(CLAIMANT_NAME)
+                                                                                            .defendantName(
+                                                                                                DEFENDANT_NAME)
+                                                                                            .responseDeadline(
+                                                                                                RESPONSE_DEADLINE)
+                                                                                            .ocmc(true)
+                                                                                            .createdDate(CREATE_DATETIME)
+                                                                                            .build()
+    );
 
     @BeforeEach
     void setUp() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder()
-                           .defendants(Arrays.asList(CmcParty.builder().name(DEFENDANT_NAME).build()))
-                           .claimants(Arrays.asList(CmcParty.builder().name(CLAIMANT_NAME).build()))
-                           .build())
-            .referenceNumber(REFERENCE_NUMBER)
-            .responseDeadline(RESPONSE_DEADLINE)
-            .totalAmountTillToday(TOTAL_AMOUNT)
-            .createdAt(CREATE_DATETIME)
-            .build();
-        given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
-        given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
+        List<CmcClaim> cmcClaims = Arrays.asList(CmcClaim.builder()
+                                                     .claimData(ClaimData.builder()
+                                                                    .defendants(Collections.singletonList(CmcParty.builder()
+                                                                                                              .name(
+                                                                                                                  DEFENDANT_NAME)
+                                                                                                              .build()))
+                                                                    .claimants(Collections.singletonList(CmcParty.builder()
+                                                                                                             .name(
+                                                                                                                 CLAIMANT_NAME)
+                                                                                                             .build()))
+                                                                    .build())
+                                                     .referenceNumber(REFERENCE_NUMBER)
+                                                     .responseDeadline(RESPONSE_DEADLINE)
+                                                     .totalAmountTillToday(TOTAL_AMOUNT)
+                                                     .createdAt(CREATE_DATETIME)
+                                                     .intentionToProceedDeadline(intentionToProceedDeadline)
+                                                     .build(), CmcClaim.builder()
+                                                     .claimData(ClaimData.builder()
+                                                                    .defendants(Collections.singletonList(CmcParty.builder()
+                                                                                                              .name(
+                                                                                                                  DEFENDANT_NAME)
+                                                                                                              .build()))
+                                                                    .claimants(Collections.singletonList(CmcParty.builder()
+                                                                                                             .name(
+                                                                                                                 CLAIMANT_NAME)
+                                                                                                             .build()))
+                                                                    .build())
+                                                     .referenceNumber(REFERENCE_NUMBER)
+                                                     .responseDeadline(RESPONSE_DEADLINE)
+                                                     .totalAmountTillToday(TOTAL_AMOUNT)
+                                                     .createdAt(CREATE_DATETIME)
+                                                     .build());
+        given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(cmcClaims);
+        given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(cmcClaims);
     }
 
     @Test
     void shouldReturnClaimsForClaimantsSuccessfully() {
         List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
         verify(claimStoreApi).getClaimsForClaimant("23746486", "1234");
-        assertThat(resultClaims.size()).isEqualTo(1);
+        assertThat(resultClaims.size()).isEqualTo(2);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));
+        assertThat(resultClaims.get(1)).isEqualTo(EXPECTED_CLAIM_RESULT.get(1));
     }
 
     @Test
     void shouldReturnClaimsForDefendantSuccessfully() {
         List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
-        assertThat(resultClaims.size()).isEqualTo(1);
+        assertThat(resultClaims.size()).isEqualTo(2);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));
+        assertThat(resultClaims.get(1)).isEqualTo(EXPECTED_CLAIM_RESULT.get(1));
     }
 }

@@ -91,7 +91,9 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null;
+        return caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !sdoBeenDrawn();
     }
 
     @Override
@@ -148,7 +150,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean hasDefendantStatedTheyPaid() {
         return defendantRespondedWithPartAdmit()
-            && isPayImmediately();
+            && isPayImmediately() && !caseData.getApplicant1ResponseDeadlinePassed();
     }
 
     private boolean isPayImmediately() {
@@ -157,7 +159,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
+        return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
+            && !caseData.getApplicant1ResponseDeadlinePassed();
     }
 
     @Override
@@ -219,9 +222,9 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isClaimEnded() {
-        return !Objects.isNull(caseData.getApplicant1ProceedsWithClaimSpec())
+        return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence();
+            && caseData.isRespondentResponseFullDefence()) || caseData.getApplicant1ResponseDeadlinePassed();
     }
 
     @Override
@@ -248,5 +251,10 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isPartialAdmissionRejected() {
         return !Objects.isNull(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())
             && caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec().equals(YesOrNo.NO);
+    }
+
+    @Override
+    public boolean isSDOOrderCreated() {
+        return sdoBeenDrawn() && caseData.getHearingDate() == null;
     }
 }

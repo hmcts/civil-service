@@ -27,20 +27,22 @@ public class ClaimStoreService {
     }
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
-        return cmcClaims.stream().map(cmcClaim -> DashboardClaimInfo.builder()
-            .createdDate(createAtToCreateDate(cmcClaim))
-            .claimId(cmcClaim.getExternalId())
-            .claimNumber(cmcClaim.getReferenceNumber())
-            .claimantName(cmcClaim.getClaimantName())
-            .defendantName(cmcClaim.getDefendantName())
-            .responseDeadline(cmcClaim.getResponseDeadline())
-            .claimAmount(cmcClaim.getTotalAmountTillToday())
-            .paymentDate(cmcClaim.getBySpecifiedDate())
-            .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
-            .ocmc(true)
-            .admittedAmount(cmcClaim.getAdmittedAmount())
-            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
-            .build()
+        return cmcClaims.stream().map(cmcClaim ->
+                                          DashboardClaimInfo.builder()
+                                              .createdDate(createAtToCreateDate(cmcClaim))
+                                              .claimId(cmcClaim.getExternalId())
+                                              .claimNumber(cmcClaim.getReferenceNumber())
+                                              .claimantName(cmcClaim.getClaimantName())
+                                              .defendantName(cmcClaim.getDefendantName())
+                                              .responseDeadline(cmcClaim.getResponseDeadline())
+                                              .claimAmount(cmcClaim.getTotalAmountTillToday())
+                                              .paymentDate(cmcClaim.getBySpecifiedDate())
+                                              .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
+                                              .ocmc(true)
+                                              .intentionToProceedDeadline(cmcClaim.getIntentionToProceedDeadline())
+                                              .admittedAmount(cmcClaim.getAdmittedAmount())
+                                              .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
+                                              .build()
         ).collect(Collectors.toList());
     }
 
@@ -53,4 +55,5 @@ public class ClaimStoreService {
 
         return createdDate;
     }
+
 }

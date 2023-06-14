@@ -885,4 +885,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(Organisation::getOrganisationID)
             .orElse("");
     }
+
+    @JsonIgnore
+    public boolean getApplicant1ResponseDeadlinePassed() {
+        return getApplicant1ResponseDeadline() != null
+            && getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
+            && getApplicant1ProceedWithClaim() == null;
+    }
 }

@@ -51,6 +51,7 @@ public class DashboardClaimInfoServiceTest {
     private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
+    private static final LocalDateTime intentionToProceedDeadline = LocalDateTime.now().minusDays(1);
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
         Arrays.asList(DashboardClaimInfo.builder()
                           .ocmc(true)
@@ -74,6 +75,19 @@ public class DashboardClaimInfoServiceTest {
                           .ocmc(true)
                           .createdDate(DATE_IN_2022)
                           .build()
+        );
+    private static final List<DashboardClaimInfo> Intention_To_ProceedDeadline_CASES =
+        Arrays.asList(
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2021)
+                .intentionToProceedDeadline(intentionToProceedDeadline)
+                .build(),
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2022)
+                .intentionToProceedDeadline(intentionToProceedDeadline)
+                .build()
         );
 
     @BeforeEach
@@ -220,6 +234,23 @@ public class DashboardClaimInfoServiceTest {
         assertThat(claimsForDefendant.size()).isEqualTo(2);
         assertThat(claimsForDefendant.get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
         assertThat(claimsForDefendant.get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
+    }
+
+    @Test
+    void shouldReturnCasesIntentionToProceedDeadline() {
+        List<CaseDetails> cases = List.of();
+        SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
+        given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(Intention_To_ProceedDeadline_CASES);
+        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+
+        assertThat(claimsForDefendant.size()).isEqualTo(2);
+        assertThat(claimsForDefendant.get(0).getIntentionToProceedDeadline()).isEqualTo(intentionToProceedDeadline);
+        assertThat(claimsForDefendant.get(1).getIntentionToProceedDeadline()).isEqualTo(intentionToProceedDeadline);
     }
 
     @Test

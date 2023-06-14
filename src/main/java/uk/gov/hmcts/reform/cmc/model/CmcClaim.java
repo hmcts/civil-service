@@ -23,8 +23,9 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -48,6 +49,10 @@ public class CmcClaim implements Claim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate responseDeadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime intentionToProceedDeadline;
     private boolean moreTimeRequested;
     private String submitterEmail;
 
@@ -254,6 +259,11 @@ public class CmcClaim implements Claim {
         return false;
     }
 
+    @Override
+    public boolean isSDOOrderCreated() {
+        return false;
+    }
+
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return hasClaimantResponse()
@@ -290,6 +300,13 @@ public class CmcClaim implements Claim {
 
     private boolean hasClaimantResponse() {
         return claimantResponse != null;
+    }
+
+    private boolean isApplicant1ResponseDeadlineEnded() {
+        return Optional.ofNullable(getIntentionToProceedDeadline()).filter(deadline ->
+                                                                               deadline.isBefore(LocalDateTime.now()))
+            .isPresent() && !hasClaimantResponse();
+
     }
 
     @Override
@@ -329,8 +346,9 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimEnded() {
-        return response.isFullDefence()
-            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
+        return (response.isFullDefence()
+            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION))
+            || isApplicant1ResponseDeadlineEnded();
     }
 
     @Override

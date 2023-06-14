@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -433,5 +434,23 @@ public class CaseDataTest {
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
+    }
+    
+    @Test
+    void isApplicationDeadlineNotPassed_thenFalse() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        //When
+        //Then
+        assertFalse(caseData.getApplicant1ResponseDeadlinePassed());
+    }
+
+    @Test
+    void isApplicationDeadlinePassed_thenTrue() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline().build();
+        //When
+        //Then
+        assertTrue(caseData.getApplicant1ResponseDeadlinePassed());
     }
 }

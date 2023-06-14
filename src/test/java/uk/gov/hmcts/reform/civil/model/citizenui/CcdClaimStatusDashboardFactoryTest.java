@@ -34,6 +34,17 @@ class CcdClaimStatusDashboardFactoryTest {
     @InjectMocks
     private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
+    private static CaseData getClaimWithFullAdmitResponse(
+        RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(paymentMethod)
+            .build();
+        return claim;
+    }
+
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
         CaseData claim = CaseData.builder()
@@ -227,6 +238,24 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired() {
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED);
+    }
+
+    @Test
     void given_mediation_whenGetSatus_mediationSuccessful() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -291,8 +320,21 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_claimantNotRespondedWithInDeadLine_whenGetStatus_claimEnded() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+            .applicant1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
 
@@ -342,15 +384,5 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_SETTLE_IN_COURT);
-    }
-
-    private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(paymentMethod)
-            .build();
-        return claim;
     }
 }

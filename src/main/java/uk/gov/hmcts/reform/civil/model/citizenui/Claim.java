@@ -77,4 +77,7 @@ public interface Claim {
     boolean claimantRejectOffer();
 
     boolean isPartialAdmissionRejected();
+
+    boolean isSDOOrderCreated();
+
 }

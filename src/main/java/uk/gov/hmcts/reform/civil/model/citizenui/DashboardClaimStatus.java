@@ -56,6 +56,11 @@ public enum DashboardClaimStatus {
     PROCEED_OFFLINE(
         Claim::isProceedOffline
     ),
+
+    SDO_ORDER_CREATED(
+        Claim::isSDOOrderCreated
+    ),
+
     RESPONSE_BY_POST(
         Claim::isPaperResponse
     ),
