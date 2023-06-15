@@ -124,6 +124,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     //hnl fields for trial
     private TrialHearingTimeDJ trialHearingTimeDJ;
+    private final boolean disposalHearingDateToToggle;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
     private final boolean writtenByJudge;

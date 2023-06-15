@@ -201,6 +201,9 @@ public class SdoHelper {
                 return caseData.getFastTrackMethodToggle() != null;
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
+            case "fastTrackTrialDateToToggle":
+                return caseData.getFastTrackHearingTime() != null
+                    && caseData.getFastTrackHearingTime().getDateToToggle() != null;
             default:
                 return false;
         }
@@ -333,6 +336,9 @@ public class SdoHelper {
                 return caseData.getDisposalHearingCostsToggle() != null;
             case "disposalHearingAddNewDirections":
                 return caseData.getDisposalHearingAddNewDirections() != null;
+            case "disposalHearingDateToToggle":
+                return caseData.getTrialHearingTimeDJ() != null
+                    && caseData.getTrialHearingTimeDJ().getDateToToggle() != null;
             default:
                 return false;
         }
