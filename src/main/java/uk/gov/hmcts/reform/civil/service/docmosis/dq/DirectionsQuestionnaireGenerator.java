@@ -504,7 +504,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
-                .getCourtLocationsByEpimmsId(authorisation,
+                .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
                     rc.getCaseLocation().getBaseLocation()
                 ));
             RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
