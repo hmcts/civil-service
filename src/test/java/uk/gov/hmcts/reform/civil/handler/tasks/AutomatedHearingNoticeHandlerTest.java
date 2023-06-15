@@ -130,8 +130,8 @@ class AutomatedHearingNoticeHandlerTest {
                 .hearingId(HEARING_ID)
                 .triggeredViaScheduler(true)
                 .build());
-        when(hearingsService.getUnNotifiedHearingResponses(AUTH_TOKEN, SERVICE_ID, null,
-                                                           null)).thenReturn(
+        when(hearingsService.getUnNotifiedHearingResponses(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -174,7 +174,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -214,7 +214,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID, "hearing-id-2", "hearing-id-3")));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -246,7 +246,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(List.of())
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.CASE_CLOSED));
@@ -284,7 +284,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(dispatchedHearingIds)
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -316,7 +316,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -362,7 +362,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
@@ -400,7 +400,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .build());
 
         when(hearingsService.getUnNotifiedHearingResponses(
-            AUTH_TOKEN, SERVICE_ID, null, null)).thenReturn(
+            anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
 
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(

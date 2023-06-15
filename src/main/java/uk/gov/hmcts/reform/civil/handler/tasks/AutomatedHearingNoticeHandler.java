@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceDa
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +128,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
         return hearingsService.getUnNotifiedHearingResponses(
             getSystemUpdateUser().getUserToken(),
             serviceId,
-            null,
+            LocalDateTime.now().minusDays(7),
             null
         );
     }
