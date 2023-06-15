@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -273,12 +276,6 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnListingComments_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo("");
-    }
-
-    @Test
     void shouldReturnEmptyString_whenHearingRequesterInvoked() {
         assertThat(HearingDetailsMapper.getHearingRequester()).isEqualTo("");
     }
@@ -334,5 +331,189 @@ public class HearingDetailsMapperTest {
                     .build()))
             .build();
         assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(List.of("11"));
+    }
+
+    @Nested
+    class GetListingComments {
+        @Test
+        void shouldReturnList_whenInvokedWithOneEvidenceFlag() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Audio/Video Evidence")
+                                           .flagCode("PF0014")
+                                           .flagComment("flag comment for evidence")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build())
+                .respondent1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("other flag")
+                                           .flagCode("PF0010")
+                                           .flagComment("flag comment")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build()
+                )
+                .build();
+
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
+                "Audio/Video Evidence: flag comment for evidence");
+        }
+
+        @Test
+        void shouldReturnList_whenInvokedWithMultipleEvidenceFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Audio/Video Evidence")
+                                           .flagCode("PF0014")
+                                           .flagComment("flag comment one")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build())
+                .respondent1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Audio/Video Evidence")
+                                           .flagCode("PF0014")
+                                           .flagComment("flag comment two")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build()
+                )
+                .build();
+
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
+                "Audio/Video Evidence: flag comment two, Audio/Video Evidence: flag comment one");
+        }
+
+        @Test
+        void shouldReturnList_whenInvokedWithMultipleEvidenceFlagsMissingComments() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Audio/Video Evidence")
+                                           .flagCode("PF0014")
+                                           .flagComment("flag comment one")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build())
+                .respondent1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Audio/Video Evidence")
+                                           .flagCode("PF0014")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build()
+                )
+                .build();
+
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
+                "Audio/Video Evidence, Audio/Video Evidence: flag comment one");
+        }
+
+        @Test
+        void shouldReturnNull_whenInvokedWithNoEvidenceFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Other 1")
+                                           .flagCode("PF0012")
+                                           .flagComment("flag comment one")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build())
+                .respondent1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Other 2")
+                                           .flagCode("PF0010")
+                                           .status("Active")
+                                           .flagComment("flag comment two")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build()
+                )
+                .build();
+
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).isNull();
+        }
+
+        @Test
+        void shouldReturnTruncatedComment_whenTheResultingListingCommentsAreOver200CharactersLong() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Other 1")
+                                           .flagCode("PF0014")
+                                           .flagComment(
+                                               "flag comment one flag comment one flag comment one flag comment one " +
+                                                   "flag comment one flag comment one flag comment one")
+                                           .status("Active")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build())
+                .respondent1(
+                    Party.builder()
+                        .flags(Flags.builder()
+                                   .details(wrapElements(List.of(
+                                       FlagDetail.builder()
+                                           .name("Other 2")
+                                           .flagCode("PF0014")
+                                           .status("Active")
+                                           .flagComment(
+                                               "flag comment two flag comment two flag comment two flag comment two " +
+                                                   "flag comment two flag comment two flag comment two")
+                                           .build()
+                                   )))
+                                   .build())
+                        .build()
+                )
+                .build();
+
+            assertThat(HearingDetailsMapper.getListingComments(caseData)).hasSize(200);
+        }
     }
 }
