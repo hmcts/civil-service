@@ -120,7 +120,7 @@ public class CaseDataToTextGeneratorTest {
         useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(
             type = FilterType.ASSIGNABLE_TYPE,
-            classes = CaseDataToTextGenerator.class
+            classes = {CaseDataToTextGenerator.class, ClaimUrlsConfiguration.class}
         )
     )
     public static class CaseDataToTextGeneratorTestConfig {
