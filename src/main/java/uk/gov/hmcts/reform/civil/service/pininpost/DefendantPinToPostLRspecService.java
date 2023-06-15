@@ -61,7 +61,7 @@ public class DefendantPinToPostLRspecService {
         return DefendantPinToPostLRspec.builder()
             .accessCode(AccessCodeGenerator.generateAccessCode())
             .respondentCaseRole(
-                CaseRole.Defendant.getFormattedName())
+                CaseRole.DEFENDENT.getFormattedName())
             .expiryDate(expiryDate)
             .build();
     }
