@@ -29,16 +29,12 @@ public record LipDefenceFormParty(String name, boolean isIndividual,
             .name(party.getPartyName())
             .phone(party.getPartyPhone())
             .email(party.getPartyEmail())
-            .primaryAddress(party.getPrimaryAddress());
-        if (party.isIndividual() || party.isSoleTrader()) {
-            builder.isIndividual(true);
+            .primaryAddress(party.getPrimaryAddress())
+            .isIndividual(party.isIndividual() || party.isSoleTrader());
             Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
                 .filter(Objects::nonNull)
                 .findFirst()
                 .ifPresent(builder::dateOfBirth);
-        } else {
-            builder.isIndividual(false);
-        }
         return builder;
     }
 
