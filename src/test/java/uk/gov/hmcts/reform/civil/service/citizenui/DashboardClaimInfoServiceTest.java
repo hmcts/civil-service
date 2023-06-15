@@ -131,7 +131,7 @@ public class DashboardClaimInfoServiceTest {
         assertThat(claimsForClaimant).isEqualTo(CLAIM_STORE_SERVICE_RESULTS);
     }
 
-    // @Test
+    @Test
     void shouldReturnClaimsForDefendantSuccessfully() {
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
@@ -172,7 +172,7 @@ public class DashboardClaimInfoServiceTest {
         assertThat(claimsForDefendant.get(2).getResponseDeadline()).isEqualTo(DATE_IN_2025.toLocalDate());
     }
 
-    // @Test
+    @Test
     void shouldIncludePaymentDateWhenItExists() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
