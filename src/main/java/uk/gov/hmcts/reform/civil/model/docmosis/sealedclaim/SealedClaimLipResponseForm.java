@@ -239,7 +239,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private static void addRepaymentMethod(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalAmount) {
         BigDecimal totalAmountInPounds = MonetaryConversions.penniesToPounds(totalAmount);
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediately(builder, totalAmountInPounds);
+            addPayByDatePayImmediately(builder, totalAmount);
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmountInPounds);
         } else if (caseData.isPayBySetDate()) {
