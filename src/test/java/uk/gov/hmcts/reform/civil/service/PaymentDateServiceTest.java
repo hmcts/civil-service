@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +39,7 @@ public class PaymentDateServiceTest {
         //When
         LocalDate payDate = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         //Then
-        org.assertj.core.api.Assertions.assertThat(payDate).isEqualTo(whenWillPay);
+        assertThat(payDate).isEqualTo(whenWillPay);
     }
 
     @Test
@@ -52,11 +54,11 @@ public class PaymentDateServiceTest {
         //When
         LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         //Then
-        org.assertj.core.api.Assertions.assertThat(result).isEqualTo(whenWasPaid);
+        assertThat(result).isEqualTo(whenWasPaid);
     }
 
     @Test
-    void shouldReturRespondent1ResponseDatePlus5Days_whenRespondent1ResponseDateArePresent() {
+    void shouldReturnRespondent1ResponseDatePlus5Days_whenRespondent1ResponseDateArePresent() {
         //Given
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         when(calculator.calculateRespondentPaymentDateAdmittedClaim(any())).thenReturn(whenWillPay);
@@ -66,17 +68,17 @@ public class PaymentDateServiceTest {
         //When
         LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         //Then
-        org.assertj.core.api.Assertions.assertThat(result).isEqualTo(whenWillPay);
+        assertThat(result).isEqualTo(whenWillPay);
     }
 
     @Test
-    void shouldReturNull_whenAnythingIsSettled() {
+    void shouldReturnNull_whenAnythingIsSettled() {
         //Given
         CaseData caseData = CaseData.builder().build();
         //When
         LocalDate result = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         //Then
-        org.assertj.core.api.Assertions.assertThat(result).isNull();
+        assertThat(result).isNull();
     }
 
 }
