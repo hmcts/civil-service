@@ -227,6 +227,8 @@ public class SdoGeneratorService {
             )
             .fastTrackAddNewDirections(caseData.getFastTrackAddNewDirections())
             .fastTrackNotes(caseData.getFastTrackNotes())
+            .fastTrackTrialDateToToggle(
+                SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle"))
             .fastTrackAltDisputeResolutionToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle")
             )
@@ -296,7 +298,6 @@ public class SdoGeneratorService {
             .smallClaimsHearingTime(
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
-            .smallClaimsMethod(caseData.getSmallClaimsMethod())
             // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
             // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
