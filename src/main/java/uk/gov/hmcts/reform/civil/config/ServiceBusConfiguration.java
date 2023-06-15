@@ -65,6 +65,7 @@ public class ServiceBusConfiguration {
         log.info("endpoint: {}", endpoint);
 
         String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
+        log.info("destination: {}", destination);
 
         ConnectionStringBuilder connectionStringBuilder =
             new ConnectionStringBuilder(
