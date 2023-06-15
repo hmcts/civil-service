@@ -100,6 +100,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean fastTrackWitnessOfFactToggle;
     private final boolean fastTrackSchedulesOfLossToggle;
     private final boolean fastTrackCostsToggle;
+    private final boolean fastTrackTrialDateToToggle;
     private final boolean fastTrackTrialToggle;
     private final boolean fastTrackMethodToggle;
 }
