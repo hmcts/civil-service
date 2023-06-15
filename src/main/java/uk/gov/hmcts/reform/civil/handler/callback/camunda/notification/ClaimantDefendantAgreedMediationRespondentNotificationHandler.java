@@ -88,10 +88,16 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
 
     private String addTemplate(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented()) {
-            return notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate();
+            return getNotifyRespondentLiPMediationAgreementTemplate(caseData);
         } else {
             return notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate();
         }
+    }
+
+    private String getNotifyRespondentLiPMediationAgreementTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh() :
+            notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate();
     }
 
     public String getRespondentLegalOrganizationName(CaseData caseData) {

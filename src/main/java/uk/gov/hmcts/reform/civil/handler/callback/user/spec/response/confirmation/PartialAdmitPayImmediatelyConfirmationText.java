@@ -24,7 +24,12 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
+        if (whenBePaid == null) {
+            throw new IllegalStateException("Unable to format the payment date.");
+        }
+
         String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
+
         String applicantName = caseData.getApplicant1().getPartyName();
 
         StringBuilder sb = new StringBuilder();

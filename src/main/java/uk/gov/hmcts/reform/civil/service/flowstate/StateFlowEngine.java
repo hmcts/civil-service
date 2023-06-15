@@ -467,17 +467,9 @@ public class StateFlowEngine {
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set(flags -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                if (featureToggleService.isSdoEnabled()) {
-                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                }
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).and(applicantOutOfTime.negate()).or(declinedMediation))
-            .set(flags -> {
-                if (featureToggleService.isSdoEnabled()) {
-                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                }
-            })
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
@@ -509,11 +501,6 @@ public class StateFlowEngine {
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
                 .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
                                                                               .and(not(agreedToMediation)))
-                .set(flags -> {
-                    if (featureToggleService.isSdoEnabled()) {
-                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                    }
-                })
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
@@ -534,11 +521,6 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
-                    .set(flags -> {
-                        if (featureToggleService.isSdoEnabled()) {
-                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                        }
-                    })
             .state(FULL_DEFENCE_NOT_PROCEED)
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -562,11 +544,6 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
-                    .set(flags -> {
-                        if (featureToggleService.isSdoEnabled()) {
-                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
-                        }
-                    })
             .state(FULL_ADMIT_AGREE_REPAYMENT)
             .state(FULL_ADMIT_REJECT_REPAYMENT)
             .state(FULL_ADMIT_PROCEED)
