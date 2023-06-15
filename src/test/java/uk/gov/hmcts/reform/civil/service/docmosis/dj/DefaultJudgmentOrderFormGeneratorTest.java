@@ -151,8 +151,8 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().
-            roles(Collections.emptyList()).build());
+        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                .roles(Collections.emptyList()).build());
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
