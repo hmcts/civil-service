@@ -517,8 +517,8 @@ public class SdoHelperTest {
                 .fastTrackWitnessOfFactToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackSchedulesOfLossToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-                .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
@@ -533,6 +533,34 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenFastDateToTogglesExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateSdoFastTrackTrial()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle")).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDisposalHearingDateToToggleExist() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .atStateClaimIssuedTrialHearing()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateClaimIssuedTrialSDOInPersonHearing()
+                .atStateClaimIssuedTrialLocationInPerson()
+                .atStateSdoTrialDj()
+                .build();
+
+            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
         }
 
         @Test
@@ -576,7 +604,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isFalse();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
-
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
         }
     }
