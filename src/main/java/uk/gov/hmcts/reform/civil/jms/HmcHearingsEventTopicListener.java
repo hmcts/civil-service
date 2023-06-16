@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.exception.HmcTopicEventProcessingException;
@@ -18,6 +21,7 @@ import javax.jms.TextMessage;
 
 import java.nio.charset.StandardCharsets;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 import static uk.gov.hmcts.reform.hmc.model.jms.HmcStatus.EXCEPTION;
 
 @Slf4j
@@ -77,14 +81,14 @@ public class HmcHearingsEventTopicListener {
         );
 
         // trigger event for WA
-        // StartEventResponse startEventResponse =
-        //    coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
-        // CaseDataContent caseDataContent = CaseDataContent.builder()
-        //     .eventToken(startEventResponse.getToken())
-        //     .event(Event.builder().id(startEventResponse.getEventId()).build())
-        //     .data(startEventResponse.getCaseDetails().getData())
-        // .build();
-        // coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+         StartEventResponse startEventResponse =
+            coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
+         CaseDataContent caseDataContent = CaseDataContent.builder()
+             .eventToken(startEventResponse.getToken())
+             .event(Event.builder().id(startEventResponse.getEventId()).build())
+             .data(startEventResponse.getCaseDetails().getData())
+         .build();
+         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
         log.info(
             "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
             caseId, hearingId);
