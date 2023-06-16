@@ -29,15 +29,21 @@ public class EndBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        ExternalTaskInput externalTaskInput = mapper.convertValue(externalTask.getAllVariables(),
-                                                                  ExternalTaskInput.class);
-        String caseId = externalTaskInput.getCaseId();
+        try {
+            ExternalTaskInput externalTaskInput = mapper.convertValue(
+                externalTask.getAllVariables(),
+                ExternalTaskInput.class
+            );
+            String caseId = externalTaskInput.getCaseId();
 
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
-        CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = data.getBusinessProcess();
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
+            CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            BusinessProcess businessProcess = data.getBusinessProcess();
 
-        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        } catch (Exception e) {
+            log.error("CAMUNDA EXCEPTION End business process ----  ({}) )", e.getMessage());
+        }
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {

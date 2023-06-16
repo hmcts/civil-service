@@ -34,11 +34,15 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        CaseData caseData = startBusinessProcess(externalTask);
-        variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(caseData);
-        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
-        variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        try {
+            CaseData caseData = startBusinessProcess(externalTask);
+            variables = Variables.createVariables();
+            var stateFlow = stateFlowEngine.evaluate(caseData);
+            variables.putValue(FLOW_STATE, stateFlow.getState().getName());
+            variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        } catch (Exception e) {
+            log.error("CAMUNDA EXCEPTION Start business process ----  ({}) )", e.getMessage());
+        }
     }
 
     @Override

@@ -58,6 +58,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+            log.info("CaseID ({})  caseEvent ({}) from CaseEventTaskHandler -- ", caseId, variables.getCaseEvent());
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
@@ -73,6 +74,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
+        } catch (Exception e) {
+            log.error("CAMUNDA EXCEPTION CaseEventTaskHandler process ----  ({}) )", e.getMessage());
         }
     }
 
