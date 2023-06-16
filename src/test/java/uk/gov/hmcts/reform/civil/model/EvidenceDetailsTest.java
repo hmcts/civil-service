@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +21,7 @@ class EvidenceDetailsTest {
 
     @Test
     void shouldReturnExpertWitnessEvidenceWhenItsNotNull() {
-       //Given
+        //Given
         EvidenceDetails evidenceDetails = EvidenceDetails.builder().expertWitnessEvidence(WITNESS_EVIDENCE).build();
         //When
         String description = evidenceDetails.getEvidenceDescription();

@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 
 import java.time.LocalDateTime;
@@ -24,13 +23,13 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateCUIResponseSealedFormCallBackHandler.class,
     JacksonAutoConfiguration.class,
 })
 public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
