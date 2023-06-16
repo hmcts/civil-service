@@ -26,10 +26,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI
 @RequiredArgsConstructor
 public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandler {
 
+    private final static List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
+
     private final ObjectMapper objectMapper;
     private final SealedClaimLipResponseFormGenerator formGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
-    private final static List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
+
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
     );
