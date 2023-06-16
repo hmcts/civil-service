@@ -24,20 +24,6 @@ public record LipDefenceFormParty(String name, boolean isIndividual,
         return builder.build();
     }
 
-    private static LipDefenceFormPartyBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
-        LipDefenceFormPartyBuilder builder = LipDefenceFormParty.builder()
-            .name(party.getPartyName())
-            .phone(party.getPartyPhone())
-            .email(party.getPartyEmail())
-            .primaryAddress(party.getPrimaryAddress())
-            .isIndividual(party.isIndividual() || party.isSoleTrader());
-            Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
-                .filter(Objects::nonNull)
-                .findFirst()
-                .ifPresent(builder::dateOfBirth);
-        return builder;
-    }
-
     @JsonIgnore
     public static LipDefenceFormParty toLipDefenceParty(Party party, Address correspondenceAddress) {
         if (party == null) {
@@ -46,5 +32,19 @@ public record LipDefenceFormParty(String name, boolean isIndividual,
         LipDefenceFormPartyBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
         builder.correspondenceAddress(correspondenceAddress);
         return builder.build();
+    }
+
+    private static LipDefenceFormPartyBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
+        LipDefenceFormPartyBuilder builder = LipDefenceFormParty.builder()
+            .name(party.getPartyName())
+            .phone(party.getPartyPhone())
+            .email(party.getPartyEmail())
+            .primaryAddress(party.getPrimaryAddress())
+            .isIndividual(party.isIndividual() || party.isSoleTrader());
+        Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
+            .filter(Objects::nonNull)
+            .findFirst()
+            .ifPresent(builder::dateOfBirth);
+        return builder;
     }
 }

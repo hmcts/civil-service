@@ -18,7 +18,7 @@ public class DebtTemplateData {
     private final BigDecimal paidPerMonth;
 
     @JsonIgnore
-    public static DebtTemplateData loanDebtFrom (final LoanCardDebtLRspec debt) {
+    public static DebtTemplateData loanDebtFrom(final LoanCardDebtLRspec debt) {
         return DebtTemplateData.builder()
             .debtOwedTo(debt.getLoanCardDebtDetail())
             .paidPerMonth(debt.getMonthlyPayment())
@@ -27,7 +27,7 @@ public class DebtTemplateData {
     }
 
     @JsonIgnore
-    public static DebtTemplateData generalDebtFrom (final DebtLRspec debtLRspec) {
+    public static DebtTemplateData generalDebtFrom(final DebtLRspec debtLRspec) {
         DebtTemplateData.DebtTemplateDataBuilder builder = DebtTemplateData.builder()
             .debtOwedTo(debtLRspec.getDebtType().getLabel());
         switch (debtLRspec.getPaymentFrequency()) {
@@ -47,6 +47,5 @@ public class DebtTemplateData {
                 break;
         }
         return builder.build();
-
     }
 }

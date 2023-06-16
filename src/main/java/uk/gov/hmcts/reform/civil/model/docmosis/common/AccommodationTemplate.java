@@ -21,20 +21,27 @@ import static uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec.PRIVATE_RENTA
 @Getter
 @Builder
 public class AccommodationTemplate {
-    private static final Map<HomeTypeOptionLRspec, String> whereDoTheyLiveMap = Map.of(OWNED_HOME, "Owned outright",
-                                                                                       PRIVATE_RENTAL, "Rent",
-                                                                                       JOINTLY_OWNED_HOME, "Jointly owned home",
-                                                                                       ASSOCIATION_HOME, "Council or housing");
+
+    private static final Map<HomeTypeOptionLRspec, String> WHERE_DO_THEY_LIVE_MAP = Map.of(OWNED_HOME,
+                                                                                           "Owned outright",
+                                                                                           PRIVATE_RENTAL,
+                                                                                           "Rent",
+                                                                                           JOINTLY_OWNED_HOME,
+                                                                                           "Jointly owned home",
+                                                                                           ASSOCIATION_HOME,
+                                                                                           "Council or housing"
+    );
     private HomeDetails homeDetails;
+
     public String getDisplayValue() {
         return Optional.ofNullable(homeDetails)
             .map(home -> getHomeTypeAsString()).orElse("");
     }
 
     private String getHomeTypeAsString() {
-        if(OTHER == homeDetails.type()){
+        if (OTHER == homeDetails.type()) {
             return homeDetails.typeOtherDetails();
         }
-        return whereDoTheyLiveMap.get(homeDetails.type());
+        return WHERE_DO_THEY_LIVE_MAP.get(homeDetails.type());
     }
 }
