@@ -22,7 +22,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
 
-
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         return SealedClaimLipResponseForm.toTemplate(caseData);

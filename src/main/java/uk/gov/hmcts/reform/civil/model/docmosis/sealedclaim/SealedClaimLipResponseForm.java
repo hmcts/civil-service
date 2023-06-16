@@ -159,7 +159,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     }
 
-
     private static void addPayBySetDate(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
         builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
             .amountToPay(totalClaimAmount + "")
@@ -178,7 +177,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
                        .finalPaymentBy(totalClaimAmount))
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
-
 
     @JsonIgnore
     private static void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
@@ -245,7 +243,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
             addPayBySetDate(caseData, builder, totalAmountInPounds);
         }
     }
-
 
     @JsonIgnore
     private static List<DebtTemplateData> mapToDebtList(Respondent1DebtLRspec debtLRspec) {
