@@ -157,7 +157,7 @@ public class HearingValuesServiceTest {
             .hearingInWelshFlag(true)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
-            .listingComments("")
+            .listingComments(null)
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
