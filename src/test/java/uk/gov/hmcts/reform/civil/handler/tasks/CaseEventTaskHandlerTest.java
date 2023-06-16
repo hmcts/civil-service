@@ -34,12 +34,12 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -181,7 +181,13 @@ class CaseEventTaskHandlerTest {
             verify(externalTaskService, never()).complete(mockTask);
             verify(externalTaskService).handleFailure(
                 eq(mockTask),
-                eq(errorMessage),
+                eq(String.format(
+                    "[%s] during [%s] to [%s] [%s]: []",
+                    422,
+                    Request.HttpMethod.POST,
+                    "exampleUrl",
+                    errorMessage
+                )),
                 anyString(),
                 eq(2),
                 eq(500L)
@@ -300,11 +306,12 @@ class CaseEventTaskHandlerTest {
         }
 
         @Test
-        //Using an invalid flow state `PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA`
+            //Using an invalid flow state `PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA`
         void shouldThrowErrorMessage_whenInAnInvalidFlowStatePopulatingSummary() {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName());
-            variables.putValue(FLOW_FLAGS,
+            variables.putValue(
+                FLOW_FLAGS,
                 getFlowFlags(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
             );
 
@@ -746,7 +753,7 @@ class CaseEventTaskHandlerTest {
             return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
                           FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
-                    );
+            );
         }
 
         private CaseData getCaseData(FlowState.Main state) {
