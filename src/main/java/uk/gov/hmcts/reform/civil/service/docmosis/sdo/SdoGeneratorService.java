@@ -378,7 +378,6 @@ public class SdoGeneratorService {
             )
             .smallClaimsNumberOfWitnessesToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
-            )
             );
 
         if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson) {
