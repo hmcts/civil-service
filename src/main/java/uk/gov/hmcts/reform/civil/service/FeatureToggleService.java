@@ -52,4 +52,8 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
+    public boolean isAutomatedHearingNoticeEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("ahn");
+    }
+
 }
