@@ -162,7 +162,18 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
                 .thenAnswer(invocation -> {
-                    throw new Exception(errorMessage);
+                    throw FeignException.errorStatus(errorMessage, Response.builder()
+                        .request(
+                            Request.create(
+                                Request.HttpMethod.POST,
+                                "exampleUrl",
+                                new HashMap<>(),
+                                null,
+                                null,
+                                null
+                            ))
+                        .status(422)
+                        .build());
                 });
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);

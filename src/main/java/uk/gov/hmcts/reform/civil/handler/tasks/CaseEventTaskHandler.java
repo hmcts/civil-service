@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.util.Map;
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.exception.ValueMapperException;
@@ -17,13 +15,16 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+
+import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -74,6 +75,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
+        } catch (FeignException feignException) {
+            log.error("FeignException ", feignException);
+            throw feignException;
         } catch (Exception e) {
             log.error("CAMUNDA EXCEPTION CaseEventTaskHandler process ----  ({}) )", e.getMessage());
         }
@@ -165,27 +169,37 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             switch (flowState) {
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    return format("Unrepresented defendant: %s",
-                                      StringUtils.join(
-                                          getDefendantNames(UNREPRESENTED, caseData), " and "
-                                      ));
+                    return format(
+                        "Unrepresented defendant: %s",
+                        StringUtils.join(
+                            getDefendantNames(UNREPRESENTED, caseData), " and "
+                        )
+                    );
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    return format("Unregistered defendant solicitor firm: %s",
-                                     StringUtils.join(
-                                         getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                               ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                           caseData), " and "
-                                     ));
+                    return format(
+                        "Unregistered defendant solicitor firm: %s",
+                        StringUtils.join(
+                            getDefendantNames(
+                                featureToggleService.isNoticeOfChangeEnabled()
+                                    ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                caseData
+                            ), " and "
+                        )
+                    );
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    return format("Unrepresented defendant and unregistered defendant solicitor firm. "
-                                      + "Unrepresented defendant: %s. "
-                                      + "Unregistered defendant solicitor firm: %s.",
-                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
-                                        StringUtils.join(
-                                            getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                                  ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                              caseData), " and "
-                                        ));
+                    return format(
+                        "Unrepresented defendant and unregistered defendant solicitor firm. "
+                            + "Unrepresented defendant: %s. "
+                            + "Unregistered defendant solicitor firm: %s.",
+                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                        StringUtils.join(
+                            getDefendantNames(
+                                featureToggleService.isNoticeOfChangeEnabled()
+                                    ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                caseData
+                            ), " and "
+                        )
+                    );
                 case FULL_DEFENCE_PROCEED:
                     return !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                         ? getDescriptionFullDefenceProceed(caseData) : null;
