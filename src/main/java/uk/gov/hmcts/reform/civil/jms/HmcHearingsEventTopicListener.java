@@ -81,14 +81,14 @@ public class HmcHearingsEventTopicListener {
         );
 
         // trigger event for WA
-         StartEventResponse startEventResponse =
+        StartEventResponse startEventResponse =
             coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
-         CaseDataContent caseDataContent = CaseDataContent.builder()
-             .eventToken(startEventResponse.getToken())
-             .event(Event.builder().id(startEventResponse.getEventId()).build())
-             .data(startEventResponse.getCaseDetails().getData())
-         .build();
-         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+        CaseDataContent caseDataContent = CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(startEventResponse.getCaseDetails().getData())
+            .build();
+        coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
         log.info(
             "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
             caseId, hearingId);
