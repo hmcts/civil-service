@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -194,17 +193,17 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitAlreadyPaid(){
+    public void partAdmitAlreadyPaid() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(BigDecimal.valueOf(10_000))
-                                        .howWasThisAmountPaid(PaymentMethod.CHEQUE)
-                                        .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
-                                        .build())
+                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                                .build())
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
 
         CaseData caseData = timeline(builder)
@@ -216,7 +215,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseAlreadyPaid(){
+    public void fullDefenseAlreadyPaid() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -238,7 +237,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseDispute(){
+    public void fullDefenseDispute() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -255,7 +254,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void counterClaim(){
+    public void counterClaim() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))

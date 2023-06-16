@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
