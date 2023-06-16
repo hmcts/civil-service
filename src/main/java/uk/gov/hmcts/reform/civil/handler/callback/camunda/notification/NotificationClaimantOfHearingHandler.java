@@ -1,18 +1,24 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -21,16 +27,26 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationClaimantOfHearingHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
+    private final HearingFeesService hearingFeesService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
+    private final RuntimeService camundaService;
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING, NOTIFY_CLAIMANT_HEARING_HMC);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
+    public static final String TASK_ID_CLAIMANT_HMC = "NotifyClaimantSolicitorHearing";
+    private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String TIME_FORMAT = "hh:mma";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -41,13 +57,26 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID_CLAIMANT;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (NOTIFY_CLAIMANT_HEARING.equals(caseEvent)) {
+            return TASK_ID_CLAIMANT;
+        } else if (NOTIFY_CLAIMANT_HEARING_HMC.equals(caseEvent)) {
+            return TASK_ID_CLAIMANT_HMC;
+        } else {
+            throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
+        }
     }
 
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
-        sendEmail(caseData, recipient);
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (NOTIFY_CLAIMANT_HEARING.equals(caseEvent)) {
+            sendEmail(caseData, recipient);
+        }
+        if (NOTIFY_CLAIMANT_HEARING_HMC.equals(caseEvent)) {
+            sendEmailHMC(caseData, recipient);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
@@ -62,6 +91,23 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         }
         notificationService.sendMail(recipient, emailTemplate, addProperties(caseData),
                                      String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber())
+        );
+    }
+
+    private void sendEmailHMC(CaseData caseData, String recipient) {
+        String emailTemplate;
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
+        if (fee != null && fee.getCalculatedAmountInPence().compareTo(
+            BigDecimal.ZERO) > 0) {
+            emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC();
+        } else {
+            emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
+        }
+        var variables = camundaService.getVariables(caseData.getBusinessProcess().getProcessInstanceId());
+        String hearingId = variables.get("hearingId").toString();
+        log.info("Hearing id from camunda {}", hearingId);
+        notificationService.sendMail(recipient, emailTemplate, addPropertiesHMC(caseData),
+                                     String.format(REFERENCE_TEMPLATE_HEARING, hearingId)
         );
     }
 
@@ -98,5 +144,32 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             CLAIMANT_REFERENCE_NUMBER, reference
 
         ));
+    }
+
+    public Map<String, String> addPropertiesHMC(final CaseData caseData) {
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
+        var variables = camundaService.getVariables(caseData.getBusinessProcess().getProcessInstanceId());
+
+        LocalDate hearingDate = (LocalDate) variables.get("hearingDate");
+        log.info("Hearing id from camunda {}", hearingDate);
+
+        LocalTime hearingTime = (LocalTime) variables.get("hearingTime");
+        log.info("Hearing id from camunda {}", hearingTime);
+
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            HEARING_FEE,
+            fee == null ? "£0.00" : String.valueOf(fee.formData()),
+            HEARING_DATE,
+            hearingDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT)),
+            HEARING_TIME,
+            hearingTime.format(DateTimeFormatter.ofPattern(TIME_FORMAT)).replace("AM", "am").replace(
+                "PM",
+                "pm"
+            ),
+            HEARING_DUE_DATE,
+            calculateHearingDueDate(LocalDate.now(), hearingDate).format(DateTimeFormatter.ofPattern(DATE_FORMAT))
+        );
     }
 }
