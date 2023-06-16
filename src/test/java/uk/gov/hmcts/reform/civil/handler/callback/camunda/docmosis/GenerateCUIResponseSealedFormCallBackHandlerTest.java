@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,9 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
     private GenerateCUIResponseSealedFormCallBackHandler handler;
     @MockBean
     private SealedClaimLipResponseFormGenerator formGenerator;
+
+    @MockBean
+    private SystemGeneratedDocumentService systemGeneratedDocumentService;
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
