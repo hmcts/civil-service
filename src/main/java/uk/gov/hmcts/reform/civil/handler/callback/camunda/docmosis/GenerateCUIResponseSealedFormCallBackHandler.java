@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI
 @RequiredArgsConstructor
 public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandler {
 
-    private final static List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_CUI_SEALED);
 
     private final ObjectMapper objectMapper;
     private final SealedClaimLipResponseFormGenerator formGenerator;
