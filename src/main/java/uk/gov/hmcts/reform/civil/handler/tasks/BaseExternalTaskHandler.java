@@ -83,6 +83,12 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
+        log.info("Handle failure remainingRetries '{}' externalTask.getRetries() is null '{}' " +
+                     "processInstanceId '{}' maxRetries '{}'", remainingRetries,
+            externalTask.getRetries() != null ? externalTask.getRetries() : true,
+            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
+            maxRetries
+        );
 
         externalTaskService.handleFailure(
             externalTask,
