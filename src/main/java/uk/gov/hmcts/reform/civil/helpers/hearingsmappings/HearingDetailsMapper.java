@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 
 public class HearingDetailsMapper {
 
@@ -20,6 +21,8 @@ public class HearingDetailsMapper {
     public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
     private static String EMPTY_STRING = "";
+
+    private static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -100,8 +103,20 @@ public class HearingDetailsMapper {
     }
 
     public static String getListingComments(CaseData caseData) {
-        return EMPTY_STRING;
-        //todo CIV-6855
+        String comments = getAllActiveFlags(caseData).stream()
+            .flatMap(flags -> flags.getDetails().stream())
+            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
+            .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
+            .reduce("", String::concat)
+            .replaceAll("\n", " ")
+            .replaceAll("\\s+", " ");
+
+        if (comments != null && !comments.isEmpty()) {
+            String refactoredComment = comments.substring(0, comments.length() - 2);
+            return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
+        }
+
+        return null;
     }
 
     public static String getHearingRequester() {
