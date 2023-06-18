@@ -146,7 +146,7 @@ class DeadlineExtensionValidatorTest {
                 false
             );
 
-            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 56 days.");
+            assertThat(errors).contains("The agreed extension date must be after the current deadline");
         }
 
         @Test
