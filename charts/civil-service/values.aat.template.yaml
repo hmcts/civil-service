@@ -44,6 +44,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
   postgresql:
     enabled: true
     image:
