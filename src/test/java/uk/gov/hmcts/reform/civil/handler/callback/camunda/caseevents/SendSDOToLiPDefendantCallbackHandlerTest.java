@@ -49,15 +49,15 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        // Given
+        // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        // When
+        // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
-        // Then
+        // then
         assertThat(response.getErrors()).isNull();
         verify(sendSDOBulkPrintService).sendSDOToDefendantLIP(caseData);
     }

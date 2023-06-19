@@ -35,15 +35,15 @@ class SendSDOBulkPrintServiceTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        // Given
+        // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         given(sealedClaimFormGeneratorForSpec.downloadDocument(any())).willReturn(LETTER_CONTENT);
 
-        // When
+        // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
 
-        // Then
+        // then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
@@ -55,27 +55,27 @@ class SendSDOBulkPrintServiceTest {
 
     @Test
     void shouldNotDownloadDocument_whenNull() {
-        // Given
+        // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(null).build();
 
-        // When
+        // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
 
-        // Then
+        // then
         verifyNoInteractions(bulkPrintService);
     }
 
     @Test
     void shouldNotDownloadDocument_whenSDOOrderAbsent() {
-        // Given
+        // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build())).build();
 
-        // When
+        // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
 
-        // Then
+        // then
         verifyNoInteractions(bulkPrintService);
     }
 }
