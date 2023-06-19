@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
 
 /**
  * Interface for standard implementation of task handler that is invoked for each fetched and locked task.
@@ -83,11 +82,13 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
-        log.info("Handle failure remainingRetries '{}' externalTask.getRetries() is null '{}' " +
-                     "processInstanceId '{}' maxRetries '{}'", remainingRetries,
-            externalTask.getRetries() != null ? externalTask.getRetries() : true,
-            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
-            maxRetries
+        log.info("Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
+                     "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
+                 externalTask.getRetries() != null ? false : true,
+                 externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
+                 remainingRetries,
+                 externalTask.getRetries(),
+                 maxRetries
         );
 
         externalTaskService.handleFailure(
@@ -95,7 +96,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             e.getMessage(),
             getStackTrace(e),
             remainingRetries - 1,
-            calculateExponentialRetryTimeout(500, maxRetries, remainingRetries)
+            5 * 60 * 1000 // 5 min delay harcoded
         );
     }
 
