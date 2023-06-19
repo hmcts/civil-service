@@ -81,8 +81,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
-  syncBranchesWithMaster(['demo'])
-
   before('smoketest:preview') {
     validateRpaContract()
     sh """
