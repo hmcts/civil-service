@@ -189,7 +189,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .getHumanFriendly());
     }
 
-
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .timelineComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getTimeLineComment).orElse(
