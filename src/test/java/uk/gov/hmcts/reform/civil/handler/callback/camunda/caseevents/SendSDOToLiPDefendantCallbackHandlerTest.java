@@ -33,7 +33,7 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
     @MockBean
     private SendSDOBulkPrintService sendSDOBulkPrintService;
 
-    public static final String TASK_ID = "SendSDOToDefendantLiP";
+    public static final String TASK_ID = "SendSDOToDefendantLIP";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

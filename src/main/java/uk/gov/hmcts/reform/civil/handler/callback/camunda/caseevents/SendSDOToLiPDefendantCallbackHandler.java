@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SDO_ORDER_TO_LIP
 public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SEND_SDO_ORDER_TO_LIP_DEFENDANT);
-    public static final String TASK_ID = "SendSDOToDefendantLiP";
+    public static final String TASK_ID = "SendSDOToDefendantLIP";
     private final SendSDOBulkPrintService sendSDOBulkPrintService;
 
     @Override
