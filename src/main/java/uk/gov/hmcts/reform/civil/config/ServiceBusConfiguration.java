@@ -55,6 +55,7 @@ public class ServiceBusConfiguration {
     // private int threadCount;
 
     @Bean
+    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
         log.info("namespace: {}", namespace);
@@ -76,6 +77,7 @@ public class ServiceBusConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
