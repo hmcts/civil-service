@@ -51,12 +51,12 @@ public class HearingsService {
 
     public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
                                                         int requestVersion, LocalDateTime receivedDateTime,
-                                                        PartiesNotified serviceData) {
+                                                        PartiesNotified payload) {
         try {
             return hearingNoticeApi.updatePartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
-                serviceData,
+                payload,
                 hearingId,
                 requestVersion,
                 receivedDateTime
