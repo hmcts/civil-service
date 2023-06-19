@@ -68,6 +68,7 @@ java:
     HMC_HEARINGS_TOPIC_NAME: 'hmc-to-cft-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
 
   keyVaults:
     civil:

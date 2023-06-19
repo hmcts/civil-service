@@ -337,6 +337,7 @@ azure:
       idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+      enabled: {HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
 
 ---
 
