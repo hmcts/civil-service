@@ -413,14 +413,14 @@ rd_commondata:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    recipient: matthew.fallon@hmcts.net
+    multipartyrecipient: matthew.fallon@hmcts.net
+    specRecipient: matthew.fallon@hmcts.net
 
 notification:
   caseworker:
     spec:
-      receiver: civilmoneyclaimsdemo@gmail.com
+      receiver: matthew.fallon@hmcts.net
 ---
 
 spring:
