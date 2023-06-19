@@ -38,7 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_VACATE_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
@@ -163,7 +163,7 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldPay_whenConsentedWithin14DaysAdjournVacateApplicationIsBeingMade() {
         CaseData caseData = getFeeCase(
-                List.of(ADJOURN_VACATE_HEARING),
+                List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(14));
 
         assertThat(feesService.isFreeApplication(caseData)).isFalse();
@@ -172,7 +172,7 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldBeFree_whenConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
         CaseData caseData = getFeeCase(
-                List.of(ADJOURN_VACATE_HEARING),
+                List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
 
         assertThat(feesService.isFreeApplication(caseData)).isTrue();
@@ -298,17 +298,17 @@ class GeneralAppFeesServiceTest {
         @Test
         void adjourn_should_pay_default_or_free_fee() {
             CaseData caseDataWithin14DaysWithNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithNotice))
                     .isEqualTo(FEE_PENCE_275);
             CaseData caseDataWithin14DaysWithoutNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.NO, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithoutNotice))
                     .isEqualTo(FEE_PENCE_108);
             CaseData caseDataOutside14Days = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.YES, YesOrNo.NO, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
                     .isEqualTo(FEE_PENCE_0);
@@ -356,7 +356,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void mix_default_adjourn_should_not_free() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.ADJOURN_VACATE_HEARING);
+            randomList.add(GeneralApplicationTypes.ADJOURN_HEARING);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
