@@ -916,6 +916,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
-        return getRespondToAdmittedClaim() != null? getRespondToAdmittedClaim() : getRespondToClaim();
+        return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
     }
 }
