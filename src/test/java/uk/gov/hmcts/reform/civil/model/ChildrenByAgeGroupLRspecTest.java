@@ -13,7 +13,7 @@ class ChildrenByAgeGroupLRspecTest {
         //When
         int result = childrenByAgeGroupLRspec.getTotalChildren();
         //Then
-        assertThat(result).isEqualTo(0);
+        assertThat(result).isZero();
     }
 
     @Test

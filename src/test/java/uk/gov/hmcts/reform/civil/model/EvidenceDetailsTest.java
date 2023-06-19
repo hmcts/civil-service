@@ -36,7 +36,7 @@ class EvidenceDetailsTest {
         //When
         String description = evidenceDetails.getEvidenceDescription();
         //Then
-        assertThat(description).isEqualTo("");
+        assertThat(description).isEmpty();
     }
 
 }

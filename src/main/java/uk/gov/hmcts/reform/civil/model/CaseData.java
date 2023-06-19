@@ -913,4 +913,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
             .orElse(null);
     }
+
+    @JsonIgnore
+    public RespondToClaim getResponseToClaim() {
+        return getRespondToAdmittedClaim() != null? getRespondToAdmittedClaim() : getRespondToClaim();
+    }
 }

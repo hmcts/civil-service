@@ -178,23 +178,17 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
 
-    @JsonIgnore
-    private static void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
-        addDetailsOnWhyClaimIsRejected(caseData, builder);
-        if (caseData.hasDefendantPayedTheAmountClaimed()) {
-            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                .orElse(caseData.getRespondToClaim());
-            builder.whyReject("ALREADY_PAID")
-                .howMuchWasPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "")
-                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
-                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                                ? respondToClaim.getHowWasThisAmountPaidOther()
-                                : respondToClaim.getHowWasThisAmountPaid()
-                    .getHumanFriendly());
-        } else if (caseData.isClaimBeingDisputed()) {
-            builder.whyReject("DISPUTE");
-        }
+    private static void alreadyPaid(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        builder.whyReject("ALREADY_PAID")
+            .howMuchWasPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "")
+            .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
+            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
+                            ? respondToClaim.getHowWasThisAmountPaidOther()
+                            : respondToClaim.getHowWasThisAmountPaid()
+                .getHumanFriendly());
     }
+
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
@@ -215,19 +209,20 @@ public class SealedClaimLipResponseForm implements MappableObject {
                               .toList());
     }
 
+    private static void fullDefenceData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+        addDetailsOnWhyClaimIsRejected(caseData, builder);
+        if (caseData.hasDefendantPayedTheAmountClaimed()) {
+            alreadyPaid(caseData, builder);
+        } else if (caseData.isClaimBeingDisputed()) {
+            builder.whyReject("DISPUTE");
+        }
+    }
+
     @JsonIgnore
     private static void partAdmissionData(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
-            RespondToClaim respondToClaim = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                .orElse(caseData.getRespondToClaim());
-            builder.whyReject("ALREADY_PAID")
-                .howMuchWasPaid(respondToClaim.getHowMuchWasPaid() + "")
-                .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
-                .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                                ? respondToClaim.getHowWasThisAmountPaidOther()
-                                : respondToClaim.getHowWasThisAmountPaid()
-                    .getHumanFriendly());
+            alreadyPaid(caseData, builder);
         } else {
             addRepaymentMethod(caseData, builder, caseData.getRespondToAdmittedClaimOwingAmount());
         }

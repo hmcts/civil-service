@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Data
@@ -61,7 +62,7 @@ public class EvidenceDetails {
                 statementOfTruthEvidence,
                 otherEvidence
             )
-            .filter(description -> description != null).findFirst().orElse("");
+            .filter(Objects::nonNull).findFirst().orElse("");
     }
 
 }

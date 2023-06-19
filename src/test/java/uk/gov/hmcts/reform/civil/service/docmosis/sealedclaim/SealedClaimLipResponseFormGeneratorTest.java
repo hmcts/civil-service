@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -10,6 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DebtTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -39,6 +43,8 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.account.AccountType;
+import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
 import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
@@ -52,23 +58,63 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     SealedClaimLipResponseFormGenerator.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class SealedClaimLipResponseFormGeneratorTest {
+class SealedClaimLipResponseFormGeneratorTest {
 
+    private static final String AUTHORIZATION = "authorization";
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
     private DocumentManagementService documentManagementService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
+    @Captor
+    ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
     @Test
-    public void admitPayImmediate() {
+    void shouldGenerateDocumentSuccessfully() {
+        //Given
+        CaseData caseData = commonData().build();
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        //When
+        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
+        //Then
+        assertThat(result).isEqualTo(caseDocument);
+        verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
+        verify(documentManagementService).uploadDocument(
+            eq(AUTHORIZATION),
+            uploadDocumentArgumentCaptor.capture()
+        );
+        PDF document = uploadDocumentArgumentCaptor.getValue();
+        assertThat(document.getDocumentType()).isEqualTo(DEFENDANT_DEFENCE);
+    }
+
+    @Test
+    void admitPayImmediate() {
         CaseData caseData = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -82,7 +128,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void admitPayInstalments() {
+    void admitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))
@@ -104,7 +150,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void admitPayByDate() {
+    void admitPayByDate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -124,7 +170,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayImmediate() {
+    void partAdmitPayImmediate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -143,7 +189,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayInstalments() {
+    void partAdmitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))
@@ -193,7 +239,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitAlreadyPaid() {
+    void partAdmitAlreadyPaid() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -215,7 +261,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseAlreadyPaid() {
+    void fullDefenseAlreadyPaid() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -237,7 +283,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void fullDefenseDispute() {
+    void fullDefenseDispute() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -254,7 +300,7 @@ public class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void counterClaim() {
+    void counterClaim() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
