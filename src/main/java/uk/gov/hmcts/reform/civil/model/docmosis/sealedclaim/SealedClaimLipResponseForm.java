@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.LipDefenceFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
@@ -70,13 +70,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final LocalDate payBy;
     private final String whyNotPayImmediately;
     private final RepaymentPlanLRspec repaymentPlan;
-
     private final RespondentResponseTypeSpec responseType;
     private final String whyReject;
     private final String freeTextWhyReject;
-    private final LipDefenceFormParty claimant1;
-    private final LipDefenceFormParty defendant1;
-    private final LipDefenceFormParty defendant2;
+    private final LipFormParty claimant1;
+    private final LipFormParty defendant1;
+    private final LipFormParty defendant2;
     private final List<EventTemplateData> timelineEventList;
     private final String timelineComments;
     private final List<EvidenceTemplateData> evidenceList;
@@ -86,7 +85,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final PartnerAndDependentsLRspec partnerAndDependent;
     private final List<EmployerDetailsLRspec> employerDetails;
     private final Respondent1SelfEmploymentLRspec selfEmployment;
-    private List<AccountSimpleTemplateData> bankAccountList;
+    private final List<AccountSimpleTemplateData> bankAccountList;
     private final List<Respondent1CourtOrderDetails> courtOrderDetails;
     private final List<DebtTemplateData> debtList;
     private final List<ReasonMoneyTemplateData> incomeList;
@@ -112,12 +111,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .generationDate(LocalDate.now())
             .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimant1(LipDefenceFormParty.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipDefenceFormParty.toLipDefenceParty(
+            .claimant1(LipFormParty.toLipDefenceParty(caseData.getApplicant1()))
+            .defendant1(LipFormParty.toLipDefenceParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1CorrespondanceAddress()
             ))
-            .defendant2(LipDefenceFormParty.toLipDefenceParty(caseData.getRespondent2()))
+            .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
             .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())

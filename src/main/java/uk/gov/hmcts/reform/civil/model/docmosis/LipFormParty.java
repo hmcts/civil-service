@@ -11,31 +11,30 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Builder
-public record LipDefenceFormParty(String name, boolean isIndividual,
-                                  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
-                                  String phone, String email, Address primaryAddress, Address correspondenceAddress) {
+public record LipFormParty(String name, boolean isIndividual,
+                           @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
+                           String phone, String email, Address primaryAddress, Address correspondenceAddress) {
 
     @JsonIgnore
-    public static LipDefenceFormParty toLipDefenceParty(Party party) {
+    public static LipFormParty toLipDefenceParty(Party party) {
         if (party == null) {
             return null;
         }
-        LipDefenceFormPartyBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
-        return builder.build();
+        return getLipDefenceFormPartyBuilderWithPartyData(party).build();
     }
 
     @JsonIgnore
-    public static LipDefenceFormParty toLipDefenceParty(Party party, Address correspondenceAddress) {
+    public static LipFormParty toLipDefenceParty(Party party, Address correspondenceAddress) {
         if (party == null) {
             return null;
         }
-        LipDefenceFormPartyBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
+        LipFormPartyBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
         builder.correspondenceAddress(correspondenceAddress);
         return builder.build();
     }
 
-    private static LipDefenceFormPartyBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
-        LipDefenceFormPartyBuilder builder = LipDefenceFormParty.builder()
+    private static LipFormPartyBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
+        LipFormPartyBuilder builder = LipFormParty.builder()
             .name(party.getPartyName())
             .phone(party.getPartyPhone())
             .email(party.getPartyEmail())
