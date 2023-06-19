@@ -24,14 +24,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
 
-    public boolean isHearingAndListingSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-sdo");
-    }
-
-    public boolean isHearingAndListingLegalRepEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
-    }
-
     public boolean isCaseFlagsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-flags");
     }
@@ -58,6 +50,10 @@ public class FeatureToggleService {
 
     public boolean isCaseFileViewEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-file-view");
+    }
+
+    public boolean isAutomatedHearingNoticeEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
 }
