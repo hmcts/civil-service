@@ -121,16 +121,6 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
-    public SearchResult getAllCases(String authorization) {
-        String query = mapper.createObjectNode()
-            .put("size", RETURNED_NUMBER_OF_CASES)
-            .set("query", mapper.createObjectNode()
-                .set("match_all", mapper.createObjectNode()))
-            .toString();
-
-        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
-    }
-
     public SearchResult searchCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
@@ -165,5 +155,15 @@ public class CoreCaseDataService {
             return caseData.getRespondent1ResponseDeadline().toLocalDate();
         }
         return null;
+    }
+
+    public SearchResult getAllCases(String authorization) {
+        String query = mapper.createObjectNode()
+            .put("size", RETURNED_NUMBER_OF_CASES)
+            .set("query", mapper.createObjectNode()
+                .set("match_all", mapper.createObjectNode()))
+            .toString();
+
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
 }
