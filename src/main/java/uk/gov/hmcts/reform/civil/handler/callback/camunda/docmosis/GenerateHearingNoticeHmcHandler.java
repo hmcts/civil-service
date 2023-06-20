@@ -66,7 +66,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             processInstanceId,
             camundaVars.toBuilder()
                 .hearingStartDateTime(hearingStartDay.getHearingStartDateTime())
-                .hearingLocationEpims(hearingStartDay.getHearingVenueEpimsId())
+                .hearingLocationEpims(hearingStartDay.getHearingVenueId())
                 .days(getHearingDays(hearing))
                 .requestVersion(hearing.getRequestDetails().getVersionNumber())
                 .caseState(caseData.getCcdState().name())

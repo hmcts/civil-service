@@ -588,7 +588,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                NotSuitable_SDO
             )
         ),
         entry(

@@ -72,7 +72,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
             .hearingResponse(HearingResponse.builder().hearingDaySchedule(
                     List.of(
                         HearingDaySchedule.builder()
-                            .hearingVenueEpimsId(EPIMS)
+                            .hearingVenueId(EPIMS)
                             .hearingStartDateTime(hearingDay.getHearingStartDateTime())
                             .hearingEndDateTime(hearingDay.getHearingEndDateTime())
                             .build()))

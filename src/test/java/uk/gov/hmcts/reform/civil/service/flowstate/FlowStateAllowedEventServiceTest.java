@@ -614,7 +614,8 @@ class FlowStateAllowedEventServiceTest {
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        NotSuitable_SDO
                     }
                 ),
                 of(
