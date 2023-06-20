@@ -70,6 +70,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         } catch (Exception e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
+            throw e;
         }
     }
 
@@ -83,11 +84,13 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
-        log.info("Handle failure remainingRetries '{}' externalTask.getRetries() is null '{}' " +
-                     "processInstanceId '{}' maxRetries '{}'", remainingRetries,
-            externalTask.getRetries() != null ? externalTask.getRetries() : true,
-            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
-            maxRetries
+        log.info("Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
+                     "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
+                 externalTask.getRetries() != null ? false : true,
+                 externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
+                 remainingRetries,
+                 externalTask.getRetries(),
+                 maxRetries
         );
 
         externalTaskService.handleFailure(
