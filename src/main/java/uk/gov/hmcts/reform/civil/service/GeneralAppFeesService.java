@@ -50,7 +50,7 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SET_ASIDE
             = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
-            = List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING);
+            = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
             = List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT);
 
@@ -143,7 +143,7 @@ public class GeneralAppFeesService {
     public boolean isFreeApplication(final CaseData caseData) {
         if (caseData.getGeneralAppType().getTypes().size() == 1
                 && caseData.getGeneralAppType().getTypes()
-                .contains(GeneralApplicationTypes.ADJOURN_VACATE_HEARING)
+                .contains(GeneralApplicationTypes.ADJOURN_HEARING)
                 && caseData.getGeneralAppRespondentAgreement() != null
                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                 && caseData.getGeneralAppHearingDate() != null
