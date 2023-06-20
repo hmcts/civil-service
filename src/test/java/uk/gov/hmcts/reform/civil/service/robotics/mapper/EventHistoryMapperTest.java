@@ -5330,7 +5330,6 @@ class EventHistoryMapperTest {
                                      expectedMiscEvents.get(3), expectedMiscEvents.get(4));
             }
 
-            @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendantSDO() {
 
                 String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
