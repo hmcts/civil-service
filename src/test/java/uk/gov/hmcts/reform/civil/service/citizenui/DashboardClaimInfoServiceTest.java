@@ -83,7 +83,7 @@ public class DashboardClaimInfoServiceTest {
 
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getAllCases(any())).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
                             .applicant1(Party.builder()
@@ -210,7 +210,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getAllCases(any())).willReturn(searchResult);
 
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
@@ -227,7 +227,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
 
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getAllCases(any())).willReturn(searchResult);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
 
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
