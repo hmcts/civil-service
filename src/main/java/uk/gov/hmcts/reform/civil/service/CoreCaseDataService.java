@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -120,6 +121,16 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
+    public SearchResult getAllCases(String authorization) {
+        String query = mapper.createObjectNode()
+            .put("size", RETURNED_NUMBER_OF_CASES)
+            .set("query", mapper.createObjectNode()
+                .set("match_all", mapper.createObjectNode()))
+            .toString();
+
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    }
+
     public SearchResult searchCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
@@ -148,13 +159,11 @@ public class CoreCaseDataService {
                                                        caseId.toString(), supplementaryData);
     }
 
-    public SearchResult getAllCases(String authorization) {
-        String query = mapper.createObjectNode()
-            .put("size", RETURNED_NUMBER_OF_CASES)
-            .set("query", mapper.createObjectNode()
-                .set("match_all", mapper.createObjectNode()))
-            .toString();
-
-        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    public LocalDate getAgreedDeadlineResponseDate(Long caseId, String authorization) {
+        CaseData caseData = caseDetailsConverter.toCaseData(this.getCase(caseId, authorization));
+        if (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null) {
+            return caseData.getRespondent1ResponseDeadline().toLocalDate();
+        }
+        return null;
     }
 }
