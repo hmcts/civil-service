@@ -20,8 +20,6 @@ import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,15 +48,10 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
-<<<<<<< HEAD
-    private static final OffsetDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
-    private static final OffsetDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
-    private static final OffsetDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0).atOffset(ZoneOffset.UTC);
-=======
+    private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
     private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
->>>>>>> 1ae087e26dad3ed71927db9164a64cb16af0f6af
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
         Arrays.asList(DashboardClaimInfo.builder()
                           .ocmc(true)
@@ -66,30 +59,22 @@ public class DashboardClaimInfoServiceTest {
                           .build());
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
-<<<<<<< HEAD
-        .createdDate(DATE_IN_2021.toLocalDateTime())
-        .build();
-    private static final CaseDetails CASE_DETAILS_2 = CaseDetails.builder()
-        .id(2L)
-        .createdDate(DATE_IN_2022.toLocalDateTime())
-=======
         .createdDate(DATE_IN_2021)
         .build();
     private static final CaseDetails CASE_DETAILS_2 = CaseDetails.builder()
         .id(2L)
         .createdDate(DATE_IN_2022)
->>>>>>> 1ae087e26dad3ed71927db9164a64cb16af0f6af
         .build();
-
     private static final List<DashboardClaimInfo> ORDERED_CASES =
-        Arrays.asList(DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2021)
-                          .build(),
-                      DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2022)
-                          .build()
+        Arrays.asList(
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2021)
+                .build(),
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2022)
+                .build()
         );
 
     @BeforeEach
@@ -178,12 +163,8 @@ public class DashboardClaimInfoServiceTest {
                                                                                             .statementOfValueInPennies(
                                                                                                 new BigDecimal("100000"))
                                                                                             .build())
-<<<<<<< HEAD
-                                                                            .respondent1ResponseDeadline(DATE_IN_2025.toLocalDateTime())
-=======
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
->>>>>>> 1ae087e26dad3ed71927db9164a64cb16af0f6af
-                                                                            .build());
+                                                                            t.build());
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
             "123"
@@ -223,6 +204,41 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(2).getPaymentDate()).isEqualTo(DATE_IN_2025.toLocalDate());
+    }
+
+    @Test
+    void shouldGetThePartPaymentImmediateValue() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .claimValue(ClaimValue
+                                            .builder()
+                                            .statementOfValueInPennies(
+                                                new BigDecimal("100000"))
+                                            .build())
+                            .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
+                            .respondToClaimAdmitPartLRspec(
+                                RespondToClaimAdmitPartLRspec
+                                    .builder()
+                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(
+            PART_ADMIT_PAY_IMMEDIATELY_AMOUNT);
     }
 
     @Test
