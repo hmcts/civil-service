@@ -1953,8 +1953,8 @@
             "required": [
               "amountOfJudgment",
               "paymentInFullDate",
-			  "isJudgmentForthwith"
-			  "amountOfCosts"
+			        "isJudgmentForthwith",
+			        "amountOfCosts"
             ],
             "properties": {
               "amountOfJudgment": {
