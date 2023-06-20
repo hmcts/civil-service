@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -26,6 +27,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 @RequiredArgsConstructor
 public class CoreCaseDataService {
 
+    private final ObjectMapper mapper;
+    private static final Integer RETURNED_NUMBER_OF_CASES = 1000;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
@@ -115,6 +118,16 @@ public class CoreCaseDataService {
 
     public SearchResult searchCases(Query query, String authorization) {
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
+    }
+
+    public SearchResult getAllCases(String authorization) {
+        String query = mapper.createObjectNode()
+            .put("size", RETURNED_NUMBER_OF_CASES)
+            .set("query", mapper.createObjectNode()
+                .set("match_all", mapper.createObjectNode()))
+            .toString();
+
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
 
     public SearchResult searchCases(Query query) {

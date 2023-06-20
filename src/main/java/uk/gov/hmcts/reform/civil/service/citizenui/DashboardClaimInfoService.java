@@ -54,18 +54,10 @@ public class DashboardClaimInfoService {
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        List<DashboardClaimInfo> dashboardClaimItems = new ArrayList<>();
-        int totalCases = 0;
-        SearchResult claims;
-        do {
-            Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases);
-            claims = coreCaseDataService.searchCases(query, authorisation);
-            log.info("-----------ccdCases received-------------total " + claims.getTotal());
-            log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
-            dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
-            totalCases += claims.getCases().size();
-        } while (totalCases < claims.getTotal());
-        return dashboardClaimItems;
+        SearchResult claims = coreCaseDataService.getAllCases(authorisation);
+        log.info("-----------ccdCases received-------------total " + claims.getTotal());
+        log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
+        return translateSearchResultToDashboardItems(claims);
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
