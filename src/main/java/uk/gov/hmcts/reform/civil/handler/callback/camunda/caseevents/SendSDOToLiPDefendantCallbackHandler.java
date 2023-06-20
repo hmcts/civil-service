@@ -28,7 +28,7 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::sendSDOBulkPrint
+            callbackKey(ABOUT_TO_SUBMIT), this::sendSDOLetter
         );
     }
 
@@ -42,7 +42,7 @@ public class SendSDOToLiPDefendantCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse sendSDOBulkPrint(CallbackParams callbackParams) {
+    private CallbackResponse sendSDOLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
 
