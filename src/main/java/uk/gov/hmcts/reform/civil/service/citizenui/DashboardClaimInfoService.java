@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -41,25 +40,25 @@ public class DashboardClaimInfoService {
     }
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
+        log.info("-----------getClaimsForDefendant() started-------------");
+        log.info("-----------calling ocmc getClaimsForDefendant()-------------");
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
+        log.info("-----------ocmcClaims received-------------size " + ocmcClaims.size());
+        log.info("-----------calling ccd getCases-------------");
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-
+        log.info("-----------ccdCases received-------------size " + ccdCases.size());
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
             .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
             .collect(Collectors.toList());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        List<DashboardClaimInfo> dashboardClaimItems = new ArrayList<>();
-        int totalCases = 0;
         SearchResult claims;
-        do {
-            Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases);
-            claims = coreCaseDataService.searchCases(query, authorisation);
-            dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
-            totalCases += claims.getCases().size();
-        } while (totalCases < claims.getTotal());
-        return dashboardClaimItems;
+        Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
+        claims = coreCaseDataService.searchCases(query, authorisation);
+        log.info("-----------ccdCases received-------------total " + claims.getTotal());
+        log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
+        return translateSearchResultToDashboardItems(claims);
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
@@ -83,6 +82,11 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
+
+        if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
+            item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+
         return item;
     }
 

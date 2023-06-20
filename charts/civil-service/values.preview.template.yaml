@@ -19,6 +19,7 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipj
         - name: launch-darkly-sdk-key-non-prod
           alias: launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
@@ -44,6 +45,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
   postgresql:
     enabled: true
     image:
