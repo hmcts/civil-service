@@ -14,7 +14,7 @@ import java.util.Optional;
 public class SendSDOBulkPrintService {
 
     private final BulkPrintService bulkPrintService;
-    private  final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
+    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
     public void sendSDOToDefendantLIP(CaseData caseData) {
