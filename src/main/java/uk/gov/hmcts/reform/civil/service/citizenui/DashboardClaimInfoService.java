@@ -76,6 +76,11 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
+
+        if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
+            item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+
         return item;
     }
 
