@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -27,20 +26,27 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
+        if (whenBePaid == null) {
+            throw new IllegalStateException("Unable to format the payment date.");
+        }
+
         String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
-        return Optional.of(format(
-            "They must make sure you have the money by %s. "
-                + "Any cheques or transfers should be clear in your account"
-                + "<p>You need to tell us if you’ve settled the claim, for example because the defendant has paid you.</p>"
-                + "<p>You can settle for less than the full claim amount.</p>"
-                + "<p><h3>If you haven’t been paid.</h3></p>"
-                + "<p>If the defendant has not paid you, you can request a County Court Judgment "
-                + "by completing the following form and sending it to the email address below.</p>"
-                + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgment on a claim for a specified amount of money</li></ul></p>"
-                + "<p>Email: <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></p>",
-            formattedWhenBePaid,
-            "https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf"
-        ));
+
+        return Optional.of(
+            String.format(
+                "They must make sure you have the money by %s. "
+                    + "Any cheques or transfers should be clear in your account"
+                    + "<p>You need to tell us if you’ve settled the claim, for example because the defendant has paid you.</p>"
+                    + "<p>You can settle for less than the full claim amount.</p>"
+                    + "<p><h3>If you haven’t been paid.</h3></p>"
+                    + "<p>If the defendant has not paid you, you can request a County Court Judgment "
+                    + "by completing the following form and sending it to the email address below.</p>"
+                    + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgment on a claim for a specified amount of money</li></ul></p>"
+                    + "<p>Email: <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></p>",
+                formattedWhenBePaid,
+                "https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf"
+            )
+        );
     }
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {

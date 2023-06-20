@@ -10,13 +10,8 @@ module "servicebus-subscription" {
 resource "azurerm_servicebus_subscription_rule" "topic_filter_rule_civil" {
   name            = "hmc-servicebus-${var.env}-subscription-rule-civil"
   subscription_id = module.servicebus-subscription.id
-  filter_type     = "CorrelationFilter"
-
-  correlation_filter {
-    properties = {
-      hmctsServiceId = "AAA7"
-    }
-  }
+  filter_type     = "SqlFilter"
+  sql_filter      = "hmctsServiceId IN ('AAA7','AAA6')"
 }
 
 data "azurerm_key_vault" "hmc-key-vault" {

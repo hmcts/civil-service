@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +79,11 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
+
+        if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
+            item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+
         return item;
     }
 
