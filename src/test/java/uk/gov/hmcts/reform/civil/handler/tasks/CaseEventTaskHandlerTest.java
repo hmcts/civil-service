@@ -130,6 +130,7 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
+            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
         }
 
         @Test
