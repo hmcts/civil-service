@@ -56,7 +56,6 @@ public class DashboardClaimInfoService {
     private List<DashboardClaimInfo> getCases(String authorisation) {
         SearchResult claims = coreCaseDataService.getAllCases(authorisation);
         log.info("-----------ccdCases received-------------total " + claims.getTotal());
-        log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
         return translateSearchResultToDashboardItems(claims);
     }
 
