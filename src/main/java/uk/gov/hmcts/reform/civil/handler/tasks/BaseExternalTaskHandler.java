@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 
 import static java.util.Optional.ofNullable;
@@ -56,7 +57,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         }
     }
 
-    default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
@@ -70,7 +71,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         } catch (Exception e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
-            throw e;
+            throw new CompleteTaskException(e);
         }
     }
 
