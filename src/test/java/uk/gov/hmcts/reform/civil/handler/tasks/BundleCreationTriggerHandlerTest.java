@@ -132,7 +132,7 @@ class BundleCreationTriggerHandlerTest {
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),

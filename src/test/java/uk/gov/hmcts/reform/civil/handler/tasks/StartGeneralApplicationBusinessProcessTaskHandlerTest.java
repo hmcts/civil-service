@@ -261,7 +261,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
             handler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService).handleFailure(
+            verify(externalTaskService, never()).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
