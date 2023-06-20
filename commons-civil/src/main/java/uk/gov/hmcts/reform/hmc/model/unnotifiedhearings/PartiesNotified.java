@@ -5,19 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class PartiesNotifiedResponse {
-
-    private LocalDateTime responseReceivedDateTime;
-
-    private Integer requestVersion;
-
-    private LocalDateTime partiesNotified;
+@Builder(toBuilder = true)
+public class PartiesNotified {
 
     private PartiesNotifiedServiceData serviceData;
 }

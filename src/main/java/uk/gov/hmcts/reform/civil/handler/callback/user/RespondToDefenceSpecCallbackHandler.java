@@ -286,7 +286,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updateDQCourtLocations(callbackParams, caseData, builder, dq);
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
-            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+            if (smallClaimWitnesses != null) {
                 dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
@@ -460,7 +460,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (!AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         } else if (isDefendantFullAdmitPayImmediately(caseData)) {
             caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
