@@ -654,6 +654,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
     public LocalDate getDateForRepayment() {
         return Optional.ofNullable(respondToClaimAdmitPartLRspec)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);

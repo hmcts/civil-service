@@ -47,8 +47,8 @@ public class EventHistory {
     private List<Event> defaultJudgment;
     @Singular("statesPaid")
     private List<Event> statesPaid;
-    @Singular("judgementByAdmission")
-    private List<Event> judgementByAdmission;
+    @Singular("judgmentByAdmission")
+    private List<Event> judgmentByAdmission;
 
     @JsonIgnore
     public List<Event> flatEvents() {
@@ -69,7 +69,7 @@ public class EventHistory {
             interlocutoryJudgment,
             defaultJudgment,
             statesPaid,
-            judgementByAdmission
+            judgmentByAdmission
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
