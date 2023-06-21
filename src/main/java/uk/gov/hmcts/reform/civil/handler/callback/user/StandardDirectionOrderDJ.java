@@ -204,7 +204,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input(judgeNameTitle
                                                            + ", Upon considering the claim form and "
                                                            + "Particulars of Claim/statements of case"
-                                                           + " [and the directions questionnaires] "
+                                                           + " [and the directions questionnaires]"
                                                            ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
