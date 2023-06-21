@@ -202,22 +202,17 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingLocation(trialHearingLocation)
             .applicant(checkApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase());
-
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            djTrialTemplateBuilder
-                .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
-                .disposalHearingDateToToggle(caseData.getTrialHearingTimeDJ() != null
-                                                 && caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
-                .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
-                .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
-        }
-
-        djTrialTemplateBuilder.hearingLocation(locationHelper.getHearingLocation(
-            trialHearingLocation,
-            caseData,
-            authorisation
-        ));
+            .respondent(checkDefendantRequested(caseData).toUpperCase())
+            .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
+            .disposalHearingDateToToggle(caseData.getTrialHearingTimeDJ() != null
+                                             && caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
+            .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
+            .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()))
+            .hearingLocation(locationHelper.getHearingLocation(
+                                trialHearingLocation,
+                                caseData,
+                                authorisation
+                            ));
 
         return djTrialTemplateBuilder.build();
 
