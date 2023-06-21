@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
@@ -9,17 +13,16 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,11 +43,13 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
+    private final DocumentHearingLocationHelper locationHelper;
+    private final IdamClient idamClient;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
+        DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData, authorisation);
         DocmosisTemplates docmosisTemplate = caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
             ? getDocmosisTemplate()
             : getDocmosisTemplateTrial();
@@ -61,7 +66,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     @Override
-        public DefaultJudgmentSDOOrderForm getTemplateData(CaseData caseData) throws IOException {
+    public DefaultJudgmentSDOOrderForm getTemplateData(CaseData caseData) throws IOException {
         return null;
     }
 
@@ -69,14 +74,24 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DefaultJudgmentSDOOrderForm getDefaultJudgmentForms(CaseData caseData) {
+    private DefaultJudgmentSDOOrderForm getDefaultJudgmentForms(CaseData caseData, String authorisation) {
         return caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
-            ? getDefaultJudgmentFormHearing(caseData)
-            : getDefaultJudgmentFormTrial(caseData);
+            ? getDefaultJudgmentFormHearing(caseData, authorisation)
+            : getDefaultJudgmentFormTrial(caseData, authorisation);
     }
 
-    private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData) {
+    private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+
+        boolean isJudge = false;
+
+        if (userDetails.getRoles() != null) {
+            isJudge = userDetails.getRoles().stream()
+                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        }
+        String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
+            .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
@@ -96,13 +111,13 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
                 caseData.getDisposalHearingMethodDJ()))
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(fillDisposalHearingMethod(caseData
-                                                                       .getDisposalHearingMethodDJ())))
-            .courtLocation(getCourt(caseData))
+                                                                                                   .getDisposalHearingMethodDJ())))
+            .courtLocation(courtLocation)
             .telephoneOrganisedBy(getHearingMethodTelephoneHearingLabel(caseData))
             .videoConferenceOrganisedBy(getHearingMethodVideoConferenceLabel(caseData))
             .disposalHearingTime(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ())
                                      ? fillDisposalHearingTime(
-                                         caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
+                caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
             .disposalHearingJudgesRecitalDJ(caseData.getDisposalHearingJudgesRecitalDJ())
             .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
             .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
@@ -116,7 +131,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
             .applicant(checkApplicantPartyName(caseData)
-                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
+                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase());
 
         djOrderFormBuilder
@@ -125,11 +140,24 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingTimeEstimateDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ()
                                                .getTime().getLabel());
 
+        djOrderFormBuilder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
+
         return djOrderFormBuilder.build();
     }
 
-    private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
+    private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
+        String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
+            ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+
+        boolean isJudge = false;
+
+        if (userDetails.getRoles() != null) {
+            isJudge = userDetails.getRoles().stream()
+                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        }
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
+            .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .trialBuildingDispute(caseData.getTrialBuildingDispute())
@@ -171,20 +199,20 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
-            .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
-                                      ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null)
+            .trialHearingLocation(trialHearingLocation)
             .applicant(checkApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase());
-
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            djTrialTemplateBuilder
-                .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
-                .disposalHearingDateToToggle(caseData.getTrialHearingTimeDJ() != null
-                                                 && caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
-                .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
-                .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
-        }
+            .respondent(checkDefendantRequested(caseData).toUpperCase())
+            .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
+            .disposalHearingDateToToggle(caseData.getTrialHearingTimeDJ() != null
+                                             && caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
+            .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
+            .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()))
+            .hearingLocation(locationHelper.getHearingLocation(
+                                trialHearingLocation,
+                                caseData,
+                                authorisation
+                            ));
 
         return djTrialTemplateBuilder.build();
 
@@ -213,7 +241,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private String fillTypeBundleInfo(DisposalHearingBundleType type) {
         switch (type) {
-            case DOCUMENTS :
+            case DOCUMENTS:
                 return "an indexed bundle of documents, with each page clearly numbered.";
             case ELECTRONIC:
                 return "an electronic bundle of digital documents.";
