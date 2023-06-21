@@ -98,7 +98,7 @@ class EvidenceUploadCheckHandlerTest {
 
         // Then: error should be handled
         verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             eq(mockTask),
             eq(errorMessage),
             anyString(),

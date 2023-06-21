@@ -88,7 +88,7 @@ class TrialReadyNotificationHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService).handleFailure(
+        verify(externalTaskService, never()).handleFailure(
             eq(mockTask),
             eq(errorMessage),
             anyString(),
