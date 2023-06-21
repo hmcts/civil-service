@@ -204,7 +204,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + ", Upon considering the claim form and "
                                                            + "Particulars of Claim/statements of case"
                                                            + " [and the directions questionnaires] "
-                                                           + "\n\nIT IS ORDERED that:-").build());
+                                                           ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
                                                         .builder()
@@ -343,7 +343,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + ", has considered the statements of "
                                                         + "the case and the information provided "
                                                         + "by the parties, \n\n "
-                                                        + "IT IS ORDERED THAT:").build());
+                                                        ).build());
 
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
