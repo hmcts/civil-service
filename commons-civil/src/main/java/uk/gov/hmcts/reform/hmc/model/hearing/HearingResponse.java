@@ -20,7 +20,7 @@ public class HearingResponse {
 
     private LocalDateTime receivedDateTime;
 
-    private ListAssistCaseStatus listAssistCaseStatus;
+    private ListAssistCaseStatus laCaseStatus;
 
     private ListingStatus listingStatus;
 
