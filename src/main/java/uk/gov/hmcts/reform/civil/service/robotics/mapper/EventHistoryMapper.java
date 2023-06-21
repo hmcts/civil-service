@@ -472,9 +472,9 @@ public class EventHistoryMapper {
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(LocalDateTime.now())
-                .eventDetailsText("RPA Reason: Judgement by Admission requested and claim moved offline.")
+                .eventDetailsText("RPA Reason: Judgment by Admission requested and claim moved offline.")
                 .eventDetails(EventDetails.builder()
-                                  .miscText("RPA Reason: Judgement by Admission requested and claim moved offline.")
+                                  .miscText("RPA Reason: Judgment by Admission requested and claim moved offline.")
                                   .build())
                 .build()));
         }
@@ -504,6 +504,7 @@ public class EventHistoryMapper {
                 .dateOfJudgment(LocalDateTime.now())
                 .jointJudgment(false)
                 .judgmentToBeRegistered(true)
+                .miscText("")
                 .build();
 
         builder.judgmentByAdmission((Event.builder()
@@ -512,6 +513,7 @@ public class EventHistoryMapper {
             .litigiousPartyID("001")
             .dateReceived(LocalDateTime.now())
             .eventDetails(judgmentByAdmissionEvent)
+            .eventDetailsText("")
             .build()));
 
     }
