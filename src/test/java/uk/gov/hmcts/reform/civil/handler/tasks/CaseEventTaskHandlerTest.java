@@ -167,7 +167,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             verify(externalTaskService, never()).complete(mockTask);
-            verify(externalTaskService).handleFailure(
+            verify(externalTaskService, never()).handleFailure(
                 eq(mockTask),
                 eq(errorMessage),
                 anyString(),
@@ -203,7 +203,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             verify(externalTaskService, never()).complete(mockTask);
-            verify(externalTaskService).handleFailure(
+            verify(externalTaskService, never()).handleFailure(
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
@@ -833,7 +833,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -853,7 +853,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -873,7 +873,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
