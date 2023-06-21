@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Evidence;
 
+import java.util.Optional;
+
 @Getter
 @Builder
 public class EvidenceTemplateData {
@@ -18,4 +20,19 @@ public class EvidenceTemplateData {
             .explanation(evidence.getValue().getEvidenceDescription())
             .build();
     }
+
+    public String displayTypeValue() {
+        return Optional.ofNullable(type).map(type -> getDisplayValueFromEvidenceType(type)).orElse("");
+    }
+
+    private String getDisplayValueFromEvidenceType(String type) {
+        String displayValue;
+        try {
+           displayValue =  EvidenceType.valueOf(type).getDisplayValue();
+        }catch(IllegalArgumentException ex) {
+            displayValue = type;
+        }
+        return displayValue;
+    }
+
 }
