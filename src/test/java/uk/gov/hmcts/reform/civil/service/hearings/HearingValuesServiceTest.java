@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.RestException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -157,7 +156,7 @@ public class HearingValuesServiceTest {
             .hearingInWelshFlag(true)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
-            .listingComments("")
+            .listingComments(null)
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
@@ -208,8 +207,7 @@ public class HearingValuesServiceTest {
     void shouldReturnExpectedHearingValuesWhenCaseDataIs() {
         var caseId = 1L;
 
-        doThrow(new NotFoundException("", new RestException("", new Exception())))
-            .when(caseDataService).getCase(caseId);
+        doThrow(new NotFoundException("")).when(caseDataService).getCase(caseId);
 
         assertThrows(
             CaseNotFoundException.class,

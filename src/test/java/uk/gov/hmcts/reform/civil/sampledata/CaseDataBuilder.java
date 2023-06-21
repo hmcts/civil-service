@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -396,6 +397,7 @@ public class CaseDataBuilder {
     private CertificateOfService cosNotifyClaimDetails2;
 
     private FastTrackHearingTime fastTrackHearingTime;
+    private List<DateToShowToggle> fastTrackTrialDateToToggle;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
 
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
@@ -2224,6 +2226,7 @@ public class CaseDataBuilder {
             .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
             .dateFrom(LocalDate.parse("2022-01-01"))
             .dateTo(LocalDate.parse("2022-01-02"))
+            .dateToToggle(List.of(DateToShowToggle.SHOW))
             .build();
         fastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
             .input(String.format("Each party has the right to apply "
@@ -2289,6 +2292,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoTrialDj() {
+        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
         trialHearingTimeDJ = TrialHearingTimeDJ.builder()
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
@@ -2299,8 +2303,9 @@ public class CaseDataBuilder {
                            + "the contents of the bundle before it is filed. The bundle will include a case "
                            + "summary and a chronology.")
             .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
-            .date1(LocalDate.parse("2022-01-01"))
-            .date2(LocalDate.parse("2022-01-02"))
+            .dateToToggle(dateToShowTrue)
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(30))
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
             .input("This order has been made without a hearing. "
@@ -5746,6 +5751,7 @@ public class CaseDataBuilder {
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .fastTrackHearingTime(fastTrackHearingTime)
             .fastTrackOrderWithoutJudgement(fastTrackOrderWithoutJudgement)
+            .fastTrackTrialDateToToggle(fastTrackTrialDateToToggle)
             .disposalHearingHearingTime(disposalHearingHearingTime)
             .disposalOrderWithoutHearing(disposalOrderWithoutHearing)
             .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
