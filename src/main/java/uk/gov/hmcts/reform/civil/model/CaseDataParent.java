@@ -667,6 +667,30 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
+    /**
+     * used to correct defendant's primary address, but not saved in db.
+     * Don't count on this field's availability.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final Address tempCorrectedDefendant1Address;
+    /**
+     * used to correct defendant's primary address, but not saved in db.
+     * Don't count on this field's availability.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final YesOrNo tempCorrectedDefendant1AddressRequired;
+    /**
+     * used to correct defendant's primary address, but not saved in db.
+     * Don't count on this field's availability.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final Address tempCorrectedDefendant2Address;
+    /**
+     * used to correct defendant's primary address, but not saved in db.
+     * Don't count on this field's availability.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final YesOrNo tempCorrectedDefendant2AddressRequired;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

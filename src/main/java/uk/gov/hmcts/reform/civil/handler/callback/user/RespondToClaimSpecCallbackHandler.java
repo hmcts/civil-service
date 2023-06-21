@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,7 +27,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -36,8 +37,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -46,13 +45,14 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -1307,9 +1307,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
-        if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
+        if (NO.equals(caseData.getTempCorrectedDefendant1AddressRequired())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
+                .primaryAddress(caseData.getTempCorrectedDefendant1Address()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
@@ -1333,19 +1333,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            Party updatedRespondent2;
+            if (NO.equals(caseData.getTempCorrectedDefendant2AddressRequired())) {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getTempCorrectedDefendant2Address()).build();
+            } else {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+            }
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec())
-            )) {
+        )) {
             LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());
@@ -1518,8 +1523,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                           updatedCaseData.build().getRespondent1ResponseDate(),
                                           DocumentType.DEFENDANT_DEFENCE
                     ));
-                assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent1ClaimDocument,
+                    "defendant1DefenseDirectionsQuestionnaire"
+                );
             }
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
@@ -1533,8 +1540,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent1DQDraftDirections,
+                    "defendant1DefenseDirectionsQuestionnaire"
+                );
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
@@ -1545,8 +1554,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               updatedCaseData.build().getRespondent2ResponseDate(),
                                               DocumentType.DEFENDANT_DEFENCE
                         ));
-                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                           "defendant2DefenseDirectionsQuestionnaire");
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        "defendant2DefenseDirectionsQuestionnaire"
+                    );
                 }
             }
         } else {
@@ -1559,8 +1570,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               updatedCaseData.build().getRespondent2ResponseDate(),
                                               DocumentType.DEFENDANT_DEFENCE
                         ));
-                    assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                           "defendant2DefenseDirectionsQuestionnaire");
+                    assignCategoryId.assignCategoryIdToDocument(
+                        respondent2ClaimDocument,
+                        "defendant2DefenseDirectionsQuestionnaire"
+                    );
                 }
             }
         }
@@ -1575,8 +1588,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                     ));
-                assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToDocument(
+                    respondent2DQDraftDirections,
+                    "defendant2DefenseDirectionsQuestionnaire"
+                );
             }
         }
         if (!defendantUploads.isEmpty()) {

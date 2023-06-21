@@ -776,8 +776,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .tempCorrectedDefendant1AddressRequired(NO)
+                .tempCorrectedDefendant1Address(AddressBuilder.maximal().build())
+                .build();
+            caseData = caseData.toBuilder()
+                .respondent1Copy(caseData.getRespondent1())
+                .respondent2Copy(caseData.getRespondent2())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
