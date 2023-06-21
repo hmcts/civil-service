@@ -6,13 +6,12 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum EvidenceType {
-        CONTRACTS_AND_AGREEMENTS( "Contracts and agreements"),
-        EXPERT_WITNESS("Expert witness"),
-        LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE("Letters, emails and other correspondence"),
-        PHOTO_EVIDENCE("Receipts"),
-        STATEMENT_OF_ACCOUNT("Statement of account"),
-        OTHER("Other");
+    CONTRACTS_AND_AGREEMENTS("Contracts and agreements"),
+    EXPERT_WITNESS("Expert witness"),
+    LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE("Letters, emails and other correspondence"),
+    PHOTO_EVIDENCE("Receipts"),
+    STATEMENT_OF_ACCOUNT("Statement of account"),
+    OTHER("Other");
 
-        private String displayValue;
-
+    private String displayValue;
 }

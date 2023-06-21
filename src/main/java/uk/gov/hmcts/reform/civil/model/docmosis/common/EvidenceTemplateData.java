@@ -28,11 +28,10 @@ public class EvidenceTemplateData {
     private String getDisplayValueFromEvidenceType(String type) {
         String displayValue;
         try {
-           displayValue =  EvidenceType.valueOf(type).getDisplayValue();
-        }catch(IllegalArgumentException ex) {
+            displayValue = EvidenceType.valueOf(type).getDisplayValue();
+        } catch (IllegalArgumentException ex) {
             displayValue = type;
         }
         return displayValue;
     }
-
 }
