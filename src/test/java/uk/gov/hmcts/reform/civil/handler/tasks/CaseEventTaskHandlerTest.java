@@ -167,12 +167,12 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             verify(externalTaskService, never()).complete(mockTask);
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 eq(mockTask),
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(500L)
+                eq(1000L)
             );
         }
 
@@ -203,12 +203,12 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             verify(externalTaskService, never()).complete(mockTask);
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
                 eq(2),
-                eq(500L)
+                eq(1000L)
             );
         }
 

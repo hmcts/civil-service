@@ -117,12 +117,12 @@ class HearingFeeDueHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).complete(mockTask);
-        verify(externalTaskService, never()).handleFailure(
+        verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(500L)
+            eq(1000L)
         );
     }
 
