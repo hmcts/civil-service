@@ -526,11 +526,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .smallClaimsNumberOfWitnessesToggle(checkList)
             .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                         + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
                         + " the hearing.")
-            .input2("")
-            .input3("")
+            .input2("2")
+            .input3("2")
             .input4("For this limitation, a party is counted as a witness.")
             .text("A witness statement must: \na) Start with the name of the case and the claim number;"
                       + "\nb) State the full name and address of the witness; "
