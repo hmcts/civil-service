@@ -43,17 +43,18 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             handleTask(externalTask);
             completeTask(externalTask, externalTaskService);
         } catch (BpmnError e) {
-            externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
             log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
+            externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
         } catch (NotRetryableException e) {
             log.error("External task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
+            handleFailureNoRetryable(externalTask, externalTaskService, e);
         } catch (Exception e) {
-            handleFailure(externalTask, externalTaskService, e);
-            log.error("External task '{}' errored  with processInstanceId '{}'",
+            log.error("External task before handleFailure '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
+            handleFailure(externalTask, externalTaskService, e);
         }
     }
 
@@ -99,9 +100,34 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             e.getMessage(),
             getStackTrace(e),
             remainingRetries - 1,
-            calculateExponentialRetryTimeout(500, maxRetries, remainingRetries)
+            calculateExponentialRetryTimeout(1000, maxRetries, remainingRetries)
         );
     }
+
+    /**
+     * Called when an exception arises and retry is not required from the {@link BaseExternalTaskHandler handleTask(externalTask)} method.
+     *
+     * @param externalTask        the external task to be handled.
+     * @param externalTaskService to interact with fetched and locked tasks.
+     * @param e                   the exception thrown by business logic.
+     */
+    default void handleFailureNoRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
+        int remainingRetries = 0;
+        log.info(
+            "No Retryable Handle failure processInstanceId: '{}' ",
+            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null"
+        );
+
+        externalTaskService.handleFailure(
+            externalTask,
+            e.getMessage(),
+            getStackTrace(e),
+            remainingRetries,
+            1000L
+        );
+    }
+
+
 
     private String getStackTrace(Throwable throwable) {
         if (throwable instanceof FeignException) {
