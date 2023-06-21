@@ -127,8 +127,6 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         );
     }
 
-
-
     private String getStackTrace(Throwable throwable) {
         if (throwable instanceof FeignException) {
             return ((FeignException) throwable).contentUTF8();
