@@ -1005,6 +1005,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                ADD_CASE_NOTE,
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 TRIAL_READY_CHECK,
