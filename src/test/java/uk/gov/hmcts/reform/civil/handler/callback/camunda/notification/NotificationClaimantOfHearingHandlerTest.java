@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.camunda.bpm.engine.RuntimeService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,10 +22,13 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 
@@ -52,9 +54,9 @@ public class NotificationClaimantOfHearingHandlerTest {
     @MockBean
     private HearingFeesService hearingFeesService;
     @MockBean
-    private RuntimeService camundaService;
-    @MockBean
     NotificationsProperties notificationsProperties;
+    @MockBean
+    HearingNoticeCamundaService hearingNoticeCamundaService;
     @Autowired
     private NotificationClaimantOfHearingHandler handler;
 
@@ -113,9 +115,13 @@ public class NotificationClaimantOfHearingHandlerTest {
 
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build());
-            when(camundaService.getVariables(any())).thenReturn(Map.of("hearingDate", LocalDate.of(2022, 10, 7), "hearingTime",
-                                                                       LocalTime.of(15, 30), "hearingId", "HER1234"
-            ));
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(15, 30)))
+                                .build());
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
@@ -175,9 +181,13 @@ public class NotificationClaimantOfHearingHandlerTest {
 
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
-            when(camundaService.getVariables(any())).thenReturn(Map.of("hearingDate", LocalDate.of(2022, 10, 7), "hearingTime",
-                                                                       LocalTime.of(15, 30), "hearingId", "HER1234"
-            ));
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(15, 30)))
+                                .build());
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
@@ -207,9 +217,13 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .build();
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
-            when(camundaService.getVariables(any())).thenReturn(Map.of("hearingDate", LocalDate.of(2022, 10, 7), "hearingTime",
-                                                                       LocalTime.of(8, 30), "hearingId", "HER1234"
-            ));
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(8, 30)))
+                                .build());
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {

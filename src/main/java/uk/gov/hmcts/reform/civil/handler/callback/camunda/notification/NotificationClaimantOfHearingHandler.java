@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,10 +14,12 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private final NotificationService notificationService;
     private final HearingFeesService hearingFeesService;
     private final NotificationsProperties notificationsProperties;
-    private final RuntimeService camundaService;
+    private final HearingNoticeCamundaService camundaService;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING, NOTIFY_CLAIMANT_HEARING_HMC);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
@@ -103,9 +104,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         } else {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
         }
-        var variables = camundaService.getVariables(caseData.getBusinessProcess().getProcessInstanceId());
-        String hearingId = variables.get("hearingId").toString();
-        log.info("Hearing id from camunda {}", hearingId);
+        String hearingId = camundaService
+            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId();
         notificationService.sendMail(recipient, emailTemplate, addPropertiesHMC(caseData),
                                      String.format(REFERENCE_TEMPLATE_HEARING, hearingId)
         );
@@ -148,13 +148,11 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     public Map<String, String> addPropertiesHMC(final CaseData caseData) {
         Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
-        var variables = camundaService.getVariables(caseData.getBusinessProcess().getProcessInstanceId());
+        LocalDateTime hearingStartDateTime = camundaService
+            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
 
-        LocalDate hearingDate = (LocalDate) variables.get("hearingDate");
-        log.info("Hearing id from camunda {}", hearingDate);
-
-        LocalTime hearingTime = (LocalTime) variables.get("hearingTime");
-        log.info("Hearing id from camunda {}", hearingTime);
+        LocalDate hearingDate = hearingStartDateTime.toLocalDate();
+        LocalTime hearingTime = hearingStartDateTime.toLocalTime();
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER,
