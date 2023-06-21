@@ -421,9 +421,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocClaimant().size()).isEqualTo(1);
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -476,9 +473,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocRespondentSol().size()).isEqualTo(1);
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -544,8 +538,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {

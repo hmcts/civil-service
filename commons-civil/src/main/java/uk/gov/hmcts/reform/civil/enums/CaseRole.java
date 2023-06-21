@@ -7,7 +7,9 @@ public enum CaseRole {
     CREATOR,
     APPLICANTSOLICITORONE,
     RESPONDENTSOLICITORONE,
-    RESPONDENTSOLICITORTWO;
+    RESPONDENTSOLICITORTWO,
+    CLAIMANT,
+    DEFENDANT;
 
     private String formattedName;
 
