@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -137,6 +138,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
+    private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -165,7 +167,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
@@ -359,6 +360,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+            .dateFrom(LocalDate.now().plusWeeks(22))
+            .dateTo(LocalDate.now().plusWeeks(30))
+            .dateToToggle(dateToShowTrue)
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
             .helpText2("Not more than seven nor less than three clear days before the trial, "
@@ -522,11 +526,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .smallClaimsNumberOfWitnessesToggle(checkList)
             .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                         + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
                         + " the hearing.")
-            .input2("")
-            .input3("")
+            .input2("2")
+            .input3("2")
             .input4("For this limitation, a party is counted as a witness.")
             .text("A witness statement must: \na) Start with the name of the case and the claim number;"
                       + "\nb) State the full name and address of the witness; "

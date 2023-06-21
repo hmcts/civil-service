@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +54,7 @@ class HearingsServiceTest {
     private static final String HEARING_ID = "hearing_id";
     private static final String HEARING_ID_2 = "hearing_id-2";
     private static final String HMCTS_SERVICE_CODE = "hmcts-service-code";
+    private static final int VERSION_NUMBER = 1;
 
     private final FeignException notFoundFeignException = new FeignException.NotFound(
         "not found message",
@@ -116,7 +118,8 @@ class HearingsServiceTest {
         private PartiesNotifiedResponse getPartiesNotified(LocalDateTime responseReceivedDateTime, Integer requestVersion,
                                                            LocalDateTime partiesNotified, JsonNode serviceData) {
             return PartiesNotifiedResponse.builder().responseReceivedDateTime(responseReceivedDateTime)
-                .requestVersion(requestVersion).partiesNotified(partiesNotified).serviceData(serviceData).build();
+                .requestVersion(requestVersion).partiesNotified(partiesNotified).serviceData(
+                    PartiesNotifiedServiceData.builder().build()).build();
         }
 
         private PartiesNotifiedResponses getPartiesNotifiedResponse() {
@@ -154,26 +157,26 @@ class HearingsServiceTest {
     @Nested
     class UpdatedPartiedNotifiedResponses {
         private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
-        private final  PartiesNotified partiesNotified = PartiesNotified.builder().requestVersion(1).serviceData(null).build();
+        private final  PartiesNotified partiesNotified = PartiesNotified.builder().serviceData(null).build();
 
         @Test
         void shouldUpdatePartiesResponses_whenInvoked() {
             // when
-            hearingNoticeService.updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
+            hearingNoticeService.updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, VERSION_NUMBER, time, partiesNotified);
 
             //then
-            verify(hearingNoticeApi).updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, 1, time);
+            verify(hearingNoticeApi).updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, VERSION_NUMBER, time);
         }
 
         @Test
         void shouldThrowException_whenExceptionError() {
 
-            when(hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, 1, time))
+            when(hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, VERSION_NUMBER, time))
                 .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(HmcException.class, () -> {
                 hearingNoticeService
-                    .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, 1, time, partiesNotified);
+                    .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, VERSION_NUMBER, time, partiesNotified);
             });
 
             String expectedMessage = "Failed to retrieve data from HMC";
