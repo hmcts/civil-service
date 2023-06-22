@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,7 +93,7 @@ class TakeCaseOfflineHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(500L)
+            eq(1000L)
         );
     }
 
@@ -102,12 +101,11 @@ class TakeCaseOfflineHandlerTest {
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
         String errorMessage = "there was an error";
 
-        doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
-            .when(externalTaskService).complete(mockTask);
+        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).handleFailure(
+        verify(externalTaskService).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),
