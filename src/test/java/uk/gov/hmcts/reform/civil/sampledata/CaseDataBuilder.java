@@ -4216,11 +4216,88 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-                                                   .input("unforeseen complexities")
+            .input("unforeseen complexities")
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+        } else {
+            atStateClaimDetailsNotified1v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(boolean isReason) {
+        atStateClaimDetailsNotified1v1();
+        respondent1TimeExtensionDate = LocalDateTime.now();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+        } else {
+            atStateNotificationAcknowledged();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+            respondent1TimeExtensionDate = LocalDateTime.now();
+            respondent2TimeExtensionDate = LocalDateTime.now();
+        } else {
+            atDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
 
         return this;
     }

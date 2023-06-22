@@ -103,7 +103,7 @@ class EvidenceUploadCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(500L)
+            eq(1000L)
         );
     }
 
@@ -118,7 +118,7 @@ class EvidenceUploadCheckHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         // Then: handle failure should not get called
-        verify(externalTaskService, never()).handleFailure(
+        verify(externalTaskService).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),
