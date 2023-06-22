@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.Application;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
@@ -66,7 +67,10 @@ public class CaseDataToTextGeneratorTest {
             Collection used = testIntentionConfig(config, allGenerators);
             toCheck.removeAll(used);
         }
-        Assertions.assertTrue(toCheck.isEmpty(), "Some generators have not been checked " + toCheck.toArray().toString());
+        Assertions.assertTrue(
+            toCheck.isEmpty(),
+            "Some generators have not been checked " + toCheck.toArray().toString()
+        );
     }
 
     /**
@@ -98,7 +102,7 @@ public class CaseDataToTextGeneratorTest {
             Assertions.assertEquals(1, suitable.size(),
                                     "There should be exactly 1 suitable generator per case."
                                         + "Case in position " + i + " has " + suitable.size()
-                                    + ", it was expecting " + cases.get(i).getRight().getSimpleName()
+                                        + ", it was expecting " + cases.get(i).getRight().getSimpleName()
             );
             //noinspection ConstantConditions
             Assertions.assertTrue(
@@ -127,7 +131,7 @@ public class CaseDataToTextGeneratorTest {
         useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(
             type = FilterType.ASSIGNABLE_TYPE,
-            classes = CaseDataToTextGenerator.class
+            classes = {CaseDataToTextGenerator.class, ClaimUrlsConfiguration.class}
         )
     )
     public static class CaseDataToTextGeneratorTestConfig {

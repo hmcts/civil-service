@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
     private final PaymentDateService paymentDateService;
+    private final ClaimUrlsConfiguration claimUrlsConfiguration;
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
@@ -44,14 +46,14 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
                     + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgment on a claim for a specified amount of money</li></ul></p>"
                     + "<p>Email: <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></p>",
                 formattedWhenBePaid,
-                "https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf"
+                claimUrlsConfiguration.getN225Link()
             )
         );
     }
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            &&  IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             && null == caseData.getApplicant1ProceedWithClaim();
     }

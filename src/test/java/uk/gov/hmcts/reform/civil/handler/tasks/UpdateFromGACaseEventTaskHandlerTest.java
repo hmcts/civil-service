@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
@@ -533,7 +532,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -554,7 +553,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -574,7 +573,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),

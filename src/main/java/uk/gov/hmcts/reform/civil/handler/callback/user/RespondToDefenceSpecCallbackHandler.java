@@ -288,7 +288,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updateDQCourtLocations(callbackParams, caseData, builder, dq);
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
-            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+            if (smallClaimWitnesses != null) {
                 dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
