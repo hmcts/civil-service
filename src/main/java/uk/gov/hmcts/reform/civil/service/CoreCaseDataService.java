@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -158,11 +162,16 @@ public class CoreCaseDataService {
     }
 
     public SearchResult getAllCases(String authorization) {
-        String query = mapper.createObjectNode()
-            .put("size", RETURNED_NUMBER_OF_CASES)
-            .set("query", mapper.createObjectNode()
-                .set("match_all", mapper.createObjectNode()))
-            .toString();
+        QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.size(RETURNED_NUMBER_OF_CASES)
+            .query(queryBuilder);
+       String query = sourceBuilder.toString();
+//        String query = mapper.createObjectNode()
+//            .put("size", RETURNED_NUMBER_OF_CASES)
+//            .set("query", mapper.createObjectNode()
+//                .set("match_all", mapper.createObjectNode()))
+//            .toString();
 
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
