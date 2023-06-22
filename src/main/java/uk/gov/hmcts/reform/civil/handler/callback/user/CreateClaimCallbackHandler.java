@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -127,7 +127,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "processed in the digital portal, the exact date when you must notify the claim details will be "
         + "provided when you first notify the Defendant legal representative of the claim.";
 
-    private final ClaimIssueConfiguration claimIssueConfiguration;
+    private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
@@ -573,16 +573,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 (areRespondentsRepresentedAndRegistered(caseData)
                     ? getConfirmationSummary(caseData)
                     : format(LIP_CONFIRMATION_BODY_COS,
-                format(caseDocLocation, caseData.getCcdCaseReference()),
-                claimIssueConfiguration.getResponsePackLink()))
+                             format(caseDocLocation, caseData.getCcdCaseReference()),
+                             claimUrlsConfiguration.getResponsePackLink()))
                 + exitSurveyContentService.applicantSurvey();
         } else {
             return
                 (areRespondentsRepresentedAndRegistered(caseData)
                     ? getConfirmationSummary(caseData)
                     : format(LIP_CONFIRMATION_BODY,
-                format(caseDocLocation, caseData.getCcdCaseReference()),
-                claimIssueConfiguration.getResponsePackLink()))
+                             format(caseDocLocation, caseData.getCcdCaseReference()),
+                             claimUrlsConfiguration.getResponsePackLink()))
                 + exitSurveyContentService.applicantSurvey();
         }
     }

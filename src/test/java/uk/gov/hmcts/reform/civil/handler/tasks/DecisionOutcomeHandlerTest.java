@@ -93,7 +93,7 @@ class DecisionOutcomeHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(500L)
+            eq(1000L)
         );
     }
 
@@ -105,7 +105,7 @@ class DecisionOutcomeHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).handleFailure(
+        verify(externalTaskService).handleFailure(
             any(ExternalTask.class),
             anyString(),
             anyString(),
