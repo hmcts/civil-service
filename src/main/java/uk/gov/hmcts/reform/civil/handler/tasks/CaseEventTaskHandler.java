@@ -127,7 +127,10 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED ->
                     "RPA Reason: Not suitable for SDO.";
-                default -> throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
+                default -> {
+                    log.info("Unexpected flow state " + flowState.fullName());
+                    yield null;
+                }
             };
         }
         return null;
