@@ -202,10 +202,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .builder()
                                                 .judgeNameTitle(judgeNameTitle)
                                                 .input(judgeNameTitle
-                                                           + ", Upon considering the claim form and "
-                                                           + "Particulars of Claim/statements of case"
-                                                           + " [and the directions questionnaires]"
-                                                           ).build());
+                                                ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
                                                         .builder()
@@ -341,10 +338,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                              .builder()
                                              .judgeNameTitle(judgeNameTitle)
                                              .input(judgeNameTitle
-                                                        + ", has considered the statements of "
-                                                        + "the case and the information provided "
-                                                        + "by the parties, \n\n "
-                                                        ).build());
+                                             ).build());
 
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments

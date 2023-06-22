@@ -158,8 +158,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("test judge, Upon considering the claim form and Particulars of Claim/statements of case "
-                               + "[and the directions questionnaires]");
+                .isEqualTo("test judge");
 
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("input")
                 .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
@@ -247,9 +246,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("test judge, has considered the statements of "
-                               + "the case and the information provided "
-                               + "by the parties, \n\n ");
+                .isEqualTo("test judge");
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
