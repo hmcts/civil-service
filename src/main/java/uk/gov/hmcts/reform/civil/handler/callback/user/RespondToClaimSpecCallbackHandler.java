@@ -164,7 +164,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        System.out.println(" Inside Response handler class");
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
