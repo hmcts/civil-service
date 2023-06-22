@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Evidence;
@@ -21,7 +22,8 @@ public class EvidenceTemplateData {
             .build();
     }
 
-    public String displayTypeValue() {
+    @JsonProperty("displayTypeValue")
+    public String getDisplayTypeValue() {
         return Optional.ofNullable(type).map(type -> getDisplayValueFromEvidenceType(type)).orElse("");
     }
 

@@ -14,7 +14,7 @@ class EvidenceTemplateDataTest {
         String expectedValue = CONTRACTS_AND_AGREEMENTS.getDisplayValue();
         EvidenceTemplateData evidenceTemplateData = new EvidenceTemplateData(enumValue, "some explanation");
         //When
-        String resultValue = evidenceTemplateData.displayTypeValue();
+        String resultValue = evidenceTemplateData.getDisplayTypeValue();
         //Then
         assertThat(resultValue).isEqualTo(expectedValue);
     }
@@ -24,7 +24,7 @@ class EvidenceTemplateDataTest {
         //Given
         EvidenceTemplateData evidenceTemplateData = new EvidenceTemplateData(null, "some explanation");
         //When
-        String resultValue = evidenceTemplateData.displayTypeValue();
+        String resultValue = evidenceTemplateData.getDisplayTypeValue();
         //Then
         assertThat(resultValue).isEmpty();
     }
@@ -35,7 +35,7 @@ class EvidenceTemplateDataTest {
         String enumValue = "ABRA_CADABRA";
         EvidenceTemplateData evidenceTemplateData = new EvidenceTemplateData(enumValue, "some explanation");
         //When
-        String resultValue = evidenceTemplateData.displayTypeValue();
+        String resultValue = evidenceTemplateData.getDisplayTypeValue();
         //Then
         assertThat(resultValue).isEqualTo(enumValue);
     }
