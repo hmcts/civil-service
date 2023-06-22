@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -4445,6 +4446,7 @@ class StateFlowEngineTest {
                 .responseClaimMediationSpecRequired(NO)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .reasonNotSuitableSDO(new ReasonNotSuitableSDO("test"))
+                .takenOfflineDate(LocalDateTime.now())
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .build();
 
@@ -4459,6 +4461,7 @@ class StateFlowEngineTest {
     @Test
     void shouldReturnInHearingReadiness_whenTransitionedFromCaseDetailsNotified() {
         // Given
+
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .hearingReferenceNumber("11111111")
             .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -4531,6 +4534,152 @@ class StateFlowEngineTest {
                 FULL_DEFENCE_PROCEED.fullName(), IN_HEARING_READINESS.fullName()
             );
 
+    }
+
+    @Nested
+    class TakenOfflineSdoNotDrawn {
+
+        @Test
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotified() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+            );
+        }
+
+        @Test
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true).build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(9)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+            );
+        }
+
+        @Test
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledge() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(9)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+            );
+        }
+
+        @Test
+        void shouldReaturnTakenOfflineSdoNotDrawn_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+            );
+        }
     }
 
 }
