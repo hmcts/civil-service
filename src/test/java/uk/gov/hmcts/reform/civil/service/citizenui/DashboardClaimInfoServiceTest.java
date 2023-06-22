@@ -32,22 +32,7 @@ public class DashboardClaimInfoServiceTest {
 
     private static final String CLAIMANT_NAME = "Harry Porter";
     private static final String DEFENDANT_NAME = "James Bond";
-
-    @Mock
-    private ClaimStoreService claimStoreService;
-
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
-
-    @Mock
-    private CaseDetailsConverter caseDetailsConverter;
-
-    @Mock
-    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
-
-    @InjectMocks
-    private DashboardClaimInfoService dashboardClaimInfoService;
-
+    private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
     private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
@@ -64,17 +49,27 @@ public class DashboardClaimInfoServiceTest {
         .id(2L)
         .createdDate(DATE_IN_2022)
         .build();
-
     private static final List<DashboardClaimInfo> ORDERED_CASES =
-        Arrays.asList(DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2021)
-                          .build(),
-                      DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2022)
-                          .build()
+        Arrays.asList(
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2021)
+                .build(),
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2022)
+                .build()
         );
+    @Mock
+    private ClaimStoreService claimStoreService;
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
+    @InjectMocks
+    private DashboardClaimInfoService dashboardClaimInfoService;
 
     @BeforeEach
     void setUp() {
@@ -203,6 +198,41 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(2).getPaymentDate()).isEqualTo(DATE_IN_2025.toLocalDate());
+    }
+
+    @Test
+    void shouldGetThePartPaymentImmediateValue() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .claimValue(ClaimValue
+                                            .builder()
+                                            .statementOfValueInPennies(
+                                                new BigDecimal("100000"))
+                                            .build())
+                            .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
+                            .respondToClaimAdmitPartLRspec(
+                                RespondToClaimAdmitPartLRspec
+                                    .builder()
+                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(
+            PART_ADMIT_PAY_IMMEDIATELY_AMOUNT);
     }
 
     @Test
