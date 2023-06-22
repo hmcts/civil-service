@@ -482,30 +482,30 @@ public class EventHistoryMapper {
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         EventDetails judgmentByAdmissionEvent;
-            judgmentByAdmissionEvent = EventDetails.builder()
-                .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                      .add(caseData.getTotalInterest()).setScale(2))
-                .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount().setScale(2))
-                .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount().setScale(2))
-                .isJudgmentForthwith(caseData.isPayImmediately())
-                .paymentInFullDate(caseData.isPayBySetDate() ?
-                                       caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
-                                       : null)
-                .installmentAmount(caseData.isPayByInstallment() ?
-                                       MonetaryConversions.penniesToPounds(
-                                           caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
-                                       : BigDecimal.ZERO)
-                .installmentPeriod(caseData.isPayByInstallment() ?
-                                       getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
-                                       : null)
-                .firstInstallmentDate(caseData.isPayByInstallment() ?
-                                          caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
-                                          : null)
-                .dateOfJudgment(LocalDateTime.now())
-                .jointJudgment(false)
-                .judgmentToBeRegistered(true)
-                .miscText("")
-                .build();
+        judgmentByAdmissionEvent = EventDetails.builder()
+            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+                                  .add(caseData.getTotalInterest()).setScale(2))
+            .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount().setScale(2))
+            .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount().setScale(2))
+            .isJudgmentForthwith(caseData.isPayImmediately())
+            .paymentInFullDate(caseData.isPayBySetDate()
+                                   ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
+                                   : null)
+            .installmentAmount(caseData.isPayByInstallment()
+                                   ? MonetaryConversions.penniesToPounds(
+                                       caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
+                                   : BigDecimal.ZERO)
+            .installmentPeriod(caseData.isPayByInstallment()
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
+                                   : null)
+            .firstInstallmentDate(caseData.isPayByInstallment()
+                                      ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
+                                      : null)
+            .dateOfJudgment(LocalDateTime.now())
+            .jointJudgment(false)
+            .judgmentToBeRegistered(true)
+            .miscText("")
+            .build();
 
         builder.judgmentByAdmission((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
@@ -2228,7 +2228,7 @@ public class EventHistoryMapper {
     }
 
     private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
-        switch(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) {
+        switch (caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) {
             case ONCE_ONE_WEEK:
                 return "WK";
             case ONCE_TWO_WEEKS:

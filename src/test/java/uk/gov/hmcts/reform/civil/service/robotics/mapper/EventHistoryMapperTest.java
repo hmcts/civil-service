@@ -7944,4 +7944,17 @@ class EventHistoryMapperTest {
         }
 
     }
+
+    @Nested
+    class RequestJudgmentByAdmission {
+        @Test
+        public void shouldGenerateRPA_ForPartAdmit_WhenClaimAgreedRepaymentPlan() {
+
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan() {
+
+        }
+    }
 }
