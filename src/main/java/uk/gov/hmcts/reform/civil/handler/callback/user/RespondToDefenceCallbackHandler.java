@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -278,9 +279,27 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 
         if (!AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            boolean proceed;
+            switch (multiPartyScenario) {
+                case ONE_V_ONE:
+                    proceed = caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                    break;
+                case TWO_V_ONE:
+                    proceed = caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
+                        || caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
+                    break;
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    proceed = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
+                        || caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
+                    break;
+                default:
+                    proceed = false;
+            }
+            CaseState newState = proceed ? CaseState.JUDICIAL_REFERRAL : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
-                .state(CaseState.JUDICIAL_REFERRAL.name())
+                .state(newState.name())
                 .build();
         }
 
@@ -338,8 +357,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 )));
         if (!claimantUploads.isEmpty()) {
             updatedCaseData.claimantResponseDocuments(claimantUploads);
-            assignCategoryId.assignCategoryIdToCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
-                                                     "directionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCollection(
+                claimantUploads,
+                document -> document.getValue().getDocumentLink(),
+                "directionsQuestionnaire"
+            );
         }
     }
 
