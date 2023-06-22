@@ -161,17 +161,9 @@ public class CoreCaseDataService {
         return null;
     }
 
-    public SearchResult getAllCases(String authorization) {
-        QueryBuilder queryBuilder = QueryBuilders.matchAllQuery();
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.size(RETURNED_NUMBER_OF_CASES)
-            .query(queryBuilder);
-       String query = sourceBuilder.toString();
-//        String query = mapper.createObjectNode()
-//            .put("size", RETURNED_NUMBER_OF_CASES)
-//            .set("query", mapper.createObjectNode()
-//                .set("match_all", mapper.createObjectNode()))
-//            .toString();
+    public SearchResult getCasesUptoMaxsize(String authorization) {
+        String query = new SearchSourceBuilder().size(RETURNED_NUMBER_OF_CASES)
+            .query(QueryBuilders.matchAllQuery()).toString();
 
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
