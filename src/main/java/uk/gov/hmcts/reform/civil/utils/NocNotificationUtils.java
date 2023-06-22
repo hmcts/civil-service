@@ -173,7 +173,7 @@ public class NocNotificationUtils {
     /**
      * Builds the case name based on the applicant 1 and applicant 2 if there is one vs respondent 1 and respondent 2
      * if there is one.
-     * @param caseData data with the party names in to build the case name
+     * @param caseData data with the party names to build the case name
      * @return String of the party names concatenated
      */
     public static String getCaseName(CaseData caseData) {
