@@ -112,8 +112,10 @@ public class ServiceBusConfiguration {
                                 log.info("test exception");
                                 return receiveClient.abandonAsync(message.getLockToken());
                             }
+                            log.info("test no  exception v1");
+                            return receiveClient.abandonAsync(message.getLockToken());
                         }
-                        log.info("test no exception");
+                        log.info("test no exception v2");
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
 
@@ -129,7 +131,7 @@ public class ServiceBusConfiguration {
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    threadCount, true,
+                    threadCount, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
