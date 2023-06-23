@@ -110,7 +110,6 @@ public class ServiceBusConfiguration {
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
                                 log.info("test exception");
-                                return receiveClient.completeAsync(message.getLockToken());
                             }
                         }
                         log.info("test no exception");
