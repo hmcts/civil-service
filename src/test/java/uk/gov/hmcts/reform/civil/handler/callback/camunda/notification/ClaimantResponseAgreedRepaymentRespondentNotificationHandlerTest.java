@@ -28,11 +28,14 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID_JUDGEMENT_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.RESPONDENT_NAME;
@@ -182,5 +185,15 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicitor",
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                "NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION").build())
+                                                 .build())).isEqualTo(TASK_ID_JUDGEMENT_ADMISSION);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                "NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT").build())
+                                                 .build())).isEqualTo(TASK_ID);
     }
 }
