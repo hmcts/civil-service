@@ -288,6 +288,9 @@ public class NotificationsProperties {
     private String mediationUnsuccessfulDefendantLIPTemplate;
 
     @NotEmpty
+    private String mediationUnsuccessfulDefendantLIPBilingualTemplate;
+
+    @NotEmpty
     private String respondent1DefaultJudgmentRequestedTemplate;
 
     @NotEmpty
