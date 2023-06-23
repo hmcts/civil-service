@@ -114,13 +114,10 @@ public class ServiceBusConfiguration {
                                          caseId
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
-                                log.info("test exception");
                                 return receiveClient.abandonAsync(message.getLockToken());
                             }
-                            log.info("test no  exception v1");
                             return receiveClient.abandonAsync(message.getLockToken());
                         }
-                        log.info("test no exception v2");
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
 
