@@ -25,9 +25,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 
 @Configuration
 @Slf4j
@@ -52,33 +58,30 @@ public class ServiceBusConfiguration {
     @Value("${azure.service-bus.hmc-to-hearings-api.subscriptionName}")
     private String subscriptionName;
 
-    // @Value("${azure.service-bus.thread-count}")
-    // private int threadCount;
+    @Value("${azure.service-bus.thread-count}")
+    private int threadCount;
 
     private final ObjectMapper objectMapper;
     private final PaymentsConfiguration paymentsConfiguration;
     private final CoreCaseDataService coreCaseDataService;
+    private final FeatureToggleService featureToggleService;
 
     @Bean
     @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
-        log.info("namespace: {}", namespace);
-        log.info("connectionPostfix: {}", connectionPostfix);
-        log.info("topicName: {}", topicName);
-        log.info("subscriptionName: {}", subscriptionName);
-        log.info("username: {}", username);
-        URI endpoint = new URI("sb://" + namespace + connectionPostfix);
-        log.info("endpoint: {}", endpoint);
+        if (featureToggleService.isAutomatedHearingNoticeEnabled()) {
+            URI endpoint = new URI("sb://" + namespace + connectionPostfix);
 
-        String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
-        log.info("destination: {}", destination);
+            String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
 
-        ConnectionStringBuilder connectionStringBuilder =
-            new ConnectionStringBuilder(
-                endpoint, destination, username, password);
-        connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
-        return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
+            ConnectionStringBuilder connectionStringBuilder =
+                new ConnectionStringBuilder(
+                    endpoint, destination, username, password);
+            connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
+            return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
+        }
+        return null;
     }
 
     @Bean
@@ -86,7 +89,8 @@ public class ServiceBusConfiguration {
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
-        IMessageHandler messageHandler =
+        if (featureToggleService.isAutomatedHearingNoticeEnabled()) {
+            IMessageHandler messageHandler =
                 new IMessageHandler() {
 
                     @SneakyThrows
@@ -98,11 +102,17 @@ public class ServiceBusConfiguration {
                         HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
                         Long caseId = hmcMessage.getCaseId();
                         String hearingId = hmcMessage.getHearingId();
-                        log.info("Hearing requested for case {}, hearing id {}", hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                        log.info(
+                            "Hearing requested for case {}, hearing id {}",
+                            hmcMessage.getCaseId(),
+                            hmcMessage.getHearingId()
+                        );
                         if (isMessageRelevantForService(hmcMessage)) {
                             if (HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
                                 log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
-                                         hearingId, caseId);
+                                         hearingId,
+                                         caseId
+                                );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
                                 return receiveClient.completeAsync(message.getLockToken());
                             }
@@ -118,26 +128,30 @@ public class ServiceBusConfiguration {
                     }
                 };
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        receiveClient.registerMessageHandler(
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+            receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    4, false, Duration.ofHours(1), Duration.ofMinutes(5)),
+                    threadCount, false,
+                    Duration.ofHours(1), Duration.ofMinutes(5)
+                ),
                 executorService
-        );
+            );
+            return null;
+        }
         return null;
     }
 
     private void triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
         // trigger event for WA
-        // StartEventResponse startEventResponse =
-        //     coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
-        // CaseDataContent caseDataContent = CaseDataContent.builder()
-        //    .eventToken(startEventResponse.getToken())
-        //    .event(Event.builder().id(startEventResponse.getEventId()).build())
-        //    .data(startEventResponse.getCaseDetails().getData())
-        //    .build();
-        // coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+        StartEventResponse startEventResponse =
+            coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
+        CaseDataContent caseDataContent = CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId()).build())
+            .data(startEventResponse.getCaseDetails().getData())
+            .build();
+        coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
         log.info(
             "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
             caseId, hearingId);
