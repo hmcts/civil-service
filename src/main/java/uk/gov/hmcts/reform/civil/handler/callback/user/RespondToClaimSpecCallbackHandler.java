@@ -138,6 +138,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
+    public static final String DEFENDANT_2_DEFENSE_DIRECTIONS_QUESTIONNAIRE = "defendant2DefenseDirectionsQuestionnaire";
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -1555,7 +1556,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         ));
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
-                        "defendant2DefenseDirectionsQuestionnaire"
+                        DEFENDANT_2_DEFENSE_DIRECTIONS_QUESTIONNAIRE
                     );
                 }
             }
@@ -1571,7 +1572,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         ));
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
-                        "defendant2DefenseDirectionsQuestionnaire"
+                        DEFENDANT_2_DEFENSE_DIRECTIONS_QUESTIONNAIRE
                     );
                 }
             }
@@ -1589,7 +1590,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     ));
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent2DQDraftDirections,
-                    "defendant2DefenseDirectionsQuestionnaire"
+                    DEFENDANT_2_DEFENSE_DIRECTIONS_QUESTIONNAIRE
                 );
             }
         }

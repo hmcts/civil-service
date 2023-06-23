@@ -778,7 +778,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
                 .tempCorrectedDefendant1AddressRequired(NO)
-                .tempCorrectedDefendant1Address(AddressBuilder.maximal().build())
+                .tempCorrectedDefendant1Address(changedAddress)
                 .build();
             caseData = caseData.toBuilder()
                 .respondent1Copy(caseData.getRespondent1())
@@ -822,8 +822,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .tempCorrectedDefendant2AddressRequired(NO)
+                .tempCorrectedDefendant2Address(changedAddress)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -837,13 +838,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo("address line 1");
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo("address line 2");
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo("address line 3");
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
         }
 
         @Test
