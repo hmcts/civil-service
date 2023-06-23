@@ -59,6 +59,8 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
+import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -104,6 +106,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -838,6 +841,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isFullAdmitClaimSpec() {
+        return FULL_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
     public boolean isClaimantIntentionSettlePartAdmit() {
         return YesOrNo.YES.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
     }
@@ -917,5 +925,23 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
         return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
+    }
+
+    @JsonIgnore
+    public List<Element<RecurringIncomeLRspec>> getRecurringIncomeForRespondent1() {
+       if (isFullAdmitClaimSpec()) {
+           return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(null);
+        }
+       return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncome).orElse(null);
+    }
+
+    @JsonIgnore
+    public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
+        if (isFullAdmitClaimSpec()) {
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
+                null);
+        }
+        return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
+            null);
     }
 }
