@@ -94,8 +94,7 @@ public class ServiceBusConfiguration {
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
                         HmcMessage hearing = objectMapper.readValue(body.get(0), HmcMessage.class);
-                        String listAssistSessionID = hearing.getHearingUpdate().getListAssistSessionID();
-                        log.info("message received: {}", listAssistSessionID);
+                        log.info("message received: {}", hearing.getHearingId());
                         if (HmcStatus.EXCEPTION.equals(hearing.getHearingUpdate().getHmcStatus())) {
                             log.info("triggering WA event");
                             // trigger ccd event for WA
