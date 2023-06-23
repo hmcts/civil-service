@@ -110,6 +110,7 @@ public class ServiceBusConfiguration {
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
                                 log.info("test exception");
+                                return receiveClient.abandonAsync(message.getLockToken());
                             }
                         }
                         log.info("test no exception");
@@ -128,7 +129,7 @@ public class ServiceBusConfiguration {
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    threadCount, false,
+                    threadCount, true,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
