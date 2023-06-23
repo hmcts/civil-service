@@ -86,7 +86,8 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        log.info("message received {}", LocalDateTime.now());
+                        String now = LocalDateTime.now().toString();
+                        log.info("message received {}", now);
                         List<byte[]> body = message.getMessageBody().getBinaryData();
                         ObjectMapper mapper = new ObjectMapper();
 
