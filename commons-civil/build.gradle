@@ -15,6 +15,9 @@ buildscript {
   }
 }
 
+group = 'uk.gov.hmcts.reform'
+version = '0.0.1'
+
 def versions = [
   junit        : '5.9.3',
   junitPlatform: '1.9.3',
