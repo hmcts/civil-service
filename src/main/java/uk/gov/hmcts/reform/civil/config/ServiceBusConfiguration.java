@@ -54,65 +54,71 @@ public class ServiceBusConfiguration {
     @Bean
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
-        log.info("namespace: {}", namespace);
-        log.info("connectionPostfix: {}", connectionPostfix);
-        log.info("topicName: {}", topicName);
-        log.info("subscriptionName: {}", subscriptionName);
-        log.info("username: {}", username);
-        URI endpoint = new URI("sb://" + namespace + connectionPostfix);
-        log.info("endpoint: {}", endpoint);
+        if (!namespace.contains("aat")) {
+            log.info("namespace: {}", namespace);
+            log.info("connectionPostfix: {}", connectionPostfix);
+            log.info("topicName: {}", topicName);
+            log.info("subscriptionName: {}", subscriptionName);
+            log.info("username: {}", username);
+            URI endpoint = new URI("sb://" + namespace + connectionPostfix);
+            log.info("endpoint: {}", endpoint);
 
-        String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
-        log.info("destination: {}", destination);
+            String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
+            log.info("destination: {}", destination);
 
-        ConnectionStringBuilder connectionStringBuilder =
-            new ConnectionStringBuilder(
-                endpoint, destination, username, password);
-        connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
-        return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
+            ConnectionStringBuilder connectionStringBuilder =
+                new ConnectionStringBuilder(
+                    endpoint, destination, username, password);
+            connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
+            return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
+        }
+        return null;
     }
 
     @Bean
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
+        if (!namespace.contains("aat")) {
+            IMessageHandler messageHandler =
+                new IMessageHandler() {
 
-        IMessageHandler messageHandler =
-            new IMessageHandler() {
+                    @SneakyThrows
+                    @Override
+                    public CompletableFuture<Void> onMessageAsync(IMessage message) {
+                        log.info("message received {}", LocalDateTime.now());
+                        List<byte[]> body = message.getMessageBody().getBinaryData();
+                        ObjectMapper mapper = new ObjectMapper();
 
-                @SneakyThrows
-                @Override
-                public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                    log.info("message received {}", LocalDateTime.now());
-                    List<byte[]> body = message.getMessageBody().getBinaryData();
-                    ObjectMapper mapper = new ObjectMapper();
-
-                    HmcMessage hearing = mapper.readValue(body.get(0), HmcMessage.class);
-                    String listAssistSessionID = hearing.getHearingUpdate().getListAssistSessionID();
-                    log.info("message received: {}", listAssistSessionID);
-                    if (HmcStatus.EXCEPTION.equals(hearing.getHearingUpdate().getHmcStatus())) {
-                        log.info("triggering WA event");
-                        // trigger ccd event for WA
-                        // if event triggered successfully
-                        return receiveClient.completeAsync(message.getLockToken());
+                        HmcMessage hearing = mapper.readValue(body.get(0), HmcMessage.class);
+                        String listAssistSessionID = hearing.getHearingUpdate().getListAssistSessionID();
+                        log.info("message received: {}", listAssistSessionID);
+                        if (HmcStatus.EXCEPTION.equals(hearing.getHearingUpdate().getHmcStatus())) {
+                            log.info("triggering WA event");
+                            // trigger ccd event for WA
+                            // if event triggered successfully
+                            return receiveClient.completeAsync(message.getLockToken());
+                        }
+                        return receiveClient.abandonAsync(message.getLockToken());
                     }
-                    return receiveClient.abandonAsync(message.getLockToken());
-                }
 
-                @Override
-                public void notifyException(
-                    Throwable throwable, ExceptionPhase exceptionPhase) {
-                    log.error("Exception occurred.");
-                    log.error(exceptionPhase + "-" + throwable.getMessage());
-                }
-            };
+                    @Override
+                    public void notifyException(
+                        Throwable throwable, ExceptionPhase exceptionPhase) {
+                        log.error("Exception occurred.");
+                        log.error(exceptionPhase + "-" + throwable.getMessage());
+                    }
+                };
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        receiveClient.registerMessageHandler(
-            messageHandler,
-            new MessageHandlerOptions(
-                4, false, Duration.ofHours(1), Duration.ofMinutes(5)),
-            executorService);
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+            receiveClient.registerMessageHandler(
+                messageHandler,
+                new MessageHandlerOptions(
+                    4, false, Duration.ofHours(1), Duration.ofMinutes(5)),
+                executorService
+            );
+            return null;
+        }
         return null;
     }
 }
