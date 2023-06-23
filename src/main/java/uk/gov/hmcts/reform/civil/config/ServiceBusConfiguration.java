@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 @Slf4j
 public class ServiceBusConfiguration {
 
-    public static final String AMQP_CONNECTION_STRING_TEMPLATE = "amqps://%1s";
-
     @Value("${azure.service-bus.hmc-to-hearings-api.namespace}")
     private String namespace;
 
@@ -55,7 +53,6 @@ public class ServiceBusConfiguration {
     // private int threadCount;
 
     @Bean
-    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
         log.info("namespace: {}", namespace);
@@ -77,7 +74,6 @@ public class ServiceBusConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
