@@ -335,7 +335,7 @@ azure:
       subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:dummySubscriptionName}
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
-      enabled: {HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+      enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
 
 ---
 
