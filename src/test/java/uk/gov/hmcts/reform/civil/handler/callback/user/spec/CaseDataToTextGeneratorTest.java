@@ -8,12 +8,19 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import uk.gov.hmcts.reform.civil.Application;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 /**
  * CaseDataToTextGenerator can hold any generation of a text that uses only a CaseData. Each intention for that text
@@ -49,7 +56,10 @@ public class CaseDataToTextGeneratorTest {
             Collection used = testIntentionConfig(config, allGenerators);
             toCheck.removeAll(used);
         }
-        Assertions.assertTrue(toCheck.isEmpty(), "Some generators have not been checked " + toCheck.toArray().toString());
+        Assertions.assertTrue(
+            toCheck.isEmpty(),
+            "Some generators have not been checked " + toCheck.toArray().toString()
+        );
     }
 
     /**
@@ -81,7 +91,7 @@ public class CaseDataToTextGeneratorTest {
             Assertions.assertEquals(1, suitable.size(),
                                     "There should be exactly 1 suitable generator per case."
                                         + "Case in position " + i + " has " + suitable.size()
-                                    + ", it was expecting " + cases.get(i).getRight().getSimpleName()
+                                        + ", it was expecting " + cases.get(i).getRight().getSimpleName()
             );
             //noinspection ConstantConditions
             Assertions.assertTrue(
@@ -110,7 +120,7 @@ public class CaseDataToTextGeneratorTest {
         useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(
             type = FilterType.ASSIGNABLE_TYPE,
-            classes = CaseDataToTextGenerator.class
+            classes = {CaseDataToTextGenerator.class, ClaimUrlsConfiguration.class}
         )
     )
     public static class CaseDataToTextGeneratorTestConfig {
@@ -139,5 +149,32 @@ public class CaseDataToTextGeneratorTest {
          *     should process it.
          */
         List<Pair<CaseData, Class<? extends T>>> getCasesToExpectedImplementation();
+    }
+
+    private final PayImmediatelyConfText generatorConf = new PayImmediatelyConfText(
+        new ClaimUrlsConfiguration("", "", "", "", ""));
+    private final PartialAdmitPayImmediatelyConfirmationText generatorHeader = new PartialAdmitPayImmediatelyConfirmationText();
+
+    private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
+        return CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .legacyCaseReference("claimNumber")
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .build();
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormattedPayImmediatelyConfText() {
+        CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> generatorConf.generateTextFor(caseData));
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormatted() {
+        CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> generatorHeader.generateTextFor(caseData));
     }
 }

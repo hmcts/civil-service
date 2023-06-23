@@ -133,11 +133,11 @@ nonworking-days:
   datafile: /data/non-working_days.dat
 
 civil:
-  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
-  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
-  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
-  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
-  n225-url: https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf
+  response-pack-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772450/n9-eng.pdf
+  n9a-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/867255/n9a-eng.pdf
+  n9b-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/866787/N9B_web_0818_save.pdf
+  n215-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/952023/n215-eng.pdf
+  n225-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/961368/n225-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -269,6 +269,7 @@ notifications:
 
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
+  mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
   notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
@@ -276,6 +277,7 @@ notifications:
 
   notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
+  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -335,6 +337,7 @@ azure:
       idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+      enabled: {HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
 
 ---
 

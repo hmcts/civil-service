@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -80,7 +80,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     CreateSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class,
+    ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     DeadlinesCalculator.class,
     ValidationAutoConfiguration.class,
@@ -967,6 +967,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
                                + "they must inform the court within 7 days of the date of this order.");
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateToToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateFrom")
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
                 .isEqualTo("Not more than seven nor less than three clear days before the trial, "
                                + "the claimant must file at court and serve an indexed and paginated bundle of "
