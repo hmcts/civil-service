@@ -150,9 +150,6 @@ allprojects {
       url "https://jitpack.io"
     }
     maven {
-      url  "https://repo.spring.io/libs-milestone"
-    }
-    maven {
       url "https://jitpack.io"
     }
     jcenter()
