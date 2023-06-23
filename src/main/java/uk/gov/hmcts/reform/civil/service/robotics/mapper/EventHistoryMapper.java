@@ -467,7 +467,7 @@ public class EventHistoryMapper {
     }
 
     private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (caseData.getCcjPaymentDetails() != null && caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null) {
+        if (caseData.isCcjRequestJudgmentByAdmission()) {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -486,8 +486,9 @@ public class EventHistoryMapper {
         judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.getTotalInterest()).setScale(2))
-            .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount().setScale(2))
-            .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount().setScale(2))
+            .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
+                               .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
+            .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
             .isJudgmentForthwith(caseData.isPayImmediately())
             .paymentInFullDate(caseData.isPayBySetDate()
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
@@ -495,7 +496,7 @@ public class EventHistoryMapper {
             .installmentAmount(caseData.isPayByInstallment()
                                    ? MonetaryConversions.penniesToPounds(
                                        caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
-                                   : BigDecimal.ZERO)
+                                   : null)
             .installmentPeriod(caseData.isPayByInstallment()
                                    ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
                                    : null)

@@ -890,4 +890,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(Organisation::getOrganisationID)
             .orElse("");
     }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmission() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null;
+    }
 }
