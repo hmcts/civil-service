@@ -25,15 +25,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
-
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 
 @Configuration
 @Slf4j
@@ -114,9 +109,11 @@ public class ServiceBusConfiguration {
                                          caseId
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
+                                log.info("test exception");
                                 return receiveClient.completeAsync(message.getLockToken());
                             }
                         }
+                        log.info("test no exception");
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
 
@@ -144,7 +141,7 @@ public class ServiceBusConfiguration {
 
     private void triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
         // trigger event for WA
-        StartEventResponse startEventResponse =
+        /**StartEventResponse startEventResponse =
             coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
         CaseDataContent caseDataContent = CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
@@ -152,6 +149,7 @@ public class ServiceBusConfiguration {
             .data(startEventResponse.getCaseDetails().getData())
             .build();
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+         */
         log.info(
             "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
             caseId, hearingId);
