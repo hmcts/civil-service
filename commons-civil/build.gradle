@@ -95,5 +95,3 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
 }
-
-mainClassName = 'uk.gov.hmcts.reform.civil.Application'
