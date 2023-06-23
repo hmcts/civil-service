@@ -97,7 +97,6 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }

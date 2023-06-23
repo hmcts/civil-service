@@ -141,13 +141,38 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 "claimant-agree-repayment-respondent-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyRespondentParty_whenInvokedWithJudgementByAdmission() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "request-judgement-by-admission-respondent-notification-000DC001"
+            );
+        }
     }
 
     @NotNull
     public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
