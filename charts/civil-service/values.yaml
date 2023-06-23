@@ -69,6 +69,7 @@ java:
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    HMC_HEARINGS_TOPIC_THREAD_COUNT: 4
 
   keyVaults:
     civil:

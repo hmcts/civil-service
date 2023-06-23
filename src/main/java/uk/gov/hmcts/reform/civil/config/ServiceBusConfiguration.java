@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
@@ -50,15 +51,17 @@ public class ServiceBusConfiguration {
     @Value("${azure.service-bus.hmc-to-hearings-api.subscriptionName}")
     private String subscriptionName;
 
-    private final ObjectMapper objectMapper;
-
-    // @Value("${thread.count}")
+    // @Value("${azure.service-bus.thread-count}")
     // private int threadCount;
+
+    private final ObjectMapper objectMapper;
+    private final PaymentsConfiguration paymentsConfiguration;
+    private final CoreCaseDataService coreCaseDataService;
 
     @Bean
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
-        if (!namespace.contains("aat")) {
+        if (namespace.contains("demo")) {
             log.info("namespace: {}", namespace);
             log.info("connectionPostfix: {}", connectionPostfix);
             log.info("topicName: {}", topicName);
@@ -83,7 +86,7 @@ public class ServiceBusConfiguration {
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
-        if (!namespace.contains("aat")) {
+        if (namespace.contains("demo")) {
             IMessageHandler messageHandler =
                 new IMessageHandler() {
 
@@ -93,13 +96,17 @@ public class ServiceBusConfiguration {
                         log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
-                        HmcMessage hearing = objectMapper.readValue(body.get(0), HmcMessage.class);
-                        log.info("message received: {}", hearing.getHearingId());
-                        if (HmcStatus.EXCEPTION.equals(hearing.getHearingUpdate().getHmcStatus())) {
-                            log.info("triggering WA event");
-                            // trigger ccd event for WA
-                            // if event triggered successfully
-                            return receiveClient.completeAsync(message.getLockToken());
+                        HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
+                        Long caseId = hmcMessage.getCaseId();
+                        String hearingId = hmcMessage.getHearingId();
+                        log.info("Hearing requested for case {}, hearing id {}", hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                        if (isMessageRelevantForService(hmcMessage)) {
+                            if (HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                                log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
+                                         hearingId, caseId);
+                                triggerReviewHearingExceptionEvent(caseId, hearingId);
+                                return receiveClient.completeAsync(message.getLockToken());
+                            }
                         }
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
@@ -122,5 +129,25 @@ public class ServiceBusConfiguration {
             return null;
         }
         return null;
+    }
+
+    private void triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
+        // trigger event for WA
+        // StartEventResponse startEventResponse =
+        //     coreCaseDataService.startUpdate(String.valueOf(caseId), REVIEW_HEARING_EXCEPTION);
+        // CaseDataContent caseDataContent = CaseDataContent.builder()
+        //    .eventToken(startEventResponse.getToken())
+        //    .event(Event.builder().id(startEventResponse.getEventId()).build())
+        //    .data(startEventResponse.getCaseDetails().getData())
+        //    .build();
+        // coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+        log.info(
+            "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
+            caseId, hearingId);
+    }
+
+    private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
+        return paymentsConfiguration.getSpecSiteId().equals(hmcMessage.getHmctsServiceCode())
+            || paymentsConfiguration.getSiteId().equals(hmcMessage.getHmctsServiceCode());
     }
 }
