@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -59,35 +60,33 @@ public class ServiceBusConfiguration {
     private final CoreCaseDataService coreCaseDataService;
 
     @Bean
+    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     public SubscriptionClient receiveClient()
         throws URISyntaxException, ServiceBusException, InterruptedException {
-        if (namespace.contains("demo")) {
-            log.info("namespace: {}", namespace);
-            log.info("connectionPostfix: {}", connectionPostfix);
-            log.info("topicName: {}", topicName);
-            log.info("subscriptionName: {}", subscriptionName);
-            log.info("username: {}", username);
-            URI endpoint = new URI("sb://" + namespace + connectionPostfix);
-            log.info("endpoint: {}", endpoint);
+        log.info("namespace: {}", namespace);
+        log.info("connectionPostfix: {}", connectionPostfix);
+        log.info("topicName: {}", topicName);
+        log.info("subscriptionName: {}", subscriptionName);
+        log.info("username: {}", username);
+        URI endpoint = new URI("sb://" + namespace + connectionPostfix);
+        log.info("endpoint: {}", endpoint);
 
-            String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
-            log.info("destination: {}", destination);
+        String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
+        log.info("destination: {}", destination);
 
-            ConnectionStringBuilder connectionStringBuilder =
-                new ConnectionStringBuilder(
-                    endpoint, destination, username, password);
-            connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
-            return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
-        }
-        return null;
+        ConnectionStringBuilder connectionStringBuilder =
+            new ConnectionStringBuilder(
+                endpoint, destination, username, password);
+        connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
+        return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
     }
 
     @Bean
+    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     CompletableFuture<Void> registerMessageHandlerOnClient(
         @Autowired SubscriptionClient receiveClient)
         throws ServiceBusException, InterruptedException {
-        if (namespace.contains("demo")) {
-            IMessageHandler messageHandler =
+        IMessageHandler messageHandler =
                 new IMessageHandler() {
 
                     @SneakyThrows
@@ -119,15 +118,13 @@ public class ServiceBusConfiguration {
                     }
                 };
 
-            ExecutorService executorService = Executors.newFixedThreadPool(4);
-            receiveClient.registerMessageHandler(
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
                     4, false, Duration.ofHours(1), Duration.ofMinutes(5)),
                 executorService
-            );
-            return null;
-        }
+        );
         return null;
     }
 
