@@ -12,11 +12,12 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class ServiceBusConfiguration {
 
     @Value("${azure.service-bus.hmc-to-hearings-api.namespace}")
@@ -47,6 +49,8 @@ public class ServiceBusConfiguration {
 
     @Value("${azure.service-bus.hmc-to-hearings-api.subscriptionName}")
     private String subscriptionName;
+
+    private final ObjectMapper objectMapper;
 
     // @Value("${thread.count}")
     // private int threadCount;
@@ -86,12 +90,10 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        String now = LocalDateTime.now().toString();
-                        log.info("message received {}", now);
+                        log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
-                        ObjectMapper mapper = new ObjectMapper();
 
-                        HmcMessage hearing = mapper.readValue(body.get(0), HmcMessage.class);
+                        HmcMessage hearing = objectMapper.readValue(body.get(0), HmcMessage.class);
                         String listAssistSessionID = hearing.getHearingUpdate().getListAssistSessionID();
                         log.info("message received: {}", listAssistSessionID);
                         if (HmcStatus.EXCEPTION.equals(hearing.getHearingUpdate().getHmcStatus())) {
