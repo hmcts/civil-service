@@ -13,10 +13,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
-import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
@@ -57,23 +56,29 @@ public class DashboardClaimInfo {
     private DashboardClaimStatus status;
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
-        pub       return Optional.ofNullable(responseDea
-
+    @JsonGetter("numberOfDays")
+    public long getNumberOfDays() {
+        return Optional.ofNullable(responseDeadline)
             .filter(deadline ->
                         deadline.isAfter(LocalDate.now()))
             .map(deadline ->
-                         LocalDate.   deadline,
-                             Chr ))
-                        
-                        
-                ter("numberOfDaysOverdue")
+                     LocalDate.now().until(
+                         deadline,
+                         ChronoUnit.DAYS
+                     ))
+            .orElse(0L);
+    }
+
+    @JsonGetter("numberOfDaysOverdue")
     public long numberOfDaysOverdue() {
         return Optional.ofNullable(responseDeadline)
             .filter(deadline ->
                         deadline.isBefore(LocalDate.now()))
             .map(deadline ->
-                         deadline.u  LocalDate.now(),
-                             Chr ))
-                        
-                        
-                
+                     deadline.until(
+                         LocalDate.now(),
+                         ChronoUnit.DAYS
+                     ))
+            .orElse(0L);
+    }
+}
