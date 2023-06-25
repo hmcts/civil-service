@@ -203,7 +203,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-    private final List<Element<ManageDocument>> managedocuments;
+    private final List<Element<ManageDocument>> manageDocuments;
     private final Document specClaimTemplateDocumentFiles;
     private final Document specClaimDetailsDocumentFiles;
     private final List<Evidence> speclistYourEvidenceList;

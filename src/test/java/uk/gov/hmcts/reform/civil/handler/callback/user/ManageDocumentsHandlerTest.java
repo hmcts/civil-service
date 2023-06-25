@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,7 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
-            Assertions.assertThat(handler.handledEvents()).contains(MANAGE_DOCUMENTS);
+            assertThat(handler.handledEvents()).contains(MANAGE_DOCUMENTS);
         }
 
         @Test
@@ -54,13 +53,12 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
                     .documentLink(Document.builder().build())
                     .build()
             );
-            CaseData caseData = CaseData.builder().managedocuments((List.of(document))).build();
+            CaseData caseData = CaseData.builder().manageDocuments((List.of(document))).build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-
-            assertThat(response.getData()).extracting("managedocuments").isNotNull();
+            assertThat(response.getData()).extracting("manageDocuments").isNotNull();
         }
     }
 }

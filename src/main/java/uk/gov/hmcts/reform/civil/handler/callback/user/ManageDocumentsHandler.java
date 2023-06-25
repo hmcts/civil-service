@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_DOCUMENTS;
 
 @Service
@@ -24,7 +25,8 @@ public class ManageDocumentsHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
-        this::uploadManageDocuments
+        this::uploadManageDocuments,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
     );
 
     @Override
