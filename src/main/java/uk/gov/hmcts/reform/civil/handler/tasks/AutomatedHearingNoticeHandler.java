@@ -15,8 +15,14 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
+import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus;
+import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
@@ -66,28 +72,20 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             .filter(hearingId -> !hearingNoticeDispatched(hearingId, dispatchedHearingIds))
             .forEach(hearingId -> {
                 try {
-                    var hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
+                    var hearing = createHearing("1234123412341234", ListAssistCaseStatus.LISTED);
                     var hearingStatus = hearing.getHearingResponse().getLaCaseStatus();
                     log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
 
-                    if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
-                        var partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
-                        if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-                            log.info("Dispatching hearing notice task for hearing [{}].",
-                                hearingId);
-                            triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
-                                                          .hearingId(hearingId)
-                                                          .caseId(hearing.getCaseDetails().getCaseRef())
-                                                          .triggeredViaScheduler(true)
-                                                          .build());
-                            dispatchedHearingIds.add(hearingId);
-
-                        } else {
-                            notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
-                        }
-                    } else {
-                        notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
-                    }
+                    log.info(
+                        "Dispatching hearing notice task for hearing [{}].",
+                        hearingId
+                    );
+                    triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
+                                                  .hearingId(hearingId)
+                                                  .caseId(hearing.getCaseDetails().getCaseRef())
+                                                  .triggeredViaScheduler(true)
+                                                  .build());
+                    dispatchedHearingIds.add(hearingId);
                 } catch (Exception e) {
                     log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage());
                 }
@@ -117,20 +115,34 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             );
         } catch (NotFoundException e) {
             log.info("Completing external task '{}' was skipped as process instance '{}' has already completed.",
-                      topicName, processInstanceId);
+                     topicName, processInstanceId
+            );
         } catch (Exception ex) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, ex);
+                      topicName, processInstanceId, ex
+            );
         }
     }
 
     private UnNotifiedHearingResponse getUnnotifiedHearings(String serviceId) {
-        return hearingsService.getUnNotifiedHearingResponses(
-            getSystemUpdateUser().getUserToken(),
-            serviceId,
-            LocalDateTime.now().minusDays(7),
-            null
-        );
+        Integer totalFound = 11;
+        return UnNotifiedHearingResponse.builder()
+            .totalFound(totalFound.longValue())
+            .hearingIds(
+                List.of(
+                    "111111",
+                    "222222",
+                    "333333",
+                    "444444",
+                    "555555",
+                    "666666",
+                    "777777",
+                    "888888",
+                    "999999",
+                    "000000",
+                    "101010"
+                ))
+            .build();
     }
 
     private List<String> getDispatchedHearingIds(HearingNoticeSchedulerVars schedulerVars) {
@@ -176,6 +188,30 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             return true;
         }
         return false;
+    }
+
+    private HearingGetResponse createHearing(String caseId, ListAssistCaseStatus hearingStatus) {
+        Integer version = 1;
+        LocalDateTime hearingDate = LocalDateTime.of(2030, 1, 1, 12, 0, 0);
+        LocalDateTime receivedDate = LocalDateTime.of(2029, 12, 1, 12, 0, 0);
+        return HearingGetResponse.builder()
+            .hearingDetails(HearingDetails.builder().build())
+            .requestDetails(HearingRequestDetails.builder()
+                                .versionNumber(version.longValue())
+                                .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef(caseId).build())
+            .partyDetails(List.of(PartyDetailsModel.builder().build()))
+            .hearingResponse(
+                HearingResponse.builder()
+                    .receivedDateTime(hearingDate)
+                    .laCaseStatus(hearingStatus)
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .hearingStartDateTime(receivedDate)
+                            .hearingVenueId("000000").build()
+                    ))
+                    .build())
+            .build();
     }
 
     @Override
