@@ -239,7 +239,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         }
     }
 
-    private static String fillTypeBundleInfo(CaseData caseData) {
+    static String fillTypeBundleInfo(CaseData caseData) {
         DisposalHearingBundleDJ disposalHearingBundle = caseData.getDisposalHearingBundleDJ();
 
         if (disposalHearingBundle != null) {
