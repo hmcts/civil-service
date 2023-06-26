@@ -117,7 +117,7 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
-    public static final String RPA_IN_MEDIATION = "RPA Reason: Mediation RPA";
+    public static final String RPA_IN_MEDIATION = "RPA Reason: In Mediation";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -512,7 +512,7 @@ public class EventHistoryMapper {
         builder.judgmentByAdmission((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
-            .litigiousPartyID("001")
+            .litigiousPartyID(APPLICANT_ID)
             .dateReceived(LocalDateTime.now())
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
