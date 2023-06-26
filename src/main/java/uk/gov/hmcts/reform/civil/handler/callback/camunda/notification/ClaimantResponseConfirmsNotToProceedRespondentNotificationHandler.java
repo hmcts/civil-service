@@ -80,7 +80,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
 
         notificationService.sendMail(
             recipient,
-            addTemplate(caseData, callbackParams),
+            getTemplate(caseData, callbackParams),
             SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? addPropertiesSpec(caseData, caseEvent)
                 : addProperties(caseData),
@@ -89,7 +89,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String addTemplate(CaseData caseData, CallbackParams callbackParams) {
+    private String getTemplate(CaseData caseData, CallbackParams callbackParams) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.isPartAdmitPayImmediatelyAccepted()) {
                 return notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec();
