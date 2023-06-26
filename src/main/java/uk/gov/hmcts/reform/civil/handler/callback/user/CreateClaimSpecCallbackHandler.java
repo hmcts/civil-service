@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -137,7 +137,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
-    private final ClaimIssueConfiguration claimIssueConfiguration;
+    private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
@@ -579,8 +579,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(caseDocLocation,
                                                        caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline))
+                         claimUrlsConfiguration.getResponsePackLink(),
+                         formattedServiceDeadline))
             + exitSurveyContentService.applicantSurvey();
     }
 
@@ -773,12 +773,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
                 : format(SPEC_LIP_CONFIRMATION_BODY,
-            format(caseDocLocation, caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            claimIssueConfiguration.getN9aLink(),
-            claimIssueConfiguration.getN9bLink(),
-            claimIssueConfiguration.getN215Link(),
-            formattedServiceDeadline
+                         format(caseDocLocation, caseData.getCcdCaseReference()),
+                         claimUrlsConfiguration.getResponsePackLink(),
+                         claimUrlsConfiguration.getN9aLink(),
+                         claimUrlsConfiguration.getN9bLink(),
+                         claimUrlsConfiguration.getN215Link(),
+                         formattedServiceDeadline
         )) + exitSurveyContentService.applicantSurvey();
     }
 

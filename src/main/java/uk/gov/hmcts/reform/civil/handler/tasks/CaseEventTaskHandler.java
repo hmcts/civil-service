@@ -117,16 +117,20 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Unregistered defendant solicitor firm(s).";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
                     "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
-                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
+                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
                     "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
                     "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
                     "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF -> "RPA Reason: Case taken offline by staff.";
-                case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION ->
+                case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED ->
                     "RPA Reason: Not suitable for SDO.";
-                default -> throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
+                default -> {
+                    log.info("Unexpected flow state " + flowState.fullName());
+                    yield null;
+                }
             };
         }
         return null;
