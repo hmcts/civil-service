@@ -404,7 +404,7 @@ public class CaseDataTest {
         //Then
         assertThat(result).isEqualTo("");
     }
-    
+
     @Test
     void isTranslatedDocumentUploaded_thenFalse() {
         //Given

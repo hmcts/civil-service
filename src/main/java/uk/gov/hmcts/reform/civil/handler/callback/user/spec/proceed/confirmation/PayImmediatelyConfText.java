@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
+    private final PaymentDateService paymentDateService;
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
 
     @Override
@@ -26,9 +27,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
-            .orElse(null);
+        LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
         if (whenBePaid == null) {
             throw new IllegalStateException("Unable to format the payment date.");
         }
