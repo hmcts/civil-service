@@ -23,4 +23,6 @@ public class RequestedCourt {
     private final DynamicList responseCourtLocations;
     private final CaseLocationCivil caseLocation;
     private final String responseCourtName;
+    private final YesOrNo remoteHearingRequested;
+    private final String reasonForRemoteHearing;
 }
