@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
@@ -22,7 +20,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -53,11 +50,8 @@ public class DashboardClaimInfoService {
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        SearchResult claims;
-        Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
-        claims = coreCaseDataService.searchCases(query, authorisation);
+        SearchResult claims = coreCaseDataService.getCasesUptoMaxsize(authorisation);
         log.info("-----------ccdCases received-------------total " + claims.getTotal());
-        log.info("-----------ccdCases received-------------claims.getCases().size() " + claims.getCases().size());
         return translateSearchResultToDashboardItems(claims);
     }
 
@@ -82,6 +76,11 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
+
+        if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
+            item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+
         return item;
     }
 

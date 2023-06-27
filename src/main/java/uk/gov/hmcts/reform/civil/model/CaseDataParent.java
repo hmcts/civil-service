@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -227,6 +228,9 @@ public class CaseDataParent implements MappableObject {
 
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
+    private final DynamicList hearingMethodValuesFastTrack;
+    private final DynamicList hearingMethodValuesDisposalHearing;
+    private final DynamicList hearingMethodValuesSmallClaims;
     private final DynamicList smallClaimsMethodInPerson;
     private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
@@ -292,6 +296,8 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+    private List<DateToShowToggle> smallClaimsHearingDateToToggle;
+    private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
     private CaseDocument sdoOrderDocument;
 

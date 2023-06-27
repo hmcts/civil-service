@@ -44,20 +44,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-sdo";
+    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
+        var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-legal-rep";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

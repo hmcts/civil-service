@@ -20,8 +20,7 @@ public class HearingResponse {
 
     private LocalDateTime receivedDateTime;
 
-    @JsonProperty("laCaseStatus")
-    private ListAssistCaseStatus listAssistCaseStatus;
+    private ListAssistCaseStatus laCaseStatus;
 
     private ListingStatus listingStatus;
 
