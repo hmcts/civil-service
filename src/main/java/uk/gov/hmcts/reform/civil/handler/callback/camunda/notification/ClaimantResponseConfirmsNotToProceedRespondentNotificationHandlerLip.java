@@ -20,6 +20,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Slf4j
 @Service
@@ -55,7 +56,9 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsNotToProceedLip(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         var recipient = caseData.getRespondent1().getPartyEmail();
-        String template = notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip();
+        String template = caseData.isPartAdmitPayImmediatelyAccepted()
+            ? notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec()
+            : notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpecLip();
         Map<String, String> properties = addProperties(caseData);
         if (StringUtils.isNotBlank(recipient)) {
             notificationService.sendMail(
@@ -72,6 +75,12 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        if (caseData.isPartAdmitPayImmediatelyAccepted()) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            );
+        }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
