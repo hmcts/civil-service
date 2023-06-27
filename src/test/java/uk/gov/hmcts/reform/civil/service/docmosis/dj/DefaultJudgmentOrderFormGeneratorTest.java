@@ -106,6 +106,56 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     }
 
     @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndTelephoneHearing() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOTelephoneHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndVidoeHearing() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOVideoHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com",

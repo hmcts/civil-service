@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -17,8 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 
 public class CaseDataTest {
@@ -434,4 +437,29 @@ public class CaseDataTest {
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
     }
+
+    @Test
+    void isPartAdmitPayImmediatelyAccepted_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isPartAdmitPayImmediatelyAccepted());
+    }
+
+    @Test
+    void isPartAdmitPayImmediatelyAccepted_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        //Then
+        assertFalse(caseData.isPartAdmitPayImmediatelyAccepted());
+    }
 }
+
+
