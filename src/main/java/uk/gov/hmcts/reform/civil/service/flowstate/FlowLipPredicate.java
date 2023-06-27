@@ -19,6 +19,8 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> isTranslatedDocumentUploaded = CaseData::isTranslatedDocumentUploaded;
 
+    public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
+
     public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
         CaseData::isCcjRequestJudgmentByAdmission;
 
