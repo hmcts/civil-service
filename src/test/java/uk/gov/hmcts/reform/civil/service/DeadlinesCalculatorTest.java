@@ -605,4 +605,53 @@ public class DeadlinesCalculatorTest {
         }
     }
 
+    @Nested
+    class RespondentPaymentDate {
+
+        @Test
+        void shouldReturnDatePlus5days_whenResponseDateIsWeekday() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 9).atTime(12, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(5);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDatePlus6days_whenResponseDateIsWeekdayAfter4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 9).atTime(17, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(6);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDeadlinePlus7days_whenResponseDateIsMondayBefore4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 12).atTime(10, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(7);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDeadlinePlus7days_whenResponseDateIsMondayAfter4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 12).atTime(18, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(7);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+    }
+
 }
