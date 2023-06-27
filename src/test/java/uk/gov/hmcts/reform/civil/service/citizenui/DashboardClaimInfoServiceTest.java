@@ -164,7 +164,7 @@ public class DashboardClaimInfoServiceTest {
                                                                                                 new BigDecimal("100000"))
                                                                                             .build())
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
-                                                                            t.build());
+                                                                            .build());
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
             "123"
