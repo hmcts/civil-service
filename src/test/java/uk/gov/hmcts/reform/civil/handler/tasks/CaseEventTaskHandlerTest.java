@@ -65,21 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     CaseEventTaskHandler.class,
@@ -703,6 +689,42 @@ class CaseEventTaskHandlerTest {
                 }
             }
 
+        } //Indu
+        @Nested
+        class FullDefenceProceedWhenApplicantDeadlineIsPassed {
+            FlowState.Main state = PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
+            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            @BeforeEach
+            void initForFullDefence() {
+                VariableMap variables = Variables.createVariables();
+                variables.putValue(FLOW_STATE, state.fullName());
+                variables.putValue(FLOW_FLAGS, getFlowFlags(state));
+
+                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+            }
+            @Nested
+            class OneVOneWhenApplicantDeadlineIsPassed {
+                @Test
+                void shouldHaveExpectedDescription() {
+                    CaseData caseData = getCaseData(state);
+                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                        .thenReturn(caseData);
+
+                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                    Event event = caseDataContent.getEvent();
+                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Not suitable for SDO.");
+                    assertThat(event.getDescription())
+                        .isEqualTo(null);
+                }
+            }
         }
 
         @NotNull
@@ -813,6 +835,12 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateNotificationAcknowledgedRespondent1TimeExtension()
                         .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
                         .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                    break;
+                case PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA:
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
