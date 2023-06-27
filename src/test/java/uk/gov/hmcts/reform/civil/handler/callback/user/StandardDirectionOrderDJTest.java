@@ -597,11 +597,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-<<<<<<< HEAD
-                .atStateClaimIssuedTrialSDOInPersonHearingNew().build();
-=======
                 .atStateClaimIssuedTrialDJInPersonHearingNew().build();
->>>>>>> origin/feat/CIV-6261-new
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
