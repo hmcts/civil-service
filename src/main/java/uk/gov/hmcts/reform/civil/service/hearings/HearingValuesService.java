@@ -95,7 +95,7 @@ public class HearingValuesService {
             .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
-            .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
+            .hearingChannels(getHearingChannels(caseData))
             .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
             .build();
     }
