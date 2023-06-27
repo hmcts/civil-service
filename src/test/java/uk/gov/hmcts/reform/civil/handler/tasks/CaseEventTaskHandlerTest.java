@@ -717,6 +717,30 @@ class CaseEventTaskHandlerTest {
                     when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
                 }
 
+                @Nested
+                class OneVOneWhenApplicantDeadlineIsPassed {
+                    @Test
+                    void shouldHaveExpectedDescription() {
+                        CaseData caseData = getCaseData(state);
+                        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                        when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                            .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                        when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                            .thenReturn(caseData);
+
+                        caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                        CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                        Event event = caseDataContent.getEvent();
+                        assertThat(event.getSummary()).isEqualTo("RPA Reason: Not suitable for SDO.");
+                        assertThat(event.getDescription())
+                            .isEqualTo(null);
+                    }
+                }
+
         @NotNull
         private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
             if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
