@@ -13,19 +13,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -38,7 +42,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Optional;
+import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -81,6 +87,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CategoryService categoryService;
 
     @Nested
     class AboutToStartCallback {
@@ -150,6 +158,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
                               .epimmsId("123").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearing().build();
@@ -532,6 +543,46 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
         }
+
+        @Test
+        void shouldPopulateDynamicLists() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing().build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            DynamicList hearingMethodValuesDisposalHearingDJ = getHearingMethodValuesDisposalHearingDJ(response);
+            DynamicList hearingMethodValuesTrialHearingDJ = getHearingMethodValuesTrialHearingDJ(response);
+
+            List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
+            assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
+        }
+
+        private DynamicList getHearingMethodValuesDisposalHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(responseCaseData);
+            return responseCaseData.getHearingMethodValuesDisposalHearingDJ();
+        }
+
+        private DynamicList getHearingMethodValuesTrialHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(responseCaseData);
+            return responseCaseData.getHearingMethodValuesTrialHearingDJ();
+        }
     }
 
     @Nested
@@ -539,12 +590,83 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "create-order";
 
         @Test
-        void shouldCreateAndSaveSDOOrder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOInPersonHearingNew().build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
-                Document.builder().documentUrl("url").build())
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOTelephoneHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOTelephoneHearingNew().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOVideoHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedTrialSDOVideoHearingNew().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOInPerson() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOInPerson().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOTelephoneCall() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOTelephoneCall().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
+        }
+
+        @Test
+        void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOVideoCall() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalSDOVideoCallNew().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
                 .build();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
