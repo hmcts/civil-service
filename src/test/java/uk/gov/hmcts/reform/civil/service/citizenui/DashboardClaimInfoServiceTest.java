@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
@@ -48,6 +49,7 @@ public class DashboardClaimInfoServiceTest {
     @InjectMocks
     private DashboardClaimInfoService dashboardClaimInfoService;
 
+    private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
     private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
@@ -64,16 +66,16 @@ public class DashboardClaimInfoServiceTest {
         .id(2L)
         .createdDate(DATE_IN_2022)
         .build();
-
     private static final List<DashboardClaimInfo> ORDERED_CASES =
-        Arrays.asList(DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2021)
-                          .build(),
-                      DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2022)
-                          .build()
+        Arrays.asList(
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2021)
+                .build(),
+            DashboardClaimInfo.builder()
+                .ocmc(true)
+                .createdDate(DATE_IN_2022)
+                .build()
         );
 
     @BeforeEach
@@ -83,7 +85,7 @@ public class DashboardClaimInfoServiceTest {
 
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
                             .applicant1(Party.builder()
@@ -206,11 +208,46 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
+    void shouldGetThePartPaymentImmediateValue() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .claimValue(ClaimValue
+                                            .builder()
+                                            .statementOfValueInPennies(
+                                                new BigDecimal("100000"))
+                                            .build())
+                            .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
+                            .respondToClaimAdmitPartLRspec(
+                                RespondToClaimAdmitPartLRspec
+                                    .builder()
+                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(
+            PART_ADMIT_PAY_IMMEDIATELY_AMOUNT);
+    }
+
+    @Test
     void shouldReturnCasesInProperOrder() {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
 
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
             "authorisation",
@@ -227,7 +264,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
 
-        given(coreCaseDataService.searchCases(any(), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
 
         List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(

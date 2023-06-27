@@ -12,21 +12,27 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -71,6 +77,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -80,6 +87,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -87,6 +95,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -97,6 +106,9 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
+    private static final String HEARING_CHANNEL = "HearingChannel";
+    private static final String SPEC_SERVICE_ID = "AAA6";
+    private static final String UNSPEC_SERVICE_ID = "AAA7";
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
         + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
@@ -137,13 +149,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
+    private final CategoryService categoryService;
+    private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
+            .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -165,7 +181,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
@@ -173,6 +188,28 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+            Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+                authToken, HEARING_CHANNEL, serviceId
+            );
+            DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+            List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+                .getListItems()
+                .stream()
+                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+                .collect(Collectors.toList());
+            hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+            DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+                .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
+            hearingMethodList.setValue(hearingMethodInPerson);
+            updatedData.hearingMethodValuesFastTrack(hearingMethodList);
+            updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
+            updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
+        }
 
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
         updatedData.disposalHearingMethodInPerson(locationsList);
@@ -359,6 +396,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+            .dateFrom(LocalDate.now().plusWeeks(22))
+            .dateTo(LocalDate.now().plusWeeks(30))
+            .dateToToggle(dateToShowTrue)
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
             .helpText2("Not more than seven nor less than three clear days before the trial, "
@@ -522,11 +562,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .smallClaimsNumberOfWitnessesToggle(checkList)
             .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                         + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
                         + " the hearing.")
-            .input2("")
-            .input3("")
+            .input2("2")
+            .input3("2")
             .input4("For this limitation, a party is counted as a witness.")
             .text("A witness statement must: \na) Start with the name of the case and the claim number;"
                       + "\nb) State the full name and address of the witness; "
@@ -699,7 +740,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = V_1.equals(callbackParams.getVersion())
+            ? mapHearingMethodFields(callbackParams.getCaseData())
+            : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         CaseDocument document = sdoGeneratorService.generate(
@@ -715,6 +758,44 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData mapHearingMethodFields(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (caseData.getHearingMethodValuesDisposalHearing() != null
+            && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
+            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearing().getValue().getLabel();
+            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesFastTrack() != null
+            && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
+            String fastTrackHearingMethodLabel = caseData.getHearingMethodValuesFastTrack().getValue().getLabel();
+            if (fastTrackHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
+            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null
+            && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
+            String smallClaimsHearingMethodLabel = caseData.getHearingMethodValuesSmallClaims().getValue().getLabel();
+            if (smallClaimsHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
+            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+            }
+        }
+
+        return updatedData.build();
     }
 
     private String getHearingInPersonSmall(CaseData caseData) {

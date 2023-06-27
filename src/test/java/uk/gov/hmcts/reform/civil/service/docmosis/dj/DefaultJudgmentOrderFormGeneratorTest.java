@@ -2,25 +2,37 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_SDO_ORDER;
@@ -58,11 +70,21 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private DocumentHearingLocationHelper documentHearingLocationHelper;
+
+    @MockBean
+    private IdamClient idamClient;
+
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -84,7 +106,61 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     }
 
     @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndTelephoneHearing() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOTelephoneHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndVidoeHearing() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOVideoHearing()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
                                                                eq(DJ_SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
@@ -99,10 +175,47 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedDisposalHearingInPersonDJ()
             .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
+        LocationRefData locationRefData = LocationRefData.builder().build();
+        Mockito.when(documentHearingLocationHelper.getHearingLocation(
+            nullable(String.class), eq(caseData), eq(BEARER_TOKEN)
+        )).thenReturn(locationRefData);
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject arg) ->
+                arg instanceof DefaultJudgmentSDOOrderForm
+                    && locationRefData.equals(((DefaultJudgmentSDOOrderForm) arg).getHearingLocation())
+            ),
+            any(DocmosisTemplates.class)
+        );
     }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGenerator_whenNoticeOfChangeEnabled() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                .roles(Collections.emptyList()).build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOInPersonHearing()
+            .atStateClaimIssuedTrialLocationInPerson()
+            .atStateSdoTrialDj()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
 }

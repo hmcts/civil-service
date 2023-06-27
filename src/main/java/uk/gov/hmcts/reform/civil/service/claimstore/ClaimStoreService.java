@@ -6,9 +6,11 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
+import uk.gov.hmcts.reform.cmc.model.Response;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,20 +29,25 @@ public class ClaimStoreService {
     }
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
-        return cmcClaims.stream().map(cmcClaim -> DashboardClaimInfo.builder()
-            .createdDate(createAtToCreateDate(cmcClaim))
-            .claimId(cmcClaim.getExternalId())
-            .claimNumber(cmcClaim.getReferenceNumber())
-            .claimantName(cmcClaim.getClaimantName())
-            .defendantName(cmcClaim.getDefendantName())
-            .responseDeadline(cmcClaim.getResponseDeadline())
-            .claimAmount(cmcClaim.getTotalAmountTillToday())
-            .paymentDate(cmcClaim.getBySpecifiedDate())
-            .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
-            .ocmc(true)
-            .admittedAmount(cmcClaim.getAdmittedAmount())
-            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
-            .build()
+
+        return cmcClaims.stream().map(cmcClaim ->
+                                          DashboardClaimInfo.builder()
+                                              .createdDate(createAtToCreateDate(cmcClaim))
+                                              .claimId(cmcClaim.getExternalId())
+                                              .claimNumber(cmcClaim.getReferenceNumber())
+                                              .claimantName(cmcClaim.getClaimantName())
+                                              .defendantName(cmcClaim.getDefendantName())
+                                              .responseDeadline(cmcClaim.getResponseDeadline())
+                                              .claimAmount(cmcClaim.getTotalAmountTillToday())
+                                              .paymentDate(cmcClaim.getBySpecifiedDate())
+                                              .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
+                                              .ocmc(true)
+                                              .admittedAmount(cmcClaim.getAdmittedAmount())
+                                              .respondToAdmittedClaimOwingAmountPounds(Optional.ofNullable(cmcClaim.getResponse())
+                                                                                           .map(Response::getAmount)
+                                                                                           .orElse(null))
+                                              .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
+                                              .build()
         ).collect(Collectors.toList());
     }
 
