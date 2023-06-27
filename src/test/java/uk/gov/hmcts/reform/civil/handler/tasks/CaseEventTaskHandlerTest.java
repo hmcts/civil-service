@@ -273,11 +273,12 @@ class CaseEventTaskHandlerTest {
         }
 
         @Test
-        //Using an invalid flow state `PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA`
+            //Using an invalid flow state `PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA`
         void shouldThrowErrorMessage_whenInAnInvalidFlowStatePopulatingSummary() {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName());
-            variables.putValue(FLOW_FLAGS,
+            variables.putValue(
+                FLOW_FLAGS,
                 getFlowFlags(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
             );
 
@@ -689,225 +690,227 @@ class CaseEventTaskHandlerTest {
                 }
             }
 
-        } //Indu
-        @Nested
-        class FullDefenceProceedWhenApplicantDeadlineIsPassed {
-            FlowState.Main state = PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
-            @BeforeEach
-            void initForFullDefence() {
-                VariableMap variables = Variables.createVariables();
-                variables.putValue(FLOW_STATE, state.fullName());
-                variables.putValue(FLOW_FLAGS, getFlowFlags(state));
-
-                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
-            }
             @Nested
-            class OneVOneWhenApplicantDeadlineIsPassed {
-                @Test
-                void shouldHaveExpectedDescription() {
-                    CaseData caseData = getCaseData(state);
-                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            class FullDefenceProceedWhenApplicantDeadlineIsPassed {
+                FlowState.Main state = PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
+                BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
 
-                    when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
-                        .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
-                                        .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+                @BeforeEach
+                void initForFullDefence() {
+                    VariableMap variables = Variables.createVariables();
+                    variables.putValue(FLOW_STATE, state.fullName());
+                    variables.putValue(FLOW_FLAGS, getFlowFlags(state));
 
-                    when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
-                        .thenReturn(caseData);
+                    when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+                }
 
-                    caseEventTaskHandler.execute(mockTask, externalTaskService);
+                @Nested
+                class OneVOneWhenApplicantDeadlineIsPassed {
+                    @Test
+                    void shouldHaveExpectedDescription() {
+                        CaseData caseData = getCaseData(state);
+                        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-                    CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
-                    Event event = caseDataContent.getEvent();
-                    assertThat(event.getSummary()).isEqualTo("RPA Reason: Not suitable for SDO.");
-                    assertThat(event.getDescription())
-                        .isEqualTo(null);
+                        when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                            .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                        when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                            .thenReturn(caseData);
+
+                        caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                        CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                        Event event = caseDataContent.getEvent();
+                        assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
+                        assertThat(event.getDescription())
+                            .isEqualTo(null);
+                    }
                 }
             }
         }
-
-        @NotNull
-        private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
-            if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
-                || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
-                return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
-                              "ONE_RESPONDENT_REPRESENTATIVE", false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
-                );
-            } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
-                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                || state.equals(FULL_ADMISSION)
-                || state.equals(PART_ADMISSION)
-                || state.equals(COUNTER_CLAIM)
-                || state.equals(FULL_DEFENCE_PROCEED)
-                || state.equals(FULL_DEFENCE_NOT_PROCEED)
-                || state.equals(CLAIM_DETAILS_NOTIFIED)
-                || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
-                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
-                );
-            }
-            return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                          FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+            @NotNull
+            private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
+                if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
+                    || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
+                    return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
+                                  "ONE_RESPONDENT_REPRESENTATIVE", false,
+                                  FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                                  FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                                  FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                     );
-        }
-
-        private CaseData getCaseData(FlowState.Main state) {
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
-            CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
-            switch (state) {
-                case FULL_ADMISSION:
-                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                case PART_ADMISSION:
-                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondent1CounterClaimAfterNotifyDetails()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
-                    break;
-                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
-                        .respondent1OrgRegistered(NO)
-                        .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(NO)
-                        .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
-                    break;
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
-                    break;
-                case FULL_DEFENCE_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                case FULL_DEFENCE_NOT_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
-                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);
-                    break;
-                case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
-                        .addRespondent2(YES)
-                        .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);
-                    break;
-                case TAKEN_OFFLINE_BY_STAFF:
-                    caseDataBuilder.atStateTakenOfflineByStaff()
-                        .addRespondent2(NO)
-                        .respondent2Represented(null)
-                        .respondent2OrgRegistered(null);
-                    break;
-                case CLAIM_DETAILS_NOTIFIED:
-                    caseDataBuilder.atStateClaimDetailsNotified1v1()
-                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
-                    break;
-                case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
-                    caseDataBuilder.atStateNotificationAcknowledgedRespondent1TimeExtension()
-                        .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
-                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
-                    break;
-                case PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
-                        .addRespondent2(NO)
-                        .respondent2OrgRegistered(null)
-                        .respondent2Represented(null);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected flow state " + state.fullName());
+                } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
+                    || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                    || state.equals(FULL_ADMISSION)
+                    || state.equals(PART_ADMISSION)
+                    || state.equals(COUNTER_CLAIM)
+                    || state.equals(FULL_DEFENCE_PROCEED)
+                    || state.equals(FULL_DEFENCE_NOT_PROCEED)
+                    || state.equals(CLAIM_DETAILS_NOTIFIED)
+                    || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
+                    return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                                  FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                                  FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                                  FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                    );
+                }
+                return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                );
             }
-            return caseDataBuilder.build();
+
+            private CaseData getCaseData(FlowState.Main state) {
+                BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+                CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
+                switch (state) {
+                    case FULL_ADMISSION:
+                        caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    case PART_ADMISSION:
+                        caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    case COUNTER_CLAIM:
+                        caseDataBuilder.atStateRespondent1CounterClaimAfterNotifyDetails()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                        caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
+                        break;
+                    case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
+                        caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
+                            .respondent1OrgRegistered(NO)
+                            .respondent1OrganisationPolicy(
+                                OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
+                            .addRespondent2(YES)
+                            .respondent2Represented(YES)
+                            .respondent2OrgRegistered(NO)
+                            .respondent2OrganisationPolicy(
+                                OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                        break;
+                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
+                        caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
+                        break;
+                    case FULL_DEFENCE_PROCEED:
+                        caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    case FULL_DEFENCE_NOT_PROCEED:
+                        caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
+                        caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                            .addRespondent2(YES)
+                            .respondent2Represented(YES)
+                            .respondent2OrgRegistered(YES);
+                        break;
+                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
+                        caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
+                            .addRespondent2(YES)
+                            .respondent2Represented(YES)
+                            .respondent2OrgRegistered(YES);
+                        break;
+                    case TAKEN_OFFLINE_BY_STAFF:
+                        caseDataBuilder.atStateTakenOfflineByStaff()
+                            .addRespondent2(NO)
+                            .respondent2Represented(null)
+                            .respondent2OrgRegistered(null);
+                        break;
+                    case CLAIM_DETAILS_NOTIFIED:
+                        caseDataBuilder.atStateClaimDetailsNotified1v1()
+                            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                        break;
+                    case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
+                        caseDataBuilder.atStateNotificationAcknowledgedRespondent1TimeExtension()
+                            .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
+                            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                        break;
+                    case PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA:
+                        caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
+                            .addRespondent2(NO)
+                            .respondent2OrgRegistered(null)
+                            .respondent2Represented(null);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected flow state " + state.fullName());
+                }
+                return caseDataBuilder.build();
+            }
+        }
+
+        @Nested
+        class NotRetryableFailureTest {
+            @Test
+            void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
+                //given: ExternalTask.getAllVariables throws ValueMapperException
+                when(mockTask.getAllVariables())
+                    .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
+
+                //when: Task handler is called and ValueMapperException is thrown
+                caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                //then: Retry should not happen in this case
+                verify(externalTaskService).handleFailure(
+                    any(ExternalTask.class),
+                    anyString(),
+                    anyString(),
+                    anyInt(),
+                    anyLong()
+                );
+            }
+
+            @Test
+            void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
+                //given: ExternalTask variables with incompatible event type
+                String incompatibleEventType = "test";
+                Map<String, Object> allVariables = Map.of("caseId", CASE_ID, "caseEvent", incompatibleEventType);
+                when(mockTask.getAllVariables()).thenReturn(allVariables);
+
+                //when: Task handler is called and IllegalArgumentException is thrown
+                caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                //then: Retry should not happen in this case
+                verify(externalTaskService).handleFailure(
+                    any(ExternalTask.class),
+                    anyString(),
+                    anyString(),
+                    anyInt(),
+                    anyLong()
+                );
+            }
+
+            @Test
+            void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
+                //given: ExternalTask variables without caseId
+                Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+                when(mockTask.getAllVariables())
+                    .thenReturn(allVariables);
+
+                //when: Task handler is called and CaseIdNotProvidedException is thrown
+                caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                //then: Retry should not happen in this case
+                verify(externalTaskService).handleFailure(
+                    any(ExternalTask.class),
+                    anyString(),
+                    anyString(),
+                    anyInt(),
+                    anyLong()
+                );
+            }
         }
     }
 
-    @Nested
-    class NotRetryableFailureTest {
-        @Test
-        void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
-            //given: ExternalTask.getAllVariables throws ValueMapperException
-            when(mockTask.getAllVariables())
-                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
-
-            //when: Task handler is called and ValueMapperException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
-            //given: ExternalTask variables with incompatible event type
-            String incompatibleEventType = "test";
-            Map<String, Object> allVariables = Map.of("caseId", CASE_ID, "caseEvent", incompatibleEventType);
-            when(mockTask.getAllVariables()).thenReturn(allVariables);
-
-            //when: Task handler is called and IllegalArgumentException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
-            //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
-            when(mockTask.getAllVariables())
-                .thenReturn(allVariables);
-
-            //when: Task handler is called and CaseIdNotProvidedException is thrown
-            caseEventTaskHandler.execute(mockTask, externalTaskService);
-
-            //then: Retry should not happen in this case
-            verify(externalTaskService).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
-            );
-        }
-    }
-}
