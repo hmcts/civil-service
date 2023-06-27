@@ -331,17 +331,15 @@ hmc-to-hearings-api:
 
 azure:
   service-bus:
-    amqp-connection-string-template : ${AMQP_CONNECTION_STRING:amqps://%1s?amqp.idleTimeout=%2d}
     connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
+    thread-count: ${HMC_HEARINGS_TOPIC_THREAD_COUNT:4}
     hmc-to-hearings-api:
-      namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:}
-      topicName: ${HMC_HEARINGS_TOPIC_NAME:}
-      subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
-      receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
-      idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+      namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:dummyNamespace}
+      topicName: ${HMC_HEARINGS_TOPIC_NAME:dummyTopicName}
+      subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:dummySubscriptionName}
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
-      enabled: {HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+      enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
 
 ---
 

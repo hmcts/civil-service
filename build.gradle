@@ -136,6 +136,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.6'
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:4.3.0"
     }
   }
 
@@ -417,6 +418,10 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
+
+  implementation group: 'com.azure', name: 'azure-core', version: '1.21.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.4.2'
+  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.5'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
