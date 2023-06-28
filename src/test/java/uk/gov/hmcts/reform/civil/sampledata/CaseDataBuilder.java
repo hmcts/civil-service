@@ -2493,18 +2493,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimIssuedDisposalSDOInPerson() {
-        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
-        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalSDOTelephoneCall() {
-        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
-        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimIssuedDisposalDJVideoCallNew() {
         DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
         hearingMethodValuesDisposalHearingDJ = hearingMethodList;
