@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.claimstore;
 
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,5 +88,21 @@ public class ClaimStoreServiceTest {
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
         assertThat(resultClaims.size()).isEqualTo(1);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));
+    }
+
+    @Test
+    void shouldReturnEmptyListForClaimantWhenCmcClaimStoreIsUnavailable() {
+        given(claimStoreApi.getClaimsForClaimant(any(), any())).willThrow(FeignException.FeignClientException.class);
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
+        verify(claimStoreApi).getClaimsForClaimant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListForDefendantWhenCmcClaimStoreIsUnavailable() {
+        given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(FeignException.FeignClientException.class);
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
+        verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
     }
 }

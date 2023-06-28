@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,10 +55,11 @@ class DismissClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .containsEntry("businessProcess", Map.of(
-                    "status", "READY",
-                    "camundaEvent", "DISMISS_CLAIM"
-                ))
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsOnly("READY", "DISMISS_CLAIM");
+
+            assertThat(response.getData())
                 .containsEntry("claimDismissedDate", localDateTime.format(ISO_DATE_TIME));
         }
     }
