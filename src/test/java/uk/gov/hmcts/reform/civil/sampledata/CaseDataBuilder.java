@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -448,6 +449,7 @@ public class CaseDataBuilder {
     private YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
+    private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2344,6 +2346,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearingNew() {
+        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedTrialDJInPersonHearingNew() {
         DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
@@ -2464,6 +2472,24 @@ public class CaseDataBuilder {
             .date(LocalDate.now().plusWeeks(16))
             .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOInPerson() {
+        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOTelephoneCall() {
+        DynamicList hearingMethodList = getHearingMethodList("TEL", "Telephone");
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCallNew() {
+        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
         return this;
     }
 
@@ -4331,11 +4357,88 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-                                                   .input("unforeseen complexities")
+            .input("unforeseen complexities")
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+        } else {
+            atStateClaimDetailsNotified1v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(boolean isReason) {
+        atStateClaimDetailsNotified1v1();
+        respondent1TimeExtensionDate = LocalDateTime.now();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+        } else {
+            atStateNotificationAcknowledged();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
+            respondent1TimeExtensionDate = LocalDateTime.now();
+            respondent2TimeExtensionDate = LocalDateTime.now();
+        } else {
+            atDeadlinePassedAfterStateNotificationAcknowledgedTimeExtension();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input(isReason ? "unforeseen complexities" : "")
+            .build();
+        unsuitableSDODate = LocalDateTime.now();
 
         return this;
     }
@@ -5560,6 +5663,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder showResponseOneVOneFlag(ResponseOneVOneShowTag showResponseOneVOneFlag) {
+        this.showResponseOneVOneFlag = showResponseOneVOneFlag;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5826,6 +5934,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartEmploymentTypeRequired(defenceAdmitPartEmploymentTypeRequired)
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
+            .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .build();
     }
 }
