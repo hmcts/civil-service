@@ -79,13 +79,12 @@ public class SdoHelper {
 
     public static boolean hasSmallAdditionalDirections(CaseData caseData, String additionalDirection) {
         SmallTrack additionalDirectionEnum = getSmallClaimsAdditionalDirectionEnum(additionalDirection);
-        List<SmallTrack> smallClaims = caseData.getSmallClaims();
+        List<SmallTrack> smallClaims = caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            ? caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() : caseData.getSmallClaims();
         boolean hasDirection;
 
         if ((smallClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack)
-                && (smallClaims.contains(additionalDirectionEnum));
+            hasDirection = smallClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }
