@@ -464,7 +464,7 @@ class AutomatedHearingNoticeHandlerTest {
             .hearingResponse(
                 HearingResponse.builder()
                     .receivedDateTime(RECEIVED_DATETIME)
-                    .listAssistCaseStatus(hearingStatus)
+                    .laCaseStatus(hearingStatus)
                     .hearingDaySchedule(List.of(
                         HearingDaySchedule.builder()
                             .hearingStartDateTime(HEARING_DATE)
