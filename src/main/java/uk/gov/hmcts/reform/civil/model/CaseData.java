@@ -929,10 +929,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public List<Element<RecurringIncomeLRspec>> getRecurringIncomeForRespondent1() {
-       if (isFullAdmitClaimSpec()) {
-           return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(null);
+        if (isFullAdmitClaimSpec()) {
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(
+                null);
         }
-       return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncome).orElse(null);
+        return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncome).orElse(null);
     }
 
     @JsonIgnore
