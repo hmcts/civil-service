@@ -3,10 +3,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -14,12 +19,17 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 /**
@@ -31,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
  * we test at least once each of its CaseDataToTextGenerators, (3) that for a given intention and CaseData there is
  * at most one implementation handling the case.</p>
  */
+@ExtendWith(SpringExtension.class)
 public class CaseDataToTextGeneratorTest {
 
     @SuppressWarnings("rawtypes")
@@ -124,7 +135,12 @@ public class CaseDataToTextGeneratorTest {
         )
     )
     public static class CaseDataToTextGeneratorTestConfig {
-
+        @Bean
+        public PaymentDateService paymentDateService() {
+            PaymentDateService mockPaymentDateService = mock(PaymentDateService.class);
+            when(mockPaymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
+            return mockPaymentDateService;
+        }
     }
 
     /**
@@ -151,9 +167,13 @@ public class CaseDataToTextGeneratorTest {
         List<Pair<CaseData, Class<? extends T>>> getCasesToExpectedImplementation();
     }
 
-    private final PayImmediatelyConfText generatorConf = new PayImmediatelyConfText(
-        new ClaimUrlsConfiguration("", "", "", "", ""));
-    private final PartialAdmitPayImmediatelyConfirmationText generatorHeader = new PartialAdmitPayImmediatelyConfirmationText();
+    @InjectMocks
+    private PayImmediatelyConfText generatorConf;
+    @InjectMocks
+    private PartialAdmitPayImmediatelyConfirmationText generatorHeader;
+
+    @Mock
+    private PaymentDateService paymentDateService;
 
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
         return CaseData.builder()
