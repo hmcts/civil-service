@@ -133,11 +133,11 @@ nonworking-days:
   datafile: /data/non-working_days.dat
 
 civil:
-  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
-  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
-  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
-  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
-  n225-url: https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf
+  response-pack-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772450/n9-eng.pdf
+  n9a-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/867255/n9a-eng.pdf
+  n9b-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/866787/N9B_web_0818_save.pdf
+  n215-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/952023/n215-eng.pdf
+  n225-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/961368/n225-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -212,6 +212,8 @@ notifications:
   sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
   claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
   claimantSolicitorConfirmsNotToProceedSpecLip: "25988b85-dafc-40be-970f-45fbb7d0f860"
+  notifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
+  notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
