@@ -4,7 +4,6 @@ import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -174,7 +173,7 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(500L)
+                eq(1000L)
             );
         }
 
@@ -210,7 +209,7 @@ class CaseEventTaskHandlerTest {
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
                 eq(2),
-                eq(500L)
+                eq(1000L)
             );
         }
 
@@ -224,12 +223,11 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.startUpdate(any(), any()))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
-            doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
-                .when(externalTaskService).complete(mockTask);
+            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -836,7 +834,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -856,7 +854,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -876,7 +874,7 @@ class CaseEventTaskHandlerTest {
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
