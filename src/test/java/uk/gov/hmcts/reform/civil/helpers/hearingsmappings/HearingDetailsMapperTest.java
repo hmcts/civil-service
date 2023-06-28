@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -15,14 +21,20 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@ExtendWith(SpringExtension.class)
 public class HearingDetailsMapperTest {
 
     @Test
@@ -307,52 +319,6 @@ public class HearingDetailsMapperTest {
     }
 
     @Test
-    void shouldReturnNull_whenHearingChannelIsNull() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(null);
-    }
-
-    @Test
-    void shouldReturnList_whenSDOFastTrackHearingChannelSelected() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssuedFastTrackSDOInPersonHearing()
-            .build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
-    }
-
-    @Test
-    void shouldReturnList_whenSDOSmallClaimsHearingChannelSelected() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssuedSmallClaimsSDOInPersonHearing()
-            .build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
-    }
-
-    @Test
-    void shouldReturnList_whenSDODisposalHearingChannelSelected() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
-            .build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
-    }
-
-    @Test
-    void shouldReturnList_whenDJDisposalHearingChannelSelected() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssuedDisposalDJVideoCallNew()
-            .build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("Video"));
-    }
-
-    @Test
-    void shouldReturnList_whenDJTrialHearingChannelSelected() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssuedTrialDJInPersonHearingNew()
-            .build();
-        assertThat(HearingDetailsMapper.getHearingChannels(caseData)).isEqualTo(List.of("In Person"));
-    }
-
-    @Test
     void getFacilitiesRequired_shouldReturnNull_whenNoDetainedIndividualFlagExist() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(null);
@@ -554,6 +520,69 @@ public class HearingDetailsMapperTest {
                 .build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).hasSize(200);
+        }
+    }
+
+    @Nested
+    class HearingChannels {
+
+        @Mock
+        private CategoryService categoryService;
+
+        @BeforeEach
+        void setUp() {
+            Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+            Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
+                Optional.of(categorySearchResult));
+        }
+
+        @Test
+        void shouldReturnNull_whenHearingChannelIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(null);
+        }
+
+        @Test
+        void shouldReturnList_whenSDOFastTrackHearingChannelSelected() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedFastTrackSDOInPersonHearing()
+                .build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("INTER"));
+        }
+
+        @Test
+        void shouldReturnList_whenSDOSmallClaimsHearingChannelSelected() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedSmallClaimsSDOInPersonHearing()
+                .build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("INTER"));
+        }
+
+        @Test
+        void shouldReturnList_whenSDODisposalHearingChannelSelected() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("INTER"));
+        }
+
+        @Test
+        void shouldReturnList_whenDJDisposalHearingChannelSelected() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedDisposalDJVideoCallNew()
+                .build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("VID"));
+        }
+
+        @Test
+        void shouldReturnList_whenDJTrialHearingChannelSelected() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedTrialDJInPersonHearingNew()
+                .build();
+            assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(List.of("INTER"));
         }
     }
 }
