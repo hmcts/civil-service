@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.google.common.collect.Streams;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
@@ -263,7 +265,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
             builder.whereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
             Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
                 .map(ElementUtils::unwrapElements)
-                .map(list -> list.stream().map(AccountSimpleTemplateData::new).collect(Collectors.toList()))
+                .map(list -> IntStream.range(0, list.size()).mapToObj(i -> new AccountSimpleTemplateData(
+                    list.get(i),
+                    i + 1
+                )).collect(Collectors.toList()))
                 .ifPresent(builder::bankAccountList);
             Optional.ofNullable(caseData.getRecurringIncomeForRespondent1())
                 .map(ElementUtils::unwrapElements)

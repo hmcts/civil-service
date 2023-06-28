@@ -1,13 +1,22 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 
+@Builder
+@AllArgsConstructor
+@Getter
 public class AccountSimpleTemplateData extends AccountSimple {
 
-    public AccountSimpleTemplateData(AccountSimple data) {
+    private int index;
+
+    public AccountSimpleTemplateData(AccountSimple data, int index) {
         setAccountType(data.getAccountType());
         setJointAccount(data.getJointAccount());
         setBalance(data.getBalance());
+        this.index = index;
     }
 
     public String getTypeDisplay() {
