@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class CaseReadyBusinessProcessSearchService extends ElasticSearchService {
@@ -18,7 +19,8 @@ public class CaseReadyBusinessProcessSearchService extends ElasticSearchService 
 
     public Query query(int startIndex) {
         return new Query(
-            boolQuery().must(matchQuery("data.businessProcess.status", "READY")),
+            boolQuery().must(matchQuery("data.businessProcess.status", "READY"))
+                .must(rangeQuery("data.businessProcess.readyOn").lt("now-5m")),
             List.of(),
             startIndex
         );
