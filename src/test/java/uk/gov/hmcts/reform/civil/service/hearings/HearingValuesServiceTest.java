@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 
@@ -79,8 +79,6 @@ public class HearingValuesServiceTest {
     private CaseCategoriesService caseCategoriesService;
     @Mock
     private OrganisationService organisationService;
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -115,7 +113,6 @@ public class HearingValuesServiceTest {
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -146,7 +143,7 @@ public class HearingValuesServiceTest {
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
             .caseManagementLocationCode(BASE_LOCATION_ID)
-            .caseSLAStartDate("2023-01-30")
+            .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .autoListFlag(false)
             .hearingType(null)
             .hearingWindow(null)
@@ -174,7 +171,6 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
-        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         assertThat(actual).isEqualTo(expected);
     }
 
