@@ -272,7 +272,7 @@ public class HearingValuesServiceTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -293,7 +293,7 @@ public class HearingValuesServiceTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
