@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi.SERVICE_AUTHORIZATION;
 
-@FeignClient(name = "hmc-api", url = "${hmc.api.url}",
+@FeignClient(name = "hmc-api", url = "http://hmc-cft-hearing-service-demo.service.core-compute-demo.internal",
     configuration = FeignClientProperties.FeignClientConfiguration.class)
 public interface HearingsApi {
 
