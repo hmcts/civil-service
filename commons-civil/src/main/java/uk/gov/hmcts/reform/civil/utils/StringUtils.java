@@ -21,4 +21,8 @@ public class StringUtils {
             .filter(Predicate.not(String::isBlank))
             .collect(Collectors.joining(delimiter));
     }
+
+    public static String textToPlural(int value, String text) {
+        return String.format(value > 1 ? "%ss" : "%s", text);
+    }
 }
