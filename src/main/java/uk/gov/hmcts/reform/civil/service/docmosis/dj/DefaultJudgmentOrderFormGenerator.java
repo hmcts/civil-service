@@ -17,13 +17,14 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +47,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
-    private final IdamClient idamClient;
+    private final UserService userService;
+    private final CoreCaseUserService coreCaseUserService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -83,20 +85,21 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserInfo userInfo = userService.getUserInfo(authorisation);
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
 
         boolean isJudge = false;
         log.info("AAAA Getting User Details then roles");
-        log.info("AAAA User email ({}) name ({})", userDetails.getEmail(), userDetails.getFullName());
-        if (userDetails.getRoles() != null) {
-            log.info("AAAA1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p -> log.info(" ROLES ({})", p));
-            isJudge = userDetails.getRoles().stream()
+        if (roles != null) {
+            log.info("AAAAAA1 userDetails.getRoles() is not null ");
+            roles.stream().forEach(p -> log.info(" ROLESSSSSS  ({})", p));
+            isJudge = roles.stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-            log.info("isJudge value inside ({})", isJudge);
         }
         log.info("isJudge value outside ({})", isJudge);
-
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
@@ -154,24 +157,25 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
-        final String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
+        String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
             ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+
+        //UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserInfo userInfo = userService.getUserInfo(authorisation);
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
 
         boolean isJudge = false;
-
-        log.info("BBBBBB  Getting User Details then roles");
-        log.info("BBBBBBB User email ({}) name ({})", userDetails.getEmail(), userDetails.getFullName());
-
-        if (userDetails.getRoles() != null) {
-            log.info("BBBB1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p -> log.info(" ROLES ({})", p));
-            isJudge = userDetails.getRoles().stream()
+        log.info("BBBBBB Getting User Details then roles");
+        if (roles != null) {
+            log.info("BBBBBBB1 userDetails.getRoles() is not null ");
+            roles.stream().forEach(p -> log.info(" ROLESSSSSS  ({})", p));
+            isJudge = roles.stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-            log.info("isJudge value inside ({})", isJudge);
         }
         log.info("isJudge value outside ({})", isJudge);
-
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())

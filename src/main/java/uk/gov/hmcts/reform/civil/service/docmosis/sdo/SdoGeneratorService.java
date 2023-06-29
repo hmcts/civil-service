@@ -23,13 +23,17 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,6 +44,8 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+    private final UserService userService;
+    private final CoreCaseUserService coreCaseUserService;
     private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -48,19 +54,21 @@ public class SdoGeneratorService {
 
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
+        UserInfo userInfo = userService.getUserInfo(authorisation);
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
 
         boolean isJudge = false;
-
         log.info("CCCC Getting User Details then roles");
-        if (userDetails.getRoles() != null) {
+        if (roles != null) {
             log.info("CCCC1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l ({})", p));
-            isJudge = userDetails.getRoles().stream()
+            roles.stream().forEach(p -> log.info(" ROLESSSSSS  ({})", p));
+            isJudge = roles.stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-            log.info("isJudge value inside ({})", isJudge);
         }
         log.info("isJudge value outside ({})", isJudge);
-
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
