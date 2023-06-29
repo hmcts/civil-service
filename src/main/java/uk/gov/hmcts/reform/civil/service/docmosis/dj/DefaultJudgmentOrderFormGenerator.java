@@ -97,7 +97,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         }
         log.info("isJudge value outside ({})", isJudge);
 
-
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
