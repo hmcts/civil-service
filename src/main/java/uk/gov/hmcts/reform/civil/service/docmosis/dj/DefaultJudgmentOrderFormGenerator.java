@@ -89,12 +89,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         log.info("AAAA Getting User Details then roles");
         if (userDetails.getRoles() != null) {
             log.info("AAAA1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l %s", p));
+            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l ({})", p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-            log.info("isJudge value inside %s", isJudge);
+            log.info("isJudge value inside ({})", isJudge);
         }
-        log.info("isJudge value outside %s", isJudge);
+        log.info("isJudge value outside ({})", isJudge);
 
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
@@ -162,12 +162,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         log.info("BBBB Getting User Details then roles");
         if (userDetails.getRoles() != null) {
             log.info("BBBB1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l %s", p));
+            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l ({})", p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-            log.info("isJudge value inside %s", isJudge);
+            log.info("isJudge value inside ({})", isJudge);
         }
-        log.info("isJudge value outside %s", isJudge);
+        log.info("isJudge value outside ({})", isJudge);
 
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
