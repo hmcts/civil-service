@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.PartyIdsUpdatedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -65,26 +66,9 @@ public class HearingValuesService {
     private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper mapper;
 
-    public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) {
+    public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
-
-        // We only really need to check the applicant field to understand if
-        // the partyIds need recreating
-        if (caseData.getApplicant1().getPartyID() == null) {
-            var builder = caseData.toBuilder();
-            // Even if party ids creation is released and cases are
-            // in an inconsistent state where app/res fields have no party ids
-            // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
-            // as it was created to not overwrite partyId fields if they exist.
-            populateWithPartyIds(builder);
-            caseData = builder.build();
-            try {
-                caseDataService.triggerEvent(caseId, UPDATE_PARTY_IDS, builder.build().toMap(mapper));
-            } catch (FeignException e) {
-                log.error(String.format("Updating case data with party ids failed: %s", e.contentUTF8()));
-                throw e;
-            }
-        }
+        populateMissingPartyIds(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
 
@@ -130,6 +114,38 @@ public class HearingValuesService {
         } catch (Exception ex) {
             log.error(String.format("No case found for %d", caseId));
             throw new CaseNotFoundException();
+        }
+    }
+
+    /**
+     * Tactical solution to updated partyIds if they do not already exist.
+     * The partyIds within applicant1 field is checked as that is the very first party field
+     * that gets populated during claim creation. If no partyIds exist it's safe to assume there
+     * are missing partyIds to populate.
+     *
+     * @param caseData given case data.
+     * @throws PartyIdsUpdatedException If party ids have been updated, to force the consumer to request
+     *                                  the hearing values endpoint again.
+     * @throws FeignException If an error is returned from case data service when triggering the event.
+     */
+    private void populateMissingPartyIds(CaseData caseData) throws Exception {
+        if (caseData.getApplicant1().getPartyID() == null) {
+            var builder = caseData.toBuilder();
+            // Even if party ids creation is released and cases are
+            // in an inconsistent state where app/res fields have no party ids
+            // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
+            // as it was created to not overwrite partyId fields if they exist.
+            populateWithPartyIds(builder);
+
+            try {
+                caseDataService.triggerEvent(
+                    caseData.getCcdCaseReference(), UPDATE_PARTY_IDS, builder.build().toMap(mapper));
+            } catch (FeignException e) {
+                log.error("Updating case data with party ids failed: {}", e);
+                throw e;
+            }
+
+            throw new PartyIdsUpdatedException();
         }
     }
 }
