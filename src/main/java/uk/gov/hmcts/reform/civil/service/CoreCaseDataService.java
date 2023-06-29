@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 public class CoreCaseDataService {
 
     private final ObjectMapper mapper;
-    private static final Integer RETURNED_NUMBER_OF_CASES = 1000;
+    private static final Integer RETURNED_NUMBER_OF_CASES = 50;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
