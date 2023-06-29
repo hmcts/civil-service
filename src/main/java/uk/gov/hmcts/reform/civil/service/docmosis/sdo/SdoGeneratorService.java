@@ -54,7 +54,7 @@ public class SdoGeneratorService {
         log.info("CCCC Getting User Details then roles");
         if (userDetails.getRoles() != null) {
             log.info("CCCC1 userDetails.getRoles() is not null ");
-            userDetails.getRoles().stream().forEach(p-> log.info(" lal la la l %s",p));
+            userDetails.getRoles().stream().forEach(p -> log.info(" lal la la l %s", p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
             log.info("isJudge value inside %s", isJudge);
