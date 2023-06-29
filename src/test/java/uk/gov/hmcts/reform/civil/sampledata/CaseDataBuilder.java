@@ -4953,9 +4953,6 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsPaymentFailed() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
-
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(SRPbaDetails.builder()
@@ -4973,9 +4970,6 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsPaymentSuccess() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
-
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(SRPbaDetails.builder()
@@ -4993,9 +4987,6 @@ public class CaseDataBuilder {
     }
 
     public CaseData withHearingFeePBADetailsNoPaymentStatus() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
-
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .claimValue(ClaimValue.builder()
