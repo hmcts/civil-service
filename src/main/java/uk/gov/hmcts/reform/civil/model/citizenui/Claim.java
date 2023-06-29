@@ -54,9 +54,9 @@ public interface Claim {
 
     boolean isHearingFormGenerated();
 
-    boolean sdoBeenDrawn();
+    boolean hasSdoBeenDrawn();
 
-    boolean beforeHearing();
+    boolean isBeforeHearing();
 
     boolean isMoreDetailsRequired();
 
@@ -68,7 +68,7 @@ public interface Claim {
 
     boolean isCourtReviewing();
 
-    boolean isClaimEnded();
+    boolean hasClaimEnded();
 
     boolean claimSentToClaimant();
 

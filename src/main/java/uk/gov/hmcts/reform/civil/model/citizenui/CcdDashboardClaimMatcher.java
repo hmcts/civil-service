@@ -166,7 +166,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean sdoBeenDrawn() {
+    public boolean hasSdoBeenDrawn() {
         return caseData.getSystemGeneratedCaseDocuments().stream()
             .anyMatch(systemGeneratedCaseDocument -> systemGeneratedCaseDocument
                 .getValue()
@@ -174,52 +174,52 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean beforeHearing() {
+    public boolean isBeforeHearing() {
         return caseData.getHearingDate().isAfter(LocalDateTime.now().toLocalDate());
     }
 
     @Override
     public boolean isMoreDetailsRequired() {
-        return sdoBeenDrawn() && beforeHearing();
+        return hasSdoBeenDrawn() && isBeforeHearing();
     }
 
     @Override
     public boolean isMediationSuccessful() {
-        return !sdoBeenDrawn()
-            && !Objects.isNull(caseData.getMediation())
-            && !Objects.isNull(caseData.getMediation().getMediationSuccessful())
-            && !Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
+        return !hasSdoBeenDrawn()
+            && Objects.nonNull(caseData.getMediation())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isMediationUnsuccessful() {
-        return !sdoBeenDrawn()
-            && !Objects.isNull(caseData.getMediation())
-            && !Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
+        return !hasSdoBeenDrawn()
+            && Objects.nonNull(caseData.getMediation())
+            && Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
             && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
     }
 
     @Override
     public boolean isMediationPending() {
-        return !Objects.isNull(caseData.getCcdState())
+        return Objects.nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.IN_MEDIATION)
-            && !Objects.isNull(caseData.getMediation())
-            && !Objects.isNull(caseData.getMediation().getMediationSuccessful())
+            && Objects.nonNull(caseData.getMediation())
+            && Objects.nonNull(caseData.getMediation().getMediationSuccessful())
             && Objects.isNull(caseData.getMediation().getMediationSuccessful().getMediationAgreement());
     }
 
     @Override
     public boolean isCourtReviewing() {
-        return !sdoBeenDrawn()
-            && !Objects.isNull(caseData.getApplicant1ProceedsWithClaimSpec())
+        return !hasSdoBeenDrawn()
+            && Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.YES)
             && caseData.isRespondentResponseFullDefence()
             && caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override
-    public boolean isClaimEnded() {
-        return !Objects.isNull(caseData.getApplicant1ProceedsWithClaimSpec())
+    public boolean hasClaimEnded() {
+        return Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
             && caseData.isRespondentResponseFullDefence();
     }
@@ -227,14 +227,14 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean claimSentToClaimant() {
         return caseData.isRespondentResponseFullDefence()
-            && !Objects.isNull(caseData.getRespondent1CourtOrderPayment())
+            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
             && (caseData.isSettlementDeclinedByClaimant()
             || caseData.isClaimantRejectsClaimAmount());
     }
 
     @Override
     public boolean claimantAcceptRepayment() {
-        return !Objects.isNull(caseData.getRespondent1CourtOrderPayment())
+        return Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
             || caseData.hasApplicantAcceptedRepaymentPlan()
             || caseData.hasApplicantProceededWithClaim();
     }
@@ -246,7 +246,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return !Objects.isNull(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())
+        return Objects.nonNull(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())
             && caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec().equals(YesOrNo.NO);
     }
 }

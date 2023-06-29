@@ -105,7 +105,7 @@ public enum DashboardClaimStatus {
         Claim::isPartialAdmissionRejected
     ),
     CLAIM_ENDED(
-        Claim::isClaimEnded
+        Claim::hasClaimEnded
     ),
     TRANSFERRED(
         Claim::isSentToCourt

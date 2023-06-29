@@ -293,12 +293,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean sdoBeenDrawn() {
+    public boolean hasSdoBeenDrawn() {
         return false;
     }
 
     @Override
-    public boolean beforeHearing() {
+    public boolean isBeforeHearing() {
         return false;
     }
 
@@ -328,7 +328,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isClaimEnded() {
+    public boolean hasClaimEnded() {
         return response.isFullDefence()
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
