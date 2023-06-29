@@ -711,6 +711,7 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
@@ -726,11 +727,13 @@ class CaseEventTaskHandlerTest {
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                 );
             }
             return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                          FlowFlag.BULK_CLAIM_ENABLED.name(), true,
                           FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                     );

@@ -62,7 +62,7 @@ public class PaymentRequestUpdateCallbackService {
         }
     }
 
-    private void createEvent(CaseData caseData, String caseId, String feeType) {
+    public void createEvent(CaseData caseData, String caseId, String feeType) {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             caseId,
@@ -120,7 +120,7 @@ public class PaymentRequestUpdateCallbackService {
         return caseData;
     }
 
-    private CaseData getCaseDataFromFeeType(String feeType, CaseData caseData, PaymentDetails paymentDetails) {
+    public CaseData getCaseDataFromFeeType(String feeType, CaseData caseData, PaymentDetails paymentDetails) {
         if (feeType.equals(FeeType.HEARING.name())) {
             caseData = caseData.toBuilder()
                 .hearingFeePaymentDetails(paymentDetails)
