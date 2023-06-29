@@ -48,6 +48,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnEligibleForCCJStatus() {
         CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .build();
 
@@ -201,6 +202,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_hearingNoticeDocumentIssued_whenGetStatus_thenReturnHearingFormGenerated() {
         CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
             .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))

@@ -6,8 +6,20 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    SETTLED(
+        Claim::isSettled
+    ),
+    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
+        Claim::claimantAcceptRepayment
+    ),
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
+    ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
     ),
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
@@ -26,17 +38,11 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
-    RESPONSE_DUE_NOW(
-        Claim::hasResponseDueToday
-    ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
-    ),
-    MORE_TIME_REQUESTED(
-        Claim::hasResponseDeadlineBeenExtended
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -47,11 +53,14 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
-    DEFENDANT_PART_ADMIT_PAID(
-        Claim::hasDefendantStatedTheyPaid
-    ),
     NO_RESPONSE(
         Claim::hasResponsePending
+    ),
+    RESPONSE_DUE_NOW(
+        Claim::hasResponseDueToday
+    ),
+    MORE_TIME_REQUESTED(
+        Claim::hasResponseDeadlineBeenExtended
     ),
     PROCEED_OFFLINE(
         Claim::isProceedOffline
@@ -83,32 +92,23 @@ public enum DashboardClaimStatus {
     IN_MEDIATION(
         Claim::isMediationPending
     ),
+    CLAIMANT_REJECT_OFFER(
+        Claim::claimantRejectOffer
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
     CLAIM_SENT_TO_CLAIMANT(
         Claim::claimSentToClaimant
     ),
-    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
-        Claim::claimantAcceptRepayment
-    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
-    ),
-    CLAIMANT_REJECT_OFFER(
-        Claim::claimantRejectOffer
     ),
     CLAIM_ENDED(
         Claim::isClaimEnded
     ),
     TRANSFERRED(
         Claim::isSentToCourt
-    ),
-    DEFENDANT_PART_ADMIT(
-        Claim::defendantRespondedWithPartAdmit
-    ),
-    SETTLED(
-        Claim::isSettled
     ),
     NO_STATUS(c -> false);
 
