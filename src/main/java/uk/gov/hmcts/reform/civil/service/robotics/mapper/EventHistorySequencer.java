@@ -83,7 +83,7 @@ public class EventHistorySequencer {
                     builder.breathingSpaceLifted(event);
                     break;
                 case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
-                    builder.breathingSpaceMentalHealthLifted(event);
+                    builder.breathingSpaceMentalHealthEntered(event);
                     break;
                 case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
                     builder.breathingSpaceMentalHealthLifted(event);
