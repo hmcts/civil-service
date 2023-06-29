@@ -160,7 +160,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
             ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
 
-        //UserDetails userDetails = idamClient.getUserDetails(authorisation);
         UserInfo userInfo = userService.getUserInfo(authorisation);
         List<String> roles = coreCaseUserService.getUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
