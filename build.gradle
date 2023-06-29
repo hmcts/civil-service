@@ -110,7 +110,7 @@ allprojects {
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
-        version: '7.18.0'
+        version: '7.17.0'
       ) {
         entry 'camunda-engine'
       }
@@ -148,9 +148,6 @@ allprojects {
     mavenCentral()
     maven {
       url "https://jitpack.io"
-    }
-    maven {
-      url  "https://repo.spring.io/libs-milestone"
     }
     maven {
       url "https://jitpack.io"
@@ -280,7 +277,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -403,9 +400,9 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.18.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.18.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
