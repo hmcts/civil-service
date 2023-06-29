@@ -285,9 +285,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
-            SRPbaDetails expected = oldHearingFeePBADetails.toBuilder()
+            SRPbaDetails expected = SRPbaDetails.builder()
                 .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
-                .paymentDetails(null)
                 .build();
 
             assertThat(actual).isEqualTo(expected);

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -69,21 +68,13 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            if (!isHearingFeeStatusAvailableHMC(caseData)) {
-                SRPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
-                if (hearingFeePBADetails != null) {
-                    caseDataBuilder.hearingFeePBADetails(hearingFeePBADetails.toBuilder()
-                                                             .fee(calculateAndApplyFee(hearingFeesService,
-                                                                                       caseData,
-                                                                                       caseData.getAllocatedTrack()))
-                                                             .build());
-                } else {
-                    caseDataBuilder.hearingFeePBADetails(SRPbaDetails.builder()
-                                                             .fee(calculateAndApplyFee(hearingFeesService,
-                                                                                       caseData,
-                                                                                       caseData.getAllocatedTrack()))
-                                                             .build());
-                }
+            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails())) {
+                caseDataBuilder.hearingFeePBADetails(SRPbaDetails.builder()
+                                                         .fee(calculateAndApplyFee(
+                                                             hearingFeesService,
+                                                             caseData,
+                                                             caseData.getAllocatedTrack()))
+                                                         .build());
             }
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -121,13 +112,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         return SRPbaDetails.builder()
             .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
             .serviceReqReference(serviceRequestReference);
-    }
-
-    private boolean isHearingFeeStatusAvailableHMC(CaseData caseData) {
-        return caseData.getHearingFeePBADetails() != null
-            && caseData.getHearingFeePBADetails().getPaymentDetails() != null
-            && (PaymentStatus.SUCCESS.equals(caseData.getHearingFeePBADetails().getPaymentDetails().getStatus())
-            || PaymentStatus.FAILED.equals(caseData.getHearingFeePBADetails().getPaymentDetails().getStatus()));
     }
 
     private boolean isHearingFeeServiceRequest(CaseData caseData) {

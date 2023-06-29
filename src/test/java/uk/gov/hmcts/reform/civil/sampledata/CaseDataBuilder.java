@@ -4993,9 +4993,6 @@ public class CaseDataBuilder {
                             .statementOfValueInPennies(BigDecimal.valueOf(10800))
                             .build())
             .allocatedTrack(SMALL_CLAIM)
-            .hearingFeePBADetails(SRPbaDetails.builder()
-                                      .paymentDetails(PaymentDetails.builder().build())
-                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
             .build();
     }
 
