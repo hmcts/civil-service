@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueL
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<DefaultJudgmentSDOOrderForm> {
 
@@ -84,11 +86,16 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
 
         boolean isJudge = false;
-
+        log.info("AAAA Getting User Details then roles");
         if (userDetails.getRoles() != null) {
+            log.info("AAAA1 userDetails.getRoles() is not null ");
+            userDetails.getRoles().stream().forEach(p-> log.info(" lal la la l %s",p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+            log.info("isJudge value inside %s", isJudge);
         }
+        log.info("isJudge value outside %s", isJudge);
+
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
@@ -152,10 +159,16 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         boolean isJudge = false;
 
+        log.info("BBBB Getting User Details then roles");
         if (userDetails.getRoles() != null) {
+            log.info("BBBB1 userDetails.getRoles() is not null ");
+            userDetails.getRoles().stream().forEach(p-> log.info(" lal la la l %s",p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+            log.info("isJudge value inside %s", isJudge);
         }
+        log.info("isJudge value outside %s", isJudge);
+
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())

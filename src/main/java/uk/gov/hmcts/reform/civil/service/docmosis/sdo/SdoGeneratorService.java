@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SdoGeneratorService {
 
@@ -49,10 +51,15 @@ public class SdoGeneratorService {
 
         boolean isJudge = false;
 
+        log.info("CCCC Getting User Details then roles");
         if (userDetails.getRoles() != null) {
+            log.info("CCCC1 userDetails.getRoles() is not null ");
+            userDetails.getRoles().stream().forEach(p-> log.info(" lal la la l %s",p));
             isJudge = userDetails.getRoles().stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+            log.info("isJudge value inside %s", isJudge);
         }
+        log.info("isJudge value outside %s", isJudge);
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
