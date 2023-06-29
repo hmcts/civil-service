@@ -97,8 +97,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
-            .typeBundleInfo(nonNull(caseData.getDisposalHearingBundleDJ())
-                                ? fillTypeBundleInfoTrial() : null)
+            .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .disposalHearingDisclosureOfDocumentsDJAddSection(nonNull(
                 caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
