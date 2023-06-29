@@ -29,7 +29,7 @@ public class ExternalTaskListenerConfiguration {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             //Increasing this to test the hearing notice scheduler. Slow hmc calls may be resuling in camunda task timeouts.
-            .asyncResponseTimeout(180000)
+            .asyncResponseTimeout(29000)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
             .baseUrl(baseUrl)
             .build();
