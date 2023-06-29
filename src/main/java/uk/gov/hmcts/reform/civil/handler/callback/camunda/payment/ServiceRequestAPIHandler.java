@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Slf4j
@@ -42,6 +45,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final HearingFeesService hearingFeesService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -63,9 +67,27 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        //ToDo: Replace with AHN logic
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            if (!isHearingFeeStatusAvailableHMC(caseData)) {
+                SRPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
+                if (hearingFeePBADetails != null) {
+                    caseDataBuilder.hearingFeePBADetails(hearingFeePBADetails.toBuilder()
+                                                             .fee(calculateAndApplyFee(hearingFeesService,
+                                                                                       caseData,
+                                                                                       caseData.getAllocatedTrack()))
+                                                             .build());
+                } else {
+                    caseDataBuilder.hearingFeePBADetails(SRPbaDetails.builder()
+                                                             .fee(calculateAndApplyFee(hearingFeesService,
+                                                                                       caseData,
+                                                                                       caseData.getAllocatedTrack()))
+                                                             .build());
+                }
+            }
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         }
 
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -99,6 +121,13 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         return SRPbaDetails.builder()
             .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
             .serviceReqReference(serviceRequestReference);
+    }
+
+    private boolean isHearingFeeStatusAvailableHMC(CaseData caseData) {
+        return caseData.getHearingFeePBADetails() != null
+            && caseData.getHearingFeePBADetails().getPaymentDetails() != null
+            && (PaymentStatus.SUCCESS.equals(caseData.getHearingFeePBADetails().getPaymentDetails().getStatus())
+            || PaymentStatus.FAILED.equals(caseData.getHearingFeePBADetails().getPaymentDetails().getStatus()));
     }
 
     private boolean isHearingFeeServiceRequest(CaseData caseData) {
