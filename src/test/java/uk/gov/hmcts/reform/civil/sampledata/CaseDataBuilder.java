@@ -4964,6 +4964,50 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData withHearingFeePBADetailsPaymentFailed() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(FAILED)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsPaymentSuccess() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(SUCCESS)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsNoPaymentStatus() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10800))
+                            .build())
+            .allocatedTrack(SMALL_CLAIM)
+            .build();
+    }
+
     public CaseData buildMakePaymentsCaseDataWithHearingDate() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();

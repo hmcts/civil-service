@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
 
 @SpringBootTest(classes = {
     ServiceRequestAPIHandler.class,
@@ -48,6 +50,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private PaymentServiceResponse paymentServiceResponse;
+
+    @MockBean
+    private HearingFeesService hearingFeesService;
 
     @MockBean
     private Time time;
@@ -259,6 +264,52 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         private SRPbaDetails extractHearingPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             return responseCaseData.getHearingFeePBADetails();
+        }
+    }
+
+    @Nested
+    class MakeServiceRequestPaymentsHMC {
+
+        @BeforeEach
+        void setup() {
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+        }
+
+        @Test
+        void shouldCalculateFee_whenPaymentStatusIsNull() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            SRPbaDetails oldHearingFeePBADetails = caseData.getHearingFeePBADetails();
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
+            SRPbaDetails expected = SRPbaDetails.builder()
+                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .build();
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldNotCalculateFee_whenPaymentStatusIsSuccess() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess();
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            verifyNoInteractions(hearingFeesService);
+        }
+
+        @Test
+        void shouldNotCalculateFee_whenPaymentStatusIsFailed() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentFailed();
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            verifyNoInteractions(hearingFeesService);
         }
     }
 }
