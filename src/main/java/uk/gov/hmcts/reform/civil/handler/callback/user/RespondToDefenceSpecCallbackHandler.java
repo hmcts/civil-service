@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -104,6 +105,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
+    private final PaymentDateService paymentDateService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -286,7 +288,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updateDQCourtLocations(callbackParams, caseData, builder, dq);
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
-            if (smallClaimWitnesses != null && featureToggleService.isHearingAndListingLegalRepEnabled()) {
+            if (smallClaimWitnesses != null) {
                 dq.applicant1DQWitnesses(smallClaimWitnesses);
             }
 
@@ -397,7 +399,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
-            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
@@ -460,7 +462,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (!AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         } else if (isDefendantFullAdmitPayImmediately(caseData)) {
             caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();

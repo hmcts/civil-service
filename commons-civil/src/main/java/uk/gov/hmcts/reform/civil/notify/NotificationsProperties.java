@@ -133,7 +133,13 @@ public class NotificationsProperties {
     private String claimantSolicitorConfirmsNotToProceedSpecLip;
 
     @NotEmpty
+    private String notifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec;
+
+    @NotEmpty
     private String respondentSolicitorNotifyNotToProceedSpec;
+
+    @NotEmpty
+    private String notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec;
 
     @NotEmpty
     private String claimantSolicitorConfirmsToProceedSpec;
@@ -258,6 +264,9 @@ public class NotificationsProperties {
     private String notifyRespondentLiPMediationAgreementTemplate;
 
     @NotEmpty
+    private String notifyRespondentLiPMediationAgreementTemplateWelsh;
+
+    @NotEmpty
     private String notifyRespondentLRMediationAgreementTemplate;
 
     @NotEmpty
@@ -277,6 +286,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String mediationUnsuccessfulDefendantLIPTemplate;
+
+    @NotEmpty
+    private String mediationUnsuccessfulDefendantLIPBilingualTemplate;
 
     @NotEmpty
     private String respondent1DefaultJudgmentRequestedTemplate;
@@ -301,5 +313,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyRespondentLiPMediationSuccessfulTemplate;
+
+    @NotEmpty
+    private String notifyRespondentLiPMediationSuccessfulTemplateWelsh;
 
 }

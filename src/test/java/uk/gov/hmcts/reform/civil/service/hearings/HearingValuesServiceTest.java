@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.SneakyThrows;
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.RestException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -170,7 +169,7 @@ public class HearingValuesServiceTest {
             .hearingInWelshFlag(true)
             .hearingLocations(expectedHearingLocation)
             .facilitiesRequired(null)
-            .listingComments("")
+            .listingComments(null)
             .hearingRequester("")
             .privateHearingRequiredFlag(false)
             .caseInterpreterRequiredFlag(false)
@@ -298,8 +297,7 @@ public class HearingValuesServiceTest {
     void shouldReturnExpectedHearingValuesWhenCaseDataIs() {
         var caseId = 1L;
 
-        doThrow(new NotFoundException("", new RestException("", new Exception())))
-            .when(caseDataService).getCase(caseId);
+        doThrow(new NotFoundException("")).when(caseDataService).getCase(caseId);
 
         assertThrows(
             CaseNotFoundException.class,

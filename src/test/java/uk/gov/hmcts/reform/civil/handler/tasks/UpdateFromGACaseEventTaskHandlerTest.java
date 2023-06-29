@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
@@ -436,6 +435,37 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask);
     }
 
+    @Test
+    void testShouldAddGaDraftApplicationDocument() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
+    }
+
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
         return StartEventResponse.builder()
             .token("1594901956117591")
@@ -502,7 +532,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -523,7 +553,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -543,7 +573,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -555,11 +585,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void checkIfDocumentExists() {
-        Element same = Element.builder().id(UUID.randomUUID())
-                .value(CaseDocument.builder().build()).build();
-        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        Element<CaseDocument> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
+            .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
+                       .build()).build();
+        List<Element<CaseDocument>> civilCaseDocumentList = new ArrayList<>();
         civilCaseDocumentList.add(same);
-        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<CaseDocument>> gaDocumentList = new ArrayList<>();
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
         gaDocumentList.add(same);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
