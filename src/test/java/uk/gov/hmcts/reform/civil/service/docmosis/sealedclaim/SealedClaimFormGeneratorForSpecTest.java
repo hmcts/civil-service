@@ -6,11 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -294,8 +290,8 @@ public class SealedClaimFormGeneratorForSpecTest {
         // given
         String documentId = "documentId";
         DownloadedDocumentResponse downloadedDoc =
-            new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes())
-            , "test", "test");
+            new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()),
+                                           "test", "test");
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(documentManagementService.downloadDocumentCUI(anyString(), anyString())).thenReturn(downloadedDoc);
 

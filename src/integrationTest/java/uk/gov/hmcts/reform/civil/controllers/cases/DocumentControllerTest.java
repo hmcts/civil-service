@@ -18,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -43,21 +42,17 @@ import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -196,7 +191,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals(FILE_NAME, jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match");
+                     "Document file names should match"
+        );
     }
 
     @Test
@@ -231,10 +227,12 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
 
         //given
-        MockMultipartFile file = new MockMultipartFile("file",
-                                                       "TestFile.png",
-                                                       "image/png",
-                                                       "This is a dummy file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
 
         //when
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
@@ -248,7 +246,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match");
+                     "Document file names should match"
+        );
     }
 
     @Test
@@ -256,17 +255,19 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     void shouldThrowExceptionAnyDocument() throws Exception {
 
         //given
-        MockMultipartFile file = new MockMultipartFile("file",
-                                                       "TestFile.png",
-                                                       "image/png",
-                                                       "This is a dummy file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
 
         //when
         when(documentManagementService.uploadDocument(anyString(), any(UploadedDocument.class)))
             .thenThrow(DocumentUploadException.class);
 
         MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
-                            .andExpect(status().isBadRequest()).andReturn();
+            .andExpect(status().isBadRequest()).andReturn();
 
         assertEquals("Document upload unsuccessful", result.getResponse().getContentAsString());
         //then
