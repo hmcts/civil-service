@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -24,8 +25,9 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -139,6 +141,61 @@ class SecuredDocumentManagementServiceTest {
 
             verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
         }
+
+        @Test
+        void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            //given
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document = new UploadedDocument("0000-claim.pdf", file);
+
+            uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.success.json"),
+                uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class
+            );
+
+            //when
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+            //then
+            assertNotNull(caseDocument.getDocumentLink());
+            Assertions.assertEquals(
+                uploadResponse.getDocuments().get(0).links.self.href,
+                caseDocument.getDocumentLink().getDocumentUrl()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
+
+        @Test
+        void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            //given
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document = new UploadedDocument("0000-failed-claim.pdf", file);
+
+            UploadResponse uploadResponse = mapper.readValue(
+                ResourceReader.readString("document-management/secured.response.failure.json"),
+                UploadResponse.class
+            );
+
+            //when
+            when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
+                .thenReturn(uploadResponse);
+
+            //then
+            DocumentUploadException documentManagementException = assertThrows(
+                DocumentUploadException.class,
+                () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
+            );
+
+            assertEquals(
+                "Unable to upload document 0000-failed-claim.pdf to document management.",
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi).uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class));
+        }
     }
 
     @Nested
@@ -182,34 +239,6 @@ class SecuredDocumentManagementServiceTest {
 
             verify(documentDownloadClient)
                 .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary));
-        }
-
-        @Test
-        void shouldDownloadDocumentByDocumentPath() {
-            //Given
-            String documentBinary = "test";
-            byte[] data = "Test Resource Data".getBytes();
-            Resource resource = new ByteArrayResource(data);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
-            // Create the ResponseEntity
-            ResponseEntity<Resource> responseEntityExpected = new ResponseEntity<>(resource, headers, HttpStatus.OK);
-            DocumentResponse documentResponseExpected = new DocumentResponse(responseEntityExpected.getBody(), headers);
-            when(documentDownloadClient.downloadBinary(
-                     anyString(),
-                     anyString(),
-                     eq(USER_ROLES_JOINED),
-                     anyString(),
-                     anyString()
-                 )
-            ).thenReturn(responseEntityExpected);
-
-            //When
-            DocumentResponse expectedResult  = documentManagementService.downloadDocumentByDocumentPath(anyString(), documentBinary);
-
-            //Then
-            assertEquals(expectedResult, documentResponseExpected);
-
         }
 
         @Test
@@ -269,6 +298,42 @@ class SecuredDocumentManagementServiceTest {
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldDownloadDocumentByDocumentPathCUI() throws JsonProcessingException {
+            //Given
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenReturn(document);
+
+            when(caseDocumentClientApi.getDocumentBinary(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenReturn(responseEntity);
+
+            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+
+            //When
+            DownloadedDocumentResponse expectedResult =
+                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
+                                               "application/pdf");
+
+            //Then
+            assertEquals(expectedResult, documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentPath));
+
         }
 
     }

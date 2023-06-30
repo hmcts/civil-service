@@ -406,12 +406,53 @@ public class DeadlinesCalculatorTest {
 
     @Nested
     class PlusWorkingsDays {
+
         @Test
         void plusWorkingDays() {
             LocalDate start = LocalDate.of(2022, 9, 12);
             when(nonWorkingDaysCollection.contains(start.plusDays(7))).thenReturn(true);
             int days = 10;
             Assertions.assertEquals(start.plusDays(15), calculator.plusWorkingDays(start, days));
+        }
+
+        @Test
+        void getOrderSetAsideOrVariedApplicationDeadlineScenerio1() {
+            LocalDateTime start = LocalDateTime.of(2023, 5, 5, 16, 0, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 15);
+
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
+        }
+
+        @Test
+        void getOrderSetAsideOrVariedApplicationDeadlineScenerio2() {
+            LocalDateTime start = LocalDateTime.of(2023, 5, 6, 10, 0, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 15);
+
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
+        }
+
+        @Test
+        void getOrderSetAsideOrVariedApplicationDeadlineScenerio3() {
+            LocalDateTime start = LocalDateTime.of(2023, 5, 5, 15, 59, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 12);
+
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
+        }
+
+        @Test
+        void getOrderSetAsideOrVariedApplicationDeadlineScenerio4() {
+            LocalDateTime start = LocalDateTime.of(2023, 5, 4, 15, 59, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 11);
+
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
+        }
+
+        @Test
+        void getOrderSetAsideOrVariedApplicationDeadlineScenerio5() {
+            LocalDateTime start = LocalDateTime.of(2023, 5, 4, 16, 59, 0);
+            LocalDate expectedDate = LocalDate.of(2023, 5, 12);
+
+            Assertions.assertEquals(expectedDate, calculator.getOrderSetAsideOrVariedApplicationDeadline(start));
         }
     }
 
@@ -562,6 +603,55 @@ public class DeadlinesCalculatorTest {
             );
             assertEquals(exception.getMessage(), "Case issue data cannot be null");
         }
+    }
+
+    @Nested
+    class RespondentPaymentDate {
+
+        @Test
+        void shouldReturnDatePlus5days_whenResponseDateIsWeekday() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 9).atTime(12, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(5);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDatePlus6days_whenResponseDateIsWeekdayAfter4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 9).atTime(17, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(6);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDeadlinePlus7days_whenResponseDateIsMondayBefore4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 12).atTime(10, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(7);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
+        @Test
+        void shouldReturnDeadlinePlus7days_whenResponseDateIsMondayAfter4pm() {
+            LocalDateTime weekdayDate = LocalDate.of(2023, 6, 12).atTime(18, 0);
+            LocalDate expectedPaymentDate = weekdayDate.toLocalDate().plusDays(7);
+            LocalDate paymentDate = calculator.calculateRespondentPaymentDateAdmittedClaim(weekdayDate);
+
+            assertThat(paymentDate)
+                .isWeekday()
+                .isTheSame(expectedPaymentDate);
+        }
+
     }
 
 }

@@ -74,6 +74,14 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
+    public LocalDate calculateRespondentPaymentDateAdmittedClaim(LocalDateTime responseDate) {
+        LocalDateTime dateTime = responseDate;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        return calculateFirstWorkingDay(dateTime.toLocalDate().plusDays(5));
+    }
+
     public LocalDate calculateFirstWorkingDay(LocalDate date) {
         while (!workingDayIndicator.isWorkingDay(date)) {
             date = date.plusDays(1);
@@ -98,6 +106,21 @@ public class DeadlinesCalculator {
             currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
         }
         return currentDate;
+    }
+
+    public LocalDate getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime fromDateTime) {
+        LocalDate fromDate = is4pmOrAfter(fromDateTime) ? fromDateTime.toLocalDate().plusDays(1)
+            : fromDateTime.toLocalDate();
+        while (workingDayIndicator.isWeekend(fromDate)) {
+            fromDate = fromDate.plusDays(1);
+        }
+
+        LocalDate deadline = fromDate.plusDays(7);
+        while (workingDayIndicator.isWeekend(deadline)) {
+            deadline = deadline.plusDays(1);
+        }
+
+        return deadline;
     }
 
     public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {

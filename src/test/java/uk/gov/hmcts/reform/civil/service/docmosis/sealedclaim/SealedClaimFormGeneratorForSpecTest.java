@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.MimeTypeUtils;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -292,22 +292,17 @@ public class SealedClaimFormGeneratorForSpecTest {
     @Test
     void testDownloadDocumentById() {
         // given
-        String documentBinary = "documents/documentId/binary";
-        byte[] data = new ByteArrayResource("test".getBytes()).getByteArray();
-        Resource resource = new ByteArrayResource(data);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
-        // Create the ResponseEntity
-        DocumentResponse documentResponseExpected = new DocumentResponse(resource, headers);
-
-        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocumentByDocumentPath(anyString(), eq(documentBinary))).thenReturn(documentResponseExpected);
         String documentId = "documentId";
+        DownloadedDocumentResponse downloadedDoc =
+            new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes())
+            , "test", "test");
+        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
+        when(documentManagementService.downloadDocumentCUI(anyString(), anyString())).thenReturn(downloadedDoc);
 
         // when
-        DocumentResponse expectedResult = sealedClaimFormGenerator.downloadDocumentById(documentId);
+        DownloadedDocumentResponse expectedResult = sealedClaimFormGenerator.downloadDocument(documentId);
         //Then
-        assertEquals(expectedResult, documentResponseExpected);
+        assertEquals(expectedResult, downloadedDoc);
     }
 
 }

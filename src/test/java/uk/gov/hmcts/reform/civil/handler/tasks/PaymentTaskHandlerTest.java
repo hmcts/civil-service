@@ -36,7 +36,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
@@ -118,7 +117,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -139,7 +138,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -159,7 +158,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),

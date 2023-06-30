@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -17,12 +18,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -48,10 +51,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService.FILES_NAME;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
+@Slf4j
 @SpringBootTest(classes = {
     UnsecuredDocumentManagementService.class,
     JacksonAutoConfiguration.class,
@@ -169,6 +174,106 @@ class UnsecuredDocumentManagementServiceTest {
             verify(documentUploadClient)
                 .upload(anyString(), anyString(), anyString(), eq(USER_ROLES), any(Classification.class), eq(files));
         }
+
+        @Test
+        void shouldUploadAnyToDocumentManagement() throws JsonProcessingException {
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document = new UploadedDocument("0000-claim.pdf", file);
+
+            try {
+
+                List<MultipartFile> files = List.of(new InMemoryMultipartFile(
+                    FILES_NAME,
+                    document.getFileBaseName(),
+                    MULTIPART_FORM_DATA_VALUE,
+                    document.getFile().getBytes()
+                ));
+
+                UploadResponse uploadResponse = mapper.readValue(
+                    ResourceReader.readString("document-management/response.success.json"), UploadResponse.class);
+
+                when(documentUploadClient.upload(
+                         anyString(),
+                         anyString(),
+                         anyString(),
+                         eq(USER_ROLES),
+                         any(Classification.class),
+                         eq(files)
+                     )
+                ).thenReturn(uploadResponse);
+
+                CaseDocument caseDocument = documentManagementService.uploadDocument(BEARER_TOKEN, document);
+                assertNotNull(caseDocument.getDocumentLink());
+                Assertions.assertEquals(
+                    uploadResponse.getEmbedded().getDocuments().get(0).links.self.href,
+                    caseDocument.getDocumentLink().getDocumentUrl()
+                );
+
+                verify(documentUploadClient)
+                    .upload(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        eq(USER_ROLES),
+                        any(Classification.class),
+                        eq(files)
+                    );
+
+            } catch (Exception e) {
+                log.error("Failed uploading file {}", file.getOriginalFilename(), e);
+                throw new DocumentUploadException(file.getOriginalFilename(), e);
+            }
+
+        }
+
+        @Test
+        void shouldThrow_whenUploadAnyDocumentFails() throws JsonProcessingException {
+            //given
+            MockMultipartFile file = new MockMultipartFile("testfile.png", new byte[]{1, 2, 3});
+            UploadedDocument document =
+                new UploadedDocument("0000-failed-claim.pdf", file);
+
+            try {
+
+                List<MultipartFile> files = List.of(new InMemoryMultipartFile(
+                    FILES_NAME,
+                    document.getFileBaseName(),
+                    MULTIPART_FORM_DATA_VALUE,
+                    document.getFile().getBytes()
+                ));
+
+                //when
+                when(documentUploadClient.upload(
+                         anyString(),
+                         anyString(),
+                         anyString(),
+                         eq(USER_ROLES),
+                         any(Classification.class),
+                         eq(files)
+                     )
+                ).thenReturn(mapper.readValue(
+                    ResourceReader.readString("document-management/response.failure.json"), UploadResponse.class));
+
+                //then
+                DocumentUploadException documentManagementException = assertThrows(
+                    DocumentUploadException.class,
+                    () -> documentManagementService.uploadDocument(BEARER_TOKEN, document)
+                );
+
+                assertEquals(
+                    "Unable to upload document 0000-failed-claim.pdf to document management.",
+                    documentManagementException.getMessage()
+                );
+
+                verify(documentUploadClient)
+                    .upload(anyString(), anyString(), anyString(), eq(USER_ROLES), any(Classification.class), eq(files));
+
+            } catch (Exception e) {
+                log.error("Failed uploading file {}", file.getOriginalFilename(), e);
+                throw new DocumentUploadException(file.getOriginalFilename(), e);
+            }
+        }
+
     }
 
     @Nested
@@ -220,30 +325,42 @@ class UnsecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldDownloadDocumentByDocumentPath() {
+        void shouldDownloadDocumentByDocumentPath() throws JsonProcessingException {
             //Given
-            String documentBinary = "test";
-            byte[] data = "Test Resource Data".getBytes();
-            Resource resource = new ByteArrayResource(data);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.asMediaType(MimeTypeUtils.APPLICATION_JSON));
-            // Create the ResponseEntity
-            ResponseEntity<Resource> responseEntity = new ResponseEntity<>(resource, headers, HttpStatus.OK);
-            DocumentResponse documentResponseExpected = new DocumentResponse(responseEntity.getBody(), headers);
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentPath = URI.create(document.links.self.href).getPath();
+            String documentBinary = URI.create(document.links.binary.href).getPath();
+
+            when(documentMetadataDownloadClient.getDocumentMetadata(
+                     anyString(),
+                     anyString(),
+                     eq(USER_ROLES_JOINED),
+                     anyString(),
+                     eq(documentPath)
+                 )
+            ).thenReturn(document);
+
+            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+
             when(documentDownloadClient.downloadBinary(
                      anyString(),
                      anyString(),
                      eq(USER_ROLES_JOINED),
                      anyString(),
-                     anyString()
+                     eq(documentBinary)
                  )
             ).thenReturn(responseEntity);
 
             //When
-            DocumentResponse expectedResult  = documentManagementService.downloadDocumentByDocumentPath(anyString(), documentBinary);
+            DownloadedDocumentResponse expectedResult  =
+                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
+                                               "application/pdf");
 
             //Then
-            assertEquals(expectedResult, documentResponseExpected);
+            assertEquals(expectedResult, documentManagementService.downloadDocumentCUI(BEARER_TOKEN, documentPath));
 
         }
 

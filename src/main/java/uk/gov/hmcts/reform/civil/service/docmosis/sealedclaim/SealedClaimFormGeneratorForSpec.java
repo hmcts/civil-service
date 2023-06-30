@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -85,10 +86,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         );
     }
 
-    public DocumentResponse downloadDocumentById(String documentId) {
+    public DownloadedDocumentResponse downloadDocument(String documentId) {
         String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String documentPath = String.format("documents/%s/binary", documentId);
-        return documentManagementService.downloadDocumentByDocumentPath(authorisation, documentPath);
+        String documentPath = String.format("documents/%s", documentId);
+
+        return documentManagementService.downloadDocumentCUI(authorisation, documentPath);
     }
 
     @NotNull

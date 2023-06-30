@@ -1,15 +1,23 @@
 buildscript {
   repositories {
+    mavenLocal()
     mavenCentral()
     maven {
       url "https://dl.bintray.com/hmcts/hmcts-maven"
     }
+    maven {
+      url "https://jitpack.io"
+    }
+    jcenter()
   }
 }
 
+group = 'uk.gov.hmcts.reform'
+version = '0.0.1'
+
 def versions = [
-  junit        : '5.7.0',
-  junitPlatform: '1.8.1',
+  junit        : '5.9.3',
+  junitPlatform: '1.9.3',
   lombok :       '1.18.26'
 ]
 
@@ -67,6 +75,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
