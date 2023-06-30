@@ -215,7 +215,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 caseData,
                                 authorisation
                             ));
-        log.debug(djTrialTemplateBuilder.build());
+        log.debug(djTrialTemplateBuilder.build().toString());
         return djTrialTemplateBuilder.build();
 
     }
