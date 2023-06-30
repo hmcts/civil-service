@@ -329,20 +329,24 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean hasClaimEnded() {
-        return response.isFullDefence()
+        return Objects.nonNull(response)
+            && response.isFullDefence()
+            && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 
     @Override
     public boolean claimSentToClaimant() {
-        return response.isFullDefence()
+        return Objects.nonNull(response)
+            && response.isFullDefence()
             && isSentToCourt()
             && Objects.isNull(claimantResponse);
     }
 
     @Override
     public boolean claimantAcceptRepayment() {
-        return response.isFullDefence()
+        return Objects.nonNull(response)
+            && response.isFullDefence()
             && isSentToCourt()
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.ACCEPTATION);
@@ -350,7 +354,8 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean claimantRejectOffer() {
-        return response.isFullDefence()
+        return Objects.nonNull(response)
+            && response.isFullDefence()
             && isSentToCourt()
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
@@ -358,7 +363,8 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return response.isPartAdmit()
+        return Objects.nonNull(response)
+            && response.isPartAdmit()
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
