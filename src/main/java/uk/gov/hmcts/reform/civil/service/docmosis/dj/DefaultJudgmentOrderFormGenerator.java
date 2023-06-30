@@ -93,9 +93,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         boolean isJudge = false;
         log.info("AAAA Getting User Details then roles");
-        if (roles != null) {
+        if (userInfo.getRoles() != null) {
             log.info("AAAAAA1 userDetails.getRoles() is not null ");
-            roles.stream().forEach(p -> log.info(" ROLESSSSSS  ({})", p));
+            userInfo.getRoles().stream().forEach(p -> log.info(" ROLESSSSSS  ({})", p));
+
             isJudge = roles.stream()
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
