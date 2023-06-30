@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -88,6 +89,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         var isRespondent1 = YES;
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
@@ -103,13 +105,37 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         // Show error message if defendant tries to extend date again ONE_V_TWO_TWO_LEGAL_REP
         if ((!solicitorRepresentsOnlyRespondent2(callbackParams) && caseData.getRespondent1TimeExtensionDate() != null)
             || (solicitorRepresentsOnlyRespondent2(callbackParams)
-                && caseData.getRespondent2TimeExtensionDate() != null)) {
+            && caseData.getRespondent2TimeExtensionDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))
                 .build();
         }
+
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().isRespondent1(isRespondent1);
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            RESPONDENTSOLICITORONE
+        )) {
+            builder.respondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
+                caseData.getClaimDetailsNotificationDate(),
+                caseData.getRespondent1AcknowledgeNotificationDate()
+            ));
+        }
+        if (coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            RESPONDENTSOLICITORTWO
+        )) {
+            builder.respondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
+                caseData.getClaimDetailsNotificationDate(),
+                caseData.getRespondent2AcknowledgeNotificationDate()
+            ));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().isRespondent1(isRespondent1).build().toMap(objectMapper))
+            .data(builder.build().toMap(objectMapper))
             .build();
     }
 
