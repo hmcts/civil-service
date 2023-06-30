@@ -60,8 +60,7 @@ public class SendingCsvWhenAgreedMediationSpecHandler extends CallbackHandler im
     }
 
     private Optional<EmailData> prepareEmail(CaseData data) {
-//        String toEmail = "smallclaimsmediation@justice.gov.uk";
-        String toEmail = "civilmoneyclaimsdemo@gmail.com";
+        String toEmail = "smallclaimsmediation@justice.gov.uk";
         String subject = "OCMC Mediation Data";
         String filename = "ocmc_mediation_data.csv";
         String content = generateAttachmentContent(data);
@@ -76,21 +75,40 @@ public class SendingCsvWhenAgreedMediationSpecHandler extends CallbackHandler im
     }
 
     private String generateAttachmentContent(CaseData data) {
-        StringBuilder content = new StringBuilder();
-        content.append(5);
-        content.append(data.getLegacyCaseReference());
-        content.append(1);
-        content.append(data.getTotalClaimAmount());
-        content.append(data.getApplicant1().getType());
-        content.append(data.getApplicant1().getCompanyName());
-        content.append(data.getApplicant1().getPartyName());
-        content.append(data.getApplicant1().getPartyPhone());
-        content.append(4);
-        content.append(5);
-        content.append(data.getApplicant1().getPartyEmail());
-        content.append(data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No");
 
-        return content.toString();
+        String [] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
+            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PART_STATUS", "CONTACT_EMAIL", "PILOT"};
+
+        String [] claimantData = {
+            "5", data.getLegacyCaseReference(), "1", data.getTotalClaimAmount().toString(),
+            data.getApplicant1().getType().toString(), data.getApplicant1().getCompanyName(),
+            data.getApplicant1().getPartyName(), data.getApplicant1().getPartyPhone(),
+            "4", "5", data.getApplicant1().getPartyEmail(),
+            data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
+        };
+
+        String [] respondentData = {
+            "5", data.getLegacyCaseReference(), "1", data.getTotalClaimAmount().toString(),
+            data.getRespondent1().getType().toString(), data.getRespondent1().getCompanyName(),
+            data.getRespondent1().getPartyName(), data.getRespondent1().getPartyPhone(),
+            "4", "5", data.getRespondent1().getPartyEmail(),
+            data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
+        };
+
+        return generateCSVRow(headers)
+            + generateCSVRow(claimantData)
+            + generateCSVRow(respondentData);
+    }
+
+    private String generateCSVRow(String [] row) {
+        StringBuilder builder = new StringBuilder();
+
+        for (String s : row) {
+            builder.append(s).append(",");
+        }
+        builder.append("\n");
+
+        return builder.toString();
     }
 
     @Override
