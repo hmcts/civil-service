@@ -344,7 +344,7 @@ public class CmcClaim implements Claim {
     public boolean claimantAcceptRepayment() {
         return response.isFullDefence()
             && isSentToCourt()
-            && !Objects.isNull(claimantResponse)
+            && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.ACCEPTATION);
     }
 
@@ -352,14 +352,14 @@ public class CmcClaim implements Claim {
     public boolean claimantRejectOffer() {
         return response.isFullDefence()
             && isSentToCourt()
-            && !Objects.isNull(claimantResponse)
+            && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 
     @Override
     public boolean isPartialAdmissionRejected() {
         return response.isPartAdmit()
-            && !Objects.isNull(claimantResponse)
+            && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 }
