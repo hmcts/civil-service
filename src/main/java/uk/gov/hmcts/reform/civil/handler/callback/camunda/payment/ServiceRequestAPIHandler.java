@@ -65,24 +65,31 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> errors = new ArrayList<>();
 
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails())) {
-                caseDataBuilder.hearingFeePBADetails(SRPbaDetails.builder()
-                                                         .fee(calculateAndApplyFee(
-                                                             hearingFeesService,
-                                                             caseData,
-                                                             caseData.getAllocatedTrack()))
-                                                         .build());
+                try {
+                    SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
+                        .fee(calculateAndApplyFee(
+                            hearingFeesService,
+                            caseData,
+                            caseData.getAllocatedTrack()));
+                    caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
+                } catch (FeignException e) {
+                    log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
+                              caseData.getCcdCaseReference(), e.status(), e);
+                    errors.add(ERROR_MESSAGE);
+                }
             }
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
+                .errors(errors)
                 .build();
         }
 
-        var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<String> errors = new ArrayList<>();
         try {
             if (isHearingFeeServiceRequest(caseData)) {
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());

@@ -4993,6 +4993,9 @@ public class CaseDataBuilder {
                             .statementOfValueInPennies(BigDecimal.valueOf(10800))
                             .build())
             .allocatedTrack(SMALL_CLAIM)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
+                Organisation.builder()
+                    .organisationID("OrgId").build()).build())
             .build();
     }
 
