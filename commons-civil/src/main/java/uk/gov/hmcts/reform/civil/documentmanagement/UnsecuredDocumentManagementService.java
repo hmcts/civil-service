@@ -170,7 +170,7 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
 
     @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
     @Override
-    public DownloadedDocumentResponse downloadDocumentCUI(String authorisation, String documentPath) {
+    public DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);

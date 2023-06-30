@@ -293,7 +293,7 @@ public class SealedClaimFormGeneratorForSpecTest {
             new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()),
                                            "test", "test");
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocumentCUI(anyString(), anyString())).thenReturn(downloadedDoc);
+        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenReturn(downloadedDoc);
 
         // when
         DownloadedDocumentResponse expectedResult = sealedClaimFormGenerator.downloadDocument(documentId);

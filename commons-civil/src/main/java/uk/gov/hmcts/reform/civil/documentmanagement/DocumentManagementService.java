@@ -13,6 +13,6 @@ public interface DocumentManagementService {
 
     byte[] downloadDocument(String authorisation, String documentPath);
 
-    DownloadedDocumentResponse downloadDocumentCUI(String authorisation, String documentPath);
+    DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath);
 
 }
