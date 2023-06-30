@@ -70,6 +70,7 @@ public class HmcDataUtils {
      * Calculates the duration in hours for a given hearing day.
      * @return duration of the hearing day in hours
      */
+
     private static int getHearingDayHoursDuration(HearingDaySchedule day) {
         return ((Long)day.getHearingStartDateTime().until(day.getHearingEndDateTime(), ChronoUnit.HOURS)).intValue();
     }
@@ -118,7 +119,7 @@ public class HmcDataUtils {
     }
 
     /**
-     * Returns the total number of days and hours the hearing has been listed for
+     * Returns the total number of days and hours the hearing has been listed for.
      *  duration = takes total hearing hours from getHearingDayHoursDuration()
      * Formatting has been added to generate plural of day/hour when necessary
      * @return If duration is a multiple of 6: returns whole day e.g. 12 hours returns "2 days"
