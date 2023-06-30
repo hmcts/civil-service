@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final IdamClient idamClient;
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
@@ -85,6 +88,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
         UserInfo userInfo = userService.getUserInfo(authorisation);
         List<String> roles = coreCaseUserService.getUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
