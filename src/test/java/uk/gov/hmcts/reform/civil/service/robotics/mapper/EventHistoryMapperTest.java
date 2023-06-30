@@ -4225,17 +4225,9 @@ class EventHistoryMapperTest {
                         .respondent2Represented(YES)
                         .build();
                 }
-                Event expectedDefenceAndCounterClaim = Event.builder()
-                    .eventSequence(4)
-                    .eventCode("52")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
-                    .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
                 assertThat(eventHistory).isNotNull();
-                assertThat(eventHistory).extracting("defenceAndCounterClaim").asList()
-                    .containsExactly(expectedDefenceAndCounterClaim);
 
                 assertEmptyEvents(
                     eventHistory,

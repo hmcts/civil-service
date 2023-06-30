@@ -554,9 +554,6 @@ public class EventHistoryMapper {
             case FULL_DEFENCE:
                 buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
                 break;
-            case COUNTER_CLAIM:
-                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
-                break;
             case PART_ADMISSION:
                 buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
@@ -639,9 +636,6 @@ public class EventHistoryMapper {
         switch (respondentResponseTypeSpec) {
             case FULL_DEFENCE:
                 buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
-                break;
-            case COUNTER_CLAIM:
-                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case PART_ADMISSION:
                 buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
