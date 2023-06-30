@@ -278,7 +278,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull() {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
-            SRPbaDetails oldHearingFeePBADetails = caseData.getHearingFeePBADetails();
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -287,9 +289,11 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
             SRPbaDetails expected = SRPbaDetails.builder()
                 .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
                 .build();
 
             assertThat(actual).isEqualTo(expected);
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
         }
 
         @Test
@@ -300,6 +304,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             verifyNoInteractions(hearingFeesService);
+            verifyNoInteractions(paymentsService);
         }
 
         @Test
@@ -310,6 +315,20 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             verifyNoInteractions(hearingFeesService);
+            verifyNoInteractions(paymentsService);
+        }
+
+        @Test
+        void shouldHandleException_whenPaymentRequestFails() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenThrow(FeignException.class);
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotEmpty();
         }
     }
 }
