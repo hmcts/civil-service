@@ -273,4 +273,19 @@ public class DashboardClaimInfoServiceTest {
 
         assertThat(claimsForDefendant.size()).isEqualTo(0);
     }
+
+    @Test
+    void shouldTranslateSubmittedDateToCreateDate() {
+        LocalDateTime now = LocalDateTime.now();
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .submittedDate(now)
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getCreatedDate()).isEqualTo(now);
+    }
 }
