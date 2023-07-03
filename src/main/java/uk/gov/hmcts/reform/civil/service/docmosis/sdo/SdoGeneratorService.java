@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -38,6 +39,7 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+    private final RoleAssignmentsService roleAssignmentsService;
     private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -46,12 +48,11 @@ public class SdoGeneratorService {
 
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
-
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
         boolean isJudge = false;
-
-        if (userDetails.getRoles() != null) {
-            isJudge = userDetails.getRoles().stream()
-                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
+        if (roleAssignmentResponse.getRoleAssignmentResponse() != null) {
+            isJudge = roleAssignmentResponse.getRoleAssignmentResponse().stream()
+                .anyMatch(s -> s != null && s.getRoleName().equals("judge"));
         }
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
