@@ -86,7 +86,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 .errorCode(null)
                 .errorMessage(null)
                 .build();
-
+            log.info("Payment Successfully completed for the case: " + caseData.getCcdCaseReference());
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403 || e.status() == 422 || e.status() == 504) {

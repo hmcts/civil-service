@@ -131,7 +131,7 @@ public class PaymentsService {
         PBAServiceRequestDTO pbaServiceRequestDTO = null;
         if (serviceRequestPBADetails != null) {
             pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
-                .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
+                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts()
                                    .getValue().getLabel())
                 .amount(srFee.getCalculatedAmount())
                 .customerReference(customerReference)
