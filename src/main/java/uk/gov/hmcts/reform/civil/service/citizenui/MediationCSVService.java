@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Service
 public class MediationCSVService {
+
     private final String toEmail = "smallclaimsmediation@justice.gov.uk";
     private final String subject = "OCMC Mediation Data";
     private final String filename = "ocmc_mediation_data.csv";
