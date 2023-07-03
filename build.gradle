@@ -332,7 +332,8 @@ configurations.all {
 }
 
 dependencies {
-  implementation project(':commons-civil')
+  implementation 'com.github.hmcts:civil-commons:1.0.0'
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
