@@ -21,6 +21,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING, NOTIFY_CLAIMANT_HEARING_HMC);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
 
@@ -46,6 +48,13 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        //ToDo: Replace with AHN logic
+        if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
+
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         sendEmail(caseData, recipient);
         return AboutToStartOrSubmitCallbackResponse.builder()
