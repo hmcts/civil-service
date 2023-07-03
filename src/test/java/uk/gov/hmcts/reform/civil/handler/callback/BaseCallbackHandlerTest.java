@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams.Params;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -70,6 +71,10 @@ public abstract class BaseCallbackHandlerTest {
 
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type) {
         return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData, CaseEvent event, CallbackType type) {
+        return callbackParamsOf(caseData, event.name(), type, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     public CallbackParams callbackParamsOf(CallbackVersion version, CaseData caseData, CallbackType type) {
@@ -139,6 +144,25 @@ public abstract class BaseCallbackHandlerTest {
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
+                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                         .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                         .build())
+            .caseData(caseData)
+            .version(version)
+            .params(params)
+            .build();
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData,
+                                           String eventId,
+                                           CallbackType type,
+                                           CallbackVersion version,
+                                           Map<Params, Object> params
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .request(CallbackRequest.builder()
+                         .eventId(eventId)
                          .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
