@@ -153,7 +153,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         log.info("Received ActorId: {}", userDetails.getId());
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
+
         boolean isJudge = false;
+
         if (roleAssignmentResponse.getRoleAssignmentResponse() != null) {
             isJudge = roleAssignmentResponse.getRoleAssignmentResponse().stream()
                 .anyMatch(s -> s != null && s.getRoleName().equals("judge"));
