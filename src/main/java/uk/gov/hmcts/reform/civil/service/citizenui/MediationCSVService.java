@@ -15,6 +15,10 @@ import java.util.Optional;
 @Service
 public class MediationCSVService {
 
+    private final String SITE_ID = "5";
+    private final String CASE_TYPE = "1";
+    private final String CHECK_LIST = "4";
+    private final String PARTY_STATUS = "5";
     private final String toEmail = "smallclaimsmediation@justice.gov.uk";
     private final String subject = "OCMC Mediation Data";
     private final String filename = "ocmc_mediation_data.csv";
@@ -33,21 +37,21 @@ public class MediationCSVService {
     public String generateAttachmentContent(CaseData data) {
 
         String [] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PART_STATUS", "CONTACT_EMAIL", "PILOT"};
+            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
 
         String [] claimantData = {
-            "5", data.getLegacyCaseReference(), "1", data.getTotalClaimAmount().toString(),
+            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
             data.getApplicant1().getType().toString(), data.getApplicant1().getCompanyName(),
             data.getApplicant1().getPartyName(), data.getApplicant1().getPartyPhone(),
-            "4", "5", data.getApplicant1().getPartyEmail(),
+            CHECK_LIST, PARTY_STATUS, data.getApplicant1().getPartyEmail(),
             data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
         };
 
         String [] respondentData = {
-            "5", data.getLegacyCaseReference(), "1", data.getTotalClaimAmount().toString(),
+            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
             data.getRespondent1().getType().toString(), data.getRespondent1().getCompanyName(),
             data.getRespondent1().getPartyName(), data.getRespondent1().getPartyPhone(),
-            "4", "5", data.getRespondent1().getPartyEmail(),
+            CHECK_LIST, PARTY_STATUS, data.getRespondent1().getPartyEmail(),
             data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
         };
 
