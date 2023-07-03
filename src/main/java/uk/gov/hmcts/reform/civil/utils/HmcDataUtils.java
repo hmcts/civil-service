@@ -66,11 +66,11 @@ public class HmcDataUtils {
             || partiesNotified.getServiceData() == null
             || hearingDataChanged(hearing, partiesNotified.getServiceData());
     }
+
     /**
      * Calculates the duration in hours for a given hearing day.
      * @return duration of the hearing day in hours
      */
-
     private static int getHearingDayHoursDuration(HearingDaySchedule day) {
         return ((Long)day.getHearingStartDateTime().until(day.getHearingEndDateTime(), ChronoUnit.HOURS)).intValue();
     }
@@ -148,8 +148,7 @@ public class HmcDataUtils {
             } else {
                 return String.format("%s %s", duration, textToPlural(duration, "hour"));
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
