@@ -133,13 +133,21 @@ public class HmcDataUtils {
 
         var totalDays = (Double)Math.floor((double)duration / MAX_HOURS_PER_DAY);
 
-        if (duration % MAX_HOURS_PER_DAY == 0) {
-            return String.format("%s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"));
-        } else if (duration > MAX_HOURS_PER_DAY) {
-            var hours = duration - (totalDays.intValue() * MAX_HOURS_PER_DAY);
-            return String.format("%s %s and %s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"), hours, textToPlural(hours, "hour"));
-        } else {
-            return String.format("%s %s", duration, textToPlural(duration, "hour"));
+        if (duration != null) {
+            if (duration % MAX_HOURS_PER_DAY == 0) {
+                return String.format("%s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"));
+            } else if (duration > MAX_HOURS_PER_DAY) {
+                var hours = duration - (totalDays.intValue() * MAX_HOURS_PER_DAY);
+                return String.format(
+                    "%s %s and %s %s",
+                    totalDays.intValue(),
+                    textToPlural(totalDays.intValue(), "day"),
+                    hours,
+                    textToPlural(hours, "hour")
+                );
+            } else {
+                return String.format("%s %s", duration, textToPlural(duration, "hour"));
+            }
         }
     }
 }
