@@ -256,22 +256,6 @@ class HmcDataUtilsTest {
     }
 
     @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_FulDay() {
-        var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
-            .build();
-
-        HearingGetResponse hearing = hearingResponse()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
-            .build();
-
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
-
-        assertEquals(result, List.of("23 May 2023 at 10:00 for 5 hours"));
-    }
-
-    @Test
     void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay() {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
