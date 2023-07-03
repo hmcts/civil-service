@@ -501,7 +501,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingHearingNotesDJ disposalHearingHearingNotesDJ;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
