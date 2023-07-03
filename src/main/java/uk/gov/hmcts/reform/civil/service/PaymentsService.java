@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -29,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PaymentsService {
 
     private static final String PAYMENT_ACTION = "Case Submit";
@@ -94,10 +92,8 @@ public class PaymentsService {
         SRPbaDetails serviceRequestPBADetails = null;
 
         if (caseData.getHearingDate() == null) {
-            log.info("hearingDate is null validate request");
             serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
         } else {
-            log.info("validate hearingDate {}", caseData.getHearingDate());
             serviceRequestPBADetails = caseData.getHearingFeePBADetails();
         }
 
@@ -119,11 +115,9 @@ public class PaymentsService {
         FeeDto srFee = null;
 
         if (caseData.getHearingDate() == null) {
-            log.info("hearingDate is null buildrequest1");
             serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
             srFee = caseData.getClaimFee().toFeeDto();
         } else {
-            log.info("buildrequest1 hearingDate {}", caseData.getHearingDate());
             serviceRequestPBADetails = caseData.getHearingFeePBADetails();
             srFee = caseData.getHearingFee().toFeeDto();
         }
@@ -153,10 +147,8 @@ public class PaymentsService {
     public PBAServiceRequestResponse createCreditAccountPayment1(CaseData caseData, String authToken) {
         String serviceReqReference = null;
         if (caseData.getHearingDate() == null) {
-            log.info("createCreditAccountPayment1 hearingDate is null");
             serviceReqReference = caseData.getClaimIssuedPBADetails().getServiceReqReference();
         } else {
-            log.info("createCreditAccountPayment1 hearingDate {}", caseData.getHearingDate());
             serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         }
         return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest1(caseData));
