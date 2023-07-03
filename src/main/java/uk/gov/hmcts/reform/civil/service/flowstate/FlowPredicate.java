@@ -962,4 +962,5 @@ public class FlowPredicate {
         && caseData.getListingOrRelisting() != null
         && caseData.getListingOrRelisting().equals(LISTING);
 
+    public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 }
