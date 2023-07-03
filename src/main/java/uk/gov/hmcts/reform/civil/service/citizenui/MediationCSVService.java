@@ -1,40 +1,19 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MediationCSVService {
 
-    private final String SITE_ID = "5";
-    private final String CASE_TYPE = "1";
-    private final String CHECK_LIST = "4";
-    private final String PARTY_STATUS = "5";
-    private final String toEmail = "smallclaimsmediation@justice.gov.uk";
-    private final String subject = "OCMC Mediation Data";
-    private final String filename = "ocmc_mediation_data.csv";
+    private static final String SITE_ID = "5";
+    private static final String CASE_TYPE = "1";
+    private static final String CHECK_LIST = "4";
+    private static final String PARTY_STATUS = "5";
 
-    public Optional<EmailData> prepareEmail(CaseData data) {
-        String content = generateAttachmentContent(data);
-        InputStreamSource inputSource = new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8));
-
-        return Optional.of(EmailData.builder()
-                               .to(toEmail)
-                               .subject(subject)
-                               .attachments(List.of(new EmailAttachment(inputSource, "text/csv", filename)))
-                               .build());
-    }
-
-    public String generateAttachmentContent(CaseData data) {
+    public String generateCSVContent(CaseData data) {
 
         String [] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
@@ -44,7 +23,7 @@ public class MediationCSVService {
             data.getApplicant1().getType().toString(), data.getApplicant1().getCompanyName(),
             data.getApplicant1().getPartyName(), data.getApplicant1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getApplicant1().getPartyEmail(),
-            data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
+            isPilot(data.getTotalClaimAmount())
         };
 
         String [] respondentData = {
@@ -52,12 +31,16 @@ public class MediationCSVService {
             data.getRespondent1().getType().toString(), data.getRespondent1().getCompanyName(),
             data.getRespondent1().getPartyName(), data.getRespondent1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getRespondent1().getPartyEmail(),
-            data.getTotalClaimAmount().compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No"
+            isPilot(data.getTotalClaimAmount())
         };
 
         return generateCSVRow(headers)
             + generateCSVRow(claimantData)
             + generateCSVRow(respondentData);
+    }
+
+    private String isPilot(BigDecimal amount) {
+        return amount.compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No";
     }
 
     private String generateCSVRow(String [] row) {
