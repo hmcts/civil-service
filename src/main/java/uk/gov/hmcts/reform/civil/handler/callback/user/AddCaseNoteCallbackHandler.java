@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
@@ -24,6 +25,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.addEventAndDate;
 
 @Service
 @RequiredArgsConstructor
@@ -58,9 +61,16 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, caseData.getCaseNotes());
 
+        List<UnavailableDate> updatedDates = addEventAndDate(
+            caseData.getApplicant1().getUnavailableDates(),
+            "New add unavailable dates event"
+        );
+
+
         CaseData updatedCaseData = caseData.toBuilder()
             .caseNotes(caseNotes)
             .caseNote(null)
+            .applicant1(caseData.getApplicant1().toBuilder().unavailableDates(wrapElements(updatedDates)).build())
             .businessProcess(BusinessProcess.ready(ADD_CASE_NOTE))
             .build();
 
