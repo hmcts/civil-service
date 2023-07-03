@@ -701,19 +701,6 @@ public class EventHistoryMapper {
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) >= 0).orElse(false);
     }
 
-    private void buildDefenceAndCounterClaim(EventHistory.EventHistoryBuilder builder,
-                                             CaseData caseData,
-                                             LocalDateTime respondentResponseDate,
-                                             String respondentID) {
-        builder.defenceAndCounterClaim(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                .dateReceived(respondentResponseDate)
-                .litigiousPartyID(respondentID)
-                .build());
-    }
-
     private void buildReceiptOfPartAdmission(EventHistory.EventHistoryBuilder builder,
                                              CaseData caseData,
                                              LocalDateTime respondentResponseDate,
