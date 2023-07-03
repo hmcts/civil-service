@@ -29,13 +29,11 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return true;
-        // this.featureToggleApi.isFeatureEnabled("pin-in-post");
+         this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return false;
-//        this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isCertificateOfServiceEnabled() {
