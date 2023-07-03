@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
@@ -613,7 +614,8 @@ class FlowStateAllowedEventServiceTest {
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        NotSuitable_SDO
                     }
                 ),
                 of(
@@ -1044,6 +1046,15 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
             .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsNotifyHearingParties() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+            .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
             .isEqualTo(true);
     }
 }

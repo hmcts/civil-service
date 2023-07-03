@@ -48,6 +48,12 @@
   </suppress>
   <suppress until="2023-08-29">
     <cve>CVE-2023-28709</cve>
+    <cve>CVE-2023-35116</cve>
+    <cve>CVE-2023-2976</cve>
+  </suppress>
+  <suppress until="2023-09-29">
+    <notes>suppressing the below as launch darkly upgrade guava dependency is major release that requires further work</notes>
+    <cve>CVE-2023-2976</cve>
   </suppress>
   <suppress until="2023-08-29">
     <cve>CVE-2023-35116</cve>
