@@ -149,5 +149,8 @@ public class HmcDataUtils {
                 return String.format("%s %s", duration, textToPlural(duration, "hour"));
             }
         }
+        else {
+            return null;
+        }
     }
 }
