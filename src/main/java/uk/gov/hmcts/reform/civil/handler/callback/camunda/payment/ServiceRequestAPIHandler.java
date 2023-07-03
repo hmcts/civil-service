@@ -86,6 +86,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         String serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
             .getServiceRequestReference();
         return SRPbaDetails.builder()
+            .pbaReference(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
             .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
             .serviceReqReference(serviceRequestReference);
     }

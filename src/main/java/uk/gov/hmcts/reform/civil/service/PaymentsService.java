@@ -121,7 +121,9 @@ public class PaymentsService {
             serviceRequestPBADetails = caseData.getHearingFeePBADetails();
             srFee = caseData.getHearingFee().toFeeDto();
         }
-
+        String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .map(PaymentDetails::getCustomerReference)
+            .orElse(caseData.getPaymentReference());
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
                 .map(Organisation::getName)
@@ -132,7 +134,7 @@ public class PaymentsService {
                 .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(srFee.getCalculatedAmount())
-                .customerReference(serviceRequestPBADetails.getPbaReference())
+                .customerReference(customerReference)
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
