@@ -129,9 +129,9 @@ public class HmcDataUtils {
     public static String getTotalHearingDurationText(HearingGetResponse hearing) {
         var duration = hearing.getHearingResponse().getHearingDaySchedule().stream()
             .map(day -> getHearingDayHoursDuration(day))
-            .reduce((aac, day) -> aac + day).get();
+            .reduce((aac, day) -> aac + day).orElse(null);
 
-        var totalDays = (Double)Math.floor(duration / MAX_HOURS_PER_DAY);
+        var totalDays = (Double)Math.floor((double)duration / MAX_HOURS_PER_DAY);
 
         if (duration % MAX_HOURS_PER_DAY == 0) {
             return String.format("%s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"));
