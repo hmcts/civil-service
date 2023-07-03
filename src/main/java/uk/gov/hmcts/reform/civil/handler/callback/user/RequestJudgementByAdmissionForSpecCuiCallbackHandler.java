@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
@@ -33,6 +37,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_JUDGEMENT_ADMISSION_SPEC);
     private final ObjectMapper objectMapper;
     private final JudgementService judgementService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -40,8 +45,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .put(callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility)
             .put(callbackKey(MID, "set-up-ccj-amount-summary"), this::buildJudgmentAmountSummaryDetails)
             .put(callbackKey(MID, "validate-amount-paid"), this::validateAmountPaid)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptySubmittedCallbackResponse)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
@@ -84,4 +89,38 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .build();
     }
 
+    private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
+        CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+
+        CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
+            .businessProcess(BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .build();
+    }
+
+    private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(setUpHeader(caseData))
+            .confirmationBody(setUpBody())
+            .build();
+    }
+
+    private String setUpHeader(CaseData caseData) {
+        String claimNumber = caseData.getLegacyCaseReference();
+        return format(
+            "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            claimNumber
+        );
+    }
+
+    private String setUpBody() {
+        return format(
+            "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
+                + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>"
+        );
+    }
 }

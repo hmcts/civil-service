@@ -28,14 +28,16 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID_JUDGEMENT_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -141,13 +143,38 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 "claimant-agree-repayment-respondent-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyRespondentParty_whenInvokedWithJudgementByAdmission() {
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondent@example.com",
+                "template-id",
+                getNotificationDataMapSpec(caseData),
+                "request-judgement-by-admission-respondent-notification-000DC001"
+            );
+        }
     }
 
     @NotNull
     public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
@@ -158,5 +185,15 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicitor",
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                "NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION").build())
+                                                 .build())).isEqualTo(TASK_ID_JUDGEMENT_ADMISSION);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                "NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT").build())
+                                                 .build())).isEqualTo(TASK_ID);
     }
 }
