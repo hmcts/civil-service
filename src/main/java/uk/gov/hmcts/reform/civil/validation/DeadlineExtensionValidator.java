@@ -17,15 +17,15 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 public class DeadlineExtensionValidator {
 
     /**
-     * initial deadline for a claim
+     * initial deadline for a claim.
      */
     public static final int INITIAL_DEADLINE = 14;
     /**
-     * deadline extension when respondent acks the claim
+     * deadline extension when respondent acks the claim.
      */
     public static final int ACK_EXTENSION = 14;
     /**
-     * deadline extension when there is an agreed extension
+     * deadline extension when there is an agreed extension.
      */
     public static final int AGREED_EXTENSION = 28;
 
