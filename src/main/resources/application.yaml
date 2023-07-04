@@ -445,6 +445,13 @@ notification:
   caseworker:
     spec:
       receiver: civilmoneyclaimsdemo@gmail.com
+
+mediation:
+  data:
+    sender: hmcts.civil@gmail.com
+    recipient: smallclaimsmediation@justice.gov.uk
+
+
 ---
 
 spring:

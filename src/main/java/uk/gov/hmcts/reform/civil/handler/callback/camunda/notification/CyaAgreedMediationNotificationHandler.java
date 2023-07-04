@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.citizenui.MediationCSVService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,8 +34,11 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CYA_ON_AGREED_MEDIATION);
     public static final String TASK_ID = "CyaAgreedMediationNotification";
     private final SendGridClient sendGridClient;
-    private final RoboticsEmailConfiguration roboticsEmailConfiguration;
+    private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private final MediationCSVService mediationCSVService;
+
+    private final String subject = "OCMC Mediation Data";
+    private final String filename = "ocmc_mediation_data.csv";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -55,21 +60,19 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
     private CallbackResponse sendCVSMediation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         Optional<EmailData> emailData = prepareEmail(caseData);
-        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
+
+        emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
-    public Optional<EmailData> prepareEmail(CaseData data) {
+    private Optional<EmailData> prepareEmail(CaseData data) {
         String content = mediationCSVService.generateCSVContent(data);
         InputStreamSource inputSource = new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8));
 
-        String toEmail = "smallclaimsmediation@justice.gov.uk";
-        String subject = "OCMC Mediation Data";
-        String filename = "ocmc_mediation_data.csv";
-
         return Optional.of(EmailData.builder()
-                               .to(toEmail)
+                               .to(mediationCSVEmailConfiguration.getRecipient())
                                .subject(subject)
                                .attachments(List.of(new EmailAttachment(inputSource, "text/csv", filename)))
                                .build());
