@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +24,19 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ServiceRequestAPIHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SERVICE_REQUEST_API);
+    private static final List<CaseEvent> EVENTS = List.of(
+        CREATE_SERVICE_REQUEST_API,
+        CREATE_SERVICE_REQUEST_API_HMC
+    );
+
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "ServiceRequestAPI";
 
@@ -57,6 +62,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
+        //ToDo: Replace with AHN logic
+        if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
