@@ -338,7 +338,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && isOneVOne(caseData)) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
