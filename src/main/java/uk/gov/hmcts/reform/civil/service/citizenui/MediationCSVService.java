@@ -14,14 +14,13 @@ public class MediationCSVService {
     private static final String PARTY_STATUS = "5";
 
     public String generateCSVContent(CaseData data) {
-
         String [] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
 
         String [] claimantData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
             data.getApplicant1().getType().toString(), data.getApplicant1().getCompanyName(),
-            data.getApplicant1().getPartyName(), data.getApplicant1().getPartyPhone(),
+            data.getApplicant1().getIndividualFirstName(), data.getApplicant1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getApplicant1().getPartyEmail(),
             isPilot(data.getTotalClaimAmount())
         };
@@ -29,7 +28,7 @@ public class MediationCSVService {
         String [] respondentData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
             data.getRespondent1().getType().toString(), data.getRespondent1().getCompanyName(),
-            data.getRespondent1().getPartyName(), data.getRespondent1().getPartyPhone(),
+            data.getRespondent1().getIndividualFirstName(), data.getRespondent1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getRespondent1().getPartyEmail(),
             isPilot(data.getTotalClaimAmount())
         };
