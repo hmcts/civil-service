@@ -92,15 +92,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (isClaimantResponse(caseData)) {
-                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
-            } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
-            }
-        } else {
-            templateId = getDocmosisTemplate(caseData);
-        }
+        templateId = getTemplateId(caseData);
 
         templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
@@ -111,6 +103,20 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     DocumentType.DIRECTIONS_QUESTIONNAIRE
             )
         );
+    }
+
+    protected DocmosisTemplates getTemplateId(CaseData caseData) {
+        DocmosisTemplates templateId;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
+        } else {
+            templateId = getDocmosisTemplate(caseData);
+        }
+        return templateId;
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
