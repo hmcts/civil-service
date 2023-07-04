@@ -659,6 +659,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
     public LocalDate getDateForRepayment() {
         return Optional.ofNullable(respondToClaimAdmitPartLRspec)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
@@ -896,5 +901,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return  SPEC_CLAIM.equals(getCaseAccessCategory())
             && YES.equals(getApplicant1AcceptAdmitAmountPaidSpec())
             && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
+    }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmission() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null;
     }
 }
