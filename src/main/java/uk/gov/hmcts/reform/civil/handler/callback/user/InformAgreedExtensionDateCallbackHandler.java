@@ -71,6 +71,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
     public static final String ERROR_EXTENSION_DATE_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
+    public static final String ERROR_DEADLINE_PAST = "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -89,6 +90,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        if (caseData.getNextDeadline() != null && caseData.getNextDeadline().isAfter(LocalDate.now())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_DEADLINE_PAST))
+                .build();
+        }
 
         var isRespondent1 = YES;
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
@@ -128,7 +135,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             userInfo.getUid(),
             RESPONDENTSOLICITORTWO
         )) {
-            builder.respondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
+            builder.respondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
                 caseData.getClaimDetailsNotificationDate(),
                 caseData.getRespondent2AcknowledgeNotificationDate()
             ));
@@ -173,7 +180,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                  solicitorRepresentsOnlyRespondent2(callbackParams), agreedExtension
         );
         if (agreedExtension == null) {
-            throw new IllegalArgumentException(String.format("Agreed extension date cannot be null"));
+            throw new IllegalArgumentException("Agreed extension date cannot be null");
         }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
