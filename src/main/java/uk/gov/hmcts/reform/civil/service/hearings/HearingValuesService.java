@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.exceptions.PartyIdsUpdatedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -59,6 +60,7 @@ public class HearingValuesService {
 
     private final PaymentsConfiguration paymentsConfiguration;
     private final ManageCaseBaseUrlConfiguration manageCaseBaseUrlConfiguration;
+    private final CategoryService categoryService;
     private final CaseCategoriesService caseCategoriesService;
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -71,9 +73,10 @@ public class HearingValuesService {
         populateMissingPartyIds(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
+        String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
 
         return ServiceHearingValuesModel.builder()
-            .hmctsServiceID(getHmctsServiceID(caseData, paymentsConfiguration))
+            .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
             .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
@@ -103,7 +106,7 @@ public class HearingValuesService {
             .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
-            .hearingChannels(getHearingChannels(caseData)) //todo civ-6261
+            .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
             .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
             .build();
     }
