@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMEN
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -113,7 +114,8 @@ public class EventHistoryMapper {
     public static final String BS_START_DT = "actual start date";
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
-    public static final String RPA_IN_MEDIATION = "RPA Reason: Mediation RPA";
+    public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
+    public static final String RPA_IN_MEDIATION = "RPA Reason: In Mediation";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -264,6 +266,7 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
+        buildCcjEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -459,6 +462,60 @@ public class EventHistoryMapper {
             default:
                 break;
         }
+    }
+
+    private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (caseData.isCcjRequestJudgmentByAdmission()) {
+            buildJudgmentByAdmissionEventDetails(builder, caseData);
+            builder.miscellaneous((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(LocalDateTime.now())
+                .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                                  .build())
+                .build()));
+        }
+    }
+
+    private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        EventDetails judgmentByAdmissionEvent;
+        judgmentByAdmissionEvent = EventDetails.builder()
+            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+                                  .add(caseData.getTotalInterest()).setScale(2))
+            .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
+                               .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
+            .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
+            .isJudgmentForthwith(caseData.isPayImmediately())
+            .paymentInFullDate(caseData.isPayBySetDate()
+                                   ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
+                                   : null)
+            .installmentAmount(caseData.isPayByInstallment()
+                                   ? MonetaryConversions.penniesToPounds(
+                                       caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
+                                   : null)
+            .installmentPeriod(caseData.isPayByInstallment()
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
+                                   : null)
+            .firstInstallmentDate(caseData.isPayByInstallment()
+                                      ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
+                                      : null)
+            .dateOfJudgment(LocalDateTime.now())
+            .jointJudgment(false)
+            .judgmentToBeRegistered(true)
+            .miscText("")
+            .build();
+
+        builder.judgmentByAdmission((Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
+            .litigiousPartyID(APPLICANT_ID)
+            .dateReceived(LocalDateTime.now())
+            .eventDetails(judgmentByAdmissionEvent)
+            .eventDetailsText("")
+            .build()));
+
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -978,6 +1035,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthLifted(), currentSequence);
         currentSequence = getCurrentSequence(history.getStatesPaid(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getJudgmentByAdmission(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -2112,6 +2170,19 @@ public class EventHistoryMapper {
         }
 
         return "FUL";
+    }
+
+    private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
+        switch (caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) {
+            case ONCE_ONE_WEEK:
+                return "WK";
+            case ONCE_TWO_WEEKS:
+                return "FOR";
+            case ONCE_ONE_MONTH:
+                return "MTH";
+            default:
+                return null;
+        }
     }
 
     private BigDecimal getCostOfJudgment(CaseData data) {
