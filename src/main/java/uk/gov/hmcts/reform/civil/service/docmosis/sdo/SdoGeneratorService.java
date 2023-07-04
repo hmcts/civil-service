@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -49,11 +50,10 @@ public class SdoGeneratorService {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
-        boolean isJudge = false;
-        if (roleAssignmentResponse.getRoleAssignmentResponse() != null) {
-            isJudge = roleAssignmentResponse.getRoleAssignmentResponse().stream()
-                .anyMatch(s -> s != null && s.getRoleName().equals("judge"));
-        }
+        boolean isJudge = Optional.ofNullable(roleAssignmentResponse.getRoleAssignmentResponse())
+            .map(list -> list.stream().filter(Objects::nonNull)
+                .anyMatch(s -> s.getRoleName().equals("judge")))
+            .orElse(false);
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
