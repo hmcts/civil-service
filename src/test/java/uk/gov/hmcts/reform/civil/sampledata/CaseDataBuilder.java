@@ -2352,6 +2352,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssuedTrialDJInPersonHearingNew() {
+        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
         trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
         return this;
@@ -2482,6 +2488,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCallNew() {
+        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalDJVideoCallNew() {
         DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
         hearingMethodValuesDisposalHearingDJ = hearingMethodList;
         return this;
