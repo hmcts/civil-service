@@ -12,6 +12,7 @@ import lombok.ToString;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -63,5 +64,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
     private final String statementOfTruthText;
+    private final DQExtraDetailsLip dqExtraDetailsLip;
 
 }
