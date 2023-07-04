@@ -43,6 +43,7 @@ java:
     STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    ROLE_ASSIGNMENT_SERVICE_API_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
   postgresql:
     enabled: true
     image:
@@ -164,7 +165,7 @@ ccd:
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
         RELEASE_REVISION: "{{ .Release.Revision }}"
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-        ROLE_ASSIGNMENT_SERVICE_API_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+
       disableKeyVaults: true
       ingressHost: civil-service-data-store-staging-aat.service.core-compute-aat.internal
   ccd-definition-store-api:
