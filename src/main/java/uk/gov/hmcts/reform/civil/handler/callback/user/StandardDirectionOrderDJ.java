@@ -233,7 +233,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                 .builder()
                                                 .judgeNameTitle(judgeNameTitle)
-                                                .input(judgeNameTitle
+                                                .input(judgeNameTitle + ","
                                                 ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
@@ -369,7 +369,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                              .builder()
                                              .judgeNameTitle(judgeNameTitle)
-                                             .input(judgeNameTitle
+                                             .input(judgeNameTitle + ","
                                              ).build());
 
         caseDataBuilder
