@@ -94,6 +94,9 @@ public class EventHistorySequencer {
                 case DEFAULT_JUDGMENT_GRANTED:
                     builder.defaultJudgment(event);
                     break;
+                case JUDGEMENT_BY_ADMISSION:
+                    builder.judgmentByAdmission(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -143,6 +146,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getDefaultJudgment())) {
             builder.defaultJudgment(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getJudgmentByAdmission())) {
+            builder.judgmentByAdmission(List.of(Event.builder().build()));
+        }
 
         return builder
             .build();
@@ -176,7 +182,8 @@ public class EventHistorySequencer {
             eventHistory.getBreathingSpaceMentalHealthEntered(),
             eventHistory.getBreathingSpaceMentalHealthLifted(),
             eventHistory.getInterlocutoryJudgment(),
-            eventHistory.getDefaultJudgment()
+            eventHistory.getDefaultJudgment(),
+            eventHistory.getJudgmentByAdmission()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
