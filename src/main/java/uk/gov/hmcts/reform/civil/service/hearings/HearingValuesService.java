@@ -52,7 +52,6 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMappe
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

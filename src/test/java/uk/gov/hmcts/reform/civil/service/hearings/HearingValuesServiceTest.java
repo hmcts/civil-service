@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -94,7 +93,7 @@ public class HearingValuesServiceTest {
     private CategoryService categoryService;
     @Mock
     private OrganisationService organisationService;
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ObjectMapper mapper;
@@ -137,7 +136,7 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(deadlinesCalculator.getSlaStartDate(any()))
-            .thenReturn(LocalDate.of(2023, 1, 30))
+            .thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -203,11 +202,8 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
-<<<<<<< HEAD
-=======
         verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
->>>>>>> feat/civ-8936-update-party-ids
         assertThat(actual).isEqualTo(expected);
     }
 
