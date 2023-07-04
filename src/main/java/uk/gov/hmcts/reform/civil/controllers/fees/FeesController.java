@@ -38,7 +38,7 @@ public class FeesController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee2Dto[]> getFeeRanges() {
-        Fee2Dto[] feeRanges = feesService.getFeeRange();
+        Fee2Dto[] feeRanges = feesService.getFeeRange().toArray(new Fee2Dto[0]);
         return new ResponseEntity<>(feeRanges, HttpStatus.OK);
     }
 

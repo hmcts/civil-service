@@ -106,7 +106,7 @@ class FeesServiceTest {
     @Test
     void shouldReturnFeeRangeSuccessfully() {
         Fee2Dto[] expectedResult = buildFeeRangeResponse();
-        Fee2Dto[] feeRange = feesService.getFeeRange();
+        Fee2Dto[] feeRange = feesService.getFeeRange().toArray(new Fee2Dto[0]);
         verify(feesClient).findRangeGroup(CHANNEL, EVENT);
         assertThat(feeRange).isEqualTo(expectedResult);
     }
