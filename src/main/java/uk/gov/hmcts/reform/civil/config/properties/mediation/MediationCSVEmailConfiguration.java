@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "mediation.data")
+@ConfigurationProperties(prefix = "mediation.emails")
 public class MediationCSVEmailConfiguration {
 
     private String sender;

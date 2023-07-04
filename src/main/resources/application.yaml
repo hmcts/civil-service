@@ -447,7 +447,7 @@ notification:
       receiver: civilmoneyclaimsdemo@gmail.com
 
 mediation:
-  data:
+  emails:
     sender: hmcts.civil@gmail.com
     recipient: smallclaimsmediation@justice.gov.uk
 
