@@ -164,7 +164,7 @@ ccd:
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-        ROLE-ASSIGNMENT-SERVICE_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+        ROLE_ASSIGNMENT_SERVICE_API_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       disableKeyVaults: true
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
   ccd-definition-store-api:
