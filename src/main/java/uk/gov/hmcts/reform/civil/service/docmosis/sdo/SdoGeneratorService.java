@@ -349,6 +349,7 @@ public class SdoGeneratorService {
             )
             // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
             // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
+            .smallClaimsMethod(caseData.getSmallClaimsMethod())
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
             .smallClaimsMethodTelephoneHearing(
                 SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
