@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstima
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<DefaultJudgmentSDOOrderForm> {
 
     private final DocumentManagementService documentManagementService;
@@ -215,7 +213,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 caseData,
                                 authorisation
                             ));
-        log.debug(djTrialTemplateBuilder.build().toString());
         return djTrialTemplateBuilder.build();
 
     }

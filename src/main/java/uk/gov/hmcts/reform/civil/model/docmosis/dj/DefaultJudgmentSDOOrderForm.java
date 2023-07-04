@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -43,7 +42,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
-@ToString
 public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     private final String caseNumber;
