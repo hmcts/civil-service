@@ -65,6 +65,7 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
             .stream()
             .filter(hearingId -> !hearingNoticeDispatched(hearingId, dispatchedHearingIds))
             .forEach(hearingId -> {
+
                 try {
                     var hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
                     var hearingStatus = hearing.getHearingResponse().getLaCaseStatus();

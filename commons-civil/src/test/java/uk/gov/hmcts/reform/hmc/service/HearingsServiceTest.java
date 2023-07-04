@@ -20,11 +20,15 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
+
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +57,11 @@ class HearingsServiceTest {
     private static final String SERVICE_TOKEN = "service_token";
     private static final String HEARING_ID = "hearing_id";
     private static final String HEARING_ID_2 = "hearing_id-2";
+    private static final String HMC_STATUS = "Listed";
     private static final String HMCTS_SERVICE_CODE = "hmcts-service-code";
     private static final int VERSION_NUMBER = 1;
+
+    private static final Long CASE_ID = new BigInteger("1234123412341234").longValue();
 
     private final FeignException notFoundFeignException = new FeignException.NotFound(
         "not found message",
@@ -215,6 +222,42 @@ class HearingsServiceTest {
 
             Exception exception = assertThrows(HmcException.class, () -> {
                 hearingNoticeService.getUnNotifiedHearingResponses(USER_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo);
+            });
+
+            String expectedMessage = "Failed to retrieve data from HMC";
+            String actualMessage = exception.getMessage();
+
+            assertTrue(actualMessage.contains(expectedMessage));
+        }
+    }
+
+    @Nested
+    class GetHearingsResponses {
+
+        @Test
+        void shouldGetNotifiedHearingResponses_whenInvoked() {
+            HearingsResponse hearings = HearingsResponse.builder()
+                .hmctsServiceCode(HMCTS_SERVICE_CODE)
+                .caseRef(CASE_ID.toString())
+                .caseHearings(List.of(CaseHearing.builder().build()))
+                .build();
+
+            when(hearingNoticeApi.getHearings(USER_TOKEN, SERVICE_TOKEN, CASE_ID, HMC_STATUS))
+                .thenReturn(hearings);
+
+            HearingsResponse result = hearingNoticeService
+                .getHearings(USER_TOKEN, CASE_ID, HMC_STATUS);
+
+            Assertions.assertThat(result).isEqualTo(hearings);
+        }
+
+        @Test
+        void shouldThrowException_whenExceptionError() {
+            when(hearingNoticeApi.getHearings(SERVICE_TOKEN, SERVICE_TOKEN, CASE_ID, HMC_STATUS))
+                .thenThrow(notFoundFeignException);
+
+            Exception exception = assertThrows(HmcException.class, () -> {
+                hearingNoticeService.getHearings(SERVICE_TOKEN, CASE_ID, HMC_STATUS);
             });
 
             String expectedMessage = "Failed to retrieve data from HMC";

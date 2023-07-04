@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -78,6 +79,20 @@ public class HearingsService {
                 hmctsServiceCode,
                 hearingStartDateFrom,
                 hearingStartDateTo);
+        } catch (FeignException e) {
+            log.error("Failed to retrieve unnotified hearings");
+            throw new HmcException(e);
+        }
+    }
+
+    public HearingsResponse getHearings(String authToken, Long caseId, String status) {
+        log.debug("Requesting Hearings for case: {}", caseId);
+        try {
+            return hearingNoticeApi.getHearings(
+                authToken,
+                authTokenGenerator.generate(),
+                caseId,
+                status);
         } catch (FeignException e) {
             log.error("Failed to retrieve unnotified hearings");
             throw new HmcException(e);

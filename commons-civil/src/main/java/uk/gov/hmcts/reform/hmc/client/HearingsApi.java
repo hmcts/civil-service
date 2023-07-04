@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -26,6 +27,7 @@ public interface HearingsApi {
     String HEARING_ENDPOINT = "/hearing";
     String PARTIES_NOTIFIED_ENDPOINT = "/partiesNotified";
     String UNNOTIFIED_HEARINGS_ENDPOINT = "/unNotifiedHearings";
+    String HEARINGS_ENDPOINT = "/hearings";
 
     @GetMapping(HEARING_ENDPOINT + "/{id}")
     HearingGetResponse getHearingRequest(
@@ -62,5 +64,13 @@ public interface HearingsApi {
             LocalDateTime hearingStartDateFrom,
         @RequestParam("hearing_start_date_to") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime hearingStartDateTo
+    );
+
+    @GetMapping(value = HEARINGS_ENDPOINT + "/{caseId}")
+    HearingsResponse getHearings(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
+        @PathVariable Long caseId,
+        @RequestParam("status") String status
     );
 }
