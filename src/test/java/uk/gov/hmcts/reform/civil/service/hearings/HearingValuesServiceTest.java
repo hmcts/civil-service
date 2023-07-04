@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
@@ -36,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -45,6 +48,7 @@ import java.util.Optional;
 import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -77,6 +81,8 @@ public class HearingValuesServiceTest {
     private PaymentsConfiguration paymentsConfiguration;
     @Mock
     private CaseCategoriesService caseCategoriesService;
+    @Mock
+    private CategoryService categoryService;
     @Mock
     private OrganisationService organisationService;
     @Mock
@@ -126,6 +132,13 @@ public class HearingValuesServiceTest {
                                         .build()));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
+            Optional.of(categorySearchResult));
 
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 

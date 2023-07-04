@@ -592,7 +592,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedTrialSDOInPersonHearingNew().build();
+                .atStateClaimIssuedTrialDJInPersonHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
@@ -662,7 +662,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOVideoCall() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedDisposalSDOVideoCallNew().build();
+                .atStateClaimIssuedDisposalDJVideoCallNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
