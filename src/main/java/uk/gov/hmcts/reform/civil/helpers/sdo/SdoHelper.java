@@ -57,6 +57,7 @@ public class SdoHelper {
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
+                
             case "applicant2":
                 return caseData.getApplicant2() != null;
             case "respondent2":
