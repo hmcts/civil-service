@@ -74,7 +74,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
@@ -84,7 +83,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
@@ -612,9 +610,6 @@ public class EventHistoryMapper {
             case FULL_DEFENCE:
                 buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
                 break;
-            case COUNTER_CLAIM:
-                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
-                break;
             case PART_ADMISSION:
                 buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
@@ -698,9 +693,6 @@ public class EventHistoryMapper {
             case FULL_DEFENCE:
                 buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
                 break;
-            case COUNTER_CLAIM:
-                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
-                break;
             case PART_ADMISSION:
                 buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
@@ -763,19 +755,6 @@ public class EventHistoryMapper {
         return totalClaimAmount != null
             && Optional.ofNullable(claimResponse).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) >= 0).orElse(false);
-    }
-
-    private void buildDefenceAndCounterClaim(EventHistory.EventHistoryBuilder builder,
-                                             CaseData caseData,
-                                             LocalDateTime respondentResponseDate,
-                                             String respondentID) {
-        builder.defenceAndCounterClaim(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                .dateReceived(respondentResponseDate)
-                .litigiousPartyID(respondentID)
-                .build());
     }
 
     private void buildReceiptOfPartAdmission(EventHistory.EventHistoryBuilder builder,
@@ -1130,17 +1109,6 @@ public class EventHistoryMapper {
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
-
-        List<Event> replyDefenceForProceedingApplicants = IntStream.range(0, applicantDetails.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(REPLY_TO_DEFENCE.getCode())
-                              .dateReceived(applicantDetails.get(index).getResponseDate())
-                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                              .build())
-            .collect(Collectors.toList());
-        builder.replyToDefence(replyDefenceForProceedingApplicants);
 
         CaseCategory claimType = caseData.getCaseAccessCategory();
         if (SPEC_CLAIM.equals(claimType)) {
@@ -2016,14 +1984,7 @@ public class EventHistoryMapper {
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.defenceAndCounterClaim(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
-            ).miscellaneous(Event.builder()
+            builder.miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent1ResponseDate())
@@ -2036,16 +1997,7 @@ public class EventHistoryMapper {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.defenceAndCounterClaim(
-                    List.of(
-                        Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                            .dateReceived(respondent2ResponseDate)
-                            .litigiousPartyID(RESPONDENT2_ID)
-                            .build()
-                    )
-                ).miscellaneous(Event.builder()
+                builder.miscellaneous(Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
                                     .eventCode(MISCELLANEOUS.getCode())
                                     .dateReceived(respondent2ResponseDate)
@@ -2058,16 +2010,7 @@ public class EventHistoryMapper {
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.defenceAndCounterClaim(
-                List.of(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(caseData.getRespondent2ResponseDate())
-                        .litigiousPartyID(RESPONDENT2_ID)
-                        .build()
-                )
-            ).miscellaneous(Event.builder()
+            builder.miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent2ResponseDate())
