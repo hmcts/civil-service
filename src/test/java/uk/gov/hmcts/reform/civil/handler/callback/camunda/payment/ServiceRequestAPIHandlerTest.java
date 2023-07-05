@@ -73,14 +73,14 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
         }
 
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -97,7 +97,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldMakePaymentServiceRequestForClaimFee_whenInvokedWithoutClaimIssuedPbaDetails() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -125,7 +125,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -141,7 +141,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotMakePaymentServiceRequestForHearingFee_whenServiceRequestWasAlreadyIssued() {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params =  callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
@@ -152,7 +152,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldMakePaymentServiceRequestForHearingFee_whenInvokedWithoutClaimIssuedPbaDetails() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -169,7 +169,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotMakePaymentServiceRequestForHearingFee_whenInvokedWithClaimIssuedPbaDetails() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT).toBuilder().build();
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
@@ -186,7 +186,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .toBuilder()
                 .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
                 .build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
@@ -206,7 +206,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .hearingDueDate(LocalDate.now())
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
                 .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
@@ -224,7 +224,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
             //GIVEN
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //THEN
             assertThat(handler.camundaActivityId(params)).isEqualTo("ServiceRequestAPI");
         }
@@ -233,7 +233,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldHandleException_whenServiceRequestFails() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenThrow(FeignException.class);
             //WHEN
@@ -248,7 +248,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference()
                 .toBuilder().hearingDueDate(LocalDate.now().plusWeeks(1))
                 .hearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN

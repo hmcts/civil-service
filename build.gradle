@@ -79,7 +79,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '31.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '32.1.1-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
@@ -332,7 +332,8 @@ configurations.all {
 }
 
 dependencies {
-  implementation project(':commons-civil')
+  implementation 'com.github.hmcts:civil-commons:1.0.0'
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -373,6 +374,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
