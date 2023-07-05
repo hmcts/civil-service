@@ -70,7 +70,7 @@ public class HearingValuesService {
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
-        populateMissingPartyIds(caseData);
+        populateMissingPartyIds(caseId, caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
@@ -131,7 +131,7 @@ public class HearingValuesService {
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private void populateMissingPartyIds(CaseData caseData) throws Exception {
+    private void populateMissingPartyIds(Long caseId, CaseData caseData) throws Exception {
         if (caseData.getApplicant1().getPartyID() == null) {
             var builder = caseData.toBuilder();
             // Even if party ids creation is released and cases are
@@ -142,7 +142,7 @@ public class HearingValuesService {
 
             try {
                 caseDataService.triggerEvent(
-                    caseData.getCcdCaseReference(), UPDATE_PARTY_IDS, builder.build().toMap(mapper));
+                    caseId, UPDATE_PARTY_IDS, builder.build().toMap(mapper));
             } catch (FeignException e) {
                 log.error("Updating case data with party ids failed: {}", e);
                 throw e;
