@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
@@ -16,7 +17,10 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
+import java.util.Optional;
 
 import java.util.List;
 
@@ -25,12 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataTest {
 
@@ -447,6 +453,25 @@ public class CaseDataTest {
     }
 
     @Test
+    void getSDOOrderDocument_WhenItPresent() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
+    }
+
+    @Test
+    void getSDOOrderDocument_WhenItsNull() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(null).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertTrue(caseDocument.isEmpty());
+    }
+
     void isPartAdmitPayImmediatelyAccepted_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
