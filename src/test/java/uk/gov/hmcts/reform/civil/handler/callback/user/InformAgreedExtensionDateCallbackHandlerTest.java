@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -120,6 +121,31 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldSetDate() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            // When
+            when(coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                "uid",
+                RESPONDENTSOLICITORONE
+            )).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("respondentSolicitor1AgreedDeadlineExtension")
+                .isEqualTo(caseData.getClaimDetailsNotificationDate().plusDays(42).toLocalDate().toString());
+        }
+
+        @Test
         void shouldSetRespondent1FlagToYes_whenTwoRespondentRepresentativesWithNoRespondent2CaseRole() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -177,6 +203,28 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
             // Then
             assertThat(response.getErrors()).containsOnly(ERROR_EXTENSION_DATE_SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnErrorIfAfterDeadline() {
+            // Given
+            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(NO)
+                .build().toBuilder()
+                .nextDeadline(LocalDate.now().minusDays(1))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            String error =
+                "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
+            assertThat(response.getErrors()).containsOnly(error);
         }
 
         @Test

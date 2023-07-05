@@ -94,7 +94,7 @@ public class DeadlineExtensionValidator {
             .plusDays(AGREED_EXTENSION + INITIAL_DEADLINE + (ackNotificationDate == null ? 0 : ACK_EXTENSION))
             .toLocalDate();
         while (!workingDayIndicator.isWorkingDay(date)) {
-            date = date.plusDays(1);
+            date = date.plusDays(1L);
         }
         return date;
     }

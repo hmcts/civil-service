@@ -12,12 +12,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -71,7 +71,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
     public static final String ERROR_EXTENSION_DATE_SUBMITTED =
         "This action cannot currently be performed because it has already been completed";
-    public static final String ERROR_DEADLINE_PAST = "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
+    public static final String ERROR_DEADLINE_PAST =
+        "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -91,7 +92,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.getNextDeadline() != null && caseData.getNextDeadline().isAfter(LocalDate.now())) {
+        if (caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEADLINE_PAST))
                 .build();
