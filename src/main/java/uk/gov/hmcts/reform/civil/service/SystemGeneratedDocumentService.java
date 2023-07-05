@@ -25,4 +25,10 @@ public class SystemGeneratedDocumentService {
         systemGeneratedDocuments.add(element(caseDocument));
         return systemGeneratedDocuments;
     }
+
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(CaseDocument caseDocument, CaseData caseData) {
+        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+        systemGeneratedDocuments.add(element(caseDocument));
+        return systemGeneratedDocuments;
+    }
 }
