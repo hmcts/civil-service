@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -29,9 +31,12 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT);
+        NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT,
+        NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION);
     public static final String TASK_ID = "ClaimantAgreedRepaymentNotifyRespondent1";
+    public static final String TASK_ID_JUDGEMENT_ADMISSION = "RequestJudgementByAdmissionNotifyRespondent1";
     private static final String REFERENCE_TEMPLATE = "claimant-agree-repayment-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE_JUDGEMENT_ADMISSION = "request-judgement-by-admission-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -48,7 +53,15 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        switch (caseEvent) {
+            case NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT:
+                return TASK_ID;
+            case NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION:
+                return TASK_ID_JUDGEMENT_ADMISSION;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
     }
 
     @Override
@@ -67,7 +80,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             addEmail(caseData),
             addTemplate(caseData),
             addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            String.format(getReferenceTemplate(callbackParams), caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -84,7 +97,6 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
@@ -133,5 +145,17 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             || ((!isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondent1().getPartyEmail() == null))
             );
+    }
+
+    private String getReferenceTemplate(CallbackParams callbackParams) {
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        switch (caseEvent) {
+            case NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT:
+                return REFERENCE_TEMPLATE;
+            case NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION:
+                return REFERENCE_TEMPLATE_JUDGEMENT_ADMISSION;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
     }
 }
