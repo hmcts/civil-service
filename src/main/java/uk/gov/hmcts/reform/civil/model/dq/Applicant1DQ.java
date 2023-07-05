@@ -136,6 +136,9 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    public RemoteHearing getRemoteHearing() {return null;}
+
+    @Override
     @JsonProperty("applicant1DQLanguage")
     public WelshLanguageRequirements getWelshLanguageRequirements() {
         return applicant1DQLanguage;

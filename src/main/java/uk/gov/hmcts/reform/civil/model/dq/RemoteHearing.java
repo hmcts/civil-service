@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 @Data
 @Builder(toBuilder = true)
-public class RequestedCourt {
+public class RemoteHearing {
 
     /**
      * Was used to say if the party chose a preferred court.
@@ -16,12 +16,6 @@ public class RequestedCourt {
      * @deprecated location is mandatory for all parties now
      */
     @Deprecated(forRemoval = true)
-    private final YesOrNo requestHearingAtSpecificCourt;
-    private final String otherPartyPreferredSite;
-    private final String responseCourtCode;
-    private final String reasonForHearingAtSpecificCourt;
-    private final DynamicList responseCourtLocations;
-    private final CaseLocationCivil caseLocation;
-    private final String responseCourtName;
-    //private final RemoteHearing remoteHearing;
+    private final YesOrNo hearingToBeHeldRemotely;
+    private final String hearingToBeHeldRemotelyReason;
 }

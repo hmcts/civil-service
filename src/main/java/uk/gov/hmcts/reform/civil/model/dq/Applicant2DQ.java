@@ -98,6 +98,10 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
+    public RemoteHearing getRemoteHearing() {return null;
+    }
+
+    @Override
     @JsonProperty("applicant2DQHearingSupport")
     public HearingSupport getHearingSupport() {
         return applicant2DQHearingSupport;
