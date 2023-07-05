@@ -63,6 +63,11 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
+            if (featureToggleService.isAutomatedHearingNoticeEnabled()
+                && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
+            }
+
             String flowState = externalTask.getVariable(FLOW_STATE);
             CaseDataContent caseDataContent = caseDataContent(
                 startEventResponse,
@@ -117,7 +122,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Unregistered defendant solicitor firm(s).";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
                     "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
-                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
+                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
                     "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
                     "RPA Reason: Claimant(s) intends not to proceed.";
@@ -127,6 +132,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED ->
                     "RPA Reason: Not suitable for SDO.";
+                case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
+                    "RPA Reason: Judgement by Admission requested and claim moved offline.";
                 default -> {
                     log.info("Unexpected flow state " + flowState.fullName());
                     yield null;

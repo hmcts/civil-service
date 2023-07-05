@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -104,6 +105,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
+    private final PaymentDateService paymentDateService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -336,7 +338,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && isOneVOne(caseData)) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()
@@ -397,7 +399,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
-            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
