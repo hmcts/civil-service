@@ -220,11 +220,14 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
+        log.info("user auth:", authorisation);
+        String serviceAuth = authTokenGenerator.generate();
+        log.info("Service auth:", serviceAuth);
 
         try {
             return caseDocumentClientApi.getMetadataForDocument(
                 authorisation,
-                authTokenGenerator.generate(),
+                serviceAuth,
                 getDocumentIdFromSelfHref(documentPath)
             );
 
