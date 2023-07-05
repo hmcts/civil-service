@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
@@ -31,14 +34,16 @@ class SendSDOBulkPrintServiceTest {
     @Autowired
     private SendSDOBulkPrintService sendSDOBulkPrintService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
+    private static final String TEST = "test";
+    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
-        given(sealedClaimFormGeneratorForSpec.downloadDocument(any())).willReturn(LETTER_CONTENT);
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build())).build();
+        given(sealedClaimFormGeneratorForSpec.downloadDocument(any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
