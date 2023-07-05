@@ -508,6 +508,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
+    private final DynamicList hearingMethodValuesDisposalHearingDJ;
+    private final DynamicList hearingMethodValuesTrialHearingDJ;
     private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
@@ -653,6 +655,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return defenceAdmitPartPaymentTimeRouteRequired != null
             && defenceAdmitPartPaymentTimeRouteRequired
             == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+    }
+
+    @JsonIgnore
+    public boolean isPayImmediately() {
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
@@ -893,5 +900,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return  SPEC_CLAIM.equals(getCaseAccessCategory())
             && YES.equals(getApplicant1AcceptAdmitAmountPaidSpec())
             && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
+    }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmission() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null;
     }
 }
