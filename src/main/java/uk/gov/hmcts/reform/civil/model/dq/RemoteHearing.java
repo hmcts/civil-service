@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.civil.model.dq;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 @Data
 @Builder(toBuilder = true)

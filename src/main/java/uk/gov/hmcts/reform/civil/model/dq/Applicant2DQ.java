@@ -98,7 +98,8 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
-    public RemoteHearing getRemoteHearing() {return null;
+    public RemoteHearing getRemoteHearing() {
+        return null;
     }
 
     @Override
