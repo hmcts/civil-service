@@ -14,7 +14,8 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -258,11 +259,23 @@ public class ServiceHearingsCaseLevelMapperTest {
     @Nested
     class GetCaseSLAStartDate {
         @Test
-        void shouldReturnExpectedSLAStartDateInStringFormat() {
-            var date = LocalDate.of(2023, 1, 30);
-            var expected = "2023-01-30";
+        void shouldReturnExpectedSLAStartDateInStringFormat_whenClaimIssued() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            var date = LocalDateTime.now();
+            var expected = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-            var actual = ServiceHearingsCaseLevelMapper.getCaseSLAStartDate(date);
+            var actual = ServiceHearingsCaseLevelMapper.getCaseSLAStartDate(caseData);
+
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnExpectedSLAStartDateInStringFormat_whenClaimSubmitted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            var date = LocalDateTime.now();
+            var expected = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            var actual = ServiceHearingsCaseLevelMapper.getCaseSLAStartDate(caseData);
 
             assertThat(actual).isEqualTo(expected);
         }
