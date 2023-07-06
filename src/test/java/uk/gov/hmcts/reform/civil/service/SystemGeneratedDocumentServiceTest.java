@@ -36,4 +36,21 @@ class SystemGeneratedDocumentServiceTest {
         assertThat(result.get(0)).isNotNull();
         assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME);
     }
+
+    @Test
+    void shouldAddCaseDocumentToSystemGeneratedDocuments() {
+        //Given
+        CaseDocument caseDocument = CaseDocument.builder().documentName(FILE_NAME).build();
+        CaseData caseData = CaseData.builder().systemGeneratedCaseDocuments(new ArrayList<>())
+            .build();
+        //When
+        List<Element<CaseDocument>> result = systemGeneratedDocumentService
+            .getSystemGeneratedDocumentsWithAddedDocument(
+                caseDocument,
+                caseData
+            );
+        //Then
+        assertThat(result.get(0)).isNotNull();
+        assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME);
+    }
 }
