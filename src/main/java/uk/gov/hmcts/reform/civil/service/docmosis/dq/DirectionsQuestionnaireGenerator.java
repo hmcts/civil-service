@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -244,6 +245,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+            caseData,
+            authorisation
+        );
+
+        return builder.build();
+    }
+
+    @NotNull
+    protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
@@ -296,8 +307,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq, authorisation));
-
-        return builder.build();
+        return builder;
     }
 
     private List<Party> getApplicants(CaseData caseData) {
