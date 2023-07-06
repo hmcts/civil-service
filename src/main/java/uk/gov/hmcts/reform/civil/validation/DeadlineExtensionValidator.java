@@ -19,15 +19,15 @@ public class DeadlineExtensionValidator {
     /**
      * initial deadline for a claim.
      */
-    public static final int INITIAL_DEADLINE = 14;
+    public static final long INITIAL_DEADLINE = 14;
     /**
      * deadline extension when respondent acks the claim.
      */
-    public static final int ACK_EXTENSION = 14;
+    public static final long ACK_EXTENSION = 14;
     /**
      * deadline extension when there is an agreed extension.
      */
-    public static final int AGREED_EXTENSION = 28;
+    public static final long AGREED_EXTENSION = 28;
 
     private final WorkingDayIndicator workingDayIndicator;
 
@@ -91,7 +91,10 @@ public class DeadlineExtensionValidator {
 
     public LocalDate getMaxDate(LocalDateTime notificationDetailsDate, LocalDateTime ackNotificationDate) {
         LocalDate date = notificationDetailsDate
-            .plusDays(AGREED_EXTENSION + INITIAL_DEADLINE + (ackNotificationDate == null ? 0 : ACK_EXTENSION))
+            .plusDays(
+                AGREED_EXTENSION
+                    + INITIAL_DEADLINE
+                    + (ackNotificationDate == null ? 0L : ACK_EXTENSION))
             .toLocalDate();
         while (!workingDayIndicator.isWorkingDay(date)) {
             date = date.plusDays(1L);
