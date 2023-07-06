@@ -51,8 +51,6 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMappe
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -65,7 +63,6 @@ public class HearingValuesService {
     private final CoreCaseDataService caseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final OrganisationService organisationService;
-    private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper mapper;
 
     public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
@@ -85,7 +82,7 @@ public class HearingValuesService {
             .caseRestrictedFlag(getCaseRestrictedFlag())
             .externalCaseReference(getExternalCaseReference())
             .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
-            .caseSLAStartDate(getCaseSLAStartDate(deadlinesCalculator.getSlaStartDate(caseData)))
+            .caseSLAStartDate(getCaseSLAStartDate(caseData))
             .autoListFlag(getAutoListFlag())
             .hearingType(getHearingType())
             .hearingWindow(getHearingWindow())

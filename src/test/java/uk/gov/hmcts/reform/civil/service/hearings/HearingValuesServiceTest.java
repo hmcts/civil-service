@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +60,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 
@@ -93,8 +93,6 @@ public class HearingValuesServiceTest {
     private CategoryService categoryService;
     @Mock
     private OrganisationService organisationService;
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ObjectMapper mapper;
 
@@ -133,10 +131,7 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(deadlinesCalculator.getSlaStartDate(any()))
-            .thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -174,7 +169,7 @@ public class HearingValuesServiceTest {
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
             .caseManagementLocationCode(BASE_LOCATION_ID)
-            .caseSLAStartDate("2023-01-30")
+            .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .autoListFlag(false)
             .hearingType(null)
             .hearingWindow(null)
@@ -202,7 +197,6 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
-        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
         assertThat(actual).isEqualTo(expected);
     }
@@ -427,7 +421,7 @@ public class HearingValuesServiceTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -448,7 +442,7 @@ public class HearingValuesServiceTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
