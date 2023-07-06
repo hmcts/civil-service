@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -70,7 +71,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate payBy;
     private final String whyNotPayImmediately;
-    private final RepaymentPlanLRspec repaymentPlan;
+    private final RepaymentPlanTemplateData repaymentPlan;
     private final RespondentResponseTypeSpec responseType;
     private final String whyReject;
     private final String freeTextWhyReject;
@@ -172,7 +173,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     private static void addRepaymentPlan(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.repaymentPlan(caseData.getRespondent1RepaymentPlan())
+        builder.repaymentPlan(RepaymentPlanTemplateData.builder()
+                                  .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
+                                  .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
+                                  .paymentAmount(caseData.getRespondent1RepaymentPlan().getPaymentAmount())
+                                  .build())
             .payBy(caseData.getRespondent1RepaymentPlan()
                        .finalPaymentBy(totalClaimAmount))
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
