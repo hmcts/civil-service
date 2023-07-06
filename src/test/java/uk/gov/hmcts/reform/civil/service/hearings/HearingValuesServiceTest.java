@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
@@ -36,19 +38,21 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.util.Lists.emptyList;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 
@@ -78,9 +82,9 @@ public class HearingValuesServiceTest {
     @Mock
     private CaseCategoriesService caseCategoriesService;
     @Mock
-    private OrganisationService organisationService;
+    private CategoryService categoryService;
     @Mock
-    private DeadlinesCalculator deadlinesCalculator;
+    private OrganisationService organisationService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -115,7 +119,6 @@ public class HearingValuesServiceTest {
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(deadlinesCalculator.getSlaStartDate(caseData)).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -126,6 +129,13 @@ public class HearingValuesServiceTest {
                                         .build()));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
+        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
+        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
+            Optional.of(categorySearchResult));
 
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
 
@@ -146,7 +156,7 @@ public class HearingValuesServiceTest {
             .caseRestrictedFlag(false)
             .externalCaseReference(null)
             .caseManagementLocationCode(BASE_LOCATION_ID)
-            .caseSLAStartDate("2023-01-30")
+            .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
             .autoListFlag(false)
             .hearingType(null)
             .hearingWindow(null)
@@ -174,7 +184,6 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
-        verify(deadlinesCalculator).getSlaStartDate(eq(caseData));
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -272,7 +281,7 @@ public class HearingValuesServiceTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -293,7 +302,7 @@ public class HearingValuesServiceTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
