@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -211,7 +212,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-
+    private final List<Element<ManageDocument>> manageDocuments;
     private final Document specClaimTemplateDocumentFiles;
     private final Document specClaimDetailsDocumentFiles;
     private final List<Evidence> speclistYourEvidenceList;
@@ -925,7 +926,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && YES.equals(getApplicant1AcceptAdmitAmountPaidSpec())
             && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
     }
-  
+
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
