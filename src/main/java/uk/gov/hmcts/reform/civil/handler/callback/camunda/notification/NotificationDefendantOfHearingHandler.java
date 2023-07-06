@@ -92,8 +92,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         } else if (isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC)) {
             if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
+                sendEmailHmc(caseData, recipient, false);
             }
-            sendEmailHmc(caseData, recipient, false);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
