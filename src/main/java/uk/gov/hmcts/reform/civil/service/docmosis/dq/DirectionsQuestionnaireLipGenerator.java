@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
@@ -63,5 +65,14 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
         return super.getTemplateId(caseData);
     }
 
+    @Override
+    protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
+        return List.of(Party.builder()
+                            .name(caseData.getRespondent1().getPartyName())
+                            .emailAddress(caseData.getRespondent1().getPartyEmail())
+                            .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                            .build());
+    }
 
 }

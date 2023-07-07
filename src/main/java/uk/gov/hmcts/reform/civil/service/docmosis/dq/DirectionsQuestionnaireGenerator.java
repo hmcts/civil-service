@@ -652,7 +652,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
     }
 
-    private List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
+    protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         if (isClaimantResponse(caseData)) {
 
             List<Party> respondents = new ArrayList<>();
