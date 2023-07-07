@@ -67,7 +67,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipUpdateTemplate(),
+                    notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
                     addPropertiesLRvLip(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
@@ -117,7 +117,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
         );
     };
