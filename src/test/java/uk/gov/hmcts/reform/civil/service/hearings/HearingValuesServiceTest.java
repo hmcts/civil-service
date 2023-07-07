@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.format.DateTimeFormatter;
