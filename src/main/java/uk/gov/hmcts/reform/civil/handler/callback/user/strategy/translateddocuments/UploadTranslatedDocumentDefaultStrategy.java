@@ -50,7 +50,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         )).orElse(caseData.getSystemGeneratedCaseDocuments());
     }
 
-    private CaseDocument getTranslatedDocumentAsCaseDocument(CallbackParams callbackParams){
+    private CaseDocument getTranslatedDocumentAsCaseDocument(CallbackParams callbackParams) {
         Optional<TranslatedDocument> translatedDocument = callbackParams.getCaseData().getTranslatedDocument();
         return translatedDocument.map(document -> CaseDocument.toCaseDocument(
             document.getFile(),
