@@ -93,6 +93,7 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
+                        receiveClient.complete(message.getLockToken());
                         log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
@@ -129,7 +130,7 @@ public class ServiceBusConfiguration {
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    1, true,
+                    1, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
