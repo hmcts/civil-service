@@ -232,7 +232,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "caseTypeId"
         )
             .andExpect(content().json(toJson(caseDetails)))
-            .andExpect(status().isOk());
+            .andExpect(status().isCreated());
     }
 
     @Test
