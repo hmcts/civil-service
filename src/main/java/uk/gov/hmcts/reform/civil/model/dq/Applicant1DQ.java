@@ -142,6 +142,11 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    public RemoteHearingLRspec getRemoteHearingLRspec() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("applicant1DQStatementOfTruth")
     public StatementOfTruth getStatementOfTruth() {
         return applicant1DQStatementOfTruth;

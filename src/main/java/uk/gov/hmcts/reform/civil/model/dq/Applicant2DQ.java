@@ -116,6 +116,11 @@ public class Applicant2DQ implements DQ {
     }
 
     @Override
+    public RemoteHearingLRspec getRemoteHearingLRspec() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("applicant2DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return applicant2DQLanguageLRspec;
