@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class RepaymentPlanLRspec {
     private final PaymentFrequencyLRspec repaymentFrequency;
     private final LocalDate firstRepaymentDate;
 
+    @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {
         if (firstRepaymentDate != null && paymentAmount != null && repaymentFrequency != null) {
             long installmentsAfterFirst = totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING)
@@ -40,6 +42,7 @@ public class RepaymentPlanLRspec {
         return null;
     }
 
+    @JsonIgnore
     public String getPaymentFrequencyDisplay() {
         return repaymentFrequency.getLabel();
     }
