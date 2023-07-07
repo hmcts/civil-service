@@ -119,7 +119,7 @@ public class HearingsPartyMapperTest {
             "0123456789"
         );
 
-        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
+        applicantPartyDetails.setUnavailabilityRanges(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
 
         PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
             APPLICANT_LR_ORG_NAME,
@@ -196,7 +196,7 @@ public class HearingsPartyMapperTest {
             DEFENDANT_ROLE,
             null
         );
-        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
+        respondentPartyDetails.setUnavailabilityRanges(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
 
         PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
             RESPONDENT_ONE_LR_ORG_NAME,
@@ -806,7 +806,7 @@ public class HearingsPartyMapperTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -829,7 +829,7 @@ public class HearingsPartyMapperTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
