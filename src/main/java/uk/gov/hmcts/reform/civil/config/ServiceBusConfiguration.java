@@ -93,7 +93,6 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        receiveClient.complete(message.getLockToken());
                         log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
@@ -114,7 +113,7 @@ public class ServiceBusConfiguration {
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
                             }
                         }
-                        return null;
+                        return receiveClient.completeAsync(message.getLockToken());
                     }
 
                     @Override
@@ -125,11 +124,11 @@ public class ServiceBusConfiguration {
                     }
                 };
 
-            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    1, false,
+                    threadCount, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
