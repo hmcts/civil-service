@@ -132,7 +132,7 @@ public class ServiceBusConfiguration {
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    threadCount, false,
+                    1, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
