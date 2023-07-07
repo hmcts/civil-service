@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
@@ -66,6 +67,9 @@ class PaymentsServiceTest {
 
     @MockBean
     private OrganisationService organisationService;
+
+    @MockBean
+    private HearingFeesService hearingFeesService;
 
     @Autowired
     private PaymentsService paymentsService;
