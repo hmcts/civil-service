@@ -298,7 +298,7 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .individualDetails(individualDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
@@ -321,7 +321,7 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
