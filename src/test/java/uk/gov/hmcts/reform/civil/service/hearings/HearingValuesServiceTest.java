@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.format.DateTimeFormatter;
@@ -226,9 +227,7 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(deadlinesCalculator.getSlaStartDate(any())).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -275,9 +274,7 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-        when(deadlinesCalculator.getSlaStartDate(any())).thenReturn(LocalDate.of(2023, 1, 30));
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
                                         .name(APPLICANT_LR_ORG_NAME)
@@ -316,7 +313,6 @@ public class HearingValuesServiceTest {
             .data(caseData.toMap(mapper))
             .id(caseId).build();
 
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         doThrow(FeignException.GatewayTimeout.class)
