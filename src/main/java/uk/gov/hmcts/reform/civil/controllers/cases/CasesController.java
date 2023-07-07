@@ -186,7 +186,6 @@ public class CasesController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @RequestBody CaseworkerSubmitEventDTo submitEventDto
     ) {
-        System.out.println("testtt");
         CaseworkerEventSubmissionParams params = CaseworkerEventSubmissionParams
             .builder()
             .authorisation(authorization)
@@ -196,7 +195,7 @@ public class CasesController {
             .build();
         log.info("Updated case data:  " + submitEventDto.getData().toString());
         CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
-        return new ResponseEntity<>(caseDetails, HttpStatus.valueOf(201));
+        return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
     }
 
 }
