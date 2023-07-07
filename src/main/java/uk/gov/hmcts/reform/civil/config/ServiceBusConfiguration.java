@@ -128,11 +128,11 @@ public class ServiceBusConfiguration {
                     }
                 };
 
-            ExecutorService executorService = Executors.newFixedThreadPool(4);
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    1, false,
+                    threadCount, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
