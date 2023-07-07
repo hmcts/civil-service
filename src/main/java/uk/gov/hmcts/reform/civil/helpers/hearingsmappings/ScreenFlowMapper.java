@@ -74,13 +74,6 @@ public class ScreenFlowMapper {
         screenNavigationList.add(ScreenNavigationModel.builder()
                                      .screenName("hearing-timing")
                                      .navigation(List.of(NavigationModel.builder()
-                                                             .resultValue("hearing-link")
-                                                             .build()))
-                                     .build());
-
-        screenNavigationList.add(ScreenNavigationModel.builder()
-                                     .screenName("hearing-link")
-                                     .navigation(List.of(NavigationModel.builder()
                                                              .resultValue("hearing-additional-instructions")
                                                              .build()))
                                      .build());
