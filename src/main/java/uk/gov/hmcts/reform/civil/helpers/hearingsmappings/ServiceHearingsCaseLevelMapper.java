@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.service.hearings.CaseCategoriesService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagUtils;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +51,11 @@ public class ServiceHearingsCaseLevelMapper {
         return caseData.getCaseManagementLocation().getBaseLocation();
     }
 
-    public static String getCaseSLAStartDate(LocalDate slaStartDate) {
-        return slaStartDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+    public static String getCaseSLAStartDate(CaseData caseData) {
+        if (caseData.getIssueDate() != null) {
+            return caseData.getIssueDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+        }
+        return caseData.getSubmittedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
     public static boolean getCaseAdditionalSecurityFlag(CaseData caseData) {
