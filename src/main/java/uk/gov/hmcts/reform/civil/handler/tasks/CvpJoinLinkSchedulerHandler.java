@@ -26,6 +26,7 @@ public class CvpJoinLinkSchedulerHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
+                log.info("Publishing event for case id: '{}'", caseDetails.getId());
                 applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseDetails.getId()));
             } catch (Exception e) {
                 log.error("Publishing 'CvpJoinLinkEvent' event for case id: '{}' failed", caseDetails.getId(), e);
