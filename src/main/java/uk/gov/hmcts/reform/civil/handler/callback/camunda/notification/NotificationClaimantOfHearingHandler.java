@@ -29,6 +29,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 
@@ -97,12 +98,11 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
         String emailTemplate;
-        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
-        if (fee != null && fee.getCalculatedAmountInPence().compareTo(
-            BigDecimal.ZERO) > 0) {
-            emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC();
-        } else {
+        if (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
+        } else {
+            emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC();
         }
         String hearingId = camundaService
             .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId();
