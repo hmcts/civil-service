@@ -226,7 +226,6 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
@@ -274,7 +273,6 @@ public class HearingValuesServiceTest {
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
             .thenReturn(Optional.of(Organisation.builder()
@@ -314,7 +312,6 @@ public class HearingValuesServiceTest {
             .data(caseData.toMap(mapper))
             .id(caseId).build();
 
-        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         doThrow(FeignException.GatewayTimeout.class)

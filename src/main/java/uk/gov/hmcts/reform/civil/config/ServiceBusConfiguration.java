@@ -112,8 +112,9 @@ public class ServiceBusConfiguration {
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
                             }
+                            return receiveClient.completeAsync(message.getLockToken());
                         }
-                        return receiveClient.completeAsync(message.getLockToken());
+                        return receiveClient.abandonAsync(message.getLockToken());
                     }
 
                     @Override
