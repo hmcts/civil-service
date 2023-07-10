@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,5 +17,7 @@ public class RepaymentPlanTemplateData {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal paymentAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate firstRepaymentDate;
 }
