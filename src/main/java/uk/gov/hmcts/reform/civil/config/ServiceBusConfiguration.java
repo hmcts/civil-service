@@ -101,9 +101,8 @@ public class ServiceBusConfiguration {
                         boolean exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
                         if (exceptionEventTriggered) {
                             return receiveClient.completeAsync(message.getLockToken());
-                        } else {
-                            return receiveClient.abandonAsync(message.getLockToken());
                         }
+                        return receiveClient.abandonAsync(message.getLockToken());
                     }
 
                     @Override
