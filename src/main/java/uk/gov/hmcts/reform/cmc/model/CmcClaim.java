@@ -102,7 +102,9 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponsePending() {
-        return !hasResponse() && getResponseDeadline().isAfter(LocalDate.now());
+        return !hasResponse()
+            && getResponseDeadline() != null
+            && getResponseDeadline().isAfter(LocalDate.now());
     }
 
     @Override
@@ -114,7 +116,9 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponseDueToday() {
-        return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
+        return !hasResponse()
+            && getResponseDeadline() != null
+            && getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
@@ -262,7 +266,9 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     public boolean hasResponseDeadlinePassed() {
-        return !hasResponse() && (getResponseDeadline().isBefore(LocalDate.now())
+        return !hasResponse()
+            && (getResponseDeadline() != null
+            && getResponseDeadline().isBefore(LocalDate.now())
             || isResponseDeadlinePastFourPmToday());
     }
 
@@ -284,7 +290,8 @@ public class CmcClaim implements Claim {
     }
 
     private boolean isResponseDeadlinePastFourPmToday() {
-        return getResponseDeadline().isEqual(LocalDate.now())
+        return getResponseDeadline() != null
+            && getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
