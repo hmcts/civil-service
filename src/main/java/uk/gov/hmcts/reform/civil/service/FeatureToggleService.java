@@ -33,7 +33,8 @@ public class FeatureToggleService {
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        //return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return false;
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -41,7 +42,8 @@ public class FeatureToggleService {
     }
 
     public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+        //return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+        return true;
     }
 
     public boolean isHmcEnabled() {
