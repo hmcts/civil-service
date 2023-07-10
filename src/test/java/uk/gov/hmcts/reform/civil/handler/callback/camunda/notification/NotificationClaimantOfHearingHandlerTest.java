@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -169,13 +171,16 @@ public class NotificationClaimantOfHearingHandlerTest {
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1WithNoFeeHMC() {
+        void shouldNotifyApplicantSolicitor_whenInvoked1v1WithNoFeeHMC() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
                 .businessProcess(BusinessProcess.builder().processInstanceId("").build())
                 .build();
 
@@ -201,42 +206,6 @@ public class NotificationClaimantOfHearingHandlerTest {
                     "applicantemail@hmcts.net",
                     "test-template-no-fee-claimant-id-hmc",
                     getNotificationNoFeeDatePMDataMapHMC(caseData),
-                    "notification-of-hearing-HER1234"
-                );
-            }
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedNoFeeAnd1v1HMC() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-                .addApplicant2(YesOrNo.NO)
-                .addRespondent2(YesOrNo.NO)
-                .build();
-            when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
-                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
-            when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
-                                    LocalDate.of(2022, 10, 7),
-                                    LocalTime.of(8, 30)))
-                                .build());
-
-            LocalDate now = LocalDate.of(2022, 9, 29);
-            try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
-                mock.when(LocalDate::now).thenReturn(now);
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
-                // When
-                handler.handle(params);
-                // Then
-                verify(notificationService).sendMail(
-                    "applicantemail@hmcts.net",
-                    "test-template-no-fee-claimant-id-hmc",
-                    getNotificationNoFeeDataMapHMC(caseData),
                     "notification-of-hearing-HER1234"
                 );
             }
