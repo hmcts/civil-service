@@ -157,6 +157,7 @@ public class Respondent1DQ implements DQ {
         }
         return respondent1DQRequestedCourt;
     }
+
     @Override
     @JsonProperty("respondent1DQRemoteHearingLRspec")
     public RemoteHearingLRspec getRemoteHearingLRspec() {
