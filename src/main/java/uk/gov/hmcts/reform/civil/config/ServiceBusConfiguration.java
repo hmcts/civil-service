@@ -106,12 +106,17 @@ public class ServiceBusConfiguration {
                         );
                         if (isMessageRelevantForService(hmcMessage)
                             && HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                            boolean isEventTriggerSuccessful = false;
                                 log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
                                          hearingId,
                                          caseId
                                 );
-                                triggerReviewHearingExceptionEvent(caseId, hearingId);
-                            return receiveClient.completeAsync(message.getLockToken());
+                                isEventTriggerSuccessful = triggerReviewHearingExceptionEvent(caseId, hearingId);
+                                if (isEventTriggerSuccessful) {
+                                    return receiveClient.completeAsync(message.getLockToken());
+                                } else {
+                                    return receiveClient.abandonAsync(message.getLockToken());
+                                }
                         }
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
@@ -138,12 +143,13 @@ public class ServiceBusConfiguration {
         return null;
     }
 
-    private void triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
+    private boolean triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
         // trigger event for WA
         coreCaseDataService.triggerEvent(caseId, REVIEW_HEARING_EXCEPTION);
         log.info(
             "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
             caseId, hearingId);
+        return true;
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
