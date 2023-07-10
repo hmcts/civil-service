@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.List;
@@ -129,7 +128,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new DismissClaimEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(eq(new CvpJoinLinkEvent(caseId)));
 
         handler.execute(mockTask, externalTaskService);
 
