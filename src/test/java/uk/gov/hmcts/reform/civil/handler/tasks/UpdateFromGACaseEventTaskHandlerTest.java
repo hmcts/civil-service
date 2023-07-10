@@ -596,6 +596,19 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
+    @Test
+    void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
+        Element<Document> documentElement = Element.<Document>builder()
+            .id(UUID.randomUUID())
+            .value(Document.builder().documentUrl("string").build()).build();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        gaDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
+        civilCaseDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
+    }
+
     public final CaseDocument pdfDocument = CaseDocument.builder()
         .createdBy("John")
         .documentName("documentName")
