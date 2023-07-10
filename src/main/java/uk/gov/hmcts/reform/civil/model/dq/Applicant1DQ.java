@@ -135,6 +135,10 @@ public class Applicant1DQ implements DQ {
         return applicant1DQFurtherInformation;
     }
 
+    /*
+      This method is only used in Defendant DQ but because both journeys implements DQ we have to implement
+      abstract method getRemoteHearing() but it will return null if called unless value is set in future
+    */
     @Override
     public RemoteHearing getRemoteHearing() {
         return null;
