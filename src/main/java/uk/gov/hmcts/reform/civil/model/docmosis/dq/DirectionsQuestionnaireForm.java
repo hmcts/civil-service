@@ -65,8 +65,9 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
     private final String statementOfTruthText;
-    private Address respondent1LiPCorrespondenceAddress;
+    private final Address respondent1LiPCorrespondenceAddress;
     private final LipExperts lipExperts;
     private final LipExtraDQ lipExtraDQ;
+    private final HearingLipSupportRequirements hearingLipSupportRequirements;
 
 }
