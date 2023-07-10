@@ -25,12 +25,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.handler.ReviewHearingExceptionHandler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
-import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
-
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 
 @Configuration
 @Slf4j
@@ -59,8 +56,7 @@ public class ServiceBusConfiguration {
     private int threadCount;
 
     private final ObjectMapper objectMapper;
-    private final PaymentsConfiguration paymentsConfiguration;
-    private final CoreCaseDataService coreCaseDataService;
+    private final ReviewHearingExceptionHandler handler;
     private final FeatureToggleService featureToggleService;
 
     @Bean
@@ -97,27 +93,17 @@ public class ServiceBusConfiguration {
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
                         HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
-                        Long caseId = hmcMessage.getCaseId();
-                        String hearingId = hmcMessage.getHearingId();
                         log.info(
                             "Hearing requested for case {}, hearing id {}",
                             hmcMessage.getCaseId(),
                             hmcMessage.getHearingId()
                         );
-                        if (isMessageRelevantForService(hmcMessage)
-                            && HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                            log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
-                                         hearingId,
-                                         caseId
-                                );
-                            Boolean isEventTriggerSuccessful = triggerReviewHearingExceptionEvent(caseId, hearingId);
-                            if (isEventTriggerSuccessful) {
-                                return receiveClient.completeAsync(message.getLockToken());
-                            } else {
-                                return receiveClient.abandonAsync(message.getLockToken());
-                            }
+                        boolean exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
+                        if (exceptionEventTriggered) {
+                            return receiveClient.completeAsync(message.getLockToken());
+                        } else {
+                            return receiveClient.abandonAsync(message.getLockToken());
                         }
-                        return receiveClient.abandonAsync(message.getLockToken());
                     }
 
                     @Override
@@ -140,24 +126,5 @@ public class ServiceBusConfiguration {
             return null;
         }
         return null;
-    }
-
-    private boolean triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
-        // trigger event for WA
-        try {
-            coreCaseDataService.triggerEvent(caseId, REVIEW_HEARING_EXCEPTION);
-            log.info(
-                "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
-                caseId, hearingId);
-            return true;
-        } catch (Exception e) {
-            log.info("Error triggering CCD event {}", e.getMessage());
-        }
-        return false;
-    }
-
-    private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
-        return paymentsConfiguration.getSpecSiteId().equals(hmcMessage.getHmctsServiceCode())
-            || paymentsConfiguration.getSiteId().equals(hmcMessage.getHmctsServiceCode());
     }
 }
