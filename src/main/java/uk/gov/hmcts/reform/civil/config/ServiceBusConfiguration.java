@@ -104,14 +104,13 @@ public class ServiceBusConfiguration {
                             hmcMessage.getCaseId(),
                             hmcMessage.getHearingId()
                         );
-                        if (isMessageRelevantForService(hmcMessage)) {
-                            if (HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                        if (isMessageRelevantForService(hmcMessage)
+                            && HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
                                 log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
                                          hearingId,
                                          caseId
                                 );
                                 triggerReviewHearingExceptionEvent(caseId, hearingId);
-                            }
                             return receiveClient.completeAsync(message.getLockToken());
                         }
                         return receiveClient.abandonAsync(message.getLockToken());
@@ -125,11 +124,11 @@ public class ServiceBusConfiguration {
                     }
                 };
 
-            ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
             receiveClient.registerMessageHandler(
                 messageHandler,
                 new MessageHandlerOptions(
-                    threadCount, false,
+                    4, false,
                     Duration.ofHours(1), Duration.ofMinutes(5)
                 ),
                 executorService
