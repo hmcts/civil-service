@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -411,6 +412,7 @@ public class CaseDataParent implements MappableObject {
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
+    private final PaymentType applicant1RepaymentOptionForDefendantSpec;
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
