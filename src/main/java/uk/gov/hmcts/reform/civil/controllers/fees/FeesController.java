@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Tag(name = "Fees Controller")
 @Slf4j
@@ -37,8 +38,8 @@ public class FeesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<Fee2Dto[]> getFeeRanges() {
-        Fee2Dto[] feeRanges = feesService.getFeeRange();
+    public ResponseEntity<List<Fee2Dto>> getFeeRanges() {
+        List<Fee2Dto> feeRanges = feesService.getFeeRange();
         return new ResponseEntity<>(feeRanges, HttpStatus.OK);
     }
 
