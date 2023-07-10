@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Data
 @Builder
@@ -33,7 +37,7 @@ public class EvidenceDetails {
                            @JsonProperty("contractAndAgreementsEvidence") String contractAndAgreementsEvidence,
                            @JsonProperty("expertWitnessEvidence") String expertWitnessEvidence,
                            @JsonProperty("lettersEmailsAndOtherCorrespondenceEvidence")
-                                   String lettersEmailsAndOtherCorrespondenceEvidence,
+                           String lettersEmailsAndOtherCorrespondenceEvidence,
                            @JsonProperty("receiptsEvidence") String receiptsEvidence,
                            @JsonProperty("statementOfTruthEvidence") String statementOfTruthEvidence,
                            @JsonProperty("otherEvidence") String otherEvidence) {
@@ -45,6 +49,20 @@ public class EvidenceDetails {
         this.receiptsEvidence = receiptsEvidence;
         this.statementOfTruthEvidence = statementOfTruthEvidence;
         this.otherEvidence = otherEvidence;
+    }
+
+    @JsonIgnore
+    public String getEvidenceDescription() {
+        return Stream.of(
+                photoEvidence,
+                contractAndAgreementsEvidence,
+                expertWitnessEvidence,
+                lettersEmailsAndOtherCorrespondenceEvidence,
+                receiptsEvidence,
+                statementOfTruthEvidence,
+                otherEvidence
+            )
+            .filter(Objects::nonNull).findFirst().orElse("");
     }
 
 }
