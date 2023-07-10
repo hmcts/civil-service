@@ -87,6 +87,36 @@ class HmcDataUtilsTest {
     }
 
     @Test
+    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrueExtraDay() {
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(
+                HearingResponse.builder().hearingDaySchedule(
+                        List.of(
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .build(),
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+                                .build()))
+                    .build())
+            .build();
+
+        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
+            .serviceData(PartiesNotifiedServiceData.builder()
+                             .days(List.of(HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build()))
+                             .hearingLocation("Venue A")
+                             .build()).build();
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
+    @Test
     void hearingDataChanged_WhenHearingDataNotChanged_ReturnsFalse() {
         HearingGetResponse hearing = hearingResponse()
             .hearingResponse(
