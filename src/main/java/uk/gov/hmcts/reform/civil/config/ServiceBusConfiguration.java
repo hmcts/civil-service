@@ -106,17 +106,16 @@ public class ServiceBusConfiguration {
                         );
                         if (isMessageRelevantForService(hmcMessage)
                             && HmcStatus.EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                            boolean isEventTriggerSuccessful = false;
-                                log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
+                            log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
                                          hearingId,
                                          caseId
                                 );
-                                isEventTriggerSuccessful = triggerReviewHearingExceptionEvent(caseId, hearingId);
-                                if (isEventTriggerSuccessful) {
-                                    return receiveClient.completeAsync(message.getLockToken());
-                                } else {
-                                    return receiveClient.abandonAsync(message.getLockToken());
-                                }
+                            Boolean isEventTriggerSuccessful = triggerReviewHearingExceptionEvent(caseId, hearingId);
+                            if (isEventTriggerSuccessful) {
+                                return receiveClient.completeAsync(message.getLockToken());
+                            } else {
+                                return receiveClient.abandonAsync(message.getLockToken());
+                            }
                         }
                         return receiveClient.abandonAsync(message.getLockToken());
                     }
@@ -145,11 +144,16 @@ public class ServiceBusConfiguration {
 
     private boolean triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
         // trigger event for WA
-        coreCaseDataService.triggerEvent(caseId, REVIEW_HEARING_EXCEPTION);
-        log.info(
-            "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
-            caseId, hearingId);
-        return true;
+        try {
+            coreCaseDataService.triggerEvent(caseId, REVIEW_HEARING_EXCEPTION);
+            log.info(
+                "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
+                caseId, hearingId);
+            return true;
+        } catch (Exception e) {
+            log.info("Error triggering CCD event {}", e.getMessage());
+        }
+        return false;
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
