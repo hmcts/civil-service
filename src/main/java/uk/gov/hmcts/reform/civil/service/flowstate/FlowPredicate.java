@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
@@ -620,6 +617,11 @@ public class FlowPredicate {
         caseData.getApplicant1ResponseDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
             && caseData.getApplicant1ProceedWithClaim() == null;
+
+    public static final Predicate<CaseData> demageMultiClaim = caseData ->
+        AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+        && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+
 
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
