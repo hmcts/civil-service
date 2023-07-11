@@ -34,7 +34,7 @@ public class PartyDetailsModel {
 
     private List<UnavailabilityDOWModel> unavailabilityDOW;
 
-    private List<UnavailabilityRangeModel> unavailabilityRange;
+    private List<UnavailabilityRangeModel> unavailabilityRanges;
 
     private String hearingSubChannel;
 }
