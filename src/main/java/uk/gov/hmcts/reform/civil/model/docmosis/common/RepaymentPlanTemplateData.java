@@ -17,7 +17,7 @@ public class RepaymentPlanTemplateData {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal paymentAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate firstRepaymentDate;
 }
