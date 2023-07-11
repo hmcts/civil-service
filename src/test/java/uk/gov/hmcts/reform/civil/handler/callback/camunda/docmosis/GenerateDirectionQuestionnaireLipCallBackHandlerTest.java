@@ -62,7 +62,4 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
     }
-
-
-
 }
