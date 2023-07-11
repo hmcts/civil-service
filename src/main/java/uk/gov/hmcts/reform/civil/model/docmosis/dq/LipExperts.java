@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class LipExperts {
+
     private final List<ExpertReportTemplate> details;
     private final YesOrNo caseNeedsAnExpert;
     private final String expertCanStillExamineDetails;

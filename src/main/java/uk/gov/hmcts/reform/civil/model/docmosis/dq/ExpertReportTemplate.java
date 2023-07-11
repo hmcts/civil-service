@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class ExpertReportTemplate {
+
     private String expertName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     private LocalDate reportDate;
