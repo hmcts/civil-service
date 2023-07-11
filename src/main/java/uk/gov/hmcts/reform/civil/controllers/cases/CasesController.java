@@ -199,8 +199,7 @@ public class CasesController {
             log.info("Updated case data:  " + submitEventDto.getData().toString());
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
-        }
-        catch (FeignException.UnprocessableEntity ex) {
+        } catch (FeignException.UnprocessableEntity ex) {
             throw new CaseDataInvalidException();
         }
     }
