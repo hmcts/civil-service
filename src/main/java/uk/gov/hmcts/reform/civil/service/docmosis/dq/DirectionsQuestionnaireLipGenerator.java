@@ -4,14 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
-import uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -28,7 +26,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
@@ -75,7 +72,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
             .map(RespondentLiPResponse::getRespondent1DQExtraDetails)
             .orElse(null);
         if (respondent1DQExtraDetails != null) {
-
             builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(respondent1DQExtraDetails.getTriedToSettle())
                                    .requestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
                                    .considerClaimantDocuments(respondent1DQExtraDetails.getConsiderClaimantDocuments())
