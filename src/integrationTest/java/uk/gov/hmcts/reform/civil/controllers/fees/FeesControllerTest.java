@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.fees.client.model.FeeVersionDto;
 import uk.gov.hmcts.reform.fees.client.model.FlatAmountDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -49,7 +50,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnFeeRanges() {
         Fee2Dto[] response = buildFeeRangeResponse();
-        when(feesService.getFeeRange()).thenReturn(response);
+        when(feesService.getFeeRange()).thenReturn(List.of(response));
         doGet(BEARER_TOKEN, FEES_RANGES_URL)
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
