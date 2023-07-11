@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
@@ -68,6 +69,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final Address respondent1LiPCorrespondenceAddress;
     private final LipExperts lipExperts;
     private final LipExtraDQ lipExtraDQ;
-    private final HearingLipSupportRequirements hearingLipSupportRequirements;
+    private final List<RequirementsLip> hearingLipSupportRequirements;
 
 }

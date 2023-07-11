@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,14 +57,14 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                                         .map(CaseDataLiP::getRespondent1LiPResponse)
                                                         .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
                                                         .orElse(null))
-            .hearingLipSupportRequirements(HearingLipSupportRequirements
-                                               .toHearingSupportRequirements(Optional.ofNullable(
-                                                       caseData.getCaseDataLiP())
-                                                                                 .map(
-                                                                                     CaseDataLiP::getRespondent1LiPResponse)
-                                                                                 .map(
-                                                                                     RespondentLiPResponse::getRespondent1DQHearingSupportLip)
-                                                                                 .orElse(null)));
+            .hearingLipSupportRequirements(Optional.ofNullable(
+                    caseData.getCaseDataLiP())
+                                               .map(
+                                                   CaseDataLiP::getRespondent1LiPResponse)
+                                               .map(
+                                                   RespondentLiPResponse::getRespondent1DQHearingSupportLip)
+                                               .map(HearingSupportLip::getUnwrappedRequirementsLip)
+                                               .orElse(Collections.emptyList()));
         var respondent1DQExtraDetails = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1DQExtraDetails)
