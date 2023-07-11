@@ -79,6 +79,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
             builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(respondent1DQExtraDetails.getTriedToSettle())
                                    .requestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
                                    .considerClaimantDocumentsDetails(respondent1DQExtraDetails.getConsiderClaimantDocumentsDetails())
+                                   .determinationWithoutHearingRequired(respondent1DQExtraDetails.getDeterminationWithoutHearingRequired())
                                    .determinationWithoutHearingReason(respondent1DQExtraDetails.getDeterminationWithoutHearingReason())
                                    .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
                                    .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
