@@ -175,7 +175,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isBeforeHearing() {
-        return caseData.getHearingDate().isAfter(LocalDateTime.now().toLocalDate());
+        return caseData.getHearingDate() != null
+            && caseData.getHearingDate().isAfter(LocalDateTime.now().toLocalDate());
     }
 
     @Override
