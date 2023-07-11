@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;

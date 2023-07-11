@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 
 import static uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements.OTHER_SUPPORT;
 
-
 @Data
 @AllArgsConstructor
 public class DisabilityRequirement {

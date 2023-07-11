@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Data
 @Builder
 public class LipExtraDQ {
+
     private YesOrNo wantPhoneOrVideoHearing;
     private String whyPhoneOrVideoHearing;
     private String whyUnavailableForHearing;

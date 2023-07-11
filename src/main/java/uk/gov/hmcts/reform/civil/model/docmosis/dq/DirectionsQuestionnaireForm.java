@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -23,9 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
 import java.time.LocalDate;
 import java.util.List;

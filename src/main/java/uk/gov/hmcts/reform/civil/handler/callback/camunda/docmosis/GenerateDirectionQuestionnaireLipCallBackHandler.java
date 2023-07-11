@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_DQ_
 @RequiredArgsConstructor
 public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHandler {
 
-
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_DQ_LIP_SEALED);
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareDirectionsQuestionnaire

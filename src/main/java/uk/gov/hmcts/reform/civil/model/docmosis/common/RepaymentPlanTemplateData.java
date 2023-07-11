@@ -13,8 +13,7 @@ import java.time.LocalDate;
 @Builder
 public class RepaymentPlanTemplateData {
 
-   private String paymentFrequencyDisplay;
-
+    private String paymentFrequencyDisplay;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal paymentAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

@@ -20,16 +20,15 @@ public class HearingLipSupportRequirements {
 
     @JsonIgnore
     public static HearingLipSupportRequirements toHearingSupportRequirements(RequirementsLip hearingSupportLip) {
-        return hearingSupportLip != null ?
-            HearingLipSupportRequirements.builder()
-                .otherSupport(hearingSupportLip.getOtherSupport())
-                .name(hearingSupportLip.getName())
-                .requirements(Optional.ofNullable(hearingSupportLip.getRequirements()).map(Collection::stream).map(
-                    requirements -> requirements.map(requirement -> DisabilityRequirement.toDisabilityRequirements(
-                        requirement,
-                        hearingSupportLip.getOtherSupport()
-                    )).toList()).orElse(Collections.emptyList()))
-                .build()
+        return hearingSupportLip != null ? HearingLipSupportRequirements.builder()
+            .otherSupport(hearingSupportLip.getOtherSupport())
+            .name(hearingSupportLip.getName())
+            .requirements(Optional.ofNullable(hearingSupportLip.getRequirements()).map(Collection::stream).map(
+                requirements -> requirements.map(requirement -> DisabilityRequirement.toDisabilityRequirements(
+                    requirement,
+                    hearingSupportLip.getOtherSupport()
+                )).toList()).orElse(Collections.emptyList()))
+            .build()
             : HearingLipSupportRequirements.builder().build();
 
     }

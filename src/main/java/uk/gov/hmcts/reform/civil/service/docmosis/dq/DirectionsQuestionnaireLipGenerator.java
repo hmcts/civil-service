@@ -100,8 +100,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                 .build());
 
         }
-
-
         return builder.build();
     }
 

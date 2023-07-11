@@ -7,9 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
