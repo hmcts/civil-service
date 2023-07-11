@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
@@ -38,5 +39,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> documentUploadException(DocumentUploadException documentUploadException) {
         log.error(documentUploadException.getMessage());
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CaseDataInvalidException.class)
+    public ResponseEntity<Object> caseDataInvalidException(CaseDataInvalidException caseDataInvalidException) {
+        log.error(caseDataInvalidException.getMessage());
+        return new ResponseEntity<>("Submit claim unsuccessful, Invalid Case data", new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

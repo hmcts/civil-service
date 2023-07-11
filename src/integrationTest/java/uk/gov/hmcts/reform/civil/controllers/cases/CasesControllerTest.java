@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
@@ -237,7 +238,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void shouldNotSubmitEventSuccessfullyForInvalidCaseWorker() {
+    void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
         doPost(
             "invalid token",
             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
@@ -246,6 +247,27 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "jurisdictionId",
             "caseTypeId"
         )
-            .andExpect(status().is4xxClientError());
+            .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowUnprocessableEntityExceptionCaseWorkerSubmit() {
+        when(caseworkerCaseEventService.submitEventForNewClaimCaseWorker(any()))
+            .thenThrow(CaseDataInvalidException.class);
+
+        doPost(
+             BEARER_TOKEN,
+             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+             CASEWORKER_SUBMIT_EVENT_URL,
+             "userId",
+             "jurisdictionId",
+             "caseTypeId"
+        )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(content().string("Submit claim unsuccessful, Invalid Case data"))
+            .andReturn();
+
+    }
+
 }
