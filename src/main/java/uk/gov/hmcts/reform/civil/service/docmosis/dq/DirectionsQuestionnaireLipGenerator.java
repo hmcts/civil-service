@@ -21,10 +21,12 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -64,6 +66,9 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                                .map(
                                                    RespondentLiPResponse::getRespondent1DQHearingSupportLip)
                                                .map(HearingSupportLip::getUnwrappedRequirementsLip)
+                                               .map(Collection::stream)
+                                               .map(items -> items.map(item -> toHearingSupportRequirements(item))
+                                                   .toList())
                                                .orElse(Collections.emptyList()));
         var respondent1DQExtraDetails = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)

@@ -69,6 +69,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final Address respondent1LiPCorrespondenceAddress;
     private final LipExperts lipExperts;
     private final LipExtraDQ lipExtraDQ;
-    private final List<RequirementsLip> hearingLipSupportRequirements;
+    private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;
 
 }
