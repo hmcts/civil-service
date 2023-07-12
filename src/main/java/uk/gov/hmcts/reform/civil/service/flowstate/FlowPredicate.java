@@ -626,7 +626,6 @@ public class FlowPredicate {
         AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
         && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
-
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
 
