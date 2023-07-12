@@ -86,7 +86,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                                 .details(respondent1DQExtraDetails
                                              .getReportExpertDetails()
                                              .stream()
-                                             .map(detail -> ExpertReportTemplate.toExpertReportTemplate(detail))
+                                             .map(ExpertReportTemplate::toExpertReportTemplate)
                                              .toList())
                                 .caseNeedsAnExpert(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
@@ -120,5 +120,4 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                            .build());
     }
-
 }

@@ -32,6 +32,5 @@ public class DQExtraDetailsLip {
     @JsonIgnore
     public List<ExpertReportLiP> getReportExpertDetails() {
         return Optional.ofNullable(respondent1DQLiPExpert).map(ExpertLiP::getUnwrappedDetails).orElse(Collections.emptyList());
-
     }
 }
