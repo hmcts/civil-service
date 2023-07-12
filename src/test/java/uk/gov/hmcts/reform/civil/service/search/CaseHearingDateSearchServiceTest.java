@@ -26,7 +26,7 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
         Clock clock = Clock.fixed(Instant.parse("2023-07-10T10:15:30Z"), ZoneId.of("UTC"));
         Instant.now(clock);
 
-        String targetDate = LocalDate.of(2023, 07, 24).format(DateTimeFormatter.ISO_DATE);
+        String targetDate = LocalDate.of(2023, 07, 26).format(DateTimeFormatter.ISO_DATE);
 
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
