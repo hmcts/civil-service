@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
@@ -35,6 +37,7 @@ public class PaymentsService {
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+    private final HearingFeesService hearingFeesService;
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
@@ -175,7 +178,12 @@ public class PaymentsService {
             feeResponse = caseData.getClaimFee().toFeeDto();
         } else {
             callbackURLUsed = callBackUrl;
-            feeResponse = caseData.getHearingFee().toFeeDto();
+            if (caseData.getHearingFee() != null) {
+                feeResponse = caseData.getHearingFee().toFeeDto();
+            } else {
+                feeResponse = HearingFeeUtils.calculateAndApplyFee(
+                    hearingFeesService, caseData, caseData.getAllocatedTrack()).toFeeDto();
+            }
         }
 
         if (callbackURLUsed != null) {
