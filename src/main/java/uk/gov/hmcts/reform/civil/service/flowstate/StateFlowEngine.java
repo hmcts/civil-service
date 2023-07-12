@@ -483,12 +483,14 @@ public class StateFlowEngine {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(demageMultiClaim).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).and(applicantOutOfTime.negate()).or(declinedMediation))
+            .onlyIf(fullDefenceProceed.and(demageMultiClaim).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                        .and(applicantOutOfTime.negate()).or(declinedMediation))
             .set(flags -> {
                 flags.put(FlowFlag.MULTI_CLAIM_YES.name(), true);
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(demageMultiClaim.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).and(applicantOutOfTime.negate()).or(declinedMediation))
+            .onlyIf(fullDefenceProceed.and(demageMultiClaim.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                        .and(applicantOutOfTime.negate()).or(declinedMediation))
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
