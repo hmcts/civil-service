@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
@@ -68,6 +69,9 @@ public interface DQ {
     WelshLanguageRequirements getWelshLanguageRequirements();
 
     WelshLanguageRequirements getWelshLanguageRequirementsLRspec();
+
+    @JsonProperty("applicant1DQRemoteHearingLRspec")
+    RemoteHearingLRspec getRemoteHearingLRspec();
 
     StatementOfTruth getStatementOfTruth();
 
