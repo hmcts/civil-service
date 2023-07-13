@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,8 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING, NOTIFY_CLAIMANT_HEARING_HMC);
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     private static final String REFERENCE_TEMPLATE_HEARING_LIP = "notification-of-hearing-lip-%s";
     public static final String TASK_ID_CLAIMANT = "NotifyClaimantHearing";
@@ -50,6 +54,13 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
+
+        //ToDo: Replace with AHN logic
+        if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
+
         sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

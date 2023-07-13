@@ -13,10 +13,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
-import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
@@ -55,12 +54,13 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
     private DashboardClaimStatus status;
+    private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
         return Optional.ofNullable(responseDeadline)
             .filter(deadline ->
-                       deadline.isAfter(LocalDate.now()))
+                        deadline.isAfter(LocalDate.now()))
             .map(deadline ->
                      LocalDate.now().until(
                          deadline,

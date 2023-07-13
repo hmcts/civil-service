@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,10 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING_HMC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isDefendant1;
 
 @Service
@@ -30,11 +35,18 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT1_HEARING, NOTIFY_DEFENDANT2_HEARING);
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_DEFENDANT1_HEARING,
+        NOTIFY_DEFENDANT2_HEARING,
+        NOTIFY_DEFENDANT1_HEARING_HMC,
+        NOTIFY_DEFENDANT2_HEARING_HMC
+    );
     private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
     private static final String REFERENCE_TEMPLATE_HEARING_LIP = "notification-of-hearing-lip-%s";
     public static final String TASK_ID_DEFENDANT1 = "NotifyDefendant1Hearing";
     public static final String TASK_ID_DEFENDANT2 = "NotifyDefendant2Hearing";
+    public static final String TASK_ID_DEFENDANT1_HMC = "NotifyDefendantSolicitor1Hearing";
+    public static final String TASK_ID_DEFENDANT2_HMC = "NotifyDefendantSolicitor2Hearing";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,6 +63,12 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private CallbackResponse notifyDefendantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        //ToDo: Replace with AHN logic
+        if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC) || isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC)) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         boolean isRespondentLip = isRespondentLip(caseData);
         boolean isDefendant1 = isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING);
         sendEmail(caseData, getRespondentRecipient(caseData, isDefendant1, isRespondentLip), isDefendant1, isRespondentLip);

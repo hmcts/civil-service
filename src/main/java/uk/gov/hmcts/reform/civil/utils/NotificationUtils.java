@@ -39,7 +39,7 @@ public class NotificationUtils {
         return caseEvent.equals(matchEvent);
     }
 
-    public static boolean isDefendant1(CallbackParams callbackParams, CaseEvent matchEvent) {
+    public static boolean isEvent(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return caseEvent.equals(matchEvent);
     }

@@ -44,29 +44,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-sdo";
+    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
+        var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-legal-rep";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
-        var courtLocationDynamicListKey = "court-location-dynamic-list";
-        givenToggle(courtLocationDynamicListKey, toggleStat);
-
-        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -94,15 +76,6 @@ class FeatureToggleServiceTest {
         givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
-        var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, toggleStat);
-
-        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

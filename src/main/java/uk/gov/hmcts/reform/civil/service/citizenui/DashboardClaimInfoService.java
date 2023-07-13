@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -11,19 +10,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -41,25 +37,22 @@ public class DashboardClaimInfoService {
     }
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
+        log.info("-----------getClaimsForDefendant() started-------------");
+        log.info("-----------calling ocmc getClaimsForDefendant()-------------");
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
+        log.info("-----------ocmcClaims received-------------size " + ocmcClaims.size());
+        log.info("-----------calling ccd getCases-------------");
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
-
+        log.info("-----------ccdCases received-------------size " + ccdCases.size());
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream())
             .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
             .collect(Collectors.toList());
     }
 
     private List<DashboardClaimInfo> getCases(String authorisation) {
-        List<DashboardClaimInfo> dashboardClaimItems = new ArrayList<>();
-        int totalCases = 0;
-        SearchResult claims;
-        do {
-            Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), totalCases);
-            claims = coreCaseDataService.searchCases(query, authorisation);
-            dashboardClaimItems.addAll(translateSearchResultToDashboardItems(claims));
-            totalCases += claims.getCases().size();
-        } while (totalCases < claims.getTotal());
-        return dashboardClaimItems;
+        SearchResult claims = coreCaseDataService.getCasesUptoMaxsize(authorisation);
+        log.info("-----------ccdCases received-------------total " + claims.getTotal());
+        return translateSearchResultToDashboardItems(claims);
     }
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
@@ -83,6 +76,11 @@ public class DashboardClaimInfoService {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
             item.setPaymentDate(caseData.getDateForRepayment());
         }
+
+        if (caseData.getRespondToAdmittedClaimOwingAmountPounds() != null) {
+            item.setRespondToAdmittedClaimOwingAmountPounds(caseData.getRespondToAdmittedClaimOwingAmountPounds());
+        }
+
         return item;
     }
 

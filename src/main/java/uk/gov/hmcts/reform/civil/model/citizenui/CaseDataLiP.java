@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,6 +18,8 @@ public class CaseDataLiP {
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
     private TranslatedDocument translatedDocument;
+    @JsonProperty("respondent1LiPFinancialDetails")
+    private FinancialDetailsLiP respondent1LiPFinancialDetails;
     @JsonProperty("applicant1ClaimMediationSpecRequiredLip")
     private ClaimantMediationLip applicant1ClaimMediationSpecRequiredLip;
 
@@ -29,5 +33,19 @@ public class CaseDataLiP {
     public boolean hasClaimantNotAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
             && applicant1ClaimMediationSpecRequiredLip.hasClaimantNotAgreedToFreeMediation();
+    }
+
+    @JsonIgnore
+    public String getEvidenceComment() {
+        return Optional.ofNullable(respondent1LiPResponse)
+            .map(RespondentLiPResponse::getEvidenceComment)
+            .orElse("");
+    }
+
+    @JsonIgnore
+    public String getTimeLineComment() {
+        return Optional.ofNullable(respondent1LiPResponse)
+            .map(RespondentLiPResponse::getTimelineComment)
+            .orElse("");
     }
 }

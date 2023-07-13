@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -51,6 +52,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -66,6 +68,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -217,6 +220,7 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
     private DisposalHearingHearingTime disposalHearingHearingTime;
     private DisposalHearingBundle disposalHearingBundle;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotes;
     private String disposalHearingHearingNotes;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
@@ -227,6 +231,9 @@ public class CaseDataParent implements MappableObject {
 
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
+    private final DynamicList hearingMethodValuesFastTrack;
+    private final DynamicList hearingMethodValuesDisposalHearing;
+    private final DynamicList hearingMethodValuesSmallClaims;
     private final DynamicList smallClaimsMethodInPerson;
     private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
@@ -250,6 +257,7 @@ public class CaseDataParent implements MappableObject {
     private FastTrackHearingNotes fastTrackHearingNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
     private final List<FastTrack> fastClaims;
+    private final List<FastTrack> trialAdditionalDirectionsForFastTrack;
     private final FastTrackMethod fastTrackMethod;
     private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
     private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
@@ -265,6 +273,7 @@ public class CaseDataParent implements MappableObject {
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
+    private final List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
     private final SmallClaimsMethod smallClaimsMethod;
     private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
     private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
@@ -292,6 +301,8 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+    private List<DateToShowToggle> smallClaimsHearingDateToToggle;
+    private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
     private CaseDocument sdoOrderDocument;
 
@@ -403,6 +414,7 @@ public class CaseDataParent implements MappableObject {
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
+    private final PaymentType applicant1RepaymentOptionForDefendantSpec;
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
@@ -427,12 +439,15 @@ public class CaseDataParent implements MappableObject {
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidence;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
     private final List<EvidenceUploadExpert> expertSelectionEvidence;
+    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidence;
+    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
@@ -572,6 +587,12 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaRespDocClaimant;
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
+
+    private final List<Element<CaseDocument>> gaDraftDocument;
+    private final List<Element<CaseDocument>> gaDraftDocStaff;
+    private final List<Element<CaseDocument>> gaDraftDocClaimant;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
+    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     /* Final Orders */
 
@@ -713,5 +734,10 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
     }
 }

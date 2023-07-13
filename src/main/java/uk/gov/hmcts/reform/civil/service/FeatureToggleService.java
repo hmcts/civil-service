@@ -16,28 +16,12 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isSdoEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
-    }
-
     public boolean isGeneralApplicationsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
 
     public boolean isNoticeOfChangeEnabled() {
         return this.featureToggleApi.isFeatureEnabled("notice-of-change");
-    }
-
-    public boolean isHearingAndListingSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-sdo");
-    }
-
-    public boolean isHearingAndListingLegalRepEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hearing-and-listing-legal-rep");
-    }
-
-    public boolean isCourtLocationDynamicListEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("court-location-dynamic-list");
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -50,10 +34,6 @@ public class FeatureToggleService {
 
     public boolean isPbaV3Enabled() {
         return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
-    }
-
-    public boolean isSDOEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enableSDO");
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -70,6 +50,10 @@ public class FeatureToggleService {
 
     public boolean isCaseFileViewEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-file-view");
+    }
+
+    public boolean isAutomatedHearingNoticeEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
 }

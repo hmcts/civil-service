@@ -109,6 +109,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterNotificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension;
 
 class FlowPredicateTest {
 
@@ -2723,6 +2727,181 @@ class FlowPredicateTest {
                 .build();
             assertTrue(takenOfflineSDONotDrawn.test(caseData));
             assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
         }
 
         @Test

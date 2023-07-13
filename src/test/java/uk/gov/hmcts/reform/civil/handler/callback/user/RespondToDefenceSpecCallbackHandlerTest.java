@@ -61,8 +61,10 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -124,7 +126,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CourtLocationUtils.class,
     LocationHelper.class,
     LocationRefDataService.class,
-    JudgementService.class
+    JudgementService.class,
+    PaymentDateService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -136,6 +139,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private JudgementService judgementService;
+
+    @Autowired
+    private PaymentDateService paymentDateService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -156,6 +162,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CaseFlagsInitialiser caseFlagsInitialiser;
     @MockBean
     private RespondentMediationService respondentMediationService;
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Nested
     class AboutToStart {
@@ -181,35 +189,12 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateInitialDataV1() {
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                CaseData.builder()
-                    .respondent1(Party.builder()
-                                     .type(Party.Type.COMPANY)
-                                     .companyName("company name")
-                                     .build())
-                    .build(),
-                ABOUT_TO_START
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("respondent1Copy")
-                .isNotNull();
-            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
-                .isNotNull();
-        }
-
-        // TODO my test
-        @Test
         void shouldPopulateCourtLocations() {
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             when(courtLocationUtils.getLocationsFromList(any()))
                 .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -706,9 +691,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = FlowState.Main.class,
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV2(FlowState.Main flowState) {
             var params = callbackParamsOf(
-                CallbackVersion.V_1,
+                CallbackVersion.V_2,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -748,7 +733,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -865,10 +849,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class HandleCourtLocation {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-            }
 
             @Test
             void shouldHandleCourtLocationData() {
@@ -880,6 +860,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
@@ -887,7 +868,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build()).build())
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                 assertThat(response.getData())
@@ -912,10 +893,42 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();;
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanAndFlagV2() {
+            //Given
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            assertThat(response.getState())
+                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecAndFlagV2() {
+            //Given
+            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+            CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
             assertThat(response.getState())
                 .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }

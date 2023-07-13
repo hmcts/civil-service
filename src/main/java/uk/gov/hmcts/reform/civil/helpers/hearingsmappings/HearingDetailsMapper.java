@@ -6,13 +6,18 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
+import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.getDynamicListValue;
+import static uk.gov.hmcts.reform.civil.utils.HearingMethodUtils.getHearingMethodCodes;
 
 public class HearingDetailsMapper {
 
@@ -20,6 +25,8 @@ public class HearingDetailsMapper {
     public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
     private static String EMPTY_STRING = "";
+
+    private static String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -100,8 +107,20 @@ public class HearingDetailsMapper {
     }
 
     public static String getListingComments(CaseData caseData) {
-        return EMPTY_STRING;
-        //todo CIV-6855
+        String comments = getAllActiveFlags(caseData).stream()
+            .flatMap(flags -> flags.getDetails().stream())
+            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
+            .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
+            .reduce("", String::concat)
+            .replaceAll("\n", " ")
+            .replaceAll("\\s+", " ");
+
+        if (comments != null && !comments.isEmpty()) {
+            String refactoredComment = comments.substring(0, comments.length() - 2);
+            return refactoredComment.length() > 200 ? refactoredComment.substring(0, 200) : refactoredComment;
+        }
+
+        return null;
     }
 
     public static String getHearingRequester() {
@@ -128,8 +147,21 @@ public class HearingDetailsMapper {
         return false;
     }
 
-    public static List<String> getHearingChannels(CaseData caseData) {
-        return null; //todo civ-6261
+    public static List<String> getHearingChannels(String authToken, String hmctsServiceId, CaseData caseData, CategoryService categoryService) {
+        Map<String, String> hearingMethodCode = getHearingMethodCodes(categoryService, hmctsServiceId, authToken);
+        if (caseData.getHearingMethodValuesFastTrack() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesFastTrack())));
+        } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearing())));
+        } else if (caseData.getHearingMethodValuesDisposalHearingDJ() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearingDJ())));
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesTrialHearingDJ())));
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesSmallClaims())));
+        } else {
+            return null;
+        }
     }
 
 }

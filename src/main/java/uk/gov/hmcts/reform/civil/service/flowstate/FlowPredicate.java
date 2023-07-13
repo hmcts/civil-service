@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -368,10 +368,89 @@ public class FlowPredicate {
         getPredicateForPayImmediately(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
-
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-            && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+            && caseData.getTakenOfflineDate() != null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() != null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension = caseData ->
+        caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1ResponseDate() == null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() == null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+        };
+    }
+
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
 
@@ -379,7 +458,7 @@ public class FlowPredicate {
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getReasonNotSuitableSDO() == null && caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
@@ -527,11 +606,13 @@ public class FlowPredicate {
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && (caseData.getRespondent1TimeExtensionDate() != null
-                    || caseData.getRespondent2TimeExtensionDate() != null);
+                    || caseData.getRespondent2TimeExtensionDate() != null)
+                    && caseData.getReasonNotSuitableSDO() == null;
             default:
                 return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
                     && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null;
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getReasonNotSuitableSDO() == null;
         }
     };
 
@@ -857,17 +938,17 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.hasApplicantAcceptedRepaymentPlan();
+    public static final Predicate<CaseData> acceptRepaymentPlan =
+        CaseData::hasApplicantAcceptedRepaymentPlan;
 
-    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.hasApplicantRejectedRepaymentPlan();
+    public static final Predicate<CaseData> rejectRepaymentPlan =
+        CaseData::hasApplicantRejectedRepaymentPlan;
 
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
-        caseData.isRespondentResponseBilingual();
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
+        CaseDataParent::isRespondentResponseBilingual;
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
-        caseData.isPartAdmitClaimSettled();
+    public static final Predicate<CaseData> agreePartAdmitSettle =
+        CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
         CaseData::isClaimantNotSettlePartAdmitClaim;
@@ -881,4 +962,5 @@ public class FlowPredicate {
         && caseData.getListingOrRelisting() != null
         && caseData.getListingOrRelisting().equals(LISTING);
 
+    public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 }
