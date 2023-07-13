@@ -2497,7 +2497,7 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         return this;
     }
@@ -2506,7 +2506,7 @@ public class CaseDataBuilder {
         disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
             .input("The claimant must lodge at court at least 7 "
                        + "days before the disposal")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
             .builder()

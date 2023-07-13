@@ -123,6 +123,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
+        var caseFileKey = "fast-track-uplifts";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
