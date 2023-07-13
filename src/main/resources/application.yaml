@@ -238,6 +238,7 @@ notifications:
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
   applicantHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
+  notifyLipHearingFeeUnpaid: "24ace660-b082-4d99-89b5-9906668f5812"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
   hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
