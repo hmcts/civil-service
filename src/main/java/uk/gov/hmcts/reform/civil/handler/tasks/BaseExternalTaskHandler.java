@@ -77,7 +77,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
