@@ -9,6 +9,7 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -106,11 +107,33 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    protected int checkIfDocumentExists(List<Element<CaseDocument>> civilCaseDocumentList,
-                                      List<Element<CaseDocument>> gaCaseDocumentlist) {
-        return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
-              .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentLink()
+    @SuppressWarnings("unchecked")
+    protected int checkIfDocumentExists(List<Element<?>> civilCaseDocumentList,
+                                      List<Element<?>> gaCaseDocumentlist) {
+        if (gaCaseDocumentlist.get(0).getValue().getClass().equals(CaseDocument.class)) {
+            List<Element<CaseDocument>> civilCaseList = civilCaseDocumentList.stream()
+                .map(element -> (Element<CaseDocument>) element)
+                .toList();
+            List<Element<CaseDocument>> gaCaseList = gaCaseDocumentlist.stream()
+                .map(element -> (Element<CaseDocument>) element)
+                .toList();
+
+            return civilCaseList.stream().filter(civilDocument -> gaCaseList
+                .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentLink()
                     .equals(civilDocument.getValue().getDocumentLink()))).toList().size();
+        } else {
+            List<Element<Document>> civilCaseList = civilCaseDocumentList.stream()
+                .map(element -> (Element<Document>) element)
+                .toList();
+
+            List<Element<Document>> gaCaseList = gaCaseDocumentlist.stream()
+                .map(element -> (Element<Document>) element)
+                .toList();
+
+            return civilCaseList.stream().filter(civilDocument -> gaCaseList
+                .parallelStream().anyMatch(gaDocument -> gaDocument.getValue().getDocumentUrl()
+                    .equals(civilDocument.getValue().getDocumentUrl()))).toList().size();
+        }
     }
 
     protected void updateDocCollectionField(Map<String, Object> output, CaseData civilCaseData, CaseData generalAppCaseData, String docFieldName) throws Exception {
@@ -175,16 +198,16 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                         CaseData civilCaseData, String toCivilList) throws Exception {
         Method gaGetter = ReflectionUtils.findMethod(CaseData.class,
                                                      "get" + StringUtils.capitalize(fromGaList));
-        List<Element<CaseDocument>> gaDocs =
-            (List<Element<CaseDocument>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
+        List<Element<?>> gaDocs =
+            (List<Element<?>>) (gaGetter != null ? gaGetter.invoke(generalAppCaseData) : null);
         Method civilGetter = ReflectionUtils.findMethod(CaseData.class,
                                                         "get" + StringUtils.capitalize(toCivilList));
-        List<Element<CaseDocument>> civilDocs =
-            (List<Element<CaseDocument>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
+        List<Element<?>> civilDocs =
+            (List<Element<?>>) ofNullable(civilGetter != null ? civilGetter.invoke(civilCaseData) : null)
                 .orElse(newArrayList());
         if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
-            for (Element<CaseDocument> gaDoc : gaDocs) {
+            for (Element<?> gaDoc : gaDocs) {
                 if (!ids.contains(gaDoc.getId())) {
                     civilDocs.add(gaDoc);
                 }

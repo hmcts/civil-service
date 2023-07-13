@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.service.hearings;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.SneakyThrows;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
@@ -22,6 +26,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.PartyIdsUpdatedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -38,6 +43,8 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -56,6 +63,7 @@ import static org.mockito.Mockito.doThrow;
 
 import java.time.LocalDate;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -86,7 +94,7 @@ public class HearingValuesServiceTest {
     @Mock
     private OrganisationService organisationService;
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper mapper;
 
     @InjectMocks
     private HearingValuesService hearingValuesService;
@@ -98,8 +106,13 @@ public class HearingValuesServiceTest {
     private static final String BASE_LOCATION_ID = "1234";
     private static final String WELSH_REGION_ID = "7";
 
+    @BeforeEach
+    void prepare() {
+        ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
+    }
+
     @Test
-    void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() {
+    void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() throws Exception {
         Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
@@ -114,7 +127,7 @@ public class HearingValuesServiceTest {
             .build();
         Long caseId = 1L;
         CaseDetails caseDetails = CaseDetails.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(caseData.toMap(mapper))
             .id(caseId).build();
 
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
@@ -184,7 +197,129 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "8AB87C89", "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
+        verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldTriggerEventAndThrowPartyFlagsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
+        Long caseId = 1L;
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseReference(caseId)
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent2(PartyBuilder.builder().company().build())
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
+            .build();
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(mapper))
+            .id(caseId).build();
+
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(APPLICANT_LR_ORG_NAME)
+                                        .build()));
+        when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
+                                        .build()));
+        given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
+        given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        assertThrows(PartyIdsUpdatedException.class, () -> {
+            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+        });
+
+        verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_PARTY_IDS), any());
+    }
+
+    @Test
+    void shouldNotTriggerEventIfPartyIdExistsForApplicant1() throws Exception {
+        Long caseId = 1L;
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .applicant1(PartyBuilder.builder().build()
+                            .toBuilder()
+                            .partyID("party-id")
+                            .build())
+            .caseReference(caseId)
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent2(PartyBuilder.builder().company().build())
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
+            .build();
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(mapper))
+            .id(caseId).build();
+
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(APPLICANT_LR_ORG_NAME)
+                                        .build()));
+        when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
+                                        .build()));
+        given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
+        given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        verify(caseDataService, times(0))
+            .triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_PARTY_IDS), any());
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldThrowFeinExceptionIfCaseDataServiceThrowsException() {
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent2(PartyBuilder.builder().company().build())
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .applicant1DQ(applicant1DQ)
+            .respondent1DQ(respondent1DQ)
+            .build();
+        Long caseId = 1L;
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(mapper))
+            .id(caseId).build();
+
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        doThrow(FeignException.GatewayTimeout.class)
+            .when(caseDataService).triggerEvent(any(), any(), any());
+
+        assertThrows(FeignException.GatewayTimeout.class, () -> {
+            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+        });
     }
 
     @NotNull
@@ -281,7 +416,7 @@ public class HearingValuesServiceTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -302,7 +437,7 @@ public class HearingValuesServiceTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
