@@ -1,10 +1,23 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class UnavailabilityDatesUtils {
 
@@ -21,7 +34,9 @@ public class UnavailabilityDatesUtils {
                                       .getUnavailableDates());
             builder.respondent1(resp1.build());
 
-            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)
+                && (YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                || YES.equals(caseData.getRespondentResponseIsSame()))) {
                 Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                     .unavailableDates(caseData.getRespondent1DQ().getHearing()
                                           .getUnavailableDates());
@@ -45,13 +60,65 @@ public class UnavailabilityDatesUtils {
                 .unavailableDates(caseData.getApplicant1DQ().getHearing()
                                       .getUnavailableDates());
             builder.applicant1(appl1.build());
-        }
-        if (caseData.getApplicant2() != null && caseData.getApplicant1DQ().getHearing() != null) {
 
+            // 2v1 single response, copy applicant 1 dates to applicant 2
+            if (caseData.getApplicant2() != null
+                && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+                Party.PartyBuilder appl2 = caseData.getApplicant2().toBuilder()
+                    .unavailableDates(caseData.getApplicant1DQ().getHearing()
+                                          .getUnavailableDates());
+                builder.applicant2(appl2.build());
+            }
+        }
+
+        // 2v1 divergent response, applicant 2 proceeds
+        if (caseData.getApplicant2() != null
+            && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+            && caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ().getHearing() != null) {
             Party.PartyBuilder appl2 = caseData.getApplicant2().toBuilder()
-                .unavailableDates(caseData.getApplicant1DQ().getHearing()
+                .unavailableDates(caseData.getApplicant2DQ().getHearing()
                                       .getUnavailableDates());
             builder.applicant2(appl2.build());
+        }
+    }
+
+    public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseData = builder.build();
+        if (caseData.getHearingSupportRequirementsDJ() != null
+            && YES.equals(caseData.getHearingSupportRequirementsDJ().getHearingUnavailableDates())) {
+            List<UnavailableDate> unavailableDates = new ArrayList<>();
+            List<HearingDates> unavailableDatesDJ = unwrapElements(caseData.getHearingSupportRequirementsDJ().getHearingDates());
+
+            for (HearingDates unavailableDate : unavailableDatesDJ) {
+                LocalDate fromDate = unavailableDate.getHearingUnavailableFrom();
+                LocalDate toDate = unavailableDate.getHearingUnavailableUntil();
+                UnavailableDateType type = fromDate.isEqual(toDate) ? SINGLE_DATE : DATE_RANGE;
+
+                if (SINGLE_DATE.equals(type)) {
+                    unavailableDates.add(UnavailableDate.builder()
+                                             .date(fromDate)
+                                             .unavailableDateType(type)
+                                             .build());
+                } else {
+                    unavailableDates.add(UnavailableDate.builder()
+                                             .fromDate(fromDate)
+                                             .toDate(toDate)
+                                             .unavailableDateType(type)
+                                             .build());
+                }
+            }
+
+            builder.applicant1(caseData.getApplicant1().toBuilder()
+                                   .unavailableDates(wrapElements(unavailableDates))
+                                   .build());
+
+            if (caseData.getApplicant2() != null) {
+                builder.applicant2(caseData.getApplicant2().toBuilder()
+                                       .unavailableDates(wrapElements(unavailableDates))
+                                       .build());
+            }
         }
     }
 }

@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
@@ -451,6 +453,8 @@ public class CaseDataBuilder {
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
+    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -780,6 +784,23 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQWithUnavailableDates() {
+        UnavailableDate unavailableDateRange = UnavailableDate.builder()
+            .fromDate(LocalDate.of(2023, 8, 20))
+            .toDate(LocalDate.of(2023, 8, 22))
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .build();
+        UnavailableDate unavailableDate = UnavailableDate.builder()
+            .date(LocalDate.of(2023, 8, 20))
+            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .build();
+        this.respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
+                                      .unavailableDates(wrapElements(List.of(unavailableDate, unavailableDateRange))).build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithUnavailableDateRange() {
         UnavailableDate unavailableDate = UnavailableDate.builder()
             .fromDate(LocalDate.now().plusDays(1))
@@ -801,6 +822,23 @@ public class CaseDataBuilder {
         this.applicant1DQ = Applicant1DQ.builder()
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
                                       .unavailableDates(wrapElements(List.of(unavailableDate))).build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQWithUnavailableDates() {
+        UnavailableDate unavailableDateRange = UnavailableDate.builder()
+            .fromDate(LocalDate.of(2023, 8, 20))
+            .toDate(LocalDate.of(2023, 8, 22))
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .build();
+        UnavailableDate unavailableDate = UnavailableDate.builder()
+            .date(LocalDate.of(2023, 8, 20))
+            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .build();
+        this.applicant2DQ = Applicant2DQ.builder()
+            .applicant2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
+                                      .unavailableDates(wrapElements(List.of(unavailableDate, unavailableDateRange))).build())
             .build();
         return this;
     }
@@ -2281,6 +2319,24 @@ public class CaseDataBuilder {
         trialHearingJudgesRecitalDJ = TrialHearingJudgesRecital
             .builder()
             .judgeNameTitle("test name")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
+        HearingDates singleDate = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            .build();
+
+        HearingDates dateRange = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            .build();
+
+        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+            .hearingUnavailableDates(YES)
+            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
         return this;
     }
@@ -5970,6 +6026,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
+            .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .build();
     }
 }
