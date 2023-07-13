@@ -500,7 +500,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .build();
     }
 
-    private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
+    protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
