@@ -10,8 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -29,9 +31,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @SpringBootTest(classes = {
     GenerateOrderNotificationHandler.class,
@@ -55,6 +60,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @BeforeEach
         void setup() {
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
         }
 
         @Test
@@ -109,6 +115,66 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldNotifyRespondent1Lip_whenInvoked() {
+            //given: case where applicant litigant in person has email as applicant@example.com
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: ApplicantNotificationhandler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id-lip",
+                getNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent2Lip_whenInvoked() {
+            //given: case where applicant litigant in person has email as applicant@example.com
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .respondent2Represented(YesOrNo.NO)
+                .respondent2(Party.builder().partyName("respondentLip2").type(Party.Type.INDIVIDUAL).partyEmail("respondentLip2@gmail" +
+                                                                                                ".com").build()).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: ApplicantNotificationhandler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "respondentLip2@gmail.com",
+                "template-id-lip",
+                getNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvoked() {
+            //given: case where applicant litigant in person has email as applicant@example.com
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+            //when: ApplicantNotificationhandler is called
+            handler.handle(params);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip",
+                getNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(
@@ -131,6 +197,15 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, handler.getLegalOrganizationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
         }
     }
