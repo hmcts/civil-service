@@ -61,14 +61,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         CaseData caseData = callbackParams.getCaseData();
 
         //ToDo: Replace with AHN logic
-        if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC) || isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC)) {
+        if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC) || isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC)  ||  caseData.isLRvLipOneVOne()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        if (caseData.isLRvLipOneVOne()) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
         String recipient = caseData.getRespondentSolicitor1EmailAddress();
 
         if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
