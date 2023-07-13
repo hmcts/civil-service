@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -219,6 +220,7 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
     private DisposalHearingHearingTime disposalHearingHearingTime;
     private DisposalHearingBundle disposalHearingBundle;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotes;
     private String disposalHearingHearingNotes;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
