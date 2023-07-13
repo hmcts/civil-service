@@ -1157,6 +1157,12 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
             )
+        ),
+         entry(
+            PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
+            List.of(
+                CREATE_SDO
+            )
         )
     );
 
