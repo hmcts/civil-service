@@ -35,15 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsRpaContinuousFeedEnabledInvoked(Boolean toggleState) {
-        var multipartyFeatureKey = "rpaContinuousFeed";
-        givenToggle(multipartyFeatureKey, toggleState);
-
-        assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
         var noticeOfChangeKey = "notice-of-change";
         givenToggle(noticeOfChangeKey, toggleState);
@@ -53,29 +44,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-sdo";
+    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
+        var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-legal-rep";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
-        var courtLocationDynamicListKey = "court-location-dynamic-list";
-        givenToggle(courtLocationDynamicListKey, toggleStat);
-
-        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -107,28 +80,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
-        var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, toggleStat);
-
-        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
         var certificateOfServiceKey = "isCertificateOfServiceEnabled";
         givenToggle(certificateOfServiceKey, toggleStat);
 
         assertThat(featureToggleService.isCertificateOfServiceEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    public void rpaContinuousFeed_LDTagName(Boolean toggleStat) {
-        var rpaContinuousFeed = "specified-rpa-continuous-feed";
-        givenToggle(rpaContinuousFeed, toggleStat);
-        assertThat(featureToggleService.isSpecRpaContinuousFeedEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -156,6 +112,15 @@ class FeatureToggleServiceTest {
         givenToggle(enableRPAEmailsKey, toggleStat);
 
         assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
+        var caseFileKey = "case-file-view";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

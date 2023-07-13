@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,8 +15,11 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -22,14 +28,19 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -43,13 +54,15 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.DEADLINE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
     NotifyClaimDetailsCallbackHandler.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -70,6 +83,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @Nested
     class AboutToStartCallback {
@@ -334,6 +350,59 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
             assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
+        }
+
+        static Stream<Arguments> caseDataStream() {
+            DocumentWithRegex documentRegex = new DocumentWithRegex(Document.builder()
+                                                                        .documentUrl("fake-url")
+                                                                        .documentFileName("file-name")
+                                                                        .documentBinaryUrl("binary-url")
+                                                                        .build());
+            List<Element<DocumentWithRegex>> documentList = new ArrayList<>();
+            List<Element<Document>> documentList2 = new ArrayList<>();
+            documentList.add(element(documentRegex));
+            documentList2.add(element(Document.builder()
+                                          .documentUrl("fake-url")
+                                          .documentFileName("file-name")
+                                          .documentBinaryUrl("binary-url")
+                                          .build()));
+
+            var documentToUpload = ServedDocumentFiles.builder()
+                .particularsOfClaimDocument(documentList2)
+                .medicalReport(documentList)
+                .scheduleOfLoss(documentList)
+                .certificateOfSuitability(documentList)
+                .other(documentList).build();
+
+            return Stream.of(
+                arguments(CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                              .uploadParticularsOfClaim(YES)
+                              .servedDocumentFiles(documentToUpload)
+                              .build())
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("caseDataStream")
+        void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            // When
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getMedicalReport().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+            assertThat(updatedData.getServedDocumentFiles().getOther().get(0).getValue().getDocument()
+                           .getCategoryID()).isEqualTo("particularsOfClaim");
+
         }
     }
 

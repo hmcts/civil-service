@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
     NotSuitableSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class,
+    ClaimUrlsConfiguration.class,
     JacksonConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class})
@@ -131,17 +131,14 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-
+        private CaseData caseData;
         private CallbackParams params;
 
         private static final String EMAIL = "example@email.com";
 
         @BeforeEach
         void setup() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             String userId = UUID.randomUUID().toString();
-
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
@@ -151,12 +148,25 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(NotSuitable_SDO.name(), "READY");
+
+        }
+
+        @Test
+        void checkOtherDetailsUpdated() {
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("otherDetails").extracting("reasonNotSuitableForSDO").isEqualTo("unforeseen complexities");
 
         }
     }

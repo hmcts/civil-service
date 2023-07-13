@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -34,7 +33,9 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -51,10 +52,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -62,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +80,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final ToggleConfiguration toggleConfiguration;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -90,14 +91,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
-            callbackKey(V_1, ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
-            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -205,7 +204,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         LocalDateTime currentTime = time.now();
@@ -219,9 +218,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                           + " is " + builder.build().getCaseManagementLocation());
         }
 
-        if (v1) {
-            updateCaseManagementLocation(callbackParams, builder);
-        }
+        updateCaseManagementLocation(callbackParams, builder);
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
@@ -237,18 +234,15 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
                 applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
-                if (featureToggleService.isCourtLocationDynamicListEnabled()) {
-
-                    String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
-                        caseData,
-                        CallbackParams.Params.BEARER_TOKEN.toString(), true
-                    );
-                    applicant1DQBuilder.applicant1DQRequestedCourt(
-                        RequestedCourt.builder()
-                            .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                            .responseCourtCode(responseCourtCode)
-                            .build());
-                }
+                String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
+                    caseData,
+                    CallbackParams.Params.BEARER_TOKEN.toString(), true
+                );
+                applicant1DQBuilder.applicant1DQRequestedCourt(
+                    RequestedCourt.builder()
+                        .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                        .responseCourtCode(responseCourtCode)
+                        .build());
 
                 builder.applicant1DQ(applicant1DQBuilder.build());
             }
@@ -268,7 +262,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(builder);
+        }
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
@@ -276,46 +276,21 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
-        AboutToStartOrSubmitCallbackResponse response = null;
 
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 
-        if (v1 && featureToggleService.isSdoEnabled()
-            && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-            if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
-                if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(builder.build().toMap(objectMapper))
-                        .state(CaseState.JUDICIAL_REFERRAL.name())
-                        .build();
-                } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                    if (caseData.getRespondent2ClaimResponseType()
-                        .equals(RespondentResponseType.FULL_DEFENCE)) {
-                        response = AboutToStartOrSubmitCallbackResponse.builder()
-                            .data(builder.build().toMap(objectMapper))
-                            .state(CaseState.JUDICIAL_REFERRAL.name())
-                            .build();
-                    }
-                } else {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(builder.build().toMap(objectMapper))
-                        .build();
-                }
-            } else {
-                response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .build();
-            }
-        } else {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
+        if (!AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
-                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                .state(CaseState.JUDICIAL_REFERRAL.name())
                 .build();
         }
 
-        return response;
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .build();
     }
 
     private void updateCaseManagementLocation(CallbackParams callbackParams,
@@ -366,6 +341,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 )));
         if (!claimantUploads.isEmpty()) {
             updatedCaseData.claimantResponseDocuments(claimantUploads);
+            assignCategoryId.assignCategoryIdToCollection(claimantUploads,  document -> document.getValue().getDocumentLink(),
+                                                     "directionsQuestionnaire");
         }
     }
 

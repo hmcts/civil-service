@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAccessDataStoreApi caseAccessDataStoreApi;
@@ -44,7 +45,8 @@ public class InitiateGeneralApplicationServiceHelper {
             .equals(organisationIdentifier);
     }
 
-    public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
+    public GeneralApplication setRespondentDetailsIfPresent(CaseData.CaseDataBuilder dataBuilder,
+                                                            GeneralApplication generalApplication,
                                                             CaseData caseData, UserDetails userDetails) {
         if (caseData.getApplicant1OrganisationPolicy() == null
                 || caseData.getRespondent1OrganisationPolicy() == null
@@ -144,6 +146,7 @@ public class InitiateGeneralApplicationServiceHelper {
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
+
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
@@ -179,10 +182,17 @@ public class InitiateGeneralApplicationServiceHelper {
             gaApplicantDisplayName = applicantPartyName + " - Defendant";
         }
         applicationBuilder.gaApplicantDisplayName(gaApplicantDisplayName);
-        return applicationBuilder
+        applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
                                            : YesOrNo.NO).build();
+
+        return applicationBuilder.build();
+    }
+
+    public static boolean isWithNotice(CaseData caseData) {
+        return caseData.getGeneralAppInformOtherParty() != null
+            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
     public String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,

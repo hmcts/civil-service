@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,12 +44,14 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DI
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateResponseSealedSpec.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
@@ -60,6 +63,9 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
 
     @MockBean
     private CivilDocumentStitchingService civilDocumentStitchingService;
@@ -268,6 +274,96 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvoked() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<CaseDocument> documents = new ArrayList<>();
+        documents.add(SEALED_FORM);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
+
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvokedStitchedEnabled() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<CaseDocument> documents = new ArrayList<>();
+        documents.add(SEALED_FORM);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
+
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvokedAndRespondent2() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<CaseDocument> documents = new ArrayList<>();
+        documents.add(SEALED_FORM);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .respondent2DocumentGeneration("userRespondent2")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
+
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvokedAndRespondent2StitchedEnabled() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<CaseDocument> documents = new ArrayList<>();
+        documents.add(SEALED_FORM);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .respondent2DocumentGeneration("userRespondent2")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
+
     }
 
     @Test

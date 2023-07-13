@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,15 +26,12 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
-import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -48,11 +42,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +60,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
-    private final PublicHolidaysCollection publicHolidaysCollection;
     private final Time time;
     private final HearingFeesService hearingFeesService;
 
@@ -178,9 +171,8 @@ public class HearingScheduledHandler extends CallbackHandler {
 
         if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(
-                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
-                                                                   publicHolidaysCollection.getPublicHolidays()));
-            caseDataBuilder.hearingFee(calculateAndApplyFee(caseData, allocatedTrack));
+                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+            caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack));
         } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
@@ -189,43 +181,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private Fee calculateAndApplyFee(CaseData caseData, AllocatedTrack allocatedTrack) {
-
-        BigDecimal claimAmount;
-        if (nonNull(caseData.getClaimValue())) {
-            claimAmount = caseData.getClaimValue().toPounds();
-        } else if (nonNull(caseData.getTotalInterest())) {
-            claimAmount = caseData.getTotalClaimAmount()
-                .add(caseData.getTotalInterest())
-                .setScale(2, RoundingMode.UNNECESSARY);
-        } else {
-            claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
-        }
-
-        if (SMALL_CLAIM.equals(allocatedTrack)) {
-            return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
-        } else if (FAST_CLAIM.equals(allocatedTrack)) {
-            return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
-        } else {
-            return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
-        }
-    }
-
-    LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate, Set<LocalDate> holidays) {
-        LocalDate calculatedHearingDueDate;
-        if (now.isBefore(hearingDate.minusWeeks(4))) {
-            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 20, holidays);
-        } else {
-            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
-        }
-
-        if (calculatedHearingDueDate.isAfter(hearingDate)) {
-            calculatedHearingDueDate = hearingDate;
-        }
-
-        return calculatedHearingDueDate;
     }
 
     private List<String> checkTrueOrElseAddError(boolean condition, String error) {

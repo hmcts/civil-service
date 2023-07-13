@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
@@ -306,6 +306,49 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNullDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "directionOrderDocument",
+                    caseData, "directionOrderDocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateNoExistFieldDocCollection() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder().build();
+        Map<String, Object> output = new HashMap<>();
+        String noExistingField = "notExist";
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, noExistingField + "Document",
+                    caseData, noExistingField + "DocStaff");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                    (List<Element<CaseDocument>>)output.get(noExistingField + "DocStaff");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void testUpdateDocCollectionWithoutNoticeGaCreatedByResp2() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
@@ -359,6 +402,68 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         assertThat(output.get("directionOrderDocRespondentSolTwo")).isNotNull();
         assertThat(output.get("directionOrderDocClaimant")).isNotNull();
         assertThat(output.get("directionOrderDocRespondentSol")).isNotNull();
+    }
+
+    @Test
+    void testShouldAddConsentOrderDocument() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithConsentOrderPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithConsentOrderStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
+    }
+
+    @Test
+    void testShouldAddGaDraftApplicationDocument() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
@@ -427,7 +532,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -448,7 +553,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -468,7 +573,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -476,6 +581,32 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    @Test
+    void checkIfDocumentExists() {
+        Element<?> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
+            .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
+                       .build()).build();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        gaDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
+        civilCaseDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
+    }
+
+    @Test
+    void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
+        Element<Document> documentElement = Element.<Document>builder()
+            .id(UUID.randomUUID())
+            .value(Document.builder().documentUrl("string").build()).build();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        gaDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
+        civilCaseDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()

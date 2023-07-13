@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -26,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 @RequiredArgsConstructor
 public class CoreCaseDataService {
 
+    private final ObjectMapper mapper;
+    private static final Integer RETURNED_NUMBER_OF_CASES = 50;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
@@ -145,4 +151,18 @@ public class CoreCaseDataService {
                                                        caseId.toString(), supplementaryData);
     }
 
+    public LocalDate getAgreedDeadlineResponseDate(Long caseId, String authorization) {
+        CaseData caseData = caseDetailsConverter.toCaseData(this.getCase(caseId, authorization));
+        if (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null) {
+            return caseData.getRespondent1ResponseDeadline().toLocalDate();
+        }
+        return null;
+    }
+
+    public SearchResult getCasesUptoMaxsize(String authorization) {
+        String query = new SearchSourceBuilder().size(RETURNED_NUMBER_OF_CASES)
+            .query(QueryBuilders.matchAllQuery()).toString();
+
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    }
 }

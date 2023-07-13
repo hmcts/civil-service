@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -210,6 +211,59 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             return properties;
         }
+
+        @Test
+        void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_CLAIMANT_LR_SPEC")
+                             .build())
+                .build();
+
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.empty());
+            // When
+            handler.handle(params);
+
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
+                caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+
+            // Then
+            verify(notificationService).sendMail(
+                APPLICANT_SOLICITOR_EMAIL,
+                TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyClaimantSolicitor_whenRespondent1NotRepresented() {
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_CLAIMANT_LR_SPEC")
+                             .build())
+                .build();
+
+            // When
+            handler.handle(params);
+
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+
+            // Then
+            verify(notificationService).sendMail(
+                APPLICANT_SOLICITOR_EMAIL,
+                TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
+        }
     }
 
     @Test
@@ -221,5 +275,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     }
 }

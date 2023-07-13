@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -60,6 +61,8 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("mediationSettlementAgreedAt").isNotNull();
             assertThat(response.getData()).extracting("mediationAgreement").isNotNull();
+            assertThat(response.getState())
+                .isEqualTo(CaseState.CASE_STAYED.name());
 
         }
     }

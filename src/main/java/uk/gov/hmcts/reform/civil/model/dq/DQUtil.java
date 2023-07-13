@@ -32,21 +32,8 @@ public class DQUtil {
             return Collections.emptyList();
         } else {
             return lrDates.stream().map(Element::getValue)
-                .map(this::mapDate)
                 .map(ElementUtils::element)
                 .collect(Collectors.toList());
         }
     }
-
-    private UnavailableDate mapDate(UnavailableDate lrSpec) {
-        UnavailableDate.UnavailableDateBuilder builder = UnavailableDate.builder()
-            .who(lrSpec.getWho());
-        if (lrSpec.getDate() != null) {
-            builder.date(lrSpec.getDate());
-        } else {
-            builder.fromDate(lrSpec.getFromDate()).toDate(lrSpec.getToDate());
-        }
-        return builder.build();
-    }
-
 }

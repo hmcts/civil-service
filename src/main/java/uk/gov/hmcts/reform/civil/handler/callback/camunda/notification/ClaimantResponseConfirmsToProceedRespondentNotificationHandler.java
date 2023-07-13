@@ -81,6 +81,18 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
+        if (isLRvLipToDefendant(callbackParams)) {
+            if (caseData.getRespondent1().getPartyEmail() != null) {
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
+                    addPropertiesLRvLip(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         if ((isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
             || (!isRespondentSolicitor2Notification(callbackParams)
@@ -131,6 +143,13 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         );
     }
 
+    public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
@@ -154,5 +173,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.isLRvLipOneVOne()
+            && !isCcNotification(callbackParams);
     }
 }

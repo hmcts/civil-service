@@ -3,12 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +34,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
@@ -60,16 +55,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 })
 class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
-    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
-
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private HearingScheduledHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
     @MockBean
     private HearingFeesService feesService;
 
@@ -79,37 +70,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     public void prepareTest() {
         given(time.now()).willReturn(LocalDateTime.now());
-
-        Set<LocalDate> publicHolidays = new HashSet<>();
-        publicHolidays.add(time.now().toLocalDate().plusDays(3));
-        given(publicHolidaysCollection.getPublicHolidays()).willReturn(publicHolidays);
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(Fee.builder().build());
         given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(Fee.builder().build());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        // current date,hearing date,expected
-        "2022-10-27,2022-11-04,2022-11-04",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
-        "2022-10-01,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
-        "2022-10-01,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
-    })
-    void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
-        String strCurrentDate, String strHearingDate, String strExpectedHearingDueDate) {
-        // Given
-
-        LocalDate currentDate = LocalDate.parse(strCurrentDate, DATE_FORMAT);
-        LocalDate hearingDate = LocalDate.parse(strHearingDate, DATE_FORMAT);
-        LocalDate expectedHearingDueDate = LocalDate.parse(strExpectedHearingDueDate, DATE_FORMAT);
-        Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
-
-        // When
-        LocalDate actualHearingDueDate = handler.calculateHearingDueDate(currentDate, hearingDate, holidays);
-
-        // Then
-        assertThat(actualHearingDueDate).isEqualTo(expectedHearingDueDate);
-
     }
 
     @ParameterizedTest

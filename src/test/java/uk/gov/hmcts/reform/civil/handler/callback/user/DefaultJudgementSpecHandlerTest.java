@@ -38,14 +38,18 @@ import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_HEADER;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_REQUESTED_LIP_CASE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -856,6 +860,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                      .build())
                                           .build())
                 .specRespondent1Represented(NO)
+                .respondent1Represented(null)
 
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
@@ -878,6 +883,37 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + " £1222.00";
 
             assertThat(response.getData().get("repaymentSummaryObject")).isEqualTo(test);
+        }
+    }
+
+    @Nested
+    class MidRepaymentTotal {
+
+        private static final String PAGE_ID = "repaymentTotal";
+
+        @Test
+        void shouldGetException_whenIsCalledAndTheOverallIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            assertThrows(NullPointerException.class, () -> {
+                handler.handle(params);
+            });
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        @Test
+        void shouldGenerateDocument_whenIsCalled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess").isNotNull();
         }
     }
 
@@ -954,6 +990,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                                                           .build());
         }
 
+        @Test
+        void shouldReturnJudgementRequestedResponse_whenLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1(PartyBuilder.builder().build())
+                .respondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(caseData.isLRvLipOneVOne()).isTrue();
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(
+                                                                              JUDGMENT_REQUESTED_HEADER)
+                                                                          .confirmationBody(String.format(
+                                                                              JUDGMENT_REQUESTED_LIP_CASE))
+                                                                          .build());
+        }
     }
 
 }

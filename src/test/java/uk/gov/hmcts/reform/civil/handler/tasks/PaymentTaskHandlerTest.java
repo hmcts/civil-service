@@ -36,7 +36,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
@@ -87,8 +86,6 @@ class PaymentTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                                                  "RPA_CONTINUOUS_FEED", false,
-                                                  FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                                                   FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                                                   FlowFlag.NOTICE_OF_CHANGE.name(), false,
                                                   FlowFlag.CERTIFICATE_OF_SERVICE.name(), false));
@@ -120,7 +117,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -141,7 +138,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -161,7 +158,7 @@ class PaymentTaskHandlerTest {
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),

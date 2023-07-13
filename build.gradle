@@ -8,7 +8,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.46.0'
   id 'org.sonarqube' version '3.4.0.2513'
   id 'au.com.dius.pact' version '4.2.14'
-  id "io.freefair.lombok" version "5.3.3.3"
+  id "io.freefair.lombok" version "6.6.3"
   id "org.flywaydb.flyway" version "9.0.1"
 }
 
@@ -79,7 +79,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '31.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '32.1.1-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
@@ -110,7 +110,7 @@ allprojects {
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
-        version: '7.18.0'
+        version: '7.17.0'
       ) {
         entry 'camunda-engine'
       }
@@ -148,9 +148,6 @@ allprojects {
     mavenCentral()
     maven {
       url "https://jitpack.io"
-    }
-    maven {
-      url  "https://repo.spring.io/libs-milestone"
     }
     maven {
       url "https://jitpack.io"
@@ -231,41 +228,15 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
 }
 
-task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-spec'
+task runProdApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
-task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
+task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-sdo'
-}
-
-task runApiTests(type: Exec, description: 'Runs Api tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-unspec'
-}
-
-task runDJTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-dj'
-}
-
-task runCosTests(type: Exec, description: 'Runs DJ Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-cos'
-}
-
-task runNoCTests(type: Exec, description: 'Runs Notice of change Api functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-noc'
-}
-
-task runRpaHandOffTests(type: Exec, description: 'Runs functional tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:rpa'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
@@ -273,10 +244,6 @@ task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nig
     return System.env.NIGHTLY_RUN == 'true'
   }
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nightly-prod'
-}
-
-task runEndToEndUnspecTests(type: Exec, description: 'Runs E2E Unspecified claim tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:AATFunctional'
 }
 
 task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
@@ -296,7 +263,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runCosTests, runDJTests, runSpecApiTests, runSdoApiTests, runApiTests, runNoCTests, runNightlyApiTests))
+    runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -310,8 +277,9 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }
@@ -334,8 +302,8 @@ jacocoTestReport.dependsOn {
 }
 
 def versions = [
-  junit              : '5.7.0',
-  junitPlatform      : '1.8.1',
+  junit              : '5.9.3',
+  junitPlatform      : '1.9.3',
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.2.0',
@@ -364,7 +332,8 @@ configurations.all {
 }
 
 dependencies {
-  implementation project(':commons-civil')
+  implementation 'com.github.hmcts:civil-commons:1.0.0'
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -405,10 +374,10 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.5'
@@ -433,12 +402,13 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.18.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.18.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
@@ -466,8 +436,8 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.7.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.9.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.9.3')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -13,8 +14,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -26,6 +30,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -44,6 +50,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -55,7 +62,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -78,11 +85,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     CreateSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class,
+    ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     DeadlinesCalculator.class,
     ValidationAutoConfiguration.class,
-    LocationHelper.class},
+    LocationHelper.class,
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -101,6 +109,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateSDOCallbackHandler handler;
 
     @Autowired
+    private AssignCategoryId assignCategoryId;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
@@ -115,10 +126,59 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private NonWorkingDaysCollection nonWorkingDaysCollection;
 
+    @MockBean
+    private CategoryService categoryService;
+
     @Nested
-    class AboutToStartCallback {
+    class AboutToStartCallback extends LocationRefSampleDataBuilder {
+        @BeforeEach
+        void setup() {
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
+                .thenReturn(LocalDate.now().plusDays(7));
+        }
 
+        @Test
+        void shouldGenerateDynamicListsCorrectly() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList hearingMethodValuesFastTrack = responseCaseData.getHearingMethodValuesFastTrack();
+            DynamicList hearingMethodValuesDisposalHearing = responseCaseData.getHearingMethodValuesDisposalHearing();
+            DynamicList hearingMethodValuesSmallClaims = responseCaseData.getHearingMethodValuesSmallClaims();
+
+            List<String> hearingMethodValuesFastTrackActual = hearingMethodValuesFastTrack.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            List<String> hearingMethodValuesDisposalHearingActual = hearingMethodValuesDisposalHearing.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            List<String> hearingMethodValuesSmallClaimsActual = hearingMethodValuesSmallClaims.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            assertThat(hearingMethodValuesFastTrackActual).containsOnly("In Person");
+            assertThat(hearingMethodValuesDisposalHearingActual).containsOnly("In Person");
+            assertThat(hearingMethodValuesSmallClaimsActual).containsOnly("In Person");
+        }
     }
 
     @Nested
@@ -315,6 +375,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
         }
+
+        @Test
+        void shouldReturnNullDocument_whenInvokedAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNull();
+        }
     }
 
     @Nested
@@ -327,6 +398,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -358,6 +431,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -395,6 +470,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -438,6 +515,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
+                .thenReturn(LocalDate.now().plusDays(7));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -468,6 +547,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class))).thenReturn(newDate);
         }
 
         private final LocalDate date = LocalDate.of(2020, 1, 15);
@@ -481,6 +561,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -631,7 +714,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Each party must upload to the Digital Portal copies of those documents on which they "
                                + "wish to rely at trial by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
 
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
@@ -941,6 +1024,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
                                + "they must inform the court within 7 days of the date of this order.");
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateToToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateFrom")
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
                 .isEqualTo("Not more than seven nor less than three clear days before the trial, "
                                + "the claimant must file at court and serve an indexed and paginated bundle of "
@@ -1147,7 +1235,134 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "generate-sdo-order";
 
         @Test
-        void shouldGenerateAndSaveSdoOrder() {
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedDisposalHearingSDOInPersonHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedDisposalHearingSDOTelephoneHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOTelephoneHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedDisposalHearingSDOVideoHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOVideoHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedFastTrackSDOInPersonHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedFastTrackSDOInPersonHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedFastTrackSDOTelephoneHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedFastTrackSDOTelephoneHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedFastTrackSDOVideoHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedFastTrackSDOVideoHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedSmallClaimsSDOInPersonHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedSmallClaimsSDOInPersonHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedSmallClaimsSDOTelephoneHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedSmallClaimsSDOTelephoneHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldGenerateAndSaveSdoOrder_whenStateClaimIssuedSmallClaimsSDOVideoHearing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedSmallClaimsSDOVideoHearing().build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenInvoked() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1156,8 +1371,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
         }
+
     }
 
     @Nested

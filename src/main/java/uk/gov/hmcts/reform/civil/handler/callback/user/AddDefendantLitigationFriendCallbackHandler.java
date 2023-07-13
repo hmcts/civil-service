@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +57,8 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private final CoreCaseUserService coreCaseUserService;
 
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -128,6 +132,10 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
         caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseDataUpdated);
         caseDataUpdated.isRespondent1(null);
+
+        if (featureToggleService.isHmcEnabled()) {
+            populateWithPartyIds(caseDataUpdated);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))

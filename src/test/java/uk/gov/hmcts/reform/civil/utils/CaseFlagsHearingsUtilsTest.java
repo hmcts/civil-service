@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveFlagDetails()));
 
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
@@ -64,8 +65,8 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveHearingRelevantFlagDetails()));
 
-        List<Flags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags(activeFlags);
+        List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
@@ -90,8 +91,8 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveSMCodeFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveSMCodeFlagDetails()));
 
-        List<Flags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getSMCodeFlags(activeFlags);
+        List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getSMCodeFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
@@ -108,7 +109,7 @@ public class CaseFlagsHearingsUtilsTest {
             .withRespondent1ExpertFlags()
             .build();
 
-        List<Flags> expectedFlags = new ArrayList<>();
+        List<PartyFlags> expectedFlags = new ArrayList<>();
 
         expectedFlags.add(getRespondent1Flags(caseData, getAllActiveRACodeFlagDetails()));
         expectedFlags.add(getApplicant1Flags(caseData, getAllActiveRACodeFlagDetails()));
@@ -116,8 +117,8 @@ public class CaseFlagsHearingsUtilsTest {
         expectedFlags.add(getRespondent1ExpertsFlags(caseData, getAllActiveRACodeFlagDetails()));
         expectedFlags.add(getRespondent1WitnessFlags(caseData, getAllActiveRACodeFlagDetails()));
 
-        List<Flags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
-        List<Flags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(activeFlags);
+        List<PartyFlags> activeFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
@@ -147,8 +148,8 @@ public class CaseFlagsHearingsUtilsTest {
                 .withRespondent1Flags(flags)
                 .withApplicant1Flags(flags)
                 .withRespondent1LitigationFriendFlags(flags)
-                .withRespondent1WitnessFlags(flags)
-                .withRespondent1ExpertFlags(flags)
+                .withRespondent1WitnessFlags()
+                .withRespondent1ExpertFlags()
                 .build();
 
             assertThat(CaseFlagsHearingsUtils.detainedIndividualFlagExist(caseData)).isTrue();
@@ -185,28 +186,32 @@ public class CaseFlagsHearingsUtilsTest {
         }
     }
 
-    private Flags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details);
+    private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details, caseData.getRespondent1().getPartyID());
     }
 
-    private Flags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details);
+    private PartyFlags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details, caseData.getApplicant1().getPartyID());
     }
 
-    private Flags getRespondent1LitFriendFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getRespondent1LitigationFriend().getFullName(), "Respondent 1 Litigation Friend", details);
+    private PartyFlags getRespondent1LitFriendFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty(caseData.getRespondent1LitigationFriend().getFullName(),
+                                "Respondent 1 Litigation Friend", details, caseData.getRespondent1LitigationFriend().getPartyID());
     }
 
-    private Flags getRespondent1WitnessFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("W First W Last", "Respondent 1 Witness", details);
+    private PartyFlags getRespondent1WitnessFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("W First W Last", "Respondent 1 Witness", details,
+                                "res-1-witness-party-id");
     }
 
-    private Flags getRespondent1ExpertsFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("E First E Last", "Respondent 1 Expert", details);
+    private PartyFlags getRespondent1ExpertsFlags(CaseData caseData, List<Element<FlagDetail>> details) {
+        return getFlagsForParty("E First E Last", "Respondent 1 Expert", details,
+                                "res-1-expert-party-id");
     }
 
-    private Flags getFlagsForParty(String name, String role, List<Element<FlagDetail>> details) {
-        return Flags.builder()
+    private PartyFlags getFlagsForParty(String name, String role, List<Element<FlagDetail>> details, String partyId) {
+        return PartyFlags.builder()
+            .partyId(partyId)
             .partyName(name)
             .roleOnCase(role)
             .details(details)

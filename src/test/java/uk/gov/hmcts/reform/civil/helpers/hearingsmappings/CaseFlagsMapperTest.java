@@ -36,7 +36,7 @@ public class CaseFlagsMapperTest {
 
         CaseFlags expectedCaseFlags = CaseFlags.builder()
             .flags(List.of(PartyFlagsModel.builder()
-                               .partyID("")
+                               .partyID("res-1-party-id")
                                .partyName(caseData.getRespondent1().getPartyName())
                                .flagParentId("")
                                .flagId("AB001")
@@ -44,7 +44,7 @@ public class CaseFlagsMapperTest {
                                .flagStatus("Active")
                                .build(),
                            PartyFlagsModel.builder()
-                               .partyID("")
+                               .partyID("res-1-party-id")
                                .partyName(caseData.getRespondent1().getPartyName())
                                .flagParentId("")
                                .flagId("SM001")

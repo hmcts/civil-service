@@ -63,12 +63,18 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
 
     private CaseData getPartialAdmitPayImmediately() {
         BigDecimal admitted = BigDecimal.valueOf(1000);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         return CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(admitted)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
             .build();
     }
 
