@@ -112,7 +112,7 @@ public class HearingValuesService {
         try {
             return caseDetailsConverter.toCaseData(caseDataService.getCase(caseId).getData());
         } catch (Exception ex) {
-            log.error(String.format("No case found for %d", caseId));
+            log.error(String.format("No case found for %d", caseId), ex);
             throw new CaseNotFoundException();
         }
     }
