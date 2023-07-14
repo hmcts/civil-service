@@ -15,7 +15,10 @@ import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.model.Party.Type.*;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
