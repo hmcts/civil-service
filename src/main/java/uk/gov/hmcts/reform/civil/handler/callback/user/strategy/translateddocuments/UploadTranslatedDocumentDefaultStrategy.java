@@ -32,6 +32,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             callbackParams);
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
             updatedDocumentList)
+            .respondent1ClaimResponseDocumentSpec(getTranslatedDocumentAsCaseDocument(callbackParams))
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(AWAITING_APPLICANT_INTENTION.name())
@@ -47,5 +48,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             document.getCorrespondingDocumentType(),
             callbackParams
         )).orElse(caseData.getSystemGeneratedCaseDocuments());
+    }
+
+    private CaseDocument getTranslatedDocumentAsCaseDocument(CallbackParams callbackParams) {
+        Optional<TranslatedDocument> translatedDocument = callbackParams.getCaseData().getTranslatedDocument();
+        return translatedDocument.map(document -> CaseDocument.toCaseDocument(
+            document.getFile(),
+            document.getCorrespondingDocumentType()
+        )).orElse(null);
     }
 }
