@@ -9,9 +9,6 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
-    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
-        Claim::claimantAcceptRepayment
-    ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
@@ -98,14 +95,17 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    CLAIM_SENT_TO_CLAIMANT(
+        Claim::claimSentToClaimant
+    ),
+    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
+        Claim::claimantAcceptRepayment
+    ),
     CLAIMANT_REJECT_OFFER(
         Claim::claimantRejectOffer
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
-    ),
-    CLAIM_SENT_TO_CLAIMANT(
-        Claim::claimSentToClaimant
     ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected

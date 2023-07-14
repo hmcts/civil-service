@@ -80,8 +80,9 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSettled() {
-        return caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant();
+        return !caseData.isRespondentResponseFullDefence()
+            && (caseData.respondent1PaidInFull()
+            || caseData.isResponseAcceptedByClaimant());
     }
 
     @Override
@@ -229,20 +230,21 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean claimSentToClaimant() {
         return caseData.isRespondentResponseFullDefence()
             && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
-            && (caseData.isSettlementDeclinedByClaimant()
-            || caseData.isClaimantRejectsClaimAmount());
+            && Objects.isNull(caseData.getApplicant1ResponseDate());
     }
 
     @Override
     public boolean claimantAcceptRepayment() {
-        return Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
-            || caseData.hasApplicantAcceptedRepaymentPlan()
-            || caseData.hasApplicantProceededWithClaim();
+        return caseData.isRespondentResponseFullDefence()
+            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
+            && caseData.hasApplicantAcceptedRepaymentPlan();
     }
 
     @Override
     public boolean claimantRejectOffer() {
-        return caseData.hasApplicantRejectedRepaymentPlan();
+        return caseData.isRespondentResponseFullDefence()
+            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
+            && caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override

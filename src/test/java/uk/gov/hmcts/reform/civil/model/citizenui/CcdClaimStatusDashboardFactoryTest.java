@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -304,8 +305,6 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .applicant1ResponseDate(LocalDateTime.now())
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
@@ -316,6 +315,8 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_applicantRejectRepaymentPlan_whenGetStatus_rejectOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
@@ -338,6 +339,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_applicantAcceptRepaymentPlan_whenGetStatus_acceptOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .build();
