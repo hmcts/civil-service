@@ -45,6 +45,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
         //Given
+        TranslatedDocument translatedDocument = TranslatedDocument
+            .builder()
+            .documentType(DEFENDANT_RESPONSE)
+            .file(Document.builder().documentFileName(FILE_NAME).build())
+            .build();
         CaseData caseData = CaseDataBuilder
             .builder()
             .atStatePendingClaimIssued()
@@ -52,11 +57,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .builder()
             .caseDataLiP(CaseDataLiP
                              .builder()
-                             .translatedDocument(TranslatedDocument
-                                                     .builder()
-                                                     .documentType(DEFENDANT_RESPONSE)
-                                                     .file(Document.builder().documentFileName(FILE_NAME).build())
-                                                     .build())
+                             .translatedDocument(translatedDocument)
                              .build())
             .build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
@@ -71,6 +72,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .asList()
             .extracting("value")
             .extracting("documentName")
+            .isNotNull();
+        assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec")
             .isNotNull();
     }
 
@@ -87,6 +90,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             callbackParams);
         //Then
         assertThat(response.getData()).extracting("systemGeneratedCaseDocuments")
+            .isNull();
+        assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec")
             .isNull();
     }
 }
