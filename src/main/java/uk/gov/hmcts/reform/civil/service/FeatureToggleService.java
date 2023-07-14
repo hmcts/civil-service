@@ -56,4 +56,8 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
+    public boolean isFastTrackUpliftsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
+    }
+
 }
