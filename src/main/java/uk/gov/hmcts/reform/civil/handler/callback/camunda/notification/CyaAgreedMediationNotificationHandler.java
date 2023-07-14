@@ -57,9 +57,13 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
 
     private CallbackResponse sendCVSMediation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Optional<EmailData> emailData = prepareEmail(caseData);
 
-        emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+        // LRvLR will be added in CIV-9525
+        if (caseData.isLRvLipOneVOne()) {
+            Optional<EmailData> emailData = prepareEmail(caseData);
+
+            emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

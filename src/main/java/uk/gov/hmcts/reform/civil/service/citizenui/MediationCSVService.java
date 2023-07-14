@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.math.BigDecimal;
 
@@ -19,16 +20,16 @@ public class MediationCSVService {
 
         String [] claimantData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
-            data.getApplicant1().getType().toString(), data.getApplicant1().getCompanyName(),
-            data.getApplicant1().getIndividualFirstName(), data.getApplicant1().getPartyPhone(),
+            data.getApplicant1().getType().toString(), setUpCsvCompanyName(data.getApplicant1()),
+            setUpCsvIndividualName(data.getApplicant1()), data.getApplicant1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getApplicant1().getPartyEmail(),
             isPilot(data.getTotalClaimAmount())
         };
 
         String [] respondentData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
-            data.getRespondent1().getType().toString(), data.getRespondent1().getCompanyName(),
-            data.getRespondent1().getIndividualFirstName(), data.getRespondent1().getPartyPhone(),
+            data.getRespondent1().getType().toString(), setUpCsvCompanyName(data.getRespondent1()),
+            setUpCsvIndividualName(data.getRespondent1()), data.getRespondent1().getPartyPhone(),
             CHECK_LIST, PARTY_STATUS, data.getRespondent1().getPartyEmail(),
             isPilot(data.getTotalClaimAmount())
         };
@@ -51,5 +52,39 @@ public class MediationCSVService {
         builder.append("\n");
 
         return builder.toString();
+    }
+
+    private String setUpCsvCompanyName(Party party) {
+        switch (party.getType()) {
+            case COMPANY:
+                return party.getCompanyName();
+            case ORGANISATION:
+                return party.getOrganisationName();
+            default:
+                return null;
+        }
+    }
+
+    private String setUpCsvIndividualName(Party party) {
+        switch (party.getType()) {
+            case INDIVIDUAL:
+                return getIndividualName(party);
+            case SOLE_TRADER:
+                return getSoleTraderName(party);
+            default:
+                return null;
+        }
+    }
+
+    private static String getSoleTraderName(Party party) {
+        return party.getSoleTraderFirstName()
+            + " "
+            + party.getSoleTraderLastName();
+    }
+
+    private static String getIndividualName(Party party) {
+        return party.getIndividualFirstName()
+            + " "
+            + party.getIndividualLastName();
     }
 }
