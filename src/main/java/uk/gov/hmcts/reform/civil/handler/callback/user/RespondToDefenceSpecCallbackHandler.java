@@ -279,7 +279,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                           + " is " + builder.build().getCaseManagementLocation());
         }
 
-        if (caseData.hasApplicantProceededWithClaim() || caseData.isPartAdmitClaimNotSettled()) {
+        if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
