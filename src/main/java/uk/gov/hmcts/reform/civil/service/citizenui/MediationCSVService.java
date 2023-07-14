@@ -55,36 +55,10 @@ public class MediationCSVService {
     }
 
     private String setUpCsvCompanyName(Party party) {
-        switch (party.getType()) {
-            case COMPANY:
-                return party.getCompanyName();
-            case ORGANISATION:
-                return party.getOrganisationName();
-            default:
-                return null;
-        }
+        return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
 
     private String setUpCsvIndividualName(Party party) {
-        switch (party.getType()) {
-            case INDIVIDUAL:
-                return getIndividualName(party);
-            case SOLE_TRADER:
-                return getSoleTraderName(party);
-            default:
-                return null;
-        }
-    }
-
-    private static String getSoleTraderName(Party party) {
-        return party.getSoleTraderFirstName()
-            + " "
-            + party.getSoleTraderLastName();
-    }
-
-    private static String getIndividualName(Party party) {
-        return party.getIndividualFirstName()
-            + " "
-            + party.getIndividualLastName();
+        return (party.isIndividual() || party.isSoleTrader()) ? party.getPartyName() : null;
     }
 }
