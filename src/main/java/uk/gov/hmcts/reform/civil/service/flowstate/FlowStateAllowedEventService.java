@@ -1125,7 +1125,8 @@ public class FlowStateAllowedEventService {
             IN_MEDIATION.fullName(),
             List.of(
                 MEDIATION_SUCCESSFUL,
-                MEDIATION_UNSUCCESSFUL
+                MEDIATION_UNSUCCESSFUL,
+                CREATE_SDO
             )
         ),
         entry(
