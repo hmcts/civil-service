@@ -14,8 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING_HMC;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isDefendant1;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +54,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING) ? TASK_ID_DEFENDANT1
+        return isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING) ? TASK_ID_DEFENDANT1
             : TASK_ID_DEFENDANT2;
     }
 
@@ -70,7 +67,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         }
 
         boolean isRespondentLip = isRespondentLip(caseData);
-        boolean isDefendant1 = isDefendant1(callbackParams, NOTIFY_DEFENDANT1_HEARING);
+        boolean isDefendant1 = isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING);
         sendEmail(caseData, getRespondentRecipient(caseData, isDefendant1, isRespondentLip), isDefendant1, isRespondentLip);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
