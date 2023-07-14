@@ -327,9 +327,6 @@ exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
   respondent-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Defendant/
 
-hmc-to-hearings-api:
-  enabled: ${HMC_HEARINGS_TOPIC_LISTENING_ENABLED:false}
-
 azure:
   service-bus:
     connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
