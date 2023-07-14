@@ -692,6 +692,14 @@ public class CaseDataParent implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final YesOrNo tempCorrectedDefendant2AddressRequired;
 
+    /**
+     * used to correct solicitor's correspondence address, but not saved in db.
+     * Don't count on this field's availability.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final Address tempCorrespondenceAddress;
+    private final Address specRespondent2CorrespondenceAddressdetails;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES

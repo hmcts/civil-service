@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -1319,6 +1321,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
+
+        if (caseData.getTempCorrespondenceAddress() != null
+            && StringUtils.isNotBlank(caseData.getTempCorrespondenceAddress().getAddressLine1())) {
+            if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
+                updatedData.specRespondentCorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress());
+            } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
+                updatedData.specRespondent2CorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress());
+            }
+            // front does not delete based on null, but can replace with an empty object
+            updatedData.tempCorrespondenceAddress(Address.builder().build());
+        }
 
         if (respondent2HasSameLegalRep(caseData)) {
             // if responses are marked as same, copy respondent 1 values into respondent 2
