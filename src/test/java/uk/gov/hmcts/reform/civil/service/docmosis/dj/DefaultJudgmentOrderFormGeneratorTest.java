@@ -19,10 +19,13 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -66,6 +69,17 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         .documentName(fileNameTrial)
         .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
         .build();
+    private static RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
+        .builder()
+        .roleAssignmentResponse(
+            List.of(RoleAssignmentResponse
+                        .builder()
+                        .actorId("1111111")
+                        .roleName("judge")
+                        .build()
+            )
+        )
+        .build();
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
 
@@ -81,8 +95,13 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @MockBean
     private IdamClient idamClient;
 
+    @MockBean
+    private RoleAssignmentsService roleAssignmentsService;
+
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
+
+    private static final String USER_AUTH_TOKEN = "Bearer caa-user-xyz";
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
@@ -95,6 +114,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
@@ -121,6 +141,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
@@ -146,6 +167,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
@@ -172,6 +194,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedDisposalHearing()
@@ -206,8 +229,11 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                .roles(Collections.emptyList()).build());
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com",
+                                        "Test", "User",
+                                        Collections.emptyList()));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()

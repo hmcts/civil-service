@@ -24,10 +24,12 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -35,12 +37,14 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -73,6 +77,17 @@ public class SdoGeneratorServiceTest {
         .documentName(fileNameDisposal)
         .documentType(SDO_ORDER)
         .build();
+    private static RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
+        .builder()
+        .roleAssignmentResponse(
+            List.of(RoleAssignmentResponse
+                        .builder()
+                        .actorId("1111111")
+                        .roleName("judge")
+                        .build()
+            )
+        )
+        .build();
 
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
@@ -81,10 +96,10 @@ public class SdoGeneratorServiceTest {
     private DocumentGeneratorService documentGeneratorService;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
+    protected IdamClient idamClient;
 
     @MockBean
-    protected IdamClient idamClient;
+    private RoleAssignmentsService roleAssignmentsService;
 
     @MockBean
     private DocumentHearingLocationHelper documentHearingLocationHelper;
@@ -100,6 +115,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -125,6 +141,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         LocationRefData locationRefData = LocationRefData.builder().build();
         String locationLabel = "String 1";
@@ -168,6 +185,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_FAST);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -194,6 +212,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_FAST);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         LocationRefData locationRefData = LocationRefData.builder().build();
         String locationLabel = "String 1";
@@ -238,6 +257,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -278,6 +298,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
         when(idamClient.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+        when(roleAssignmentsService.getRoleAssignments(anyString(), anyString())).thenReturn(RAS_RESPONSE);
 
         LocationRefData locationRefData = LocationRefData.builder().build();
         String locationLabel = "String 1";

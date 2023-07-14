@@ -69,6 +69,7 @@ java:
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    ROLE_ASSIGNMENT_SERVICE_API_URL: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
   keyVaults:
     civil:

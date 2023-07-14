@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -27,6 +28,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
@@ -46,6 +49,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
     private final IdamClient idamClient;
+    private final RoleAssignmentsService roleAssignmentsService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -83,13 +87,11 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-
-        boolean isJudge = false;
-
-        if (userDetails.getRoles() != null) {
-            isJudge = userDetails.getRoles().stream()
-                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-        }
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
+        boolean isJudge = Optional.ofNullable(roleAssignmentResponse.getRoleAssignmentResponse())
+            .map(list -> list.stream().filter(Objects::nonNull)
+                .anyMatch(s -> s.getRoleName().equals("judge")))
+            .orElse(false);
         String courtLocation = getCourt(caseData);
         var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
@@ -149,13 +151,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
             ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
 
-        boolean isJudge = false;
-
-        if (userDetails.getRoles() != null) {
-            isJudge = userDetails.getRoles().stream()
-                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-        }
+        boolean isJudge = Optional.ofNullable(roleAssignmentResponse.getRoleAssignmentResponse())
+            .map(list -> list.stream().filter(Objects::nonNull)
+                .anyMatch(s -> s.getRoleName().equals("judge")))
+            .orElse(false);
         var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
             .writtenByJudge(isJudge)
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
@@ -358,4 +359,3 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return nonNull(casedata.getApplicant1()) && nonNull(casedata.getApplicant1().getPartyName());
     }
 }
-

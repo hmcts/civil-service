@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,6 +40,7 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+    private final RoleAssignmentsService roleAssignmentsService;
     private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -46,13 +49,11 @@ public class SdoGeneratorService {
 
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
-
-        boolean isJudge = false;
-
-        if (userDetails.getRoles() != null) {
-            isJudge = userDetails.getRoles().stream()
-                .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
-        }
+        var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(userDetails.getId(), authorisation);
+        boolean isJudge = Optional.ofNullable(roleAssignmentResponse.getRoleAssignmentResponse())
+            .map(list -> list.stream().filter(Objects::nonNull)
+                .anyMatch(s -> s.getRoleName().equals("judge")))
+            .orElse(false);
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
