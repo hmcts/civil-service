@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 @RequiredArgsConstructor
 public class MediationCsvServiceFactory {
 
-    private final MediationServiceLrvLr mediationServiceLrvLr;
+    private final MediationCSVLrvLrService mediationServiceLrvLr;
     private final MediationCSVLrvLipService mediationCSVLrvLipService;
 
     public MediationCSVService getMediationCSVService (CaseData caseData) {

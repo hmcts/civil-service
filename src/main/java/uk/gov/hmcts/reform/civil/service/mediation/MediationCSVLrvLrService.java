@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Service
 @RequiredArgsConstructor
-public class MediationServiceLrvLr extends MediationCSVService{
+public class MediationCSVLrvLrService extends MediationCSVService{
 
     private final OrganisationService organisationService;
 
@@ -18,6 +18,7 @@ public class MediationServiceLrvLr extends MediationCSVService{
         return MediationParams.builder()
             .applicantOrganisation(organisationService.findOrganisationById(caseData.getApplicantOrganisationId()))
             .defendantOrganisation(organisationService.findOrganisationById(caseData.getRespondent1OrganisationId()))
+            .caseData(caseData)
             .build();
     }
 
@@ -45,7 +46,7 @@ public class MediationServiceLrvLr extends MediationCSVService{
 
     @Override
     protected String getCsvContactNameForDefendant(MediationParams params) {
-        return  params.getDefendantOrganisation()
+        return params.getDefendantOrganisation()
             .map(Organisation::getName)
             .orElse("");
     }
