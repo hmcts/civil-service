@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailCo
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.citizenui.MediationCSVService;
 
@@ -83,5 +84,14 @@ public class CyaAgreedMediationNotificationHandlerTest extends BaseCallbackHandl
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
         }
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder()
+                                                 .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_CYA_ON_AGREED_MEDIATION")
+                                                              .build()).build()))
+            .isEqualTo("CyaAgreedMediationNotification");
     }
 }

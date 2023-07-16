@@ -27,19 +27,20 @@ public class MediationCSVService {
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
 
         Optional<Organisation> claimantRepresentativeOrganisation = organisationService.findOrganisationById(data.getApplicantOrganisationId());
+        String totalClaimAmount = data.getTotalClaimAmount().toString();
         String [] claimantData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
-            data.getApplicant1().getType().toString(), getApplicantSolicitorCompanyName(claimantRepresentativeOrganisation,data),
-            data.getApplicant1().getPartyName(), getRepresentativeContactNumber(claimantRepresentativeOrganisation),
+            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
+            data.getApplicant1().getType().toString(), getCsvCompanyName(data.getApplicant1()),
+            getApplicantSolicitorCompanyName(claimantRepresentativeOrganisation,data), getRepresentativeContactNumber(claimantRepresentativeOrganisation),
             CHECK_LIST, PARTY_STATUS, getApplicantEmailAddress(data),
             isPilot(data.getTotalClaimAmount())
         };
-
+        Optional<Organisation> defendantRepresentativeOrganisation = getRespondentRepresentativeOrganisation(data);
         String [] respondentData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, data.getTotalClaimAmount().toString(),
-            data.getRespondent1().getType().toString(), getCsvCompanyNameForDefendant(data.getRespondent1()),
-            getCsvIndividualName(data.getRespondent1()), data.getRespondent1().getPartyPhone(),
-            CHECK_LIST, PARTY_STATUS, data.getRespondent1().getPartyEmail(),
+            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
+            data.getRespondent1().getType().toString(), getCsvCompanyName(data.getRespondent1()),
+            getCsvContactNameForDefendant(data, defendantRepresentativeOrganisation), getContactNumberForDefendant(data, defendantRepresentativeOrganisation),
+            CHECK_LIST, PARTY_STATUS, getContactEmailForDefendant(data),
             isPilot(data.getTotalClaimAmount())
         };
 
@@ -63,26 +64,43 @@ public class MediationCSVService {
         return builder.toString();
     }
 
+    private Optional<Organisation> getRespondentRepresentativeOrganisation (CaseData caseData) {
+        if(caseData.isRespondent1LiP()){
+            return Optional.empty();
+        }
+        return organisationService.findOrganisationById(caseData.getRespondent1OrganisationId());
+    }
+
+    private String getCsvCompanyName(Party party) {
+        return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
+    }
+
+    private String getCsvContactNameForDefendant(CaseData caseData,  Optional<Organisation> defendantRepresentativeOrganisation) {
+       return defendantRepresentativeOrganisation.map(Organisation::getName).orElse(getCsvIndividualName(caseData.getRespondent1()));
+    }
+
+    private String getContactNumberForDefendant(CaseData caseData, Optional<Organisation> organisation) {
+        return caseData.isRespondent1LiP()? caseData.getRespondent1().getPartyPhone() : getRepresentativeContactNumber(organisation);
+    }
+
+    private String getContactEmailForDefendant(CaseData caseData){
+        return caseData.isRespondent1LiP()? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+    }
+
+    private String getCsvIndividualName(Party party) {
+        return (party.isIndividual() || party.isSoleTrader()) ? party.getPartyName() : null;
+    }
+
     private String getApplicantSolicitorCompanyName(Optional<Organisation> organisation, CaseData caseData) {
         return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
     private String getRepresentativeContactNumber(Optional<Organisation> organisation) {
-       return organisation.map(Organisation::getCompanyNumber).orElse("");
+        return organisation.map(Organisation::getCompanyNumber).orElse("");
     }
 
     private String getApplicantEmailAddress(CaseData caseData) {
-        return Optional.ofNullable(caseData.getApplicantSolicitor1CheckEmail()).map(CorrectEmail::getEmail).orElse("");
-    }
-
-    private String getCsvCompanyNameForDefendant(CaseData caseData) {
-        if(caseData.isRespondent1LiP()){
-            return caseData.getRespondent1().getPartyName();
-        }
-
-    }
-
-    private String getCsvIndividualName(Party party) {
-       return party.getPartyName();
+        return Optional.ofNullable(caseData.getApplicantSolicitor1CheckEmail()).map(CorrectEmail::getEmail)
+            .orElse(caseData.getApplicantSolicitor1UserDetails().getEmail());
     }
 }
