@@ -15,7 +15,7 @@ public class MediationCSVLrvLipService extends MediationCSVService {
     @Override
     protected MediationParams getMediationParams(CaseData caseData) {
         return MediationParams.builder()
-            .applicantOrganisation(organisationService.findOrganisationById(caseData.getRespondent1OrganisationId()))
+            .applicantOrganisation(organisationService.findOrganisationById(caseData.getApplicantOrganisationId()))
             .caseData(caseData)
             .build();
     }
@@ -29,14 +29,12 @@ public class MediationCSVLrvLipService extends MediationCSVService {
 
     @Override
     protected String getContactEmailForApplicant(CaseData caseData) {
-        return caseData.getRespondent1().getPartyEmail();
+        return getApplicantRepresentativeEmailAddress(caseData);
     }
 
     @Override
     protected String getContactNumberForApplicant(MediationParams params) {
-        return params.getApplicantOrganisation()
-            .map(Organisation::getName)
-            .orElse(params.getCaseData().getApplicantSolicitor1ClaimStatementOfTruth().getName());
+        return getRepresentativeContactNumber(params.getApplicantOrganisation());
     }
 
     @Override

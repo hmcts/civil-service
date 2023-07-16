@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,15 +45,15 @@ public class MediationServiceLrvLr extends MediationCSVService{
 
     @Override
     protected String getCsvContactNameForDefendant(MediationParams params) {
-        return getRepresentativeContactNumber(params.getDefendantOrganisation());
+        return  params.getDefendantOrganisation()
+            .map(Organisation::getName)
+            .orElse("");
     }
 
     @Override
     protected String getContactNumberForDefendant(MediationParams params) {
-        return null;
+        return getRepresentativeContactNumber(params.getDefendantOrganisation());
     }
 
-    private String getRepresentativeContactNumber(Optional<Organisation> organisation) {
-        return organisation.map(Organisation::getCompanyNumber).orElse("");
-    }
+
 }

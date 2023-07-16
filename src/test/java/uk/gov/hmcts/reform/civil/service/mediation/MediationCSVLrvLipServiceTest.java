@@ -6,11 +6,12 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ public class MediationCSVLrvLipServiceTest {
 
     private static final String LR_COMPANY_NAME = "Company";
     private static final String LR_COMPANY_EMAIL = "someone@email.com";
+    private static final String LR_COMPANY_NUMBER = "123455";
     private static final String RESPONDENT_COMPANY_NAME = "Respondent company name";
     private static final String RESPONDENT_ORGANISATION_NAME = "Respondent organisation name";
     private static final String RESPONDENT_EMAIL_ADDRESS  = "respondent@company.com";
@@ -39,7 +41,7 @@ public class MediationCSVLrvLipServiceTest {
     private static final String ID = "123456789";
 
     @Mock
-    Organisation organisation;
+    private uk.gov.hmcts.reform.civil.prd.model.Organisation organisation;
 
     @MockBean
     private OrganisationService organisationService;
@@ -50,6 +52,7 @@ public class MediationCSVLrvLipServiceTest {
     @BeforeEach
     void setUp() {
         given(organisation.getName()).willReturn(LR_COMPANY_NAME);
+        given(organisation.getCompanyNumber()).willReturn(LR_COMPANY_NUMBER);
         given(organisationService.findOrganisationById(anyString())).willReturn(Optional.ofNullable(organisation));
     }
 
@@ -106,12 +109,24 @@ public class MediationCSVLrvLipServiceTest {
         //When
         String result = service.generateCSVContent(caseData);
        //Then
-        assertThat(result).contains("123456789");
+        assertThat(result).contains(ID);
         assertThat(result).contains("SOLE_TRADER");
         assertThat(result).contains(RESPONDENT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME +" " + RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+    }
+
+    @Test
+    void shouldReturnLrContactDetailsForApplicant() {
+        //Given
+        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
+        //When
+        String result = service.generateCSVContent(caseData);
+        //Then
+        assertThat(result).contains(LR_COMPANY_NAME);
+        assertThat(result).contains(LR_COMPANY_EMAIL);
+        assertThat(result).contains(LR_COMPANY_NUMBER);
     }
 
     private CaseData getCaseData(Party.Type partyType) {
@@ -135,6 +150,13 @@ public class MediationCSVLrvLipServiceTest {
                              .partyPhone(RESPONDENT_PHONE_NUMBER)
                              .partyEmail(RESPONDENT_EMAIL_ADDRESS)
                              .build())
+            .applicant1OrganisationPolicy(OrganisationPolicy
+                                              .builder()
+                                              .organisation(Organisation
+                                                                .builder()
+                                                                .organisationID("123")
+                                                                .build())
+                                              .build())
             .applicantSolicitor1ClaimStatementOfTruth(
                 StatementOfTruth.builder()
                     .name(LR_COMPANY_NAME)
