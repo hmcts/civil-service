@@ -43,6 +43,9 @@ public enum DashboardClaimStatus {
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
+    RESPONSE_DUE_NOW(
+        Claim::hasResponseDueToday
+    ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
     ),
@@ -54,9 +57,6 @@ public enum DashboardClaimStatus {
     ),
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
-    ),
-    RESPONSE_DUE_NOW(
-        Claim::hasResponseDueToday
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
