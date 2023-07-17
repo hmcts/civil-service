@@ -81,7 +81,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
         if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
             sendEmailHMC(caseData, recipient);
-        }else if (NOTIFY_CLAIMANT_HEARING.equals(caseEvent)) {
+        }else if (isEvent(callbackParams,NOTIFY_CLAIMANT_HEARING)) {
             sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
         }
 
