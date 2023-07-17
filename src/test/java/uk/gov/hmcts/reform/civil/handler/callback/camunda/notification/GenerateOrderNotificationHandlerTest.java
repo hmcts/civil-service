@@ -116,7 +116,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent1Lip_whenInvoked() {
-            //given: case where respondent1 Lip in person has email and callback for notify respondent1 is triggered
+            //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -135,7 +135,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
-            //given: case where respondent2 Lip in person has email and callback for notify respondent2 is triggered
+            //given: case where respondent2 Lip has email and callback for notify respondent2 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
@@ -163,7 +163,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
-            //given: case where applicant litigant in person has email and notify for applicant is called
+            //given: case where applicant Lip has email and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
