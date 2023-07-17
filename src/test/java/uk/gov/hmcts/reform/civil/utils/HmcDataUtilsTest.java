@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
@@ -62,14 +62,54 @@ class HmcDataUtilsTest {
                             HearingDaySchedule.builder()
                                 .hearingVenueId("Venue A")
                                 .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .build(),
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
                                 .build()))
                     .build())
             .build();
 
         PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
-                             .hearingLocation("Venue B")
+                             .days(List.of(
+                                 HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build(),
+                                 HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build()))
+                             .hearingLocation("Venue A")
+                             .build()).build();
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrueExtraDay() {
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(
+                HearingResponse.builder().hearingDaySchedule(
+                        List.of(
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .build(),
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+                                .build()))
+                    .build())
+            .build();
+
+        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
+            .serviceData(PartiesNotifiedServiceData.builder()
+                             .days(List.of(HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build()))
+                             .hearingLocation("Venue A")
                              .build()).build();
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
@@ -92,7 +132,9 @@ class HmcDataUtilsTest {
 
         PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
+                             .days(List.of(HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build()))
                              .hearingLocation("Venue A")
                              .build()).build();
 
