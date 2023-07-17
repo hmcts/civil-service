@@ -73,6 +73,9 @@ public enum DashboardClaimStatus {
     CHANGE_BY_CLAIMANT(
         Claim::hasChangeRequestedFromClaimant
     ),
+    CLAIMANT_REJECT_OFFER(
+        Claim::hasClaimantRejectOffer
+    ),
     CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT(
         Claim::isClaimRejectedAndOfferSettleOutOfCourt
     ),
@@ -93,9 +96,6 @@ public enum DashboardClaimStatus {
     ),
     IN_MEDIATION(
         Claim::isMediationPending
-    ),
-    CLAIMANT_REJECT_OFFER(
-        Claim::claimantRejectOffer
     ),
     CLAIM_ENDED(
         Claim::hasClaimEnded

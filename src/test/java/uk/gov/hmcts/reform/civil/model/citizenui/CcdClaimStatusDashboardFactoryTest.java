@@ -299,19 +299,6 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_applicantRejectRepaymentPlan_whenGetStatus_rejectOffer() {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
-            .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_OFFER);
-    }
-
-    @Test
     void given_applicantRejectPartialAdmit_whenGetStatus_rejectOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())

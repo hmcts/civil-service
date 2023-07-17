@@ -330,8 +330,11 @@ public class CmcClaimStatusDashboardFactoryTest {
     void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantReject() {
         CmcClaim claim = CmcClaim.builder()
             .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
-            .state(ClaimState.TRANSFERRED)
-            .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.REJECTION).build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .type(StatementType.REJECTION)
+                                                         .build()))
+                            .build())
             .build();
 
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);

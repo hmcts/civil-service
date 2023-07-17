@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cmc.model;
 
+import org.elasticsearch.core.List;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 
@@ -97,9 +98,26 @@ public class CmcClaimTest {
                           .responseType(RespondentResponseType.FULL_DEFENCE)
                           .build())
             .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder().build()))
                             .build())
             .build();
 
         assertTrue(claim.isClaimRejectedAndOfferSettleOutOfCourt());
+    }
+
+    @Test
+    void shouldReturnTrueWhenClaimantRejectOffer(){
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.FULL_DEFENCE)
+                          .build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .type(StatementType.REJECTION)
+                                                         .build()))
+                            .build())
+            .build();
+
+        assertTrue(claim.hasClaimantRejectOffer());
     }
 }

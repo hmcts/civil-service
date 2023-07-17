@@ -33,6 +33,12 @@ public class Settlement {
     }
 
     @JsonIgnore
+    public boolean isRejectedByClaimant() {
+        return getPartyStatementStream()
+            .anyMatch(PartyStatement::isRejected);
+    }
+
+    @JsonIgnore
     public boolean isAcceptedByDefendant() {
         return getPartyStatementStream()
             .anyMatch(partyStatement -> partyStatement.isAccepted()
@@ -46,7 +52,7 @@ public class Settlement {
     }
 
     public boolean isThroughAdmissions() {
-        if(CollectionUtils.isEmpty(getPartyStatements())) {
+        if(CollectionUtils.isEmpty(getPartyStatements()) || !hasOffer()) {
             return false;
         }
 
@@ -56,6 +62,11 @@ public class Settlement {
             .reduce((first, second) -> second)
             .stream()
             .noneMatch(PartyStatement::hasPaymentIntention);
+    }
+
+    private boolean hasOffer() {
+        return getPartyStatementStream()
+            .anyMatch(PartyStatement::hasOffer);
     }
 
     private Stream<PartyStatement> getPartyStatementStream() {

@@ -239,10 +239,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean claimantRejectOffer() {
-        return caseData.isRespondentResponseFullDefence()
-            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
-            && caseData.hasApplicantRejectedRepaymentPlan();
+    public boolean hasClaimantRejectOffer() {
+        return false;
     }
 
     @Override

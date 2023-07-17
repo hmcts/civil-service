@@ -74,7 +74,7 @@ public interface Claim {
 
     boolean claimantAcceptRepayment();
 
-    boolean claimantRejectOffer();
+    boolean hasClaimantRejectOffer();
 
     boolean isPartialAdmissionRejected();
 }
