@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
-
 import java.math.BigDecimal;
 import java.util.Optional;
 

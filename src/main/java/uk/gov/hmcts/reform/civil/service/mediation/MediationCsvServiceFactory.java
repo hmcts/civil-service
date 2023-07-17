@@ -11,8 +11,8 @@ public class MediationCsvServiceFactory {
     private final MediationCSVLrvLrService mediationServiceLrvLr;
     private final MediationCSVLrvLipService mediationCSVLrvLipService;
 
-    public MediationCSVService getMediationCSVService (CaseData caseData) {
-        if(caseData.isRespondent1LiP()){
+    public MediationCSVService getMediationCSVService(CaseData caseData) {
+        if (caseData.isRespondent1LiP()) {
             return mediationCSVLrvLipService;
         }
         return mediationServiceLrvLr;
