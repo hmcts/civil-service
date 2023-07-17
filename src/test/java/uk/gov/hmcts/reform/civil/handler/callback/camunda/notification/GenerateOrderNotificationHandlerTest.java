@@ -116,60 +116,66 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotifyRespondent1Lip_whenInvoked() {
-            //given: case where applicant litigant in person has email as applicant@example.com
+            //given: case where respondent1 Lip in person has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
             ).build();
-            //when: ApplicantNotificationhandler is called
+            //when: handler is called
             handler.handle(params);
-            //then: email should be sent to applicant
+            //then: email should be sent to respondent1
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 "template-id-lip",
-                getNotificationDataMapLip(caseData),
+                getRespondentNotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyRespondent2Lip_whenInvoked() {
-            //given: case where applicant litigant in person has email as applicant@example.com
+            //given: case where respondent2 Lip in person has email and callback for notify respondent2 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder().partyName("respondentLip2").type(Party.Type.INDIVIDUAL).partyEmail("respondentLip2@gmail" +
-                                                                                                ".com").build()).build();
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Alex")
+                                 .individualLastName("Richards")
+                                 .partyName("Mr. Alex Richards")
+                                 .partyEmail("respondentLip2@gmail.com")
+                                 .build()).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
             ).build();
-            //when: ApplicantNotificationhandler is called
+            //when: handler is called
             handler.handle(params);
-            //then: email should be sent to applicant
+            //then: email should be sent to respondent2
             verify(notificationService).sendMail(
                 "respondentLip2@gmail.com",
                 "template-id-lip",
-                getNotificationDataMapLip(caseData),
+                getRespondent2NotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
-            //given: case where applicant litigant in person has email as applicant@example.com
+            //given: case where applicant litigant in person has email and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
             ).build();
-            //when: ApplicantNotificationhandler is called
+            //when: handler is called
             handler.handle(params);
             //then: email should be sent to applicant
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id-lip",
-                getNotificationDataMapLip(caseData),
+                getApplicantNotificationDataMapLip(caseData),
                 "generate-order-notification-000DC001"
             );
         }
@@ -201,10 +207,28 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+        private Map<String, String> getRespondentNotificationDataMapLip(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getRespondent2NotificationDataMapLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                PARTY_NAME, caseData.getRespondent2().getPartyName(),
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getApplicantNotificationDataMapLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                PARTY_NAME, caseData.getApplicant1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
         }

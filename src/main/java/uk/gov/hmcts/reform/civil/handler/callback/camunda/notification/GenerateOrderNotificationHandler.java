@@ -81,7 +81,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private String getTemplate(CaseData caseData) {
-        if (isApplicantLip(caseData) || isRespondentLip(caseData)) {
+        if (isApplicantLip(caseData) || isRespondent1Lip(caseData) || isRespondent2Lip(caseData) ) {
             return notificationsProperties.getNotifyLipUpdateTemplate();
         } else {
             return notificationsProperties.getGenerateOrderNotificationTemplate();
@@ -105,10 +105,10 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             return isApplicantLip(caseData)
                 ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (taskId.equals(TASK_ID_RESPONDENT1)) {
-            return isRespondentLip(caseData)
+            return isRespondent1Lip(caseData)
                 ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            return isRespondentLip(caseData)
+            return isRespondent2Lip(caseData)
                 ? caseData.getRespondent2().getPartyEmail() : caseData.getRespondentSolicitor2EmailAddress();
         }
     }
@@ -137,26 +137,52 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    public Map<String, String> addProperties(CaseData caseData) {
-        if (isApplicantLip(caseData) || isRespondentLip(caseData)) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
-            );
+    public String getPartyName(CaseData caseData) {
+        if (taskId.equals("GenerateOrderNotifyApplicantSolicitor1")) {
+            return caseData.getApplicant1().getPartyName();
+        } else if (taskId.equals("GenerateOrderNotifyRespondentSolicitor1")) {
+            return caseData.getRespondent1().getPartyName();
         } else {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationName(caseData)
-            );
+            return caseData.getRespondent2().getPartyName();
         }
+    }
+
+    public Map<String, String> addProperties(CaseData caseData) {
+        if (taskId.equals(TASK_ID_APPLICANT)) {
+            return isApplicantLip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
+        }
+        else if (taskId.equals(TASK_ID_RESPONDENT1)) {
+            return isRespondent1Lip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
+        }
+        else {
+            return isRespondent2Lip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
+        }
+    }
+
+    private Map<String, String> getLRProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationName(caseData)
+        );
+    }
+
+    private Map<String, String> getLipProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, getPartyName(caseData),
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+        );
     }
 
     private boolean isApplicantLip(CaseData caseData) {
         return (YesOrNo.NO.equals(caseData.getApplicant1Represented()));
     }
 
-    private boolean isRespondentLip(CaseData caseData) {
+    private boolean isRespondent1Lip(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
+    }
+
+    private boolean isRespondent2Lip(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getRespondent2Represented());
     }
 }
