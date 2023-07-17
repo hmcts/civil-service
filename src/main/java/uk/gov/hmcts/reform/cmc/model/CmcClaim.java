@@ -351,7 +351,8 @@ public class CmcClaim implements Claim {
     }
 
     private boolean isFullDefenceWithSubmittedOffer() {
-        return Objects.nonNull(settlement)
+        return Objects.isNull(claimantResponse)
+            && Objects.nonNull(settlement)
             && Objects.nonNull(response)
             && response.isFullDefence();
     }
