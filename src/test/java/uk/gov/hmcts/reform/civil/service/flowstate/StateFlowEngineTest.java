@@ -2771,6 +2771,58 @@ class StateFlowEngineTest {
     }
 
     @Nested
+    class ClaimantResponseToClaimAfterDefendantResponse{
+
+        @Test
+        void shouldReturnClaimantResponse_FullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponse() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .atStateNotificationAcknowledgedRespondent2()
+                .respondent1AcknowledgeNotificationDate(null)
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                .setMultiTrackClaim()
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(FULL_DEFENCE_PROCEED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(11)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName(),
+                    FULL_DEFENCE_PROCEED.fullName()
+                );
+
+            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                entry(FlowFlag.IS_MULTI_TRACK.name(), true)
+
+            );
+        }
+}
+
+@Nested
     class TakenOfflineByStaff {
 
         @Test

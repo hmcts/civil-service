@@ -486,7 +486,7 @@ public class StateFlowEngine {
             .onlyIf(fullDefenceProceed.and(demageMultiClaim).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                         .and(applicantOutOfTime.negate()).or(declinedMediation))
             .set(flags -> {
-                flags.put(FlowFlag.MULTI_CLAIM_YES.name(), true);
+                flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(demageMultiClaim.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
