@@ -89,6 +89,7 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
+                        boolean exceptionEventTriggered = false;
                         log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
@@ -98,7 +99,7 @@ public class ServiceBusConfiguration {
                             hmcMessage.getCaseId(),
                             hmcMessage.getHearingId()
                         );
-                        boolean exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
+                        exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
                         if (exceptionEventTriggered) {
                             return receiveClient.completeAsync(message.getLockToken());
                         }

@@ -19,15 +19,16 @@ public class ReviewHearingExceptionHandler {
     private final PaymentsConfiguration paymentsConfiguration;
 
     public boolean handleExceptionEvent(HmcMessage hmcMessage) {
-        if (isMessageRelevantForService(hmcMessage)
-            && EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-            log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
-                     hmcMessage.getHearingId(),
-                     hmcMessage.getCaseId()
-            );
-            return triggerReviewHearingExceptionEvent(hmcMessage.getCaseId(), hmcMessage.getHearingId());
+        if (isMessageRelevantForService(hmcMessage)) {
+            if(EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
+                         hmcMessage.getHearingId(),
+                         hmcMessage.getCaseId()
+                );
+                return triggerReviewHearingExceptionEvent(hmcMessage.getCaseId(), hmcMessage.getHearingId());
+            }
         }
-        return false;
+        return true;
     }
 
     private boolean triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
