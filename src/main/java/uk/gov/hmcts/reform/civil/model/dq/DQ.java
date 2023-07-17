@@ -9,6 +9,8 @@ public interface DQ {
 
     FileDirectionsQuestionnaire getFileDirectionQuestionnaire();
 
+    IntermediateClaims getIntermediateClaims();
+
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 
     DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments();

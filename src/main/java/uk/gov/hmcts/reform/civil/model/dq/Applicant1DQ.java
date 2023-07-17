@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 public class Applicant1DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
+    private IntermediateClaims applicant1DQIntermediateClaims;
     private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant1DQDisclosureReport;
@@ -40,6 +41,12 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
         return applicant1DQFileDirectionsQuestionnaire;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQIntermediateClaims")
+    public IntermediateClaims getIntermediateClaims() {
+        return applicant1DQIntermediateClaims;
     }
 
     @Override

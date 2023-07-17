@@ -22,6 +22,7 @@ import java.util.List;
 public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
+    private IntermediateClaims respondent2DQIntermediateClaims;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;
@@ -51,6 +52,12 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
         return respondent2DQFileDirectionsQuestionnaire;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQIntermediateClaims")
+    public IntermediateClaims getIntermediateClaims() {
+        return respondent2DQIntermediateClaims;
     }
 
     @Override
