@@ -274,6 +274,17 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
 
+        if (featureToggleService.isFastTrackUpliftsEnabled()
+            && multiPartyScenario == TWO_V_ONE
+            && YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+            CaseData latestData = builder.build();
+            builder.applicant2DQ(
+                latestData.getApplicant2DQ().toBuilder().applicant2DQFixedRecoverableCosts(
+                    latestData.getApplicant1DQ().getApplicant1DQFixedRecoverableCosts()).build()
+            ).build();
+        }
+
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 

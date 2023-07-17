@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -65,6 +66,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -512,6 +514,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(localDateTime);
+            when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -558,6 +561,173 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsEntry("applicant2ResponseDate", localDateTime.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("applicant2DQStatementOfTruth").isNotNull();
+        }
+
+        @Test
+        void shouldNotChangeApplicant1FixedRecoverableCosts_andStillMatchGivenValue() {
+            FixedRecoverableCosts fixedRecoverableCosts =
+                FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .band("BAND_1")
+                    .complexityBandingAgreed(YES)
+                    .reasons("reasons")
+                    .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .addApplicant2(NO)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQFixedRecoverableCosts(fixedRecoverableCosts)
+                        .build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(responseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCosts(), fixedRecoverableCosts);
+        }
+
+        @Test
+        void shouldPopulateApplicant2FixedRecoverableCostsWithApplicant1Data_whenBothApplicant1AndApplicant2Proceed() {
+            FixedRecoverableCosts fixedRecoverableCosts =
+                FixedRecoverableCosts.builder()
+                .isSubjectToFixedRecoverableCostRegime(YES)
+                .band("BAND_1")
+                .complexityBandingAgreed(YES)
+                .reasons("reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .applicant2(Party.builder()
+                                .companyName("company")
+                                .type(Party.Type.COMPANY)
+                                .build())
+                .addApplicant2(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQFixedRecoverableCosts(fixedRecoverableCosts)
+                        .build())
+                .applicant2DQ(Applicant2DQ.builder().build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(responseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCosts(), fixedRecoverableCosts);
+            assertEquals(responseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCosts(), fixedRecoverableCosts);
+        }
+
+        @Test
+        void shouldNotPopulateApplicant2FixedRecoverableCostsWithApplicant1Data_whenFastTrackUpliftToggleIsFalse() {
+            when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(false);
+
+            FixedRecoverableCosts fixedRecoverableCosts =
+                FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .band("BAND_1")
+                    .complexityBandingAgreed(YES)
+                    .reasons("reasons")
+                    .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .applicant2(Party.builder()
+                                .companyName("company")
+                                .type(Party.Type.COMPANY)
+                                .build())
+                .addApplicant2(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQFixedRecoverableCosts(fixedRecoverableCosts)
+                        .build())
+                .applicant2DQ(Applicant2DQ.builder().build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertNull(responseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCosts());
+        }
+
+        @Test
+        void shouldNotPopulateApplicant2FixedRecoverableCosts_whenOnlyApplicant1Proceeds() {
+            FixedRecoverableCosts fixedRecoverableCosts =
+                FixedRecoverableCosts.builder()
+                    .isSubjectToFixedRecoverableCostRegime(YES)
+                    .band("BAND_1")
+                    .complexityBandingAgreed(YES)
+                    .reasons("reasons")
+                    .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .applicant2(Party.builder()
+                                .companyName("company")
+                                .type(Party.Type.COMPANY)
+                                .build())
+                .addApplicant2(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQFixedRecoverableCosts(fixedRecoverableCosts)
+                        .build())
+                .applicant2DQ(Applicant2DQ.builder().build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(responseData.getApplicant1DQ().getApplicant1DQFixedRecoverableCosts(), fixedRecoverableCosts);
+            assertNull(responseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCosts());
+        }
+
+        @Test
+        void shouldNotReplaceApplicant2FixedRecoverableCostsWithNull_whenOnlyApplicant2Proceeds() {
+            FixedRecoverableCosts fixedRecolverableCosts = FixedRecoverableCosts.builder()
+                .isSubjectToFixedRecoverableCostRegime(YES)
+                .band("BAND_1")
+                .complexityBandingAgreed(YES)
+                .reasons("reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .applicant2(Party.builder()
+                                .companyName("company")
+                                .type(Party.Type.COMPANY)
+                                .build())
+                .addApplicant2(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .applicant1DQ(
+                    Applicant1DQ.builder().build())
+                .applicant2DQ(
+                    Applicant2DQ.builder()
+                        .applicant2DQFixedRecoverableCosts(fixedRecolverableCosts)
+                        .build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(responseData.getApplicant2DQ().getApplicant2DQFixedRecoverableCosts(), fixedRecolverableCosts);
         }
 
         @ParameterizedTest
