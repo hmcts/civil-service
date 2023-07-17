@@ -81,7 +81,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
         if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
             sendEmailHMC(caseData, recipient);
-        }else if (isEvent(callbackParams,NOTIFY_CLAIMANT_HEARING)) {
+        } else if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING)) {
             sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
         }
 
@@ -157,7 +157,6 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         }
     }
-
 
     public Map<String, String> addPropertiesHMC(final CaseData caseData) {
         Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
