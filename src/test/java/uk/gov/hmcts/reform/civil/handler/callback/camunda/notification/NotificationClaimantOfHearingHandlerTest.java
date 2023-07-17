@@ -4,12 +4,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -20,16 +23,26 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @SpringBootTest(classes = {
@@ -41,7 +54,11 @@ public class NotificationClaimantOfHearingHandlerTest {
     @MockBean
     private NotificationService notificationService;
     @MockBean
+    private HearingFeesService hearingFeesService;
+    @MockBean
     NotificationsProperties notificationsProperties;
+    @MockBean
+    HearingNoticeCamundaService hearingNoticeCamundaService;
     @Autowired
     private NotificationClaimantOfHearingHandler handler;
 
@@ -56,6 +73,10 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-no-fee-claimant-id");
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-claimant-lip-id");
+            when(notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC())
+                .thenReturn("test-template-fee-claimant-id-hmc");
+            when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC())
+                .thenReturn("test-template-no-fee-claimant-id-hmc");
         }
 
         @Test
@@ -86,6 +107,44 @@ public class NotificationClaimantOfHearingHandlerTest {
         }
 
         @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1HMC() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
+
+            when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build());
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(15, 30)))
+                                .build());
+
+            LocalDate now = LocalDate.of(2022, 9, 29);
+            try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDate::now).thenReturn(now);
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
+                // When
+                handler.handle(params);
+                // Then
+                verify(notificationService).sendMail(
+                    "applicantemail@hmcts.net",
+                    "test-template-fee-claimant-id-hmc",
+                    getNotificationFeeDataMapHMC(caseData),
+                    "notification-of-hearing-HER1234"
+                );
+            }
+        }
+
+        @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1WithNoFee() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -111,6 +170,47 @@ public class NotificationClaimantOfHearingHandlerTest {
                 getNotificationNoFeeDatePMDataMap(caseData),
                 "notification-of-hearing-000HN001"
             );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvoked1v1WithNoFeeHMC() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
+
+            when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(15, 30)))
+                                .build());
+
+            LocalDate now = LocalDate.of(2022, 9, 29);
+            try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDate::now).thenReturn(now);
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
+                // When
+                handler.handle(params);
+                // Then
+                verify(notificationService).sendMail(
+                    "applicantemail@hmcts.net",
+                    "test-template-no-fee-claimant-id-hmc",
+                    getNotificationNoFeeDatePMDataMapHMC(caseData),
+                    "notification-of-hearing-HER1234"
+                );
+            }
         }
 
         @Test
@@ -311,11 +411,27 @@ public class NotificationClaimantOfHearingHandlerTest {
     }
 
     @NotNull
+    private Map<String, String> getNotificationFeeDataMapHMC(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+        );
+    }
+
+    @NotNull
     private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£0.00",
             "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "23-11-2022"
+        );
+    }
+
+    @NotNull
+    private Map<String, String> getNotificationNoFeeDataMapHMC(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "06-10-2022"
         );
     }
 
@@ -336,10 +452,31 @@ public class NotificationClaimantOfHearingHandlerTest {
         );
     }
 
+    @NotNull
+    private Map<String, String> getNotificationNoFeeDatePMDataMapHMC(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(), "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+        );
+    }
+
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING").build()).build())).isEqualTo(TASK_ID_CLAIMANT);
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId_whenInvokedHMC() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
+                                                                                         .builder().eventId(
+                "NOTIFY_CLAIMANT_HEARING_HMC").build()).build())).isEqualTo(TASK_ID_CLAIMANT_HMC);
     }
 }
