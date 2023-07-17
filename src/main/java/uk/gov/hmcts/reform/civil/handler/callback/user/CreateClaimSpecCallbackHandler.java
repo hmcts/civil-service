@@ -487,7 +487,21 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             populateWithPartyIds(dataBuilder);
         }
 
+        List<String> errors = new ArrayList<>();
+        if (caseData.getBulkCustomerId() != null) {
+            List<String> postcodes = new ArrayList<>();
+            postcodes.add(caseData.getApplicant1().getPrimaryAddress().getPostCode());
+            postcodes.add(caseData.getRespondent1().getPrimaryAddress().getPostCode());
+            if (caseData.getRespondent2() != null) {
+                postcodes.add(caseData.getRespondent2().getPrimaryAddress().getPostCode());
+            }
+            postcodes.forEach(postcode -> {if (!postcodeValidator.validate(postcode).isEmpty()) {
+                errors.add("Postcode error, bulk claim");
+            }});
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
