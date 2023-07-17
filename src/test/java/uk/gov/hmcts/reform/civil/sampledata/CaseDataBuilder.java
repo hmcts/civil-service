@@ -784,23 +784,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder respondent2DQWithUnavailableDates() {
-        UnavailableDate unavailableDateRange = UnavailableDate.builder()
-            .fromDate(LocalDate.of(2023, 8, 20))
-            .toDate(LocalDate.of(2023, 8, 22))
-            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-            .build();
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(LocalDate.of(2023, 8, 20))
-            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-            .build();
-        this.respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
-                                      .unavailableDates(wrapElements(List.of(unavailableDate, unavailableDateRange))).build())
-            .build();
-        return this;
-    }
-
     public CaseDataBuilder applicant1DQWithUnavailableDateRange() {
         UnavailableDate unavailableDate = UnavailableDate.builder()
             .fromDate(LocalDate.now().plusDays(1))
@@ -822,23 +805,6 @@ public class CaseDataBuilder {
         this.applicant1DQ = Applicant1DQ.builder()
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
                                       .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
-        return this;
-    }
-
-    public CaseDataBuilder applicant2DQWithUnavailableDates() {
-        UnavailableDate unavailableDateRange = UnavailableDate.builder()
-            .fromDate(LocalDate.of(2023, 8, 20))
-            .toDate(LocalDate.of(2023, 8, 22))
-            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-            .build();
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(LocalDate.of(2023, 8, 20))
-            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-            .build();
-        this.applicant2DQ = Applicant2DQ.builder()
-            .applicant2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
-                                      .unavailableDates(wrapElements(List.of(unavailableDate, unavailableDateRange))).build())
             .build();
         return this;
     }

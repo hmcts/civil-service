@@ -12,7 +12,6 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
@@ -34,9 +33,7 @@ public class UnavailabilityDatesUtils {
                                       .getUnavailableDates());
             builder.respondent1(resp1.build());
 
-            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)
-                && (YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
-                || YES.equals(caseData.getRespondentResponseIsSame()))) {
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
                 Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                     .unavailableDates(caseData.getRespondent1DQ().getHearing()
                                           .getUnavailableDates());
@@ -60,25 +57,10 @@ public class UnavailabilityDatesUtils {
                 .unavailableDates(caseData.getApplicant1DQ().getHearing()
                                       .getUnavailableDates());
             builder.applicant1(appl1.build());
-
-            // 2v1 single response, copy applicant 1 dates to applicant 2
-            if (caseData.getApplicant2() != null
-                && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
-                Party.PartyBuilder appl2 = caseData.getApplicant2().toBuilder()
-                    .unavailableDates(caseData.getApplicant1DQ().getHearing()
-                                          .getUnavailableDates());
-                builder.applicant2(appl2.build());
-            }
         }
-
-        // 2v1 divergent response, applicant 2 proceeds
-        if (caseData.getApplicant2() != null
-            && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-            && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-            && caseData.getApplicant2DQ() != null
-            && caseData.getApplicant2DQ().getHearing() != null) {
+        if (caseData.getApplicant2() != null && caseData.getApplicant1DQ().getHearing() != null) {
             Party.PartyBuilder appl2 = caseData.getApplicant2().toBuilder()
-                .unavailableDates(caseData.getApplicant2DQ().getHearing()
+                .unavailableDates(caseData.getApplicant1DQ().getHearing()
                                       .getUnavailableDates());
             builder.applicant2(appl2.build());
         }
