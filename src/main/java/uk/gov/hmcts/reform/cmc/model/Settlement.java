@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -52,7 +51,7 @@ public class Settlement {
     }
 
     public boolean isThroughAdmissions() {
-        if(CollectionUtils.isEmpty(getPartyStatements()) || !hasOffer()) {
+        if (CollectionUtils.isEmpty(getPartyStatements()) || !hasOffer()) {
             return false;
         }
 

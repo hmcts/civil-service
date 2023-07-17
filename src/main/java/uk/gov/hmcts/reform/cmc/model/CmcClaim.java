@@ -349,6 +349,7 @@ public class CmcClaim implements Claim {
             && !settlement.isSettled()
             && !settlement.isThroughAdmissions();
     }
+
     private boolean isFullDefenceWithSubmittedOffer() {
         return Objects.nonNull(settlement)
             && Objects.nonNull(response)
@@ -360,7 +361,6 @@ public class CmcClaim implements Claim {
         return isClaimRejectedAndOfferSettleOutOfCourt()
             && settlement.isAcceptedByClaimant();
     }
-
 
     @Override
     public boolean hasClaimantRejectOffer() {
