@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.util.Arrays;
-
 import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -10,8 +8,13 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
+
+import java.util.Arrays;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
@@ -39,7 +42,8 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
 
         try {
             log.info("External task '{}' started with processInstanceId '{}'",
-                     topicName, processInstanceId);
+                     topicName, processInstanceId
+            );
             handleTask(externalTask);
             completeTask(externalTask, externalTaskService);
         } catch (BpmnError e) {
@@ -49,15 +53,18 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
         } catch (NotRetryableException e) {
             log.error("External task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e);
+                      topicName, processInstanceId, e
+            );
             handleFailureNoRetryable(externalTask, externalTaskService, e);
         } catch (Exception e) {
             log.error("External task before handleFailure '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e);
+                      topicName, processInstanceId, e
+            );
             handleFailure(externalTask, externalTaskService, e);
         }
     }
 
+    @Retryable(value = CompleteTaskException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))
     default void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
@@ -68,12 +75,22 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
                 () -> externalTaskService.complete(externalTask)
             );
             log.info("External task '{}' finished with processInstanceId '{}'",
-                     topicName, processInstanceId);
-        } catch (Exception e) {
+                     topicName, processInstanceId
+            );
+        } catch (Throwable e) {
             log.error("Completing external task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e);
+                      topicName, processInstanceId, e
+            );
             throw new CompleteTaskException(e);
         }
+    }
+
+    @Recover
+    default void recover(CompleteTaskException exception, ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        log.error("Recover CompleteTaskException for external task '{}' errored  with processInstanceId '{}'",
+                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception
+        );
+        externalTaskService.complete(externalTask);
     }
 
     /**
@@ -86,13 +103,14 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     default void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Exception e) {
         int maxRetries = getMaxAttempts();
         int remainingRetries = externalTask.getRetries() == null ? maxRetries : externalTask.getRetries();
-        log.info("Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
-                     "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
-                 externalTask.getRetries() != null ? false : true,
-                 externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
-                 remainingRetries,
-                 externalTask.getRetries(),
-                 maxRetries
+        log.info(
+            "Handle failure externalTask.getRetries() is null ?? '{}' processInstanceId: '{}' " +
+                "remainingRetries value : '{}' externalTask.getRetries() value: '{}' maxRetries: '{}'",
+            externalTask.getRetries() != null ? false : true,
+            externalTask.getProcessInstanceId() != null ? externalTask.getProcessInstanceId() : "Instance id is null",
+            remainingRetries,
+            externalTask.getRetries(),
+            maxRetries
         );
 
         externalTaskService.handleFailure(
