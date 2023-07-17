@@ -81,7 +81,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private String getTemplate(CaseData caseData) {
-        if (isApplicantLip(caseData) || isRespondent1Lip(caseData) || isRespondent2Lip(caseData) ) {
+        if (isApplicantLip(caseData) || isRespondent1Lip(caseData) || isRespondent2Lip(caseData)) {
             return notificationsProperties.getNotifyLipUpdateTemplate();
         } else {
             return notificationsProperties.getGenerateOrderNotificationTemplate();
@@ -150,11 +150,9 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     public Map<String, String> addProperties(CaseData caseData) {
         if (taskId.equals(TASK_ID_APPLICANT)) {
             return isApplicantLip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
-        }
-        else if (taskId.equals(TASK_ID_RESPONDENT1)) {
+        } else if (taskId.equals(TASK_ID_RESPONDENT1)) {
             return isRespondent1Lip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
-        }
-        else {
+        } else {
             return isRespondent2Lip(caseData) ? getLipProperties(caseData) : getLRProperties(caseData);
         }
     }
