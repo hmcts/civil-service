@@ -17,6 +17,8 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.civil.security.JwtGrantedAuthoritiesConverter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -49,8 +51,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/",
         "/loggers/**",
         "/assignment/**",
-        "/service-request-update",
-        "/service-request-update-claim-issued",
         "/case/document/**"
     };
 
@@ -62,8 +62,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
+    private final ServiceAuthFilter serviceAuthFilter;
+
     @Autowired
-    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
+    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
+                                 final ServiceAuthFilter serviceAuthFilter) {
+        this.serviceAuthFilter = serviceAuthFilter;
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
@@ -76,6 +80,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+            .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()
