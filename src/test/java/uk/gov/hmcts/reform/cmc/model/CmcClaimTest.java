@@ -106,7 +106,7 @@ public class CmcClaimTest {
     }
 
     @Test
-    void shouldReturnTrueWhenClaimantRejectOffer(){
+    void shouldReturnTrueWhenClaimantRejectOffer()  {
         CmcClaim claim = CmcClaim.builder()
             .response(Response.builder()
                           .responseType(RespondentResponseType.FULL_DEFENCE)
