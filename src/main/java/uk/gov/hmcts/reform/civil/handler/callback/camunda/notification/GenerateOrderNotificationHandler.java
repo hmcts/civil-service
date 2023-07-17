@@ -81,7 +81,9 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private String getTemplate(CaseData caseData) {
-        if (isApplicantLip(caseData) || isRespondent1Lip(caseData) || isRespondent2Lip(caseData)) {
+        if ((isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT))
+            || (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1))
+            || (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2))) {
             return notificationsProperties.getNotifyLipUpdateTemplate();
         } else {
             return notificationsProperties.getGenerateOrderNotificationTemplate();
