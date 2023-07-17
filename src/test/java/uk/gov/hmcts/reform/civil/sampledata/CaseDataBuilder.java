@@ -2441,7 +2441,7 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         return this;
     }
@@ -2450,7 +2450,7 @@ public class CaseDataBuilder {
         disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
             .input("The claimant must lodge at court at least 7 "
                        + "days before the disposal")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
             .builder()
@@ -4961,6 +4961,53 @@ public class CaseDataBuilder {
                                               .version("1")
                                               .build())
                                       .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsPaymentFailed() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(FAILED)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsPaymentSuccess() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(SUCCESS)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsNoPaymentStatus() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10800))
+                            .build())
+            .allocatedTrack(SMALL_CLAIM)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
+                Organisation.builder()
+                    .organisationID("OrgId").build()).build())
             .build();
     }
 
