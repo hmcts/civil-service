@@ -356,12 +356,9 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean claimantAcceptRepayment() {
-        return Objects.nonNull(response)
-            && response.isFullDefence()
-            && isSentToCourt()
-            && Objects.nonNull(claimantResponse)
-            && claimantResponse.getType().equals(ClaimantResponseType.ACCEPTATION);
+    public boolean claimantAcceptedOfferOutOfCourt() {
+        return isClaimRejectedAndOfferSettleOutOfCourt()
+            && settlement.isAcceptedByClaimant();
     }
 
 

@@ -232,10 +232,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean claimantAcceptRepayment() {
-        return caseData.isRespondentResponseFullDefence()
-            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
-            && caseData.hasApplicantAcceptedRepaymentPlan();
+    public boolean claimantAcceptedOfferOutOfCourt() {
+        return false;
     }
 
     @Override

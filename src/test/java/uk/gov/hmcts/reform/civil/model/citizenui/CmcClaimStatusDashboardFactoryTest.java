@@ -327,7 +327,7 @@ public class CmcClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantReject() {
+    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantRejectOfferOutOfCourt() {
         CmcClaim claim = CmcClaim.builder()
             .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
             .settlement(Settlement.builder()
@@ -338,7 +338,23 @@ public class CmcClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_OFFER);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_OFFER_OUT_OF_COURT);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantAcceptedOfferOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .madeBy(MadeBy.CLAIMANT)
+                                                         .type(StatementType.ACCEPTATION)
+                                                         .build()))
+                            .build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_OFFER_OUT_OF_COURT);
     }
 
     @Test

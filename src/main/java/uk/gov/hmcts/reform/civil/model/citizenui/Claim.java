@@ -72,7 +72,7 @@ public interface Claim {
 
     boolean isClaimRejectedAndOfferSettleOutOfCourt();
 
-    boolean claimantAcceptRepayment();
+    boolean claimantAcceptedOfferOutOfCourt();
 
     boolean hasClaimantRejectOffer();
 

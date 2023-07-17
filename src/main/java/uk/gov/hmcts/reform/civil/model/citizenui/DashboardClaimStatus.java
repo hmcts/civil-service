@@ -27,6 +27,9 @@ public enum DashboardClaimStatus {
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
+    CLAIMANT_ACCEPTED_OFFER_OUT_OF_COURT(
+        Claim::claimantAcceptedOfferOutOfCourt
+    ),
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
@@ -73,7 +76,7 @@ public enum DashboardClaimStatus {
     CHANGE_BY_CLAIMANT(
         Claim::hasChangeRequestedFromClaimant
     ),
-    CLAIMANT_REJECT_OFFER(
+    CLAIMANT_REJECT_OFFER_OUT_OF_COURT(
         Claim::hasClaimantRejectOffer
     ),
     CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT(
@@ -102,9 +105,6 @@ public enum DashboardClaimStatus {
     ),
     TRANSFERRED(
         Claim::isSentToCourt
-    ),
-    CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
-        Claim::claimantAcceptRepayment
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing

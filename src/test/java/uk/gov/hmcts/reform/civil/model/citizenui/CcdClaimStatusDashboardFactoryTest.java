@@ -309,19 +309,6 @@ class CcdClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
 
-    @Test
-    void given_applicantAcceptRepaymentPlan_whenGetStatus_acceptOffer() {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_SETTLE_IN_COURT);
-    }
-
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
