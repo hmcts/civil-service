@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public class Respondent1DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
-    private IntermediateClaims respondent1DQIntermediateClaims;
+    private FixedRecoverableCosts respondent1DQFixedRecoverableCosts;
     private DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent1DQDisclosureReport;
@@ -61,9 +61,9 @@ public class Respondent1DQ implements DQ {
     }
 
     @Override
-    @JsonProperty("respondent1DQIntermediateClaims")
-    public IntermediateClaims getIntermediateClaims() {
-        return respondent1DQIntermediateClaims;
+    @JsonProperty("respondent1DQFixedRecoverableCosts")
+    public FixedRecoverableCosts getFixedRecoverableCosts() {
+        return respondent1DQFixedRecoverableCosts;
     }
 
     @Override

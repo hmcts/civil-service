@@ -22,7 +22,7 @@ import java.util.List;
 public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
-    private IntermediateClaims respondent2DQIntermediateClaims;
+    private FixedRecoverableCosts respondent2DQFixedRecoverableCosts;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;
@@ -55,9 +55,9 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
-    @JsonProperty("respondent2DQIntermediateClaims")
-    public IntermediateClaims getIntermediateClaims() {
-        return respondent2DQIntermediateClaims;
+    @JsonProperty("respondent2DQFixedRecoverableCosts")
+    public FixedRecoverableCosts getFixedRecoverableCosts() {
+        return respondent2DQFixedRecoverableCosts;
     }
 
     @Override

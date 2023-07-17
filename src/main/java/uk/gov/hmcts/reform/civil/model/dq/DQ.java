@@ -9,7 +9,7 @@ public interface DQ {
 
     FileDirectionsQuestionnaire getFileDirectionQuestionnaire();
 
-    IntermediateClaims getIntermediateClaims();
+    FixedRecoverableCosts getFixedRecoverableCosts();
 
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 

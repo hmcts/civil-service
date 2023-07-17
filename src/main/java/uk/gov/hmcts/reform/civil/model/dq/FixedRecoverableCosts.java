@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
 @Builder
-public class IntermediateClaims {
+public class FixedRecoverableCosts {
 
     private YesOrNo isSubjectToFixedRecoverableCostRegime;
     private String band;
