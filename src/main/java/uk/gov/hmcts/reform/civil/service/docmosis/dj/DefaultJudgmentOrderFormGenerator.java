@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -96,8 +97,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
-            .typeBundleInfo(nonNull(caseData.getDisposalHearingBundleDJ())
-                                ? fillTypeBundleInfoTrial() : null)
+            .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .disposalHearingDisclosureOfDocumentsDJAddSection(nonNull(
                 caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
@@ -168,8 +168,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
-            .typeBundleInfo(nonNull(caseData.getTrialHearingTrialDJ())
-                                ? fillTypeBundleInfo(caseData.getTrialHearingTrialDJ().getType()) : null)
+            .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .trialHearingTrialDJAddSection(
                 getToggleValue(caseData.getTrialHearingTrialDJToggle()))
             .trialHearingNotesDJ(caseData.getTrialHearingNotesDJ())
@@ -239,17 +238,28 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         }
     }
 
-    private String fillTypeBundleInfo(DisposalHearingBundleType type) {
-        switch (type) {
-            case DOCUMENTS:
-                return "an indexed bundle of documents, with each page clearly numbered.";
-            case ELECTRONIC:
-                return "an electronic bundle of digital documents.";
-            case SUMMARY:
-                return "a case summary containing no more than 500 words.";
-            default:
-                return null;
+    static String fillTypeBundleInfo(CaseData caseData) {
+        DisposalHearingBundleDJ disposalHearingBundle = caseData.getDisposalHearingBundleDJ();
+
+        if (disposalHearingBundle != null) {
+            List<DisposalHearingBundleType> types = disposalHearingBundle.getType();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            if (disposalHearingBundle.getType().size() == 3) {
+                stringBuilder.append(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType.DOCUMENTS.getLabel());
+                stringBuilder.append(" / " + uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType.ELECTRONIC.getLabel());
+                stringBuilder.append(" / " + DisposalHearingBundleType.SUMMARY.getLabel());
+            } else if (disposalHearingBundle.getType().size() == 2) {
+                stringBuilder.append(types.get(0).getLabel());
+                stringBuilder.append(" / " + types.get(1).getLabel());
+            } else {
+                stringBuilder.append(types.get(0).getLabel());
+            }
+
+            return stringBuilder.toString();
         }
+
+        return "";
     }
 
     private String fillTypeBundleInfoTrial() {
