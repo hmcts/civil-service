@@ -5,6 +5,6 @@ public class CaseDataInvalidException extends RuntimeException {
     private static final String ERROR_MESSAGE = "Case data invalid";
 
     public CaseDataInvalidException() {
-        super(String.format(ERROR_MESSAGE));
+        super(ERROR_MESSAGE);
     }
 }
