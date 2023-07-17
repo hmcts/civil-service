@@ -299,18 +299,6 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_respondentFullDefenceAndSettlementDeclinedByClaimantOrClaimantRejectClaimAmount_whenGetStatus_claimSentToClaimant() {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1CourtOrderPayment(PaymentUponCourtOrder.builder().build())
-            .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SENT_TO_CLAIMANT);
-    }
-
-    @Test
     void given_applicantRejectRepaymentPlan_whenGetStatus_rejectOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())

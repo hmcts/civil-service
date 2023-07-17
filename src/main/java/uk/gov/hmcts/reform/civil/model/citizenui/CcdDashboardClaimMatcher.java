@@ -227,10 +227,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean claimSentToClaimant() {
-        return caseData.isRespondentResponseFullDefence()
-            && Objects.nonNull(caseData.getRespondent1CourtOrderPayment())
-            && Objects.isNull(caseData.getApplicant1ResponseDate());
+    public boolean isClaimRejectedAndOfferSettleOutOfCourt() {
+        return false;
     }
 
     @Override

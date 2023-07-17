@@ -70,7 +70,7 @@ public interface Claim {
 
     boolean hasClaimEnded();
 
-    boolean claimSentToClaimant();
+    boolean isClaimRejectedAndOfferSettleOutOfCourt();
 
     boolean claimantAcceptRepayment();
 

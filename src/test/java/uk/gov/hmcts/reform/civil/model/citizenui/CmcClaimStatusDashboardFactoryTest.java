@@ -349,6 +349,20 @@ public class CmcClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
 
+    @Test
+    void given_respondentFullDefence_whenGetStatus_claimRejectedOfferSettleOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.FULL_DEFENCE)
+                          .build())
+            .settlement(Settlement.builder()
+                            .build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT);
+    }
+
     private CmcClaim getFullAdmitClaim(PaymentOption paymentOption) {
         return CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))

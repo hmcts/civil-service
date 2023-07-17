@@ -6,34 +6,36 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    CLAIMANT_ACCEPTED_STATES_PAID(
+        Claim::claimantConfirmedDefendantPaid
+    ),
+    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
+        Claim::hasClaimantAcceptedPartialAdmissionAmount
+    ),
     SETTLED(
         Claim::isSettled
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
+    CLAIMANT_REJECT_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionRejected
+    ),
     DEFENDANT_PART_ADMIT(
         Claim::defendantRespondedWithPartAdmit
-    ),
-    CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
-        Claim::hasClaimantAcceptedPartialAdmissionAmount
-    ),
-    CLAIMANT_ASKED_FOR_SETTLEMENT(
-        Claim::hasClaimantAskedToSignSettlementAgreement
     ),
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
     ),
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
+        Claim::hasClaimantAskedToSignSettlementAgreement
+    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
-
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
-    CLAIMANT_ACCEPTED_STATES_PAID(
-        Claim::claimantConfirmedDefendantPaid
-    ),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
     ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
@@ -50,14 +52,14 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
-    NO_RESPONSE(
-        Claim::hasResponsePending
-    ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
+    ),
+    NO_RESPONSE(
+        Claim::hasResponsePending
     ),
     PROCEED_OFFLINE(
         Claim::isProceedOffline
@@ -70,6 +72,9 @@ public enum DashboardClaimStatus {
     ),
     CHANGE_BY_CLAIMANT(
         Claim::hasChangeRequestedFromClaimant
+    ),
+    CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT(
+        Claim::isClaimRejectedAndOfferSettleOutOfCourt
     ),
     WAITING_FOR_CLAIMANT_TO_RESPOND(
         Claim::isWaitingForClaimantToRespond
@@ -89,26 +94,20 @@ public enum DashboardClaimStatus {
     IN_MEDIATION(
         Claim::isMediationPending
     ),
+    CLAIMANT_REJECT_OFFER(
+        Claim::claimantRejectOffer
+    ),
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
     TRANSFERRED(
         Claim::isSentToCourt
     ),
-    CLAIM_SENT_TO_CLAIMANT(
-        Claim::claimSentToClaimant
-    ),
     CLAIMANT_ACCEPTED_SETTLE_IN_COURT(
         Claim::claimantAcceptRepayment
     ),
-    CLAIMANT_REJECT_OFFER(
-        Claim::claimantRejectOffer
-    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
-    ),
-    CLAIMANT_REJECT_PARTIAL_ADMISSION(
-        Claim::isPartialAdmissionRejected
     ),
     NO_STATUS(c -> false);
 

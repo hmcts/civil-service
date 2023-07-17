@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -44,11 +46,16 @@ public class Settlement {
     }
 
     public boolean isThroughAdmissions() {
+        if(CollectionUtils.isEmpty(getPartyStatements())) {
+            return false;
+        }
+
         Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();
-        return partyStatementsStream.filter(PartyStatement::hasOffer)
+        return partyStatementsStream
+            .filter(PartyStatement::hasOffer)
             .reduce((first, second) -> second)
             .stream()
-            .noneMatch(offer -> offer.hasPaymentIntention());
+            .noneMatch(PartyStatement::hasPaymentIntention);
     }
 
     private Stream<PartyStatement> getPartyStatementStream() {

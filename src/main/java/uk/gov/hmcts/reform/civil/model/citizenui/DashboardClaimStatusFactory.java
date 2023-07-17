@@ -10,7 +10,7 @@ public class DashboardClaimStatusFactory {
     public DashboardClaimStatus getDashboardClaimStatus(Claim claim) {
         return Arrays.stream(DashboardClaimStatus.values())
             .filter(status -> status.getClaimMatcher().test(claim))
-            .reduce((f, s) -> s)
+            .findFirst()
             .orElse(DashboardClaimStatus.NO_STATUS);
     }
 }
