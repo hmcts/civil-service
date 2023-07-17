@@ -2771,7 +2771,7 @@ class StateFlowEngineTest {
     }
 
     @Nested
-    class ClaimantResponseToClaimAfterDefendantResponse{
+    class ClaimantResponseToClaimAfterDefendantResponse {
 
         @Test
         void shouldReturnClaimantResponse_FullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponse() {
@@ -2820,9 +2820,9 @@ class StateFlowEngineTest {
 
             );
         }
-}
+    }
 
-@Nested
+    @Nested
     class TakenOfflineByStaff {
 
         @Test
