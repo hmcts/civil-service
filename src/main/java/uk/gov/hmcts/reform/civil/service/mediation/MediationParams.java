@@ -10,6 +10,7 @@ import java.util.Optional;
 @Data
 @Builder
 public class MediationParams {
+
     private CaseData caseData;
     private Optional<Organisation> applicantOrganisation;
     private Optional<Organisation> defendantOrganisation;

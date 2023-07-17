@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-
 @Service
 @RequiredArgsConstructor
 public class MediationCSVLrvLrService extends MediationCSVService {

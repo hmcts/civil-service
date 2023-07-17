@@ -42,7 +42,6 @@ public class MediationCSVLrvLipService extends MediationCSVService {
         return caseData.getRespondent1().getPartyEmail();
     }
 
-
     @Override
     protected String getCsvContactNameForDefendant(MediationParams params) {
         return getCsvIndividualName(params.getCaseData().getRespondent1());
