@@ -4027,7 +4027,6 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setMultiTrackClaim() {
-
         allocatedTrack = MULTI_CLAIM;
         return this;
     }
