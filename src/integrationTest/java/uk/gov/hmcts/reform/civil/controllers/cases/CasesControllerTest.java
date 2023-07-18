@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,7 +47,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + " }\n"
         + "}";
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
-    private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
+    private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
@@ -156,9 +158,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        when(dashboardClaimInfoService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
+        var dashBoardResponse = DashboardDefendantResponse.builder().totalPages(1).claims(claimResults).build();
+        when(dashboardClaimInfoService.getDashboardDefendantResponse(
+            any(),
+            any(),
+            eq(1)
+        )).thenReturn(dashBoardResponse);
         doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
-            .andExpect(content().json(toJson(claimResults)))
+            .andExpect(content().json(toJson(dashBoardResponse)))
             .andExpect(status().isOk());
     }
 

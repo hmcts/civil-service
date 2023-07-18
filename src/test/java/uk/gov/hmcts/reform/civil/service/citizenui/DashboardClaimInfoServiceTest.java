@@ -15,16 +15,19 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
@@ -49,6 +52,7 @@ public class DashboardClaimInfoServiceTest {
         .id(2L)
         .createdDate(DATE_IN_2022)
         .build();
+    private static final int CURRENT_PAGE_NO = 1;
     private static final List<DashboardClaimInfo> ORDERED_CASES =
         Arrays.asList(
             DashboardClaimInfo.builder()
@@ -77,8 +81,9 @@ public class DashboardClaimInfoServiceTest {
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
-        SearchResult searchResult = SearchResult.builder().total(1).cases(cases).build();
-        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
+        SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
+        given(coreCaseDataService.getTotalCCDCasesCount(any())).willReturn(cases.size());
+        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
                             .applicant1(Party.builder()
@@ -128,14 +133,16 @@ public class DashboardClaimInfoServiceTest {
 
     @Test
     void shouldReturnClaimsForDefendantSuccessfully() {
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(3);
-        assertThat(claimsForDefendant.get(0)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
-        assertThat(claimsForDefendant.get(2).getDefendantName()).isEqualTo(DEFENDANT_NAME);
-        assertThat(claimsForDefendant.get(2).getClaimantName()).isEqualTo(CLAIMANT_NAME);
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(2)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
+        assertThat(claimsForDefendant.getClaims().get(0).getDefendantName()).isEqualTo(DEFENDANT_NAME);
+        assertThat(claimsForDefendant.getClaims().get(0).getClaimantName()).isEqualTo(CLAIMANT_NAME);
     }
 
     @Test
@@ -159,12 +166,13 @@ public class DashboardClaimInfoServiceTest {
                                                                                             .build())
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
                                                                             .build());
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(3);
-        assertThat(claimsForDefendant.get(2).getResponseDeadline()).isEqualTo(DATE_IN_2025.toLocalDate());
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getResponseDeadline()).isEqualTo(DATE_IN_2025.toLocalDate());
     }
 
     @Test
@@ -192,12 +200,13 @@ public class DashboardClaimInfoServiceTest {
                                     .builder()
                                     .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
                             .build());
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(3);
-        assertThat(claimsForDefendant.get(2).getPaymentDate()).isEqualTo(DATE_IN_2025.toLocalDate());
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getPaymentDate()).isEqualTo(DATE_IN_2025.toLocalDate());
     }
 
     @Test
@@ -226,12 +235,13 @@ public class DashboardClaimInfoServiceTest {
                                     .builder()
                                     .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
                             .build());
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(3);
-        assertThat(claimsForDefendant.get(2).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(
             PART_ADMIT_PAY_IMMEDIATELY_AMOUNT);
     }
 
@@ -240,16 +250,19 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
+        given(coreCaseDataService.getTotalCCDCasesCount(any())).willReturn(searchResult.getTotal());
 
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
 
-        assertThat(claimsForDefendant.size()).isEqualTo(2);
-        assertThat(claimsForDefendant.get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
-        assertThat(claimsForDefendant.get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(2);
+        assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo(DATE_IN_2022);
+        assertThat(claimsForDefendant.getClaims().get(1).getCreatedDate()).isEqualTo(DATE_IN_2021);
+        assertThat((claimsForDefendant.getTotalPages())).isEqualTo(1);
     }
 
     @Test
@@ -257,14 +270,71 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
 
-        given(coreCaseDataService.getCasesUptoMaxsize(any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
+        given(coreCaseDataService.getTotalCCDCasesCount(any())).willReturn(searchResult.getTotal());
 
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
 
-        assertThat(claimsForDefendant.size()).isEqualTo(0);
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldReturnTotalNoPagesBasedOnTheCases() {
+        List<CaseDetails> cases = List.of();
+        SearchResult searchResult = SearchResult.builder().total(15).cases(cases).build();
+        given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
+        given(coreCaseDataService.getTotalCCDCasesCount(any())).willReturn(searchResult.getTotal());
+
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+
+        assertThat(claimsForDefendant.getTotalPages()).isEqualTo(2);
+
+    }
+
+    @Test
+    void shouldReturnCurrentPageClaimsForMoreThanTenClaims() {
+        // Given
+        List<CaseDetails> caseDetailsList = new ArrayList<CaseDetails>();
+        for (long i = 15; i >= 1; i--) {
+            var caseDetail = CaseDetails.builder()
+                .id(i)
+                .createdDate(LocalDateTime.of(2021, (int) 3, (int) i, 0, 0))
+                .build();
+            caseDetailsList.add(caseDetail);
+            given(caseDetailsConverter.toCaseData(caseDetail)).willReturn(CaseData.builder()
+                                                                              .submittedDate(LocalDateTime.of(
+                                                                                  2021,
+                                                                                  (int) 3,
+                                                                                  (int) i,
+                                                                                  0,
+                                                                                  0
+                                                                              )).build());
+
+        }
+        SearchResult searchResult = SearchResult.builder().total(caseDetailsList.size())
+            .cases(caseDetailsList.subList(10, caseDetailsList.size())).build();
+        given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
+        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(10))).willReturn(searchResult);
+        given(coreCaseDataService.getTotalCCDCasesCount(any())).willReturn(searchResult.getTotal());
+        //when
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            2
+        );
+        //assert
+        assertThat(claimsForDefendant.getTotalPages()).isEqualTo(2);
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(7);
+        assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo("2021-03-05T00:00");
+
     }
 }
