@@ -136,6 +136,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.6'
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:4.3.0"
     }
   }
 
@@ -277,7 +278,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -332,7 +333,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.0'
+  implementation 'com.github.hmcts:civil-commons:1.0.4'
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -416,6 +417,10 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
+
+  implementation group: 'com.azure', name: 'azure-core', version: '1.21.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.4.2'
+  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.5'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
