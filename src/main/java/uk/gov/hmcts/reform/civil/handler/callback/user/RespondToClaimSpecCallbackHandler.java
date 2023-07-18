@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -1325,9 +1326,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (caseData.getTempCorrespondenceAddress() != null
             && StringUtils.isNotBlank(caseData.getTempCorrespondenceAddress().getAddressLine1())) {
             if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
-                updatedData.specRespondentCorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress());
+                updatedData.specRespondentCorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress())
+                    .specRespondentCorrespondenceAddressRequired(YesOrNo.YES);
             } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
                 updatedData.specRespondent2CorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress());
+                // respondent 2 has no correspondence address required yet
             }
             // front does not delete based on null, but can replace with an empty object
             updatedData.tempCorrespondenceAddress(Address.builder().build());
