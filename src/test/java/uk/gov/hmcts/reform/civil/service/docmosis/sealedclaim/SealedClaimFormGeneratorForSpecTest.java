@@ -289,16 +289,16 @@ public class SealedClaimFormGeneratorForSpecTest {
     void testDownloadDocumentById() {
         // given
         String documentId = "documentId";
-        DownloadedDocumentResponse downloadedDoc =
+        DownloadedDocumentResponse expectedDoc =
             new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()),
                                            "test", "test");
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenReturn(downloadedDoc);
+        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenReturn(expectedDoc);
 
         // when
-        DownloadedDocumentResponse expectedResult = sealedClaimFormGenerator.downloadDocument(documentId);
+        DownloadedDocumentResponse downloadedDoc = sealedClaimFormGenerator.downloadDocument(documentId);
         //Then
-        assertEquals(expectedResult, downloadedDoc);
+        assertEquals(downloadedDoc, expectedDoc);
     }
 
 }
