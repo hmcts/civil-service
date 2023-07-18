@@ -71,7 +71,6 @@ public class MediationCSVLrvLipServiceTest {
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
     }
 
-
     @Test
     void shouldReturn_properDataForFile_ForOrganisation() {
         //Given
