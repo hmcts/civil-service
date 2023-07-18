@@ -3,23 +3,40 @@ package uk.gov.hmcts.reform.civil.model;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+
+import java.util.Optional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataTest {
 
@@ -402,7 +419,7 @@ public class CaseDataTest {
         //When
         String result = caseData.getApplicantOrganisationId();
         //Then
-        assertThat(result).isEqualTo("");
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -434,4 +451,142 @@ public class CaseDataTest {
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
     }
+
+    @Test
+    void getSDOOrderDocument_WhenItPresent() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
+    }
+
+    @Test
+    void getSDOOrderDocument_WhenItsNull() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(null).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertTrue(caseDocument.isEmpty());
+    }
+
+    void isPartAdmitPayImmediatelyAccepted_thenTrue() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
+            .caseAccessCategory(SPEC_CLAIM)
+            .build();
+        //When
+        //Then
+        assertTrue(caseData.isPartAdmitPayImmediatelyAccepted());
+    }
+
+    @Test
+    void isPartAdmitPayImmediatelyAccepted_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        //Then
+        assertFalse(caseData.isPartAdmitPayImmediatelyAccepted());
+    }
+
+    @Test
+    void shouldReturnTrueWhenResponseIsFullAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .build();
+        assertTrue(caseData.isFullAdmitClaimSpec());
+    }
+
+    @Test
+    void shouldReturnFalseWhenResponseIsNotFullAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .build();
+        assertFalse(caseData.isFullAdmitClaimSpec());
+    }
+
+    @Test
+    void shouldReturnRecurringIncomeForFullAdmitWhenTheyExist() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncomeFA(List.of(element(
+                RecurringIncomeLRspec.builder().build()))).build())
+            .build();
+        //When
+        List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
+        //Then
+        assertThat(results).isNotNull();
+    }
+
+    @Test
+    void shouldReturnRecurringIncomeForNonFullAdmitCaseWhenTheyExist() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncome(List.of(element(
+                RecurringIncomeLRspec.builder().build()))).build())
+            .build();
+        //When
+        List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
+        //Then
+        assertThat(results).isNotNull();
+    }
+
+    @Test
+    void shouldReturnNullForRecurringIncomeWhenRespondentDqIsNull() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
+        //Then
+        assertThat(results).isNull();
+    }
+
+    @Test
+    void shouldReturnRecurringExpensesForFullAdmitWhenTheyExist() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpensesFA(List.of(element(
+                RecurringExpenseLRspec.builder().build()))).build())
+            .build();
+
+        //When
+        List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
+        //Then
+        assertThat(results).isNotNull();
+    }
+
+    @Test
+    void shouldReturnRecurringExpensesForNonFullAdmitWhenTheyExist() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpenses(List.of(element(
+                RecurringExpenseLRspec.builder().build()))).build())
+            .build();
+
+        //When
+        List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
+        //Then
+        assertThat(results).isNotNull();
+    }
+
+    @Test
+    void shouldReturnNullForRecurringExpensesWhenRespondent1DQIsNull() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
+        //Then
+        assertThat(results).isNull();
+    }
 }
+
+

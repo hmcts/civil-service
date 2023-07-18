@@ -29,9 +29,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -539,10 +536,10 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
 
         private void assertCamundaEventIsReady(AboutToStartOrSubmitCallbackResponse response) {
             assertThat(response.getData())
-                .containsEntry("businessProcess", Map.of(
-                    "status", "READY",
-                    "camundaEvent", "APPLY_NOC_DECISION"
-                ));
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .contains("READY", "APPLY_NOC_DECISION");
+
         }
     }
 }
