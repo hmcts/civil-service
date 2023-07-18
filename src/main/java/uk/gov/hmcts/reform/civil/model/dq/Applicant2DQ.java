@@ -31,6 +31,7 @@ public class Applicant2DQ implements DQ {
     private FurtherInformation applicant2DQFurtherInformation;
     private WelshLanguageRequirements applicant2DQLanguage;
     private WelshLanguageRequirements applicant2DQLanguageLRspec;
+    private RemoteHearingLRspec applicant2DQRemoteHearingLRspec;
     private StatementOfTruth applicant2DQStatementOfTruth;
     private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
 
@@ -124,6 +125,12 @@ public class Applicant2DQ implements DQ {
     @JsonProperty("applicant2DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return applicant2DQLanguageLRspec;
+    }
+
+    @Override
+    @JsonProperty("applicant2DQRemoteHearingLRspec")
+    public RemoteHearingLRspec getRemoteHearingLRspec() {
+        return applicant2DQRemoteHearingLRspec;
     }
 
     @Override
