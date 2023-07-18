@@ -34,7 +34,7 @@ public class MediationCSVLrvLrServiceTest {
     private static final String APPLICANT_COMPANY_NAME = "Applicant company name";
     private static final String RESPONDENT_COMPANY_NAME = "Respondent company name";
     private static final String RESPONDENT_ORGANISATION_NAME = "Respondent organisation name";
-    private static final String RESPONDENT_EMAIL_ADDRESS  = "respondent@company.com";
+    private static final String RESPONDENT_EMAIL_ADDRESS = "respondent@company.com";
     private static final String RESPONDENT_PHONE_NUMBER = "0022002200";
     private static final String RESPONDENT_INDIVIDUAL_FIST_NAME = "Respondent Individual First Name";
     private static final String RESPONDENT_INDIVIDUAL_LAST_NAME = "Respondent Individual Last Name";
@@ -43,7 +43,7 @@ public class MediationCSVLrvLrServiceTest {
     private static final String TOTAL_AMOUNT = "9000";
     private static final String ID = "123456789";
     private static final String APP_LR_ORG_ID = "123";
-    private static final String DEF_LR_ORG_ID ="456";
+    private static final String DEF_LR_ORG_ID = "456";
 
     @Mock
     private uk.gov.hmcts.reform.civil.prd.model.Organisation applicantOrganisation;
@@ -63,8 +63,10 @@ public class MediationCSVLrvLrServiceTest {
         given(applicantOrganisation.getCompanyNumber()).willReturn(LR_APPLICANT_COMPANY_NUMBER);
         given(defendantOrganisation.getName()).willReturn(LR_DEFENDANT_COMPANY_NAME);
         given(defendantOrganisation.getCompanyNumber()).willReturn(LR_DEFENDANT_COMPANY_NUMBER);
-        given(organisationService.findOrganisationById(APP_LR_ORG_ID)).willReturn(Optional.ofNullable(applicantOrganisation));
-        given(organisationService.findOrganisationById(DEF_LR_ORG_ID)).willReturn(Optional.ofNullable(defendantOrganisation));
+        given(organisationService.findOrganisationById(APP_LR_ORG_ID)).willReturn(Optional.ofNullable(
+            applicantOrganisation));
+        given(organisationService.findOrganisationById(DEF_LR_ORG_ID)).willReturn(Optional.ofNullable(
+            defendantOrganisation));
     }
 
     @Test

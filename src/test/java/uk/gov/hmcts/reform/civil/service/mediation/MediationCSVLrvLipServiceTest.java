@@ -31,7 +31,7 @@ public class MediationCSVLrvLipServiceTest {
     private static final String LR_COMPANY_NUMBER = "123455";
     private static final String RESPONDENT_COMPANY_NAME = "Respondent company name";
     private static final String RESPONDENT_ORGANISATION_NAME = "Respondent organisation name";
-    private static final String RESPONDENT_EMAIL_ADDRESS  = "respondent@company.com";
+    private static final String RESPONDENT_EMAIL_ADDRESS = "respondent@company.com";
     private static final String RESPONDENT_PHONE_NUMBER = "0022002200";
     private static final String RESPONDENT_INDIVIDUAL_FIST_NAME = "Respondent Individual First Name";
     private static final String RESPONDENT_INDIVIDUAL_LAST_NAME = "Respondent Individual Last Name";
@@ -108,10 +108,10 @@ public class MediationCSVLrvLipServiceTest {
         CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
         //When
         String result = service.generateCSVContent(caseData);
-       //Then
+        //Then
         assertThat(result).contains(ID);
         assertThat(result).contains("SOLE_TRADER");
-        assertThat(result).contains(RESPONDENT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME +" " + RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
+        assertThat(result).contains(RESPONDENT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME + " " + RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
@@ -170,6 +170,5 @@ public class MediationCSVLrvLipServiceTest {
             .build();
         return caseData;
     }
-
 }
 
