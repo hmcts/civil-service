@@ -28,8 +28,8 @@ public abstract class MediationCSVService {
         String[] claimantData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
             data.getApplicant1().getType().toString(), getCsvCompanyName(data.getApplicant1()),
-            getCsvContactNameForApplicant(params), getContactEmailForApplicant(data),
-            CHECK_LIST, PARTY_STATUS, getContactNumberForApplicant(params),
+            getCsvContactNameForApplicant(params), getContactNumberForApplicant(params),
+            CHECK_LIST, PARTY_STATUS, getContactEmailForApplicant(data),
             isPilot(data.getTotalClaimAmount())
         };
 
