@@ -6,14 +6,18 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
+import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.getDynamicListValue;
+import static uk.gov.hmcts.reform.civil.utils.HearingMethodUtils.getHearingMethodCodes;
 
 public class HearingDetailsMapper {
 
@@ -143,8 +147,21 @@ public class HearingDetailsMapper {
         return false;
     }
 
-    public static List<String> getHearingChannels(CaseData caseData) {
-        return null; //todo civ-6261
+    public static List<String> getHearingChannels(String authToken, String hmctsServiceId, CaseData caseData, CategoryService categoryService) {
+        Map<String, String> hearingMethodCode = getHearingMethodCodes(categoryService, hmctsServiceId, authToken);
+        if (caseData.getHearingMethodValuesFastTrack() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesFastTrack())));
+        } else if (caseData.getHearingMethodValuesDisposalHearing() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearing())));
+        } else if (caseData.getHearingMethodValuesDisposalHearingDJ() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesDisposalHearingDJ())));
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesTrialHearingDJ())));
+        } else if (caseData.getHearingMethodValuesSmallClaims() != null) {
+            return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getHearingMethodValuesSmallClaims())));
+        } else {
+            return null;
+        }
     }
 
 }
