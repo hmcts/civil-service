@@ -61,11 +61,6 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
-    public RemoteHearingLRspec getRemoteHearingLRspec() {
-        return null;
-    }
-
-    @Override
     @JsonProperty("respondent2DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return respondent2DQDisclosureOfNonElectronicDocuments;
