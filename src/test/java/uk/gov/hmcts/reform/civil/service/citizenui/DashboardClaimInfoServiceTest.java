@@ -305,19 +305,14 @@ public class DashboardClaimInfoServiceTest {
         // Given
         List<CaseDetails> caseDetailsList = new ArrayList<CaseDetails>();
         for (long i = 15; i >= 1; i--) {
+            LocalDateTime createdDate = LocalDateTime.of(2021, 3, (int) i, 0, 0);
             var caseDetail = CaseDetails.builder()
                 .id(i)
-                .createdDate(LocalDateTime.of(2021, (int) 3, (int) i, 0, 0))
+                .createdDate(createdDate)
                 .build();
             caseDetailsList.add(caseDetail);
-            given(caseDetailsConverter.toCaseData(caseDetail)).willReturn(CaseData.builder()
-                                                                              .submittedDate(LocalDateTime.of(
-                                                                                  2021,
-                                                                                  (int) 3,
-                                                                                  (int) i,
-                                                                                  0,
-                                                                                  0
-                                                                              )).build());
+            CaseData caseData = CaseData.builder().submittedDate(createdDate).build();
+            given(caseDetailsConverter.toCaseData(caseDetail)).willReturn(caseData);
 
         }
         SearchResult searchResult = SearchResult.builder().total(caseDetailsList.size())
