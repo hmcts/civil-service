@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 @ComponentScan("uk.gov.hmcts.reform")
 public class ClaimFormService {
 
-    private final DocumentManagementService documentManagementService;
+    private final DocumentDownloadService documentDownloadService;
 
     public CaseDocument uploadSealedDocument(
          String authorisation, CaseData caseData) {
@@ -30,6 +30,6 @@ public class ClaimFormService {
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
     public DownloadedDocumentResponse downloadDocumentById(String caseDocumentId) {
-        return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocumentId);
+        return documentDownloadService.downloadDocument(caseDocumentId);
     }
 }

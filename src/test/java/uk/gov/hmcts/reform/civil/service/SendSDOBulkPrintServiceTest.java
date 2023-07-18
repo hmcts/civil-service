@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class SendSDOBulkPrintServiceTest {
 
     @MockBean
-    private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
+    private DocumentDownloadService documentDownloadService;
     @MockBean
     private BulkPrintService bulkPrintService;
     @Autowired
@@ -43,7 +43,7 @@ class SendSDOBulkPrintServiceTest {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build())).build();
-        given(sealedClaimFormGeneratorForSpec.downloadDocument(any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(documentDownloadService.downloadDocument(any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);

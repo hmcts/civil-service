@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -83,11 +84,6 @@ public class SealedClaimFormGeneratorForSpecTest {
     private InterestCalculator interestCalculator;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
-
-    @Mock
-    private UserService userService;
-    @Mock
-    private SystemUpdateUserConfiguration userConfig;
 
     @BeforeEach
     void setup() {
@@ -283,22 +279,6 @@ public class SealedClaimFormGeneratorForSpecTest {
         verify(representativeService).getRespondent1Representative(caseData);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
-    }
-
-    @Test
-    void testDownloadDocumentById() {
-        // given
-        String documentId = "documentId";
-        DownloadedDocumentResponse expectedDoc =
-            new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()),
-                                           "test", "test");
-        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenReturn(expectedDoc);
-
-        // when
-        DownloadedDocumentResponse downloadedDoc = sealedClaimFormGenerator.downloadDocument(documentId);
-        //Then
-        assertEquals(downloadedDoc, expectedDoc);
     }
 
 }
