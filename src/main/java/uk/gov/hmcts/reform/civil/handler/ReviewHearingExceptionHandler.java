@@ -20,7 +20,7 @@ public class ReviewHearingExceptionHandler {
 
     public boolean handleExceptionEvent(HmcMessage hmcMessage) {
         if (isMessageRelevantForService(hmcMessage)) {
-            if(EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
                 log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
                          hmcMessage.getHearingId(),
                          hmcMessage.getCaseId()
