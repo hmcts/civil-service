@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public abstract class MediationCSVService {
 
@@ -29,7 +26,7 @@ public abstract class MediationCSVService {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
             data.getApplicant1().getType().toString(), getCsvCompanyName(data.getApplicant1()),
             getCsvContactNameForApplicant(params), getContactNumberForApplicant(params),
-            CHECK_LIST, PARTY_STATUS, getContactEmailForApplicant(data),
+            CHECK_LIST, PARTY_STATUS, getContactEmailForApplicant(params),
             isPilot(data.getTotalClaimAmount())
         };
 
@@ -37,7 +34,7 @@ public abstract class MediationCSVService {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
             data.getRespondent1().getType().toString(), getCsvCompanyName(data.getRespondent1()),
             getCsvContactNameForDefendant(params), getContactNumberForDefendant(params),
-            CHECK_LIST, PARTY_STATUS, getContactEmailForDefendant(data),
+            CHECK_LIST, PARTY_STATUS, getContactEmailForDefendant(params),
             isPilot(data.getTotalClaimAmount())
         };
 
@@ -46,19 +43,35 @@ public abstract class MediationCSVService {
             + generateCSVRow(respondentData);
     }
 
+    protected abstract ApplicantContactDetails getApplicantContactDetails();
+
+    protected abstract DefendantContactDetails getDefendantContactDetails();
+
     protected abstract MediationParams getMediationParams(CaseData caseData);
 
-    protected abstract String getCsvContactNameForApplicant(MediationParams params);
+    private String getCsvContactNameForApplicant(MediationParams params) {
+       return getApplicantContactDetails().getApplicantContactName(params);
+    }
 
-    protected abstract String getContactEmailForApplicant(CaseData caseData);
+    private String getContactEmailForApplicant(MediationParams params){
+        return getApplicantContactDetails().getApplicantContactEmail(params);
+    }
 
-    protected abstract String getContactNumberForApplicant(MediationParams params);
+   private String getContactNumberForApplicant(MediationParams params){
+        return getApplicantContactDetails().getApplicantContactNumber(params);
+   }
 
-    protected abstract String getContactEmailForDefendant(CaseData caseData);
+    private String getContactEmailForDefendant(MediationParams params) {
+        return getDefendantContactDetails().getDefendantContactEmail(params);
+    }
 
-    protected abstract String getCsvContactNameForDefendant(MediationParams params);
+    private String getCsvContactNameForDefendant(MediationParams params) {
+        return getDefendantContactDetails().getDefendantContactNumber(params);
+    }
 
-    protected abstract String getContactNumberForDefendant(MediationParams params);
+    private String getContactNumberForDefendant(MediationParams params) {
+        return getDefendantContactDetails().getDefendantContactNumber(params);
+    }
 
     private String isPilot(BigDecimal amount) {
         return amount.compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No";
@@ -79,16 +92,4 @@ public abstract class MediationCSVService {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
 
-    protected String getCsvIndividualName(Party party) {
-        return (party.isIndividual() || party.isSoleTrader()) ? party.getPartyName() : null;
-    }
-
-    protected String getApplicantRepresentativeEmailAddress(CaseData caseData) {
-        return Optional.ofNullable(caseData.getApplicantSolicitor1CheckEmail()).map(CorrectEmail::getEmail)
-            .orElse(caseData.getApplicantSolicitor1UserDetails().getEmail());
-    }
-
-    protected String getRepresentativeContactNumber(Optional<Organisation> organisation) {
-        return organisation.map(Organisation::getCompanyNumber).orElse("");
-    }
 }
