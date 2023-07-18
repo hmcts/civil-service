@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 
