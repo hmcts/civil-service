@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
+import static uk.gov.hmcts.reform.civil.enums.ComplexityBand.BAND_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -569,7 +570,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             FixedRecoverableCosts fixedRecoverableCosts =
                 FixedRecoverableCosts.builder()
                     .isSubjectToFixedRecoverableCostRegime(YES)
-                    .band("BAND_1")
+                    .band(BAND_1)
                     .complexityBandingAgreed(YES)
                     .reasons("reasons")
                     .build();
@@ -596,7 +597,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             FixedRecoverableCosts fixedRecoverableCosts =
                 FixedRecoverableCosts.builder()
                 .isSubjectToFixedRecoverableCostRegime(YES)
-                .band("BAND_1")
+                .band(BAND_1)
                 .complexityBandingAgreed(YES)
                 .reasons("reasons")
                 .build();
@@ -633,7 +634,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             FixedRecoverableCosts fixedRecoverableCosts =
                 FixedRecoverableCosts.builder()
                     .isSubjectToFixedRecoverableCostRegime(YES)
-                    .band("BAND_1")
+                    .band(BAND_1)
                     .complexityBandingAgreed(YES)
                     .reasons("reasons")
                     .build();
@@ -667,7 +668,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             FixedRecoverableCosts fixedRecoverableCosts =
                 FixedRecoverableCosts.builder()
                     .isSubjectToFixedRecoverableCostRegime(YES)
-                    .band("BAND_1")
+                    .band(BAND_1)
                     .complexityBandingAgreed(YES)
                     .reasons("reasons")
                     .build();
@@ -701,7 +702,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReplaceApplicant2FixedRecoverableCostsWithNull_whenOnlyApplicant2Proceeds() {
             FixedRecoverableCosts fixedRecolverableCosts = FixedRecoverableCosts.builder()
                 .isSubjectToFixedRecoverableCostRegime(YES)
-                .band("BAND_1")
+                .band(BAND_1)
                 .complexityBandingAgreed(YES)
                 .reasons("reasons")
                 .build();
