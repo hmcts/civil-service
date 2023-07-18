@@ -452,7 +452,7 @@ notification:
 mediation:
   emails:
     sender: hmcts.civil@gmail.com
-    recipient: smallclaimsmediation@justice.gov.uk
+    recipient: civilmoneyclaimsdemo@gmail.com
 
 
 ---
