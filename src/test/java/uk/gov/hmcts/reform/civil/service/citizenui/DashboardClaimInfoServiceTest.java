@@ -330,6 +330,7 @@ public class DashboardClaimInfoServiceTest {
         assertThat(claimsForDefendant.getTotalPages()).isEqualTo(2);
         assertThat(claimsForDefendant.getClaims().size()).isEqualTo(7);
         assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo("2021-03-05T00:00");
-
+        assertThat(claimsForDefendant.getClaims().get(1).getCreatedDate()).isEqualTo("2021-03-04T00:00");
+        assertThat(claimsForDefendant.getClaims().get(2).getCreatedDate()).isEqualTo("2021-03-03T00:00");
     }
 }
