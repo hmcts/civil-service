@@ -29,7 +29,6 @@ public class DocumentDownloadServiceTest {
     @InjectMocks
     private DocumentDownloadService documentDownloadService;
 
-
     @Test
     void testDownloadDocumentById() {
         // given
