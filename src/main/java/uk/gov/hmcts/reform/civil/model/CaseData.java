@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.bulkclaims.StdRequestId;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -599,6 +600,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // bulk claims
     private final String bulkCustomerId;
+    private final String bulkRequestId;
+    private final StdRequestId stdRequestId;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
