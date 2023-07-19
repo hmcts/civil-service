@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.bulkclaims.StdRequestId;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -488,7 +489,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         List<String> errors = new ArrayList<>();
-        if (caseData.getBulkCustomerId() != null) {
+        if (caseData.getBulkRequestId() != null) {
             List<String> postcodes = new ArrayList<>();
             postcodes.add(caseData.getApplicant1().getPrimaryAddress().getPostCode());
             postcodes.add(caseData.getRespondent1().getPrimaryAddress().getPostCode());
@@ -498,6 +499,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             postcodes.forEach(postcode -> {if (!postcodeValidator.validate(postcode).isEmpty()) {
                 errors.add("Postcode error, bulk claim");
             }});
+            // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
+            dataBuilder.stdRequestId(StdRequestId.builder().createClaimRequestId(caseData.getBulkRequestId()).build());
+
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
