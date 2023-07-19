@@ -37,26 +37,24 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
@@ -106,6 +104,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     private static final String GENERATE_ANY_DOC_URL = BASE_URL + "/generateAnyDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
+    private static final String DOWNLOAD_FILE_URL = BASE_URL + "/downloadDocument/{documentId}";
+    public static final String DOCUMENT_ID = "documentId";
 
     private Document document;
 
@@ -143,17 +143,21 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentController() throws JsonProcessingException {
-
-        CaseDocument caseDocument = mapper.readValue(
-            readString("document-management/download.document.json"),
-            CaseDocument.class
+    void shouldDownloadDocumentById() throws Exception {
+        Document document = mapper.readValue(
+            ResourceReader.readString("document-management/download.success.json"),
+            Document.class
         );
-
-        String documentPath = URI.create(document.links.self.href).getPath();
+        byte[] file = "test".getBytes();
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
         UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-        when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+        when(caseDocumentClientApi.getMetadataForDocument(
+                 anyString(),
+                 anyString(),
+                 eq(documentId)
+             )
+        ).thenReturn(document);
 
         when(caseDocumentClientApi.getDocumentBinary(
                  anyString(),
@@ -162,42 +166,12 @@ public class DocumentControllerTest extends BaseIntegrationTest {
              )
         ).thenReturn(responseEntity);
 
-        byte[] pdf = documentController.downloadSealedDocument(caseDocument);
+        when(responseEntity.getBody()).thenReturn(new ByteArrayResource(file));
 
-        assertNotNull(pdf);
-        assertArrayEquals("test".getBytes(), pdf);
-
-        verify(caseDocumentClientApi)
-            .getDocumentBinary(anyString(), anyString(), eq(documentId));
-    }
-
-    @Test
-    void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentClientApi() throws JsonProcessingException {
-
-        CaseDocument caseDocument = mapper.readValue(
-            readString("document-management/download.document.json"),
-            CaseDocument.class
-        );
-
-        String documentPath = URI.create(document.links.self.href).getPath();
-        UUID documentId = getDocumentIdFromSelfHref(documentPath);
-
-        when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
-        when(caseDocumentClientApi.getDocumentBinary(
-                 anyString(),
-                 anyString(),
-                 eq(documentId)
-             )
-        ).thenReturn(responseEntity);
-
-        byte[] pdf = claimFormService.downloadSealedDocument(BEARER_TOKEN, caseDocument);
-
-        assertNotNull(pdf);
-        assertArrayEquals("test".getBytes(), pdf);
-
-        verify(caseDocumentClientApi)
-            .getDocumentBinary(anyString(), anyString(), eq(documentId));
+        //then
+        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
+            .andExpect(content().bytes(file))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -217,7 +191,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals(FILE_NAME, jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match");
+                     "Document file names should match"
+        );
     }
 
     @Test
@@ -252,10 +227,12 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
 
         //given
-        MockMultipartFile file = new MockMultipartFile("file",
-                                                       "TestFile.png",
-                                                       "image/png",
-                                                       "This is a dummy file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
 
         //when
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(byte[].class)))
@@ -269,7 +246,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match");
+                     "Document file names should match"
+        );
     }
 
     @Test
@@ -277,17 +255,19 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     void shouldThrowExceptionAnyDocument() throws Exception {
 
         //given
-        MockMultipartFile file = new MockMultipartFile("file",
-                                                       "TestFile.png",
-                                                       "image/png",
-                                                       "This is a dummy file content".getBytes());
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "TestFile.png",
+            "image/png",
+            "This is a dummy file content".getBytes()
+        );
 
         //when
         when(documentManagementService.uploadDocument(anyString(), any(UploadedDocument.class)))
             .thenThrow(DocumentUploadException.class);
 
         MvcResult result = doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)
-                            .andExpect(status().isBadRequest()).andReturn();
+            .andExpect(status().isBadRequest()).andReturn();
 
         assertEquals("Document upload unsuccessful", result.getResponse().getContentAsString());
         //then
