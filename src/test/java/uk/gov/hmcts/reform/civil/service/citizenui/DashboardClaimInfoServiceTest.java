@@ -347,11 +347,12 @@ public class DashboardClaimInfoServiceTest {
             .willReturn(CaseData.builder()
                             .submittedDate(now)
                             .build());
-        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
-            "123"
+            "123",
+            1
         );
-        assertThat(claimsForDefendant.size()).isEqualTo(3);
-        assertThat(claimsForDefendant.get(2).getCreatedDate()).isEqualTo(now);
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo(now);
     }
 }
