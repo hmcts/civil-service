@@ -126,7 +126,7 @@ public class DashboardClaimInfoService {
 
     private LocalDateTime submittedDateToCreatedDate(CaseData caseData) {
         LocalDateTime createdDate = LocalDateTime.now();
-        if (!Objects.isNull(caseData.getSubmittedDate())) {
+        if (Objects.nonNull(caseData.getSubmittedDate())) {
             createdDate = caseData.getSubmittedDate();
         }
 
