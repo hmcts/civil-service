@@ -20,8 +20,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -69,10 +71,15 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
         String emailAddress;
+        boolean isLiP = false;
+        boolean isApplicant = false;
         if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name())) {
-            emailAddress = caseData.getApplicantSolicitor1UserDetails().getEmail();
+            isApplicant = true;
+            isLiP = isLiP(isApplicant, caseData);
+            emailAddress = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name())) {
-            emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+            isLiP = isLiP(isApplicant, caseData);
+            emailAddress = isLiP ? caseData.getRespondent1EmailAddress() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
             emailAddress = caseData.getRespondentSolicitor2EmailAddress();
             if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
@@ -82,12 +89,26 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
         notificationService.sendMail(
             emailAddress,
-            notificationsProperties.getOtherPartyTrialReady(),
-            addProperties(caseData),
+            //TODO: replace getRespondent1LipClaimUpdatedTemplate() with getNotifyLipUpdateTemplate() once CIV-9123 is merged into master
+            isLiP ? notificationsProperties.getRespondent1LipClaimUpdatedTemplate() : notificationsProperties.getOtherPartyTrialReady(),
+            isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private boolean isLiP(boolean isApplicant, CaseData caseData) {
+        return isApplicant ? SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isApplicantNotRepresented()
+            : SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
+    }
+
+    private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+        );
     }
 
     @Override
