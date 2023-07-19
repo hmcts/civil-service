@@ -68,6 +68,7 @@ public class DashboardClaimInfoService {
             .claimantName(nonNull(caseData.getApplicant1()) ? caseData.getApplicant1().getPartyName() : null)
             .defendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
             .claimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
+            .admittedAmount(caseData.getPartAdmitPaidValuePounds())
             .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData)))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {

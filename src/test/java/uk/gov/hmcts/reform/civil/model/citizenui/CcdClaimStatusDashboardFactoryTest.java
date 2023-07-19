@@ -262,9 +262,8 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_court_whenGetStatus_courtReview() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
-            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
@@ -290,6 +289,7 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
