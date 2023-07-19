@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    CLAIMANT_REJECT_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionRejected
+    ),
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
     ),
@@ -27,20 +30,17 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
-    TRANSFERRED(
-        Claim::isSentToCourt
-    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
+    ),
+    TRANSFERRED(
+        Claim::isSentToCourt
     ),
     SETTLED(
         Claim::isSettled
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
-    ),
-    CLAIMANT_REJECT_PARTIAL_ADMISSION(
-        Claim::isPartialAdmissionRejected
     ),
     DEFENDANT_PART_ADMIT(
         Claim::defendantRespondedWithPartAdmit
