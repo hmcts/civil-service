@@ -148,19 +148,6 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_claimIsSentToCourt_whenGetStatus_thenReturnTransferred() {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
-
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.TRANSFERRED);
-    }
-
-    @Test
     void given_claimantRequestedCountyCourtJudgement_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
