@@ -192,6 +192,7 @@ public class CaseDataBuilder {
     protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
+    protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
@@ -3931,6 +3932,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialReadyCheckLiP() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        applicant1Represented = NO;
+        respondent1Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
@@ -5751,6 +5762,7 @@ public class CaseDataBuilder {
             .claimFee(claimFee)
             .applicant1(applicant1)
             .applicant2(applicant2)
+            .applicant1Represented(applicant1Represented)
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(respondent1Represented)

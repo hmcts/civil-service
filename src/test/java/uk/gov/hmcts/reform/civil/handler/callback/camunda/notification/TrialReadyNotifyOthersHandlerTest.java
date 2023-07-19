@@ -73,6 +73,23 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotifyApplicant_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "other-party-trial-ready-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
