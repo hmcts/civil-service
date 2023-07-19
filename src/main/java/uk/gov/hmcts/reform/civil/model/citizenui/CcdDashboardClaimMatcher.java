@@ -87,7 +87,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSentToCourt() {
-        return caseData.getCcdState() == CaseState.JUDICIAL_REFERRAL;
+        return false;
     }
 
     @Override
