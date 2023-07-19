@@ -8,7 +8,7 @@ public enum CallbackVersion {
     V_2;
 
     /**
-     * Checks whether a version number is at least this version's number
+     * Checks whether a version number is at least this version's number.
      *
      * @param anotherVersion a version number
      * @return true if anotherVersion is not null and anotherVersion is this or above
