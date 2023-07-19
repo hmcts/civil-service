@@ -57,7 +57,7 @@ class ReviewHearingExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnFalse_whenMessageRelevantForServiceNoHearingException() {
+    void shouldReturnTrue_whenMessageRelevantForServiceNoHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -69,12 +69,12 @@ class ReviewHearingExceptionHandlerTest {
 
         boolean actual = handler.handleExceptionEvent(hmcMessage);
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 
     @Test
-    void shouldReturnFalse_whenMessageNotRelevantForServiceHearingException() {
+    void shouldReturnTrue_whenMessageNotRelevantForServiceHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -86,7 +86,7 @@ class ReviewHearingExceptionHandlerTest {
 
         boolean actual = handler.handleExceptionEvent(hmcMessage);
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 }
