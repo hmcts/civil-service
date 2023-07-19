@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -94,6 +95,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -161,6 +163,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CourtLocationUtils courtLocationUtils;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
+    private ObjectMapper objectMapper;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -183,8 +186,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        ReflectionTestUtils.setField(handler, "objectMapper", objectMapper);
         ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
                                      confirmationTextGenerators
         );
@@ -1211,6 +1215,75 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .handle(params);
         // Given
         assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void lr1CorrespondenceAddress_ifProvided() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Address tempCorrespondenceAddress = Address.builder()
+            .addressLine1("Line 1")
+            .build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .build().toBuilder()
+            .tempCorrespondenceAddress(tempCorrespondenceAddress)
+            .build();
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
+            .thenReturn(true);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressRequired")).isEqualTo("Yes");
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .isEqualTo(objectMapper.convertValue(tempCorrespondenceAddress, new TypeReference<>() {
+            }));
+        assertThat(response.getData().get("tempCorrespondenceAddress")).isNull();
+    }
+
+    @Test
+    void lr2CorrespondenceAddress_ifProvided() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Address tempCorrespondenceAddress = Address.builder()
+            .addressLine1("Line 1")
+            .build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .build().toBuilder()
+            .tempCorrespondenceAddress(tempCorrespondenceAddress)
+            .build();
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
+            .thenReturn(false);
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+            .thenReturn(true);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Then
+        assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+            .isEqualTo(objectMapper.convertValue(tempCorrespondenceAddress, new TypeReference<>() {
+            }));
+        assertThat(response.getData().get("tempCorrespondenceAddress")).isNull();
     }
 
     @Test

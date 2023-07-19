@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -188,6 +189,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+            .put(callbackKey(CallbackVersion.V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -1323,14 +1325,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        if (caseData.getTempCorrespondenceAddress() != null
+        if (CallbackVersion.V_1.isEqualOrGreater(callbackParams.getVersion())
+            && caseData.getTempCorrespondenceAddress() != null
             && StringUtils.isNotBlank(caseData.getTempCorrespondenceAddress().getAddressLine1())) {
             if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
                 updatedData.specRespondentCorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress())
                     .specRespondentCorrespondenceAddressRequired(YesOrNo.YES);
             } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
-                updatedData.specRespondent2CorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress());
-                // respondent 2 has no correspondence address required yet
+                updatedData.specRespondent2CorrespondenceAddressdetails(caseData.getTempCorrespondenceAddress())
+                    .specRespondent2CorrespondenceAddressRequired(YesOrNo.YES);;
             }
             // front does not delete based on null, but can replace with an empty object
             updatedData.tempCorrespondenceAddress(Address.builder().build());

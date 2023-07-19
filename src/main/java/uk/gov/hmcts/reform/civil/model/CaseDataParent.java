@@ -708,6 +708,7 @@ public class CaseDataParent implements MappableObject {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final Address tempCorrespondenceAddress;
     private final Address specRespondent2CorrespondenceAddressdetails;
+    private final YesOrNo specRespondent2CorrespondenceAddressRequired;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
