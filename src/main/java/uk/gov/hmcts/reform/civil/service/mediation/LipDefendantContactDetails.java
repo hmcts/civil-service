@@ -14,6 +14,6 @@ public class LipDefendantContactDetails extends LipContactDetails implements Def
 
     @Override
     public String getDefendantContactEmail(MediationParams params) {
-        return params.getCaseData().getRespondent1().getPartyEmail();;
+        return params.getCaseData().getRespondent1().getPartyEmail();
     }
 }
