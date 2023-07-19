@@ -12,6 +12,27 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
+    MORE_DETAILS_REQUIRED(
+        Claim::isMoreDetailsRequired
+    ),
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
+    IN_MEDIATION(
+        Claim::isMediationPending
+    ),
+    CLAIM_ENDED(
+        Claim::hasClaimEnded
+    ),
+    TRANSFERRED(
+        Claim::isSentToCourt
+    ),
+    WAITING_COURT_REVIEW(
+        Claim::isCourtReviewing
+    ),
     SETTLED(
         Claim::isSettled
     ),
@@ -87,27 +108,6 @@ public enum DashboardClaimStatus {
     ),
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
-    ),
-    MORE_DETAILS_REQUIRED(
-        Claim::isMoreDetailsRequired
-    ),
-    MEDIATION_UNSUCCESSFUL(
-        Claim::isMediationUnsuccessful
-    ),
-    MEDIATION_SUCCESSFUL(
-        Claim::isMediationSuccessful
-    ),
-    IN_MEDIATION(
-        Claim::isMediationPending
-    ),
-    CLAIM_ENDED(
-        Claim::hasClaimEnded
-    ),
-    TRANSFERRED(
-        Claim::isSentToCourt
-    ),
-    WAITING_COURT_REVIEW(
-        Claim::isCourtReviewing
     ),
     NO_STATUS(c -> false);
 
