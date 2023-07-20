@@ -169,10 +169,4 @@ public class CoreCaseDataService {
 
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
-
-    public int getTotalCCDCasesCount(String authorization) {
-        String query = new SearchSourceBuilder()
-            .query(QueryBuilders.matchAllQuery()).size(0).toString();
-        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query).getTotal();
-    }
 }
