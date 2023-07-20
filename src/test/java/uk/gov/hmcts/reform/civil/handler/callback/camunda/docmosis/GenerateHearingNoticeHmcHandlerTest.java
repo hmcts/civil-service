@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 

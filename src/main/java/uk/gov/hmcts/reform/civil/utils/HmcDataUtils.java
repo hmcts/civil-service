@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
@@ -53,10 +53,20 @@ public class HmcDataUtils {
     }
 
     private static boolean hearingDataChanged(HearingGetResponse hearing, PartiesNotifiedServiceData serviceData) {
-        var hearingDay = hearing.getHearingResponse().getHearingDaySchedule().get(0);
-        if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
-            || !serviceData.getHearingDate().equals(hearingDay.getHearingStartDateTime())) {
+        List<HearingDaySchedule> schedule = hearing.getHearingResponse().getHearingDaySchedule();
+        if (serviceData.getDays().size() != schedule.size()) {
             return true;
+        } else {
+            for (HearingDaySchedule hearingDay : schedule) {
+                HearingDay datesFromHearingDay = HearingDay.builder()
+                    .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                    .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                    .build();
+                if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
+                    || !serviceData.getDays().contains(datesFromHearingDay)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
