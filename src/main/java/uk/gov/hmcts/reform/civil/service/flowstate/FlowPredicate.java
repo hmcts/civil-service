@@ -621,6 +621,10 @@ public class FlowPredicate {
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
             && caseData.getApplicant1ProceedWithClaim() == null;
 
+    public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
+        caseData.getClaimDismissedDeadline() != null
+            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
 
