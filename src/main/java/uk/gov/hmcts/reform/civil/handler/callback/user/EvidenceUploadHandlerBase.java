@@ -325,7 +325,36 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 header = "";
                 renameUploadEvidenceExpert(documentUpload, false);
                 break;
+            case "ApplicantExpertReport",
+                    "RespondentTwoExpertReport",
+                    "RespondentOneExpertReport":
+                header = "Experts report";
+                renameUploadReportExpert(documentUpload, header, true);
+                break;
+            case "ApplicantExpertJointStatement",
+                    "RespondentTwoExpertJointStatement",
+                    "RespondentOneExpertJointStatement":
+                header = "Joint report";
+                renameUploadReportExpert(documentUpload, header, false);
+                break;
         }
+    }
+
+    private <T> void renameUploadReportExpert(final List<Element<T>> documentUpload,
+                                              String header, boolean single) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
+            String newName = header
+                    + SPACE
+                    + type.getExpertOptionName()
+                    + SPACE
+                    + (single ? type.getExpertOptionExpertise() : type.getExpertOptionExpertises())
+                    + SPACE
+                    + type.getExpertOptionUploadDate().format(JacksonConfiguration.DATE_FORMATTER)
+                    + END + ext;
+            type.getExpertDocument().setDocumentFileName(newName);
+        });
     }
 
     private <T> void renameUploadEvidenceExpert(final List<Element<T>> documentUpload, boolean question) {
