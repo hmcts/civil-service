@@ -66,7 +66,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        String recipient = caseData.getRespondentSolicitor1EmailAddress(); //defendant
+        String recipient = caseData.getRespondentSolicitor1EmailAddress();
 
         if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
             if (isRespondent1Lip(caseData) && caseData.getRespondent1().getPartyEmail() != null) {
