@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -69,9 +68,6 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
     private RoleAssignmentsService roleAssignmentsService;
@@ -166,18 +162,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldSubmitEventSuccessfully() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
-        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
         when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
-        when(caseDetailsConverter.toCaseData(expectedCaseDetails))
-            .thenReturn(expectedCaseData);
         doPost(
             BEARER_TOKEN,
             EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(),
             SUBMIT_EVENT_URL,
             "123",
             "123"
-        )
-            .andExpect(content().json(toJson(expectedCaseData)))
+        ).andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
     }
 
