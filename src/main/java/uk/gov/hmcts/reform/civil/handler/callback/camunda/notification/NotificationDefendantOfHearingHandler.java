@@ -69,11 +69,11 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         String recipient = caseData.getRespondentSolicitor1EmailAddress(); //defendant
 
         if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
-            if(isRespondent1Lip(caseData) && caseData.getRespondent1().getPartyEmail() != null){
+            if (isRespondent1Lip(caseData) && caseData.getRespondent1().getPartyEmail() != null) {
                 recipient = caseData.getRespondent1().getPartyEmail();
                 sendEmail(caseData, recipient, true);
             }
-            if (!isRespondent1Lip(caseData)){
+            if (!isRespondent1Lip(caseData)) {
                 sendEmail(caseData, recipient, true);
             }
         } else {
@@ -125,7 +125,6 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
         ));
     }
-
 
     private boolean isRespondent1Lip(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
