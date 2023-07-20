@@ -79,7 +79,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
             emailAddress = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name())) {
             isLiP = isLiP(isApplicant, caseData);
-            emailAddress = isLiP ? caseData.getRespondent1EmailAddress() : caseData.getRespondentSolicitor1EmailAddress();
+            emailAddress = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
             emailAddress = caseData.getRespondentSolicitor2EmailAddress();
             if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
@@ -90,7 +90,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         notificationService.sendMail(
             emailAddress,
             //TODO: replace getRespondent1LipClaimUpdatedTemplate() with getNotifyLipUpdateTemplate() once CIV-9123 is merged into master
-            isLiP ? notificationsProperties.getRespondent1LipClaimUpdatedTemplate() : notificationsProperties.getOtherPartyTrialReady(),
+            isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
             isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
