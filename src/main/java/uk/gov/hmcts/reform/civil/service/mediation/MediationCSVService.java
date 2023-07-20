@@ -21,20 +21,22 @@ public abstract class MediationCSVService {
         String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         CaseData data = params.getCaseData();
+        ApplicantContactDetails applicantContactDetails = getApplicantContactDetails();
+        DefendantContactDetails defendantContactDetails = getDefendantContactDetails();
         String totalClaimAmount = data.getTotalClaimAmount().toString();
         String[] claimantData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
             data.getApplicant1().getType().toString(), getCsvCompanyName(data.getApplicant1()),
-            getCsvContactNameForApplicant(params), getContactNumberForApplicant(params),
-            CHECK_LIST, PARTY_STATUS, getContactEmailForApplicant(params),
+            applicantContactDetails.getApplicantContactName(params), applicantContactDetails.getApplicantContactNumber(params),
+            CHECK_LIST, PARTY_STATUS, applicantContactDetails.getApplicantContactEmail(params),
             isPilot(data.getTotalClaimAmount())
         };
 
         String[] respondentData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
             data.getRespondent1().getType().toString(), getCsvCompanyName(data.getRespondent1()),
-            getCsvContactNameForDefendant(params), getContactNumberForDefendant(params),
-            CHECK_LIST, PARTY_STATUS, getContactEmailForDefendant(params),
+            defendantContactDetails.getDefendantContactName(params), defendantContactDetails.getDefendantContactNumber(params),
+            CHECK_LIST, PARTY_STATUS, defendantContactDetails.getDefendantContactEmail(params),
             isPilot(data.getTotalClaimAmount())
         };
 
@@ -48,30 +50,6 @@ public abstract class MediationCSVService {
     protected abstract DefendantContactDetails getDefendantContactDetails();
 
     protected abstract MediationParams getMediationParams(CaseData caseData);
-
-    private String getCsvContactNameForApplicant(MediationParams params) {
-        return getApplicantContactDetails().getApplicantContactName(params);
-    }
-
-    private String getContactEmailForApplicant(MediationParams params) {
-        return getApplicantContactDetails().getApplicantContactEmail(params);
-    }
-
-    private String getContactNumberForApplicant(MediationParams params) {
-        return getApplicantContactDetails().getApplicantContactNumber(params);
-    }
-
-    private String getContactEmailForDefendant(MediationParams params) {
-        return getDefendantContactDetails().getDefendantContactEmail(params);
-    }
-
-    private String getCsvContactNameForDefendant(MediationParams params) {
-        return getDefendantContactDetails().getDefendantContactName(params);
-    }
-
-    private String getContactNumberForDefendant(MediationParams params) {
-        return getDefendantContactDetails().getDefendantContactNumber(params);
-    }
 
     private String isPilot(BigDecimal amount) {
         return amount.compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No";
