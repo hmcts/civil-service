@@ -58,6 +58,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final UserService userService;
 
     private static final String SPACE = " ";
+    private static final String END = ".";
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
@@ -291,63 +292,68 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
-    private <T> void renameDocuments(final List<Element<T>> documentUpload, String theId) {
-        String end = ".";
-        String header = getDocNamePrefix(theId);
-        if (Objects.isNull(header)) {
-            return;
-        }
-
-        switch (documentUpload.get(0).getValue().getClass().getSimpleName()) {
-            //Documents for Disclosure
-            //Documents referred to in the statement
-            //Documentary evidence for trial
-            case "UploadEvidenceDocumentType":
-                documentUpload.forEach(x -> {
-                    UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
-                    String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-                    String newName = header
-                            + SPACE
-                            + type.getTypeOfDocument()
-                            + SPACE
-                            + type.getDocumentIssuedDate().format(JacksonConfiguration.DATE_FORMATTER)
-                            + end + ext;
-                    type.getDocumentUpload().setDocumentFileName(newName);
-                });
-                break;
-            default:
-                break;
-        }
-    }
-
-    private String getDocNamePrefix(String theId) {
+    private <T> void renameDocuments(List<Element<T>> documentUpload, String theId) {
         String header = null;
         switch (theId) {
             case "ApplicantDisclosure",
                     "RespondentOneDisclosure",
                     "RespondentTwoDisclosure":
                 header = "Document for disclosure" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, header);
                 break;
             case "RespondentOneWitnessReferred",
                     "RespondentTwoWitnessReferred",
                     "ApplicantWitnessReferred":
                 header = "Referred Document" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, header);
                 break;
             case "RespondentOneTrialDocCorrespondence",
                     "RespondentTwoTrialDocCorrespondence",
                     "ApplicantTrialDocCorrespondence":
                 header = "Documentary Evidence" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, header);
                 break;
             case "RespondentOneExpertQuestions",
                     "RespondentTwoExpertQuestions",
-                    "RespondentOneExpertAnswers",
+                    "ApplicantExpertQuestions":
+                header = "";
+                renameUploadEvidenceExpert(documentUpload, true);
+                break;
+            case "RespondentOneExpertAnswers",
                     "RespondentTwoExpertAnswers",
-                    "ApplicantExpertQuestions",
                     "ApplicantExpertAnswers":
                 header = "";
+                renameUploadEvidenceExpert(documentUpload, false);
                 break;
         }
-        return header;
+    }
+
+    private <T> void renameUploadEvidenceExpert(final List<Element<T>> documentUpload, boolean question) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
+            String newName = type.getExpertOptionName()
+                    + SPACE
+                    + type.getExpertOptionOtherParty()
+                    + SPACE
+                    + (question ? type.getExpertDocumentQuestion() : type.getExpertDocumentAnswer())
+                    + END + ext;
+            type.getExpertDocument().setDocumentFileName(newName);
+        });
+    }
+
+    private <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String header) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = header
+                    + SPACE
+                    + type.getTypeOfDocument()
+                    + SPACE
+                    + type.getDocumentIssuedDate().format(JacksonConfiguration.DATE_FORMATTER)
+                    + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
+        });
     }
 
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
@@ -369,8 +375,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryId(caseData.getDocumentReferredInStatementRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneWitnessReferred");//
             setCategoryId(caseData.getDocumentExpertReportRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertReport");
             setCategoryId(caseData.getDocumentJointStatementRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertJointStatement");
-            setCategoryId(caseData.getDocumentQuestionsRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertQuestions");
-            setCategoryId(caseData.getDocumentAnswersRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertAnswers");
+            setCategoryId(caseData.getDocumentQuestionsRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertQuestions");//
+            setCategoryId(caseData.getDocumentAnswersRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertAnswers");//
             setCategoryId(caseData.getDocumentCaseSummaryRes(), document -> document.getValue().getDocumentUpload(), "RespondentOnePreTrialSummary");
             setCategoryId(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialSkeleton");
             setCategoryId(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialAuthorities");
@@ -380,20 +386,20 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
         if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             setCategoryId(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosureList");
-            setCategoryId(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosure");
+            setCategoryId(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosure");//
             setCategoryId(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessStatement");
             setCategoryId(caseData.getDocumentWitnessSummaryRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessSummary");
             setCategoryId(caseData.getDocumentHearsayNoticeRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessHearsay");
-            setCategoryId(caseData.getDocumentReferredInStatementRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoWitnessReferred");
+            setCategoryId(caseData.getDocumentReferredInStatementRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoWitnessReferred");//
             setCategoryId(caseData.getDocumentExpertReportRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertReport");
             setCategoryId(caseData.getDocumentJointStatementRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertJointStatement");
-            setCategoryId(caseData.getDocumentQuestionsRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertQuestions");
-            setCategoryId(caseData.getDocumentAnswersRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertAnswers");
+            setCategoryId(caseData.getDocumentQuestionsRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertQuestions");//
+            setCategoryId(caseData.getDocumentAnswersRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertAnswers");//
             setCategoryId(caseData.getDocumentCaseSummaryRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoPreTrialSummary");
             setCategoryId(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialSkeleton");
             setCategoryId(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialAuthorities");
             setCategoryId(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), "respondentTwoTrialCosts");
-            setCategoryId(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialDocCorrespondence");
+            setCategoryId(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialDocCorrespondence");//
 
         } else {
             setCategoryId(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosureList");
@@ -404,8 +410,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryId(caseData.getDocumentReferredInStatement(), document -> document.getValue().getDocumentUpload(), "ApplicantWitnessReferred");//
             setCategoryId(caseData.getDocumentExpertReport(), document -> document.getValue().getExpertDocument(), "ApplicantExpertReport");
             setCategoryId(caseData.getDocumentJointStatement(), document -> document.getValue().getExpertDocument(), "ApplicantExpertJointStatement");
-            setCategoryId(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), "ApplicantExpertQuestions");
-            setCategoryId(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), "ApplicantExpertAnswers");
+            setCategoryId(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), "ApplicantExpertQuestions");//
+            setCategoryId(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), "ApplicantExpertAnswers");//
             setCategoryId(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), "ApplicantPreTrialSummary");
             setCategoryId(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialSkeleton");
             setCategoryId(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialAuthorities");
