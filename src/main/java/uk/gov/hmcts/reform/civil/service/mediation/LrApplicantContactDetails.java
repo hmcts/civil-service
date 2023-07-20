@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import java.util.Optional;
 
 public class LrApplicantContactDetails extends LrContactDetails implements ApplicantContactDetails {
+
     @Override
     public String getApplicantContactName(MediationParams params) {
         return params.getApplicantOrganisation()

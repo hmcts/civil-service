@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Service
@@ -30,6 +29,4 @@ public class MediationCSVLrvLrService extends MediationCSVService {
             .caseData(caseData)
             .build();
     }
-
-
 }

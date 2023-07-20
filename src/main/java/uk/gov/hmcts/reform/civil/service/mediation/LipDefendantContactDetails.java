@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
-public class LipDefendantContactDetails extends LipContactDetails implements DefendantContactDetails{
+public class LipDefendantContactDetails extends LipContactDetails implements DefendantContactDetails {
 
     @Override
     public String getDefendantContactName(MediationParams params) {
