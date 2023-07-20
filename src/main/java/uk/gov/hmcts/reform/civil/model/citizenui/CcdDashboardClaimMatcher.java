@@ -168,10 +168,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasSdoBeenDrawn() {
-        return caseData.getSystemGeneratedCaseDocuments().stream()
-            .anyMatch(systemGeneratedCaseDocument -> systemGeneratedCaseDocument
-                .getValue()
-                .getDocumentType().equals(DocumentType.SDO_ORDER));
+        return caseData.getSDODocument().isPresent();
     }
 
     @Override
