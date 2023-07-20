@@ -368,7 +368,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             String newName = header
                     + SPACE
                     + type.getWitnessOptionName()
-                    + (SPACE + (date ? type.getWitnessOptionUploadDate() : ""))
+                    + (date ? SPACE + type.getWitnessOptionUploadDate() : "")
                     + END + ext;
             type.getWitnessOptionDocument().setDocumentFileName(newName);
         });
