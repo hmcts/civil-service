@@ -26,13 +26,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyNotifyOthersHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyNotifyOthersHandler.TASK_ID_RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyNotifyOthersHandler.TASK_ID_RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @SpringBootTest(classes = {
     TrialReadyNotifyOthersHandler.class,
@@ -53,6 +56,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
         }
 
         @Test
@@ -84,8 +88,8 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id",
-                getNotificationDataMap(caseData),
-                "other-party-trial-ready-notification-000DC001"
+                getLiPNotificationDataMap(true, caseData),
+                "other-party-trial-ready-notification-000MC001"
             );
         }
 
@@ -103,6 +107,23 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
                 "template-id",
                 getNotificationDataMap(caseData),
                 "other-party-trial-ready-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent1_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id",
+                getLiPNotificationDataMap(false, caseData),
+                "other-party-trial-ready-notification-000MC001"
             );
         }
 
@@ -146,6 +167,15 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
             return Map.of(
                 HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getLiPNotificationDataMap(boolean isApplicant, CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
             );
         }
     }

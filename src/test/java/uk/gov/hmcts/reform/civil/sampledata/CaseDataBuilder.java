@@ -3933,7 +3933,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTrialReadyCheckLiP() {
-        atStateHearingFeeDuePaid();
+        atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
+        legacyCaseReference = "000MC001";
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         hearingDuration = MINUTES_120;
