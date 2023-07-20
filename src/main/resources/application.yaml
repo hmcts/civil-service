@@ -284,6 +284,8 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
 
+  notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
