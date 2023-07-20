@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class CcdDashboardClaimMatcher implements Claim {
@@ -173,8 +174,21 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isBeforeHearing() {
-        return caseData.getHearingDate() != null
-            && caseData.getHearingDate().isAfter(LocalDateTime.now().toLocalDate());
+        return isBeforeSmallClaimHearing() || isBeforeFastTrackHearing();
+    }
+
+    private boolean isBeforeSmallClaimHearing() {
+        return Optional.ofNullable(caseData.getSmallClaimsHearing())
+            .map(SmallClaimsHearing::getDateFrom)
+            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
+            .orElse(false);
+    }
+
+    private boolean isBeforeFastTrackHearing() {
+        return Optional.ofNullable(caseData.getFastTrackHearingTime())
+            .map(FastTrackHearingTime::getDateFrom)
+            .map(hearingFromDate -> hearingFromDate.isAfter(LocalDate.now()))
+            .orElse(false);
     }
 
     @Override

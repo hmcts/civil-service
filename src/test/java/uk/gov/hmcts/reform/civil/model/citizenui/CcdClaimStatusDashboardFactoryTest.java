@@ -19,6 +19,9 @@ import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -200,13 +203,33 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_hearingDateIsDue_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+    void given_hearingDateForSmallClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
         Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
                                                        CaseDocument.builder()
                                                            .documentType(DocumentType.SDO_ORDER)
                                                            .build());
         CaseData claim = CaseData.builder()
-            .hearingDate(LocalDate.now().plusDays(10))
+            .smallClaimsHearing(SmallClaimsHearing.builder()
+                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .build())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
+    }
+
+    @Test
+    void given_hearingDateForFastTrackClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+                                                       CaseDocument.builder()
+                                                           .documentType(DocumentType.SDO_ORDER)
+                                                           .build());
+        CaseData claim = CaseData.builder()
+            .fastTrackHearingTime(FastTrackHearingTime.builder()
+                                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .build();
