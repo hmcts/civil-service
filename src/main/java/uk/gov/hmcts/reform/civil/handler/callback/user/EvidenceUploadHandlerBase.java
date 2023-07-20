@@ -355,6 +355,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 header = "Hearsay evidence";
                 renameUploadEvidenceWitness(documentUpload, header, true);
                 break;
+            default:
+                break;
         }
     }
 
