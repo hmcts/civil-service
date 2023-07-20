@@ -50,16 +50,16 @@ public abstract class MediationCSVService {
     protected abstract MediationParams getMediationParams(CaseData caseData);
 
     private String getCsvContactNameForApplicant(MediationParams params) {
-       return getApplicantContactDetails().getApplicantContactName(params);
+        return getApplicantContactDetails().getApplicantContactName(params);
     }
 
-    private String getContactEmailForApplicant(MediationParams params){
+    private String getContactEmailForApplicant(MediationParams params) {
         return getApplicantContactDetails().getApplicantContactEmail(params);
     }
 
-   private String getContactNumberForApplicant(MediationParams params){
+    private String getContactNumberForApplicant(MediationParams params) {
         return getApplicantContactDetails().getApplicantContactNumber(params);
-   }
+    }
 
     private String getContactEmailForDefendant(MediationParams params) {
         return getDefendantContactDetails().getDefendantContactEmail(params);
