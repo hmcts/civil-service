@@ -21,10 +21,13 @@ import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderFo
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -38,9 +41,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final IdamClient idamClient;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
+        JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
         DocmosisTemplates docmosisTemplate = null;
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             docmosisTemplate = FREE_FORM_ORDER_PDF;
@@ -63,12 +67,13 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return String.format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
     }
 
-    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData) {
-        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData) : getAssistedOrder(
+    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
+        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData, authorisation) : getAssistedOrder(
             caseData);
     }
 
-    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData) {
+    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
             .caseName(caseData.getCaseNameHmctsInternal())
@@ -87,7 +92,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionTextArea() : null)
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
-                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null);
+                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
+            .judgeNameTitle(userDetails.getFullName())
+            .courtName("Court Name")
+            .courtLocation("Court location");
         return freeFormOrderBuilder.build();
     }
 

@@ -62,4 +62,7 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final LocalDate orderInitiativeOrWithoutNoticeDate;
     private final YesOrNo isReason;
     private final String reasonText;
+    private final String judgeNameTitle;
+    private final String courtLocation;
+    private final String courtName;
 }
