@@ -124,7 +124,7 @@ public class SdoHelper {
         String fastTrackHearingTimeLabel = "";
 
         if (fastTrackHearingTime != null
-            && fastTrackHearingTime.getHearingDuration()!=null
+            && fastTrackHearingTime.getHearingDuration() != null
             && fastTrackHearingTime.getHearingDuration().getLabel() != null) {
             if (fastTrackHearingTime.getHearingDuration().getLabel().equals("Other")) {
                 StringBuilder otherLength = new StringBuilder();
