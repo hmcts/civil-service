@@ -121,7 +121,7 @@ idam:
   s2s-auth:
     microservice: civil_service
   s2s-authorised:
-    services: civil_service, fake-service-auth-provider-api
+    services: civil_service, payment_app
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"

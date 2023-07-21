@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -31,7 +32,6 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     private static final String PAID = "Paid";
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
-
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
 
@@ -94,6 +94,8 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     protected <T> ResultActions doPut(T content, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.put(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
@@ -102,6 +104,8 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     protected <T> ResultActions doPost(T content, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.post(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
