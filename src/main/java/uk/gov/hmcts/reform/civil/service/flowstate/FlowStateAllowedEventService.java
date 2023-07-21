@@ -104,6 +104,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -1125,7 +1126,8 @@ public class FlowStateAllowedEventService {
             IN_MEDIATION.fullName(),
             List.of(
                 MEDIATION_SUCCESSFUL,
-                MEDIATION_UNSUCCESSFUL
+                MEDIATION_UNSUCCESSFUL,
+                CREATE_SDO
             )
         ),
         entry(
@@ -1157,6 +1159,12 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION
+            )
+        ),
+         entry(
+            PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
+            List.of(
+                CREATE_SDO
             )
         )
     );
