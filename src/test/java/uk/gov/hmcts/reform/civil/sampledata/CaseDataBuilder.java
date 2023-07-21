@@ -3932,8 +3932,11 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateTrialReadyCheckLiP() {
+    public CaseDataBuilder atStateTrialReadyCheckLiP(boolean hasEmailAddress) {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
+        if (!hasEmailAddress) {
+            respondent1 = respondent1.toBuilder().partyEmail("").build();
+        }
         legacyCaseReference = "000MC001";
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -78,7 +79,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyApplicant_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
             ).build();
@@ -112,7 +113,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotifyRespondent1_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
             ).build();
@@ -141,6 +142,23 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
                 "template-id",
                 getNotificationDataMap(caseData),
                 "other-party-trial-ready-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotNotifyRespondent1_whenInvokedAndTheEmailAddressIsNotProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(
+                "sole.trader@email.com",
+                "template-id",
+                getLiPNotificationDataMap(false, caseData),
+                "other-party-trial-ready-notification-000MC001"
             );
         }
 
