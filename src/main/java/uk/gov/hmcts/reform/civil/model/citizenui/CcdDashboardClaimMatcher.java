@@ -258,11 +258,6 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        log.info("entering is part admit and rejected by claimant");
-        log.info("is claim status juridical referral");
-        log.info(String.valueOf(CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())));
-        log.info("is claim journey part admit?");
-        log.info(String.valueOf(caseData.isPartAdmitClaimSpec()));
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
             && caseData.isPartAdmitClaimSpec();
     }
