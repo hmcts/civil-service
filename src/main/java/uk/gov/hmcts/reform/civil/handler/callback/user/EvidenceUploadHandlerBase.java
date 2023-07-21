@@ -297,19 +297,19 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             case "ApplicantDisclosure",
                     "RespondentOneDisclosure",
                     "RespondentTwoDisclosure":
-                prefix = "Document for disclosure" + SPACE;
+                prefix = "Document for disclosure";
                 renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneWitnessReferred",
                     "RespondentTwoWitnessReferred",
                     "ApplicantWitnessReferred":
-                prefix = "Referred Document" + SPACE;
+                prefix = "Referred Document";
                 renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneTrialDocCorrespondence",
                     "RespondentTwoTrialDocCorrespondence",
                     "ApplicantTrialDocCorrespondence":
-                prefix = "Documentary Evidence" + SPACE;
+                prefix = "Documentary Evidence";
                 renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneExpertQuestions",
