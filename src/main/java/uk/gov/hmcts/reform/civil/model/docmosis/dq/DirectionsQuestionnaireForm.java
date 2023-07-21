@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -22,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -63,5 +63,9 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
     private final String statementOfTruthText;
+    private final Address respondent1LiPCorrespondenceAddress;
+    private final LipExperts lipExperts;
+    private final LipExtraDQ lipExtraDQ;
+    private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;
 
 }
