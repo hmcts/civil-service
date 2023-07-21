@@ -1649,10 +1649,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkCustomerId("bulkClaimId")
+                .bulkRequestId("bulkRequestId")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1665,7 +1667,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim1v2() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkCustomerId("bulkClaimId")
+                .bulkRequestId("bulkRequestId")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
                 .respondent1(Party.builder()
                                  .individualFirstName("James")
                                  .individualLastName("Smith")
@@ -1682,6 +1685,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
@@ -1694,16 +1698,41 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenInvokedAndInvalidPostcodeAndIsNotBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkCustomerId(null)
+                .bulkRequestId(null)
+                .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             verifyNoInteractions(postcodeValidator);
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldClaimFee_whenInvokedAndBulkClaim() {
+            // Given
+            Fee feeData = Fee.builder()
+                .code("FeeCode")
+                .calculatedAmountInPence(BigDecimal.valueOf(19990))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .bulkRequestId("bulkRequestId")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("claimFee").extracting("calculatedAmountInPence", "code")
+                .containsExactly(String.valueOf(feeData.getCalculatedAmountInPence()), feeData.getCode());
+        }
+
+        //TODO implement tests for bulk claims that have interest added.
 
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {
