@@ -256,10 +256,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isPartialAdmissionRejected() {
-        return !CaseState.IN_MEDIATION.equals(caseData.getCcdState())
-            && (caseData.isClaimantRejectsClaimAmount()
-            || caseData.isSettlementDeclinedByClaimant()
-            || caseData.hasApplicantRejectedRepaymentPlan()
-            || caseData.hasDefendantNotPaid());
+        return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
+            && caseData.isPartAdmitClaimSpec();
     }
+
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(SpringExtension.class)
 class CcdClaimStatusDashboardFactoryTest {
@@ -310,6 +311,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_applicantRejectPartialAdmit_whenGetStatus_rejectOffer() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .build();
