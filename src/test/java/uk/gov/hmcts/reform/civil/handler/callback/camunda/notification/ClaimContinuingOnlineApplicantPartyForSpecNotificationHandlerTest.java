@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -123,9 +124,8 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
     }
 
     private CaseData getCaseData(String email) {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                             .partyEmail(email)
                              .build())
             .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                              .build())
