@@ -279,7 +279,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                           + " is " + builder.build().getCaseManagementLocation());
         }
 
-        if (caseData.hasApplicantProceededWithClaim()) {
+        if (caseData.hasApplicantProceededWithClaim() || (caseData.isPartAdmitClaimSpec() && caseData.isPartAdmitClaimNotSettled())) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
@@ -338,7 +338,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && isOneVOne(caseData)) {
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 response.state(CaseState.IN_MEDIATION.name());
-            } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
+            } else if (caseData.hasApplicantRejectedRepaymentPlan() || caseData.hasApplicantAcceptedRepaymentPlan()) {
                 response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             } else if (
                 caseData.isClaimantNotSettlePartAdmitClaim()

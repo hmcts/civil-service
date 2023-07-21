@@ -169,9 +169,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("test judge, Upon considering the claim form and Particulars of Claim/statements of case "
-                               + "[and the directions questionnaires] \n\n"
-                               + "IT IS ORDERED that:-");
+                .isEqualTo("test judge" + ",");
 
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("input")
                 .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
@@ -259,10 +257,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("test judge, has considered the statements of "
-                               + "the case and the information provided "
-                               + "by the parties, \n\n "
-                               + "IT IS ORDERED THAT:");
+                .isEqualTo("test judge" + ",");
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
@@ -597,7 +592,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedTrialSDOInPersonHearingNew().build();
+                .atStateClaimIssuedTrialDJInPersonHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(
@@ -667,7 +662,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedDisposalSDOVideoCall() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .atStateClaimIssuedDisposalSDOVideoCallNew().build();
+                .atStateClaimIssuedDisposalDJVideoCallNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
             CaseDocument order = CaseDocument.builder().documentLink(

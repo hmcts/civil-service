@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
@@ -450,6 +452,8 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+
+    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2285,6 +2289,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
+        HearingDates singleDate = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            .build();
+
+        HearingDates dateRange = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            .build();
+
+        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+            .hearingUnavailableDates(YES)
+            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
+            .build();
+        return this;
+    }
+
     private DynamicList getHearingMethodList(String key, String value) {
         Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
         DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
@@ -2347,6 +2369,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearingNew() {
+        DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
+        hearingMethodValuesTrialHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialDJInPersonHearingNew() {
         DynamicList hearingMethodList = getHearingMethodList("INTER", "In Person");
         hearingMethodValuesTrialHearingDJ = hearingMethodList;
         return this;
@@ -2435,7 +2463,7 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         return this;
     }
@@ -2444,7 +2472,7 @@ public class CaseDataBuilder {
         disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
             .input("The claimant must lodge at court at least 7 "
                        + "days before the disposal")
-            .type(DisposalHearingBundleType.DOCUMENTS)
+            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
             .builder()
@@ -2482,6 +2510,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCallNew() {
+        DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
+        hearingMethodValuesDisposalHearingDJ = hearingMethodList;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalDJVideoCallNew() {
         DynamicList hearingMethodList = getHearingMethodList("VID", "Video");
         hearingMethodValuesDisposalHearingDJ = hearingMethodList;
         return this;
@@ -4952,6 +4986,53 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData withHearingFeePBADetailsPaymentFailed() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(FAILED)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsPaymentSuccess() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFeePBADetails(SRPbaDetails.builder()
+                                      .fee(
+                                          Fee.builder()
+                                              .code("FE203")
+                                              .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                              .version("1")
+                                              .build())
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(SUCCESS)
+                                                          .build())
+                                      .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .build();
+    }
+
+    public CaseData withHearingFeePBADetailsNoPaymentStatus() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10800))
+                            .build())
+            .allocatedTrack(SMALL_CLAIM)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
+                Organisation.builder()
+                    .organisationID("OrgId").build()).build())
+            .build();
+    }
+
     public CaseData buildMakePaymentsCaseDataWithHearingDate() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -5911,6 +5992,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
+            .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .build();
     }
 }

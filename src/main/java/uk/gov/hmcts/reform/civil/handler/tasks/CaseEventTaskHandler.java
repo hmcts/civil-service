@@ -63,6 +63,11 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
+            if (featureToggleService.isAutomatedHearingNoticeEnabled()
+                && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
+            }
+
             String flowState = externalTask.getVariable(FLOW_STATE);
             CaseDataContent caseDataContent = caseDataContent(
                 startEventResponse,
@@ -125,8 +130,11 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Only one of the defendants is notified.";
                 case TAKEN_OFFLINE_BY_STAFF -> "RPA Reason: Case taken offline by staff.";
                 case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
-                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED ->
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED,
+                    PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA ->
                     "RPA Reason: Not suitable for SDO.";
+                case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
+                    "RPA Reason: Judgement by Admission requested and claim moved offline.";
                 default -> {
                     log.info("Unexpected flow state " + flowState.fullName());
                     yield null;
