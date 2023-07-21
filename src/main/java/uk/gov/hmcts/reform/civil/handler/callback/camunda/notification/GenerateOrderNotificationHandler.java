@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -70,13 +71,15 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String emailAddress = getReceipientEmail(caseData);
-        String template = getReferenceTemplateString();
-        notificationService.sendMail(
-            emailAddress,
-            getTemplate(caseData),
-            addProperties(caseData),
-            String.format(template, caseData.getLegacyCaseReference())
-        );
+        if (StringUtils.isNotBlank(emailAddress)) {
+            String template = getReferenceTemplateString();
+            notificationService.sendMail(
+                emailAddress,
+                getTemplate(caseData),
+                addProperties(caseData),
+                String.format(template, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
