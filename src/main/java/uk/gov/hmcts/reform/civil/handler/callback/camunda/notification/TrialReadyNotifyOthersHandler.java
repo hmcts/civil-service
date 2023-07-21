@@ -87,13 +87,14 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
             }
         }
 
-        notificationService.sendMail(
-            emailAddress,
-            //TODO: replace getRespondent1LipClaimUpdatedTemplate() with getNotifyLipUpdateTemplate() once CIV-9123 is merged into master
-            isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
-            isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (emailAddress != null && !emailAddress.isEmpty()) {
+            notificationService.sendMail(
+                emailAddress,
+                isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
+                isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
