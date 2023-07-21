@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,7 @@ public class UpdateCaseStateCaseSettledHandler extends CallbackHandler {
     );
 
     private static final String TASK_ID = "UpdateCaseStateCaseSettled";
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateCaseState);
