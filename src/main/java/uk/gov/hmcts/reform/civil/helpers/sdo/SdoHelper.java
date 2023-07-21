@@ -1,18 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.sdo;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -22,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class SdoHelper {
 
@@ -99,8 +89,10 @@ public class SdoHelper {
 
         String hearingTimeEstimateLabel = "";
 
-        if (smallClaimHearing != null) {
-            if (smallClaimHearing.getTime().getLabel() != null && smallClaimHearing.getTime().getLabel().equals("Other")) {
+        if (Optional.ofNullable(caseData.getSmallClaimsHearing())
+            .map(SmallClaimsHearing::getTime)
+            .map(SmallClaimsTimeEstimate::getLabel).isPresent()) {
+            if (smallClaimHearing.getTime().getLabel().equals("Other")) {
                 StringBuilder otherLength = new StringBuilder();
                 if (smallClaimHearing.getOtherHours() != null) {
                     otherLength.append(smallClaimHearing.getOtherHours().toString().trim() +
@@ -123,9 +115,9 @@ public class SdoHelper {
 
         String fastTrackHearingTimeLabel = "";
 
-        if (fastTrackHearingTime != null
-            && fastTrackHearingTime.getHearingDuration() != null
-            && fastTrackHearingTime.getHearingDuration().getLabel() != null) {
+        if (Optional.ofNullable(caseData.getFastTrackHearingTime())
+            .map(FastTrackHearingTime::getHearingDuration)
+            .map(FastTrackHearingTimeEstimate::getLabel).isPresent()) {
             if (fastTrackHearingTime.getHearingDuration().getLabel().equals("Other")) {
                 StringBuilder otherLength = new StringBuilder();
                 if (fastTrackHearingTime.getOtherHours() != null) {
