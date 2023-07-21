@@ -73,17 +73,21 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         String emailAddress;
         boolean isLiP = false;
         boolean isApplicant = false;
-        if (eventId.equals(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name())) {
-            isApplicant = true;
-            isLiP = isLiP(isApplicant, caseData);
-            emailAddress = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
-        } else if (eventId.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name())) {
-            isLiP = isLiP(isApplicant, caseData);
-            emailAddress = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
-        } else {
-            emailAddress = caseData.getRespondentSolicitor2EmailAddress();
-            if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-                emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+        switch (CaseEvent.valueOf(eventId)) {
+            case NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY -> {
+                isApplicant = true;
+                isLiP = isLiP(isApplicant, caseData);
+                emailAddress = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
+            }
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
+                isLiP = isLiP(isApplicant, caseData);
+                emailAddress = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+            }
+            default -> {
+                emailAddress = caseData.getRespondentSolicitor2EmailAddress();
+                if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                    emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+                }
             }
         }
 
