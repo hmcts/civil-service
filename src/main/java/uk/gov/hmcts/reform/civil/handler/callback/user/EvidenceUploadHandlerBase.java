@@ -293,67 +293,67 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     private <T> void renameDocuments(List<Element<T>> documentUpload, String theId) {
-        String header = null;
+        String prefix = null;
         switch (theId) {
             case "ApplicantDisclosure",
                     "RespondentOneDisclosure",
                     "RespondentTwoDisclosure":
-                header = "Document for disclosure" + SPACE;
-                renameUploadEvidenceDocumentType(documentUpload, header);
+                prefix = "Document for disclosure" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneWitnessReferred",
                     "RespondentTwoWitnessReferred",
                     "ApplicantWitnessReferred":
-                header = "Referred Document" + SPACE;
-                renameUploadEvidenceDocumentType(documentUpload, header);
+                prefix = "Referred Document" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneTrialDocCorrespondence",
                     "RespondentTwoTrialDocCorrespondence",
                     "ApplicantTrialDocCorrespondence":
-                header = "Documentary Evidence" + SPACE;
-                renameUploadEvidenceDocumentType(documentUpload, header);
+                prefix = "Documentary Evidence" + SPACE;
+                renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneExpertQuestions",
                     "RespondentTwoExpertQuestions",
                     "ApplicantExpertQuestions":
-                header = "";
+                prefix = "";
                 renameUploadEvidenceExpert(documentUpload, true);
                 break;
             case "RespondentOneExpertAnswers",
                     "RespondentTwoExpertAnswers",
                     "ApplicantExpertAnswers":
-                header = "";
+                prefix = "";
                 renameUploadEvidenceExpert(documentUpload, false);
                 break;
             case "ApplicantExpertReport",
                     "RespondentTwoExpertReport",
                     "RespondentOneExpertReport":
-                header = "Experts report";
-                renameUploadReportExpert(documentUpload, header, true);
+                prefix = "Experts report";
+                renameUploadReportExpert(documentUpload, prefix, true);
                 break;
             case "ApplicantExpertJointStatement",
                     "RespondentTwoExpertJointStatement",
                     "RespondentOneExpertJointStatement":
-                header = "Joint report";
-                renameUploadReportExpert(documentUpload, header, false);
+                prefix = "Joint report";
+                renameUploadReportExpert(documentUpload, prefix, false);
                 break;
             case "ApplicantWitnessStatement",
                     "RespondentOneWitnessStatement",
                     "RespondentTwoWitnessStatement":
-                header = "Witness Statement of";
-                renameUploadEvidenceWitness(documentUpload, header, true);
+                prefix = "Witness Statement of";
+                renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             case "ApplicantWitnessSummary",
                     "RespondentOneWitnessSummary",
                     "RespondentTwoWitnessSummary":
-                header = "Witness Summary of";
-                renameUploadEvidenceWitness(documentUpload, header, false);
+                prefix = "Witness Summary of";
+                renameUploadEvidenceWitness(documentUpload, prefix, false);
                 break;
             case "ApplicantWitnessHearsay",
                     "RespondentOneWitnessHearsay",
                     "RespondentTwoWitnessHearsay":
-                header = "Hearsay evidence";
-                renameUploadEvidenceWitness(documentUpload, header, true);
+                prefix = "Hearsay evidence";
+                renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             default:
                 break;
@@ -361,11 +361,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     private <T> void renameUploadEvidenceWitness(final List<Element<T>> documentUpload,
-                                              String header, boolean date) {
+                                              String prefix, boolean date) {
         documentUpload.forEach(x -> {
             UploadEvidenceWitness type = (UploadEvidenceWitness) x.getValue();
             String ext = FilenameUtils.getExtension(type.getWitnessOptionDocument().getDocumentFileName());
-            String newName = header
+            String newName = prefix
                     + SPACE
                     + type.getWitnessOptionName()
                     + (date ? SPACE + type.getWitnessOptionUploadDate() : "")
@@ -375,11 +375,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     private <T> void renameUploadReportExpert(final List<Element<T>> documentUpload,
-                                              String header, boolean single) {
+                                              String prefix, boolean single) {
         documentUpload.forEach(x -> {
             UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
             String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
-            String newName = header
+            String newName = prefix
                     + SPACE
                     + type.getExpertOptionName()
                     + SPACE
@@ -405,11 +405,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
-    private <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String header) {
+    private <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String prefix) {
         documentUpload.forEach(x -> {
             UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
             String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-            String newName = header
+            String newName = prefix
                     + SPACE
                     + type.getTypeOfDocument()
                     + SPACE
