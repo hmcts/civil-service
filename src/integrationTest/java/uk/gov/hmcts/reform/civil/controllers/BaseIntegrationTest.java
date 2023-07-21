@@ -138,6 +138,7 @@ public abstract class BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.get(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, auth)
+                .header("ServiceAuthorization", s2sToken)
                 .contentType(MediaType.APPLICATION_JSON));
     }
 
