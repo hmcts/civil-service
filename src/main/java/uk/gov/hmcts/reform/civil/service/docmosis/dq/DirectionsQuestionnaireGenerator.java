@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -78,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
+@Getter
 @RequiredArgsConstructor
 public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
@@ -92,15 +95,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (isClaimantResponse(caseData)) {
-                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
-            } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
-            }
-        } else {
-            templateId = getDocmosisTemplate(caseData);
-        }
+        templateId = getTemplateId(caseData);
 
         templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
@@ -111,6 +106,20 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     DocumentType.DIRECTIONS_QUESTIONNAIRE
             )
         );
+    }
+
+    protected DocmosisTemplates getTemplateId(CaseData caseData) {
+        DocmosisTemplates templateId;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
+        } else {
+            templateId = getDocmosisTemplate(caseData);
+        }
+        return templateId;
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
@@ -236,6 +245,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+            caseData,
+            authorisation
+        );
+
+        return builder.build();
+    }
+
+    @NotNull
+    protected DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
@@ -288,8 +307,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq, authorisation));
-
-        return builder.build();
+        return builder;
     }
 
     private List<Party> getApplicants(CaseData caseData) {
@@ -482,7 +500,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .build();
     }
 
-    private RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
+    protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
@@ -634,7 +652,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
     }
 
-    private List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
+    protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         if (isClaimantResponse(caseData)) {
 
             List<Party> respondents = new ArrayList<>();
