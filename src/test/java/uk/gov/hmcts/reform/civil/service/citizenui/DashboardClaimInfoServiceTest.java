@@ -32,6 +32,22 @@ public class DashboardClaimInfoServiceTest {
 
     private static final String CLAIMANT_NAME = "Harry Porter";
     private static final String DEFENDANT_NAME = "James Bond";
+
+    @Mock
+    private ClaimStoreService claimStoreService;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @Mock
+    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
+
+    @InjectMocks
+    private DashboardClaimInfoService dashboardClaimInfoService;
+
     private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
     private static final LocalDateTime DATE_IN_2021 = LocalDateTime.of(2021, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
@@ -60,16 +76,6 @@ public class DashboardClaimInfoServiceTest {
                 .createdDate(DATE_IN_2022)
                 .build()
         );
-    @Mock
-    private ClaimStoreService claimStoreService;
-    @Mock
-    private CoreCaseDataService coreCaseDataService;
-    @Mock
-    private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
-    @InjectMocks
-    private DashboardClaimInfoService dashboardClaimInfoService;
 
     @BeforeEach
     void setUp() {
@@ -266,5 +272,20 @@ public class DashboardClaimInfoServiceTest {
         );
 
         assertThat(claimsForDefendant.size()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldTranslateSubmittedDateToCreateDate() {
+        LocalDateTime now = LocalDateTime.now();
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .submittedDate(now)
+                            .build());
+        List<DashboardClaimInfo> claimsForDefendant = dashboardClaimInfoService.getClaimsForDefendant(
+            "authorisation",
+            "123"
+        );
+        assertThat(claimsForDefendant.size()).isEqualTo(3);
+        assertThat(claimsForDefendant.get(2).getCreatedDate()).isEqualTo(now);
     }
 }
