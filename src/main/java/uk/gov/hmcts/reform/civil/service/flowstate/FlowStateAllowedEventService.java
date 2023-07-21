@@ -966,7 +966,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                DEFAULT_JUDGEMENT_SPEC
+                DEFAULT_JUDGEMENT_SPEC,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
 

@@ -173,17 +173,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
         builder.repaymentPlan(RepaymentPlanTemplateData.builder()
                                   .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
                                   .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-                                  .paymentAmount(caseData.getRespondent1RepaymentPlan().getPaymentAmount())
+                                  .paymentAmount(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
                                   .build())
-
-        RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
-        builder.repaymentPlan(
-            RepaymentPlanLRspec.builder()
-                .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
-                .repaymentFrequency(repaymentPlan.getRepaymentFrequency())
-                .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
-                .build()
-            )
             .payBy(caseData.getRespondent1RepaymentPlan()
                        .finalPaymentBy(totalClaimAmount))
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
