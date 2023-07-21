@@ -305,7 +305,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .amountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
                 .monthlyInstalmentAmount(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount()))
                 .build())
-            .collect(Collectors.toList())
+                .toList()
         );
     }
 
