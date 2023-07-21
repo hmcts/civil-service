@@ -8,16 +8,22 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
 
 public class HmcDataUtils {
 
     private HmcDataUtils() {
         // NO OP
     }
+
+    private static final int MAX_HOURS_PER_DAY = 6;
 
     public static HearingDaySchedule getHearingStartDay(HearingGetResponse hearing) {
         var scheduledDays = getScheduledDays(hearing);
@@ -59,5 +65,91 @@ public class HmcDataUtils {
         return partiesNotified == null
             || partiesNotified.getServiceData() == null
             || hearingDataChanged(hearing, partiesNotified.getServiceData());
+    }
+
+    /**
+     * Calculates the duration in hours for a given hearing day.
+     * @return duration of the hearing day in hours
+     */
+    private static int getHearingDayHoursDuration(HearingDaySchedule day) {
+        return ((Long)day.getHearingStartDateTime().until(day.getHearingEndDateTime(), ChronoUnit.HOURS)).intValue();
+    }
+
+    /**
+     * If a hearing is listed for 6 hours which is classed as a full day hearing,
+     *      one hour is removed from the hearingDuration to account for lunch break.
+     * hearingDayHours is the amount of hours the hearing is listed for on a single day
+     * @return hearingDayHours
+     */
+    private static int actualHours(int hearingDayHours) {
+
+        return hearingDayHours == MAX_HOURS_PER_DAY ? 5 : hearingDayHours;
+    }
+
+    /**
+     * Returns and formats information for each individual day of the hearing.
+     * Returns the date of hearing, time of hearing and total duration of hearing.
+     * @return e.g. "30 June 2023 at 10:00 for 3 hours"
+     */
+    private static String formatDay(HearingDaySchedule day) {
+        var dateString = day.getHearingStartDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        var timeString = day.getHearingStartDateTime().toLocalTime().toString();
+        var duration = actualHours(getHearingDayHoursDuration(day));
+
+        return String.format("%s at %s for %d %s", dateString, timeString, duration, duration > 1 ? "hours" : "hour");
+    }
+
+    /**
+     * Returns the details from formatDay() for each individual hearing as a list.
+     * @return e.g. "29 June 2023 at 10:00 for 3 hours", "30 June 2023 at 14:00 for 2 hours"
+     */
+    public static List<String> getHearingDaysTextList(HearingGetResponse hearing) {
+        return hearing.getHearingResponse().getHearingDaySchedule().stream()
+            .map(day -> formatDay(day))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Concats the list from getHearingDaysTextList and correctly formats it for the Hearing Notice doc.
+     * @return e.g. "29 June 2023 at 10:00 for 3 hours",
+     *              "30 June 2023 at 14:00 for 2 hours"
+     */
+    public static String getHearingDaysText(HearingGetResponse hearing) {
+        return org.apache.commons.lang.StringUtils.join(getHearingDaysTextList(hearing), "\n");
+    }
+
+    /**
+     * Returns the total number of days and hours the hearing has been listed for.
+     *  duration = takes total hearing hours from getHearingDayHoursDuration()
+     * Formatting has been added to generate plural of day/hour when necessary
+     * @return If duration is a multiple of 6: returns whole day e.g. 12 hours returns "2 days"
+     *           Else if duration is greater than 6 but not a multiple: splits into hours and days e.g. 15 hours returns "2 days and 3 hours"
+     *           Else: returns duration in hours format only e.g. 3 hours returns "3 hours"
+     */
+    public static String getTotalHearingDurationText(HearingGetResponse hearing) {
+        var duration = hearing.getHearingResponse().getHearingDaySchedule().stream()
+            .map(day -> getHearingDayHoursDuration(day))
+            .reduce((aac, day) -> aac + day).orElse(null);
+
+        var totalDays = (Double)Math.floor((double)duration / MAX_HOURS_PER_DAY);
+
+        if (duration != null) {
+            if (duration % MAX_HOURS_PER_DAY == 0) {
+                return String.format("%s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"));
+            } else if (duration > MAX_HOURS_PER_DAY) {
+                var hours = duration - (totalDays.intValue() * MAX_HOURS_PER_DAY);
+                return String.format(
+                    "%s %s and %s %s",
+                    totalDays.intValue(),
+                    textToPlural(totalDays.intValue(), "day"),
+                    hours,
+                    textToPlural(hours, "hour")
+                );
+            } else {
+                return String.format("%s %s", duration, textToPlural(duration, "hour"));
+            }
+        } else {
+            return null;
+        }
     }
 }
