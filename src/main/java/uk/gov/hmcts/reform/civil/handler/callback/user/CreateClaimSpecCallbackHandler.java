@@ -501,7 +501,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             }});
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             dataBuilder.stdRequestId(StdRequestId.builder().createClaimRequestId(caseData.getBulkRequestId()).build());
-
+            //TODO implement bulk claims that have interest added.
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
         }
