@@ -301,7 +301,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     private static void addCourtOrderDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.courtOrderDetails(
-        Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
+            Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
             .orElseGet(Stream::empty)
             .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()
                 .claimNumberText(courtOrderDetails.getValue().getClaimNumberText())
