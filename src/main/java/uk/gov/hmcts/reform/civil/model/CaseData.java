@@ -587,7 +587,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
-    private final String freeFormRecitalTextArea;
     private final String freeFormRecordedTextArea;
     private final String freeFormOrderedTextArea;
     private final FreeFormOrderValues orderOnCourtInitiative;
@@ -731,7 +730,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
                 || getApplicant1AcceptAdmitAmountPaidSpec() != null
-                || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
     }
