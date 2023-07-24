@@ -70,8 +70,8 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                               1
                                           ))
                                       .build());
-
     private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
+
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
@@ -173,6 +173,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
+    @Test
     @SneakyThrows
     void shouldSubmitEventSuccessfully() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
