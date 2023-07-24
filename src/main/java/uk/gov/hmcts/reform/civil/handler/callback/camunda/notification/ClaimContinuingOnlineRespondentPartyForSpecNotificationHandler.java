@@ -73,7 +73,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             generatePIPEmail(caseData);
         }
 
-        //generatePIPLetter(callbackParams);
+        generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -105,7 +105,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private void generatePIPEmail(CaseData caseData) {
         notificationService.sendMail(
-            "civilmoneyclaimsdemo@gmail.com",
+            caseData.getApplicant1Email(),
             notificationsProperties.getRespondentDefendantResponseForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
