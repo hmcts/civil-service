@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
+
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,18 +22,22 @@ import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 public class CasesControllerTest extends BaseIntegrationTest {
+
     private static final String CASES_URL = "/cases/{caseId}";
     private static final String CASES_ACTOR_URL = "/cases/actors/{actorId}";
     private static final String ACTORID = "1111111";
@@ -65,6 +70,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                               1
                                           ))
                                       .build());
+
     private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -77,6 +83,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private DashboardClaimInfoService dashboardClaimInfoService;
+
     @MockBean
     private CaseEventService caseEventService;
 
@@ -93,12 +100,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
+
         when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
         doGet(BEARER_TOKEN, CASES_URL, 1L)
             .andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
     }
+
     @Test
     @SneakyThrows
     public void shouldReturnRASAssignment() {
@@ -112,12 +121,15 @@ public class CasesControllerTest extends BaseIntegrationTest {
                 )
             )
             .build();
+
         when(roleAssignmentsService.getRoleAssignments(anyString(), anyString()))
             .thenReturn(rasResponse);
         doGet(BEARER_TOKEN, CASES_ACTOR_URL, ACTORID)
             .andExpect(content().json(toJson(rasResponse)))
             .andExpect(status().isOk());
+
     }
+
     @Test
     @SneakyThrows
     public void shouldReturnListOfCasesHttp200() {
@@ -130,16 +142,19 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                    .id(1L)
                                    .build()))
             .build();
+
         SearchResult expectedCaseData = SearchResult.builder()
             .total(1)
             .cases(Arrays.asList(CaseDetails.builder().id(1L).build()))
             .build();
+
         when(coreCaseDataService.searchCases(any(), anyString()))
             .thenReturn(expectedCaseDetails);
         doPost(BEARER_TOKEN, ELASTICSEARCH, CLAIMS_LIST_URL, "")
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
+
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
@@ -148,6 +163,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());
     }
+
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
@@ -156,6 +172,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());
     }
+
     @SneakyThrows
     void shouldSubmitEventSuccessfully() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
