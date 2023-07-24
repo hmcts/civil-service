@@ -129,6 +129,23 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotNotifyRespondent1_whenInvokedAndTheEmailAddressIsNotProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(
+                "sole.trader@email.com",
+                "template-id",
+                getLiPNotificationDataMap(false, caseData),
+                "other-party-trial-ready-notification-000MC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -146,16 +163,16 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotNotifyRespondent1_whenInvokedAndTheEmailAddressIsNotProvided() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false).build();
+        void shouldNotifyRespondent2_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY.name()).build()
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_OTHER_TRIAL_READY.name()).build()
             ).build();
 
             handler.handle(params);
 
-            verify(notificationService, never()).sendMail(
-                "sole.trader@email.com",
+            verify(notificationService).sendMail(
+                "rambo@email.com",
                 "template-id",
                 getLiPNotificationDataMap(false, caseData),
                 "other-party-trial-ready-notification-000MC001"
