@@ -1230,22 +1230,22 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .documentWitnessSummaryRes(
-                        getWitnessDocs(witnessName, createdDate, witnessDate))
+                        createWitnessDocs(witnessName, createdDate, witnessDate))
                 .documentWitnessStatementRes(
-                        getWitnessDocs(witnessName, createdDate, witnessDate))
-                .documentHearsayNoticeRes(getWitnessDocs(witnessName, createdDate, witnessDate))
-                .documentExpertReportRes(getExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
-                .documentJointStatementRes(getExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
-                .documentQuestionsRes(getExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
-                .documentAnswersRes(getExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
-                .documentForDisclosureRes(getEvidenceDocs("typeDisclosure", witnessDate))
-                .documentReferredInStatementRes(getEvidenceDocs("typeReferred", witnessDate))
-                .documentEvidenceForTrialRes(getEvidenceDocs("typeForTrial", witnessDate))
-                .documentDisclosureListRes(getEvidenceDocs(null, null))
-                .documentCaseSummaryRes(getEvidenceDocs(null, null))
-                .documentSkeletonArgumentRes(getEvidenceDocs(null, null))
-                .documentAuthoritiesRes(getEvidenceDocs(null, null))
-                .documentCostsRes(getEvidenceDocs(null, null))
+                        createWitnessDocs(witnessName, createdDate, witnessDate))
+                .documentHearsayNoticeRes(createWitnessDocs(witnessName, createdDate, witnessDate))
+                .documentExpertReportRes(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
+                .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
+                .documentQuestionsRes(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
+                .documentAnswersRes(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
+                .documentForDisclosureRes(createEvidenceDocs("typeDisclosure", witnessDate))
+                .documentReferredInStatementRes(createEvidenceDocs("typeReferred", witnessDate))
+                .documentEvidenceForTrialRes(createEvidenceDocs("typeForTrial", witnessDate))
+                .documentDisclosureListRes(createEvidenceDocs(null, null))
+                .documentCaseSummaryRes(createEvidenceDocs(null, null))
+                .documentSkeletonArgumentRes(createEvidenceDocs(null, null))
+                .documentAuthoritiesRes(createEvidenceDocs(null, null))
+                .documentCostsRes(createEvidenceDocs(null, null))
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
@@ -1299,22 +1299,22 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .documentWitnessSummaryRes2(
-                        getWitnessDocs(witnessName, createdDate, witnessDate))
+                        createWitnessDocs(witnessName, createdDate, witnessDate))
                 .documentWitnessStatementRes2(
-                        getWitnessDocs(witnessName, createdDate, witnessDate))
-                .documentHearsayNoticeRes2(getWitnessDocs(witnessName, createdDate, witnessDate))
-                .documentExpertReportRes2(getExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
-                .documentJointStatementRes2(getExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
-                .documentQuestionsRes2(getExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
-                .documentAnswersRes2(getExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
-                .documentForDisclosureRes2(getEvidenceDocs("typeDisclosure", witnessDate))
-                .documentReferredInStatementRes2(getEvidenceDocs("typeReferred", witnessDate))
-                .documentEvidenceForTrialRes2(getEvidenceDocs("typeForTrial", witnessDate))
-                .documentDisclosureListRes2(getEvidenceDocs(null, null))
-                .documentCaseSummaryRes2(getEvidenceDocs(null, null))
-                .documentSkeletonArgumentRes2(getEvidenceDocs(null, null))
-                .documentAuthoritiesRes2(getEvidenceDocs(null, null))
-                .documentCostsRes2(getEvidenceDocs(null, null))
+                        createWitnessDocs(witnessName, createdDate, witnessDate))
+                .documentHearsayNoticeRes2(createWitnessDocs(witnessName, createdDate, witnessDate))
+                .documentExpertReportRes2(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
+                .documentJointStatementRes2(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
+                .documentQuestionsRes2(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
+                .documentAnswersRes2(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
+                .documentForDisclosureRes2(createEvidenceDocs("typeDisclosure", witnessDate))
+                .documentReferredInStatementRes2(createEvidenceDocs("typeReferred", witnessDate))
+                .documentEvidenceForTrialRes2(createEvidenceDocs("typeForTrial", witnessDate))
+                .documentDisclosureListRes2(createEvidenceDocs(null, null))
+                .documentCaseSummaryRes2(createEvidenceDocs(null, null))
+                .documentSkeletonArgumentRes2(createEvidenceDocs(null, null))
+                .documentAuthoritiesRes2(createEvidenceDocs(null, null))
+                .documentCostsRes2(createEvidenceDocs(null, null))
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
@@ -1359,7 +1359,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
     }
 
-    private List<Element<UploadEvidenceDocumentType>> getEvidenceDocs(String type, LocalDate issuedDate) {
+    private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {
         Document document = Document.builder().documentBinaryUrl(
                         TEST_URL)
                 .documentFileName(TEST_FILE_NAME).build();
@@ -1373,13 +1373,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return evidenceDocs;
     }
 
-    private List<Element<UploadEvidenceExpert>> getExpertDocs(String expertName,
-                                                              LocalDate dateUpload,
-                                                              String expertise,
-                                                              String expertises,
-                                                              String otherParty,
-                                                              String question,
-                                                              String answer) {
+    private List<Element<UploadEvidenceExpert>> createExpertDocs(String expertName,
+                                                                 LocalDate dateUpload,
+                                                                 String expertise,
+                                                                 String expertises,
+                                                                 String otherParty,
+                                                                 String question,
+                                                                 String answer) {
         Document document = Document.builder().documentBinaryUrl(
                         TEST_URL)
                 .documentFileName(TEST_FILE_NAME).build();
@@ -1397,9 +1397,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         return expertEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceWitness>> getWitnessDocs(String witnessName,
-                                                                LocalDateTime createdDate,
-                                                                LocalDate dateMade) {
+    private List<Element<UploadEvidenceWitness>> createWitnessDocs(String witnessName,
+                                                                   LocalDateTime createdDate,
+                                                                   LocalDate dateMade) {
         Document document = Document.builder().documentBinaryUrl(
                         TEST_URL)
                 .documentFileName(TEST_FILE_NAME).build();
