@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -76,8 +75,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
-            .claimantNames(getClaimantNames(caseData).toString())
-            .defendantNames(getDefendantNames(caseData).toString())
+            .claimantNames(getClaimantNames(caseData))
+            .defendantNames(getDefendantNames(caseData))
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -420,7 +419,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-
     public String getClaimantNames(CaseData caseData) {
 
         StringBuilder claimantNames = new StringBuilder();
@@ -431,14 +429,14 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return claimantNames.toString();
     }
 
-    public StringBuilder getDefendantNames(CaseData caseData) {
+    public String getDefendantNames(CaseData caseData) {
 
         StringBuilder defendantNames = new StringBuilder();
         defendantNames.append(caseData.getRespondent1().getPartyName());
         if (caseData.getRespondent2() != null) {
             defendantNames.append(" and ").append(caseData.getRespondent2().getPartyName());
         }
-        return defendantNames;
+        return defendantNames.toString();
     }
 
 }

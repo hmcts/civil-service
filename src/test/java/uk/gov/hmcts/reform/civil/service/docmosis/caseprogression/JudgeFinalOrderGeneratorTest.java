@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,10 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.TrialNoticeProcedure;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -88,8 +93,17 @@ public class JudgeFinalOrderGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
+    @MockBean
+    private IdamClient idamClient;
+
     @Autowired
     private JudgeFinalOrderGenerator generator;
+
+    @BeforeEach
+    public void setUp() throws JsonProcessingException {
+        when(idamClient.getUserDetails(any()))
+            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
+    }
 
     @Test
     void shouldGenerateFreeFormOrder_whenNoneSelected() {
@@ -159,6 +173,14 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
                                     .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                             .partyID("app-2-party-id")
+                             .partyName("Applicant2")
+                             .build())
+            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
+                            .partyID("res-2-party-id")
+                            .partyName("Respondent2")
+                            .build())
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
