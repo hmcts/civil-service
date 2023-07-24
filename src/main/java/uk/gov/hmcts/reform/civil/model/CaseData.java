@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -509,7 +508,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingHearingNotesDJ disposalHearingHearingNotesDJ;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
@@ -733,7 +731,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
                 || getApplicant1AcceptAdmitAmountPaidSpec() != null
-                || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
     }

@@ -127,6 +127,7 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
     public void testFeignExceptionGatewayTimeoutException() {
         testTemplate(
             "gateway time out message",
@@ -147,6 +148,20 @@ class ResourceExceptionHandlerTest {
             NotificationClientException::new,
             handler::handleNotificationClientException,
             HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
+    @Test
+    void testHandleFeignNotFoundException() {
+        testTemplate(
+            "expected exception for feign not found",
+            str -> new FeignException.NotFound(
+                "expected exception for feign not found",
+                Mockito.mock(feign.Request.class),
+                new byte[]{}
+            ),
+            handler::feignExceptionNotFound,
+            HttpStatus.NOT_FOUND
         );
     }
 
