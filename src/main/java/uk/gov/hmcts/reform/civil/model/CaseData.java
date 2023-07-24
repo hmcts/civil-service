@@ -731,7 +731,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
                 || getApplicant1AcceptAdmitAmountPaidSpec() != null
-                || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
     }
