@@ -972,4 +972,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
     }
+
+    @JsonIgnore
+    public String getApplicant1Email() {
+        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+    }
 }
