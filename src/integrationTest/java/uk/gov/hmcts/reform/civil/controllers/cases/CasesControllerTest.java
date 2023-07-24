@@ -3,17 +3,21 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -49,6 +53,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
+    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases";
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final List<DashboardClaimInfo> claimResults =
@@ -85,7 +90,13 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private CaseEventService caseEventService;
 
     @MockBean
+    private CaseworkerCaseEventService caseworkerCaseEventService;
+
+    @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+
+    @MockBean
+    CoreCaseDataApi coreCaseDataApi;
 
     @Test
     @SneakyThrows
@@ -211,4 +222,59 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(agreedDate)))
             .andExpect(status().isOk());
     }
+
+    @Test
+    @SneakyThrows
+    void shouldSubmitEventSuccessfullyForCaseWorker() {
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        CaseData caseData = CaseData.builder().ccdCaseReference(1990L).build();
+        when(caseworkerCaseEventService.submitEventForNewClaimCaseWorker(any())).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails))
+            .thenReturn(caseData);
+        doPost(
+            BEARER_TOKEN,
+            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            CASEWORKER_SUBMIT_EVENT_URL,
+            "userId",
+            "jurisdictionId",
+            "caseTypeId"
+        )
+            .andExpect(content().json(toJson(caseDetails)))
+            .andExpect(status().isCreated());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
+        doPost(
+            "invalid token",
+            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            CASEWORKER_SUBMIT_EVENT_URL,
+            "userId",
+            "jurisdictionId",
+            "caseTypeId"
+        )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowUnprocessableEntityExceptionCaseWorkerSubmit() {
+        when(caseworkerCaseEventService.submitEventForNewClaimCaseWorker(any()))
+            .thenThrow(CaseDataInvalidException.class);
+
+        doPost(
+             BEARER_TOKEN,
+             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+             CASEWORKER_SUBMIT_EVENT_URL,
+             "userId",
+             "jurisdictionId",
+             "caseTypeId"
+        )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpect(content().string("Submit claim unsuccessful, Invalid Case data"))
+            .andReturn();
+
+    }
+
 }

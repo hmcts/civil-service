@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.cmc.model;
 
+import org.elasticsearch.core.List;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CmcClaimTest {
 
@@ -86,5 +89,35 @@ public class CmcClaimTest {
         LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
         //Then
         assertThat(paymentDate).isNull();
+    }
+
+    @Test
+    void shouldReturnTrueWhenClaimRejectedAndOfferSettleOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.FULL_DEFENCE)
+                          .build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder().build()))
+                            .build())
+            .build();
+
+        assertTrue(claim.isClaimRejectedAndOfferSettleOutOfCourt());
+    }
+
+    @Test
+    void shouldReturnTrueWhenClaimantRejectOffer()  {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.FULL_DEFENCE)
+                          .build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .type(StatementType.REJECTION)
+                                                         .build()))
+                            .build())
+            .build();
+
+        assertTrue(claim.hasClaimantRejectOffer());
     }
 }
