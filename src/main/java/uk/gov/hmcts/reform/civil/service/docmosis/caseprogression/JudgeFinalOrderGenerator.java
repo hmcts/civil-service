@@ -76,7 +76,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .defendantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .freeFormRecitalText(caseData.getFreeFormRecitalTextArea())
             .freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
             .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
             .orderOnCourtsList(caseData.getOrderOnCourtsList())
