@@ -615,7 +615,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        CREATE_SDO
                     }
                 ),
                 of(
