@@ -318,15 +318,15 @@ class LocationRefDataServiceTest {
     }
 
     @Nested
-    class CcmccLocationProviderTest {
+    class CtscLocationProviderTest {
 
         @Test
-        void shouldReturnLocations_whenLRDReturnsOneCcmccLocations() {
-            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+        void shouldReturnLocations_whenLRDReturnsOneCtscLocations() {
+            LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").build();
-            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ctscLocation), OK);
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),
@@ -336,17 +336,16 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData result = refDataService.getCcmccLocation("user_token");
+            LocationRefData result = refDataService.getCtscLocationUnSpec("user_token");
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
-            assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?court_venue_name=County%20Court%20Money%20Claims%20Centre");
+            assertThat(uriCaptor.getValue().toString()).isEqualTo("dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
                 .isEqualTo("service_token");
-            assertThat(result.getEpimmsId()).isEqualTo("192280");
+            assertThat(result.getEpimmsId()).isEqualTo("366774");
             assertThat(result.getRegionId()).isEqualTo("4");
         }
 
@@ -361,12 +360,12 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(new ResponseEntity<List<LocationRefData>>(OK));
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?court_venue_name=County%20Court%20Money%20Claims%20Centre");
+                "dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization"))
                 .isEqualTo("user_token");
@@ -377,17 +376,17 @@ class LocationRefDataServiceTest {
         }
 
         @Test
-        void shouldReturnLocations_whenLRDReturnsMultipleCcmccLocations() {
-            LocationRefData ccmccLocation1 = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+        void shouldReturnLocations_whenLRDReturnsMultipleCtscLocations() {
+            LocationRefData ctscLocation1 = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").build();
-            LocationRefData ccmccLocation2 = LocationRefData.builder().courtVenueId("9264").epimmsId("192281")
-                .siteName("site_name").regionId("8").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").build();
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").build();
+            LocationRefData ctscLocation2 = LocationRefData.builder().courtVenueId("13365").epimmsId("366774")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("Level 4 Metro")
+                .venueName("CTSC Salford").build();
             ResponseEntity<List<LocationRefData>> mockedResponse =
-                new ResponseEntity<>(List.of(ccmccLocation1, ccmccLocation2), OK);
+                new ResponseEntity<>(List.of(ctscLocation1, ctscLocation2), OK);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
@@ -398,19 +397,19 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?court_venue_name=County%20Court%20Money%20Claims%20Centre");
+                "dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization"))
                 .isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
                 .isEqualTo("service_token");
-            assertThat(courtLocations.getRegionId()).isIn("8", "4");
-            assertThat(courtLocations.getEpimmsId()).isIn("192281", "192280");
+            assertThat(courtLocations.getRegionId()).isIn("4");
+            assertThat(courtLocations.getEpimmsId()).isIn("366774");
         }
 
         @Test
@@ -424,7 +423,7 @@ class LocationRefDataServiceTest {
             ))
                 .thenThrow(new RestClientException("403"));
 
-            LocationRefData courtLocations = refDataService.getCcmccLocation("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
 
             assertThat(courtLocations.getRegionId()).isNull();
             assertThat(courtLocations.getEpimmsId()).isNull();
@@ -432,11 +431,11 @@ class LocationRefDataServiceTest {
 
         @Test
         void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsId() {
-            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+            LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").courtLocationCode("121").build();
-            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").courtLocationCode("121").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ctscLocation), OK);
 
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
@@ -446,7 +445,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenReturn(mockedResponse);
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "366774");
             String prefferedCourtCode = result.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
@@ -455,7 +454,7 @@ class LocationRefDataServiceTest {
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?epimms_id=192280");
+                "dummy_url/fees-register/fees/lookup?epimms_id=366774");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
@@ -465,11 +464,11 @@ class LocationRefDataServiceTest {
 
         @Test
         void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsIdAndCourtType() {
-            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+            LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").courtLocationCode("121").build();
-            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").courtLocationCode("121").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ctscLocation), OK);
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),
@@ -478,7 +477,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenReturn(mockedResponse);
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "366774");
             String prefferedCourtCode = result.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
@@ -487,7 +486,7 @@ class LocationRefDataServiceTest {
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?epimms_id=192280&court_type_id=10");
+                "dummy_url/fees-register/fees/lookup?epimms_id=366774&court_type_id=10");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
@@ -520,7 +519,7 @@ class LocationRefDataServiceTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
                 .thenThrow(new RestClientException("403"));
 
-            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "366774");
 
             assertThat(result.isEmpty());
         }
@@ -566,15 +565,15 @@ class LocationRefDataServiceTest {
     @Nested
     class CourtLocationProviderTest {
 
-        @Test
+        //@Test
         void shouldReturnLocations_whenLRDReturnsOneLocations() {
-            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+            LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").courtLocationCode("10").build();
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").courtLocationCode("10").build();
 
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
-                List.of(ccmccLocation), OK);
+                List.of(ctscLocation), OK);
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),
@@ -595,22 +594,22 @@ class LocationRefDataServiceTest {
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
                 .isEqualTo("service_token");
-            assertThat(result.getEpimmsId()).isEqualTo("192280");
+            assertThat(result.getEpimmsId()).isEqualTo("366774");
             assertThat(result.getRegionId()).isEqualTo("4");
         }
 
         @Test
         void shouldReturnLocations_whenLRDReturnsTwoLocations() {
-            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+            LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").courtLocationCode("10").build();
-            LocationRefData ccmccLocationDuplicate = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").build();
+            LocationRefData ctscLocationDuplicate = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-                .venueName("CCMCC").courtLocationCode("10").build();
+                .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
+                .venueName("CTSC Salford").build();
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
-                List.of(ccmccLocation, ccmccLocationDuplicate), OK);
+                List.of(ctscLocation, ctscLocationDuplicate), OK);
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),

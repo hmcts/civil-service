@@ -1502,6 +1502,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("region", "baseLocation")
                     .containsExactly("regionId1", "epimmsId1");
 
+                //check this too
                 assertThat(response.getData())
                     .extracting("courtLocation")
                     .extracting("applicantPreferredCourt").isEqualTo("312");
@@ -1509,7 +1510,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("caseManagementLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("4", "192280");
+                    .containsExactly("4", "366774");
             }
         }
 

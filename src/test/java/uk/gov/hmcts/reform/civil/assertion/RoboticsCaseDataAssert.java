@@ -117,7 +117,7 @@ public class RoboticsCaseDataAssert extends CustomAssert<RoboticsCaseDataAssert,
         );
         compare(
             "owningCourtName",
-            "CCMCC",
+            "CTSC",
             ofNullable(header.getOwningCourtName())
         );
     }

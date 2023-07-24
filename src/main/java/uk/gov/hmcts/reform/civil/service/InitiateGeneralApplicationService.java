@@ -186,7 +186,7 @@ public class InitiateGeneralApplicationService {
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.isCtscLocation(caseLocation.getRight() ? YES : NO);
         applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
                                             ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
 
@@ -363,13 +363,20 @@ public class InitiateGeneralApplicationService {
                 }
             }
         } else {
-            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+            LocationRefData ctscLocation;
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                ctscLocation = locationRefDataService.getCtscLocationSpec(authToken);
+            } else {
+                ctscLocation = locationRefDataService.getCtscLocationUnSpec(authToken);
+            }
+
             CaseLocationCivil courtLocation = CaseLocationCivil.builder()
-                    .region(ccmccLocation.getRegionId())
-                    .baseLocation(ccmccLocation.getEpimmsId())
-                    .siteName(ccmccLocation.getSiteName())
-                    .build();
+                .region(ctscLocation.getRegionId())
+                .baseLocation(ctscLocation.getEpimmsId())
+                .siteName(ctscLocation.getSiteName())
+                .build();
             return Pair.of(courtLocation, true);
+
         }
     }
 

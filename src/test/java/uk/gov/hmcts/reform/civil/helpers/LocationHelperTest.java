@@ -23,10 +23,10 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 public class LocationHelperTest {
 
-    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
-    private static final String CCMCC_REGION_ID = "ccmccRegionId";
-    private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private static final BigDecimal CTSC_AMOUNT = BigDecimal.valueOf(1000);
+    private static final String CTSC_REGION_ID = "ctscRegionId";
+    private static final String CTSC_EPIMS = "ctscEpims";
+    private final LocationHelper helper = new LocationHelper(CTSC_AMOUNT, CTSC_EPIMS, CTSC_REGION_ID);
 
     @Test
     public void thereIsAMatchingLocation() {
@@ -125,7 +125,7 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenLessThan1000_locationIsCcmcc() {
+    public void whenLessThan1000_locationIsCtsc() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .claimValue(ClaimValue.builder()
@@ -158,12 +158,12 @@ public class LocationHelperTest {
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
             .isEqualTo(CaseLocationCivil.builder()
-                           .baseLocation(CCMCC_EPIMS)
-                           .region(CCMCC_REGION_ID).build());
+                           .baseLocation(CTSC_EPIMS)
+                           .region(CTSC_REGION_ID).build());
     }
 
     @Test
-    public void whenLessThan1000_locationIsCcmccEvenUndef() {
+    public void whenLessThan1000_locationIsCtscEvenUndef() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(1000))
@@ -180,8 +180,8 @@ public class LocationHelperTest {
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
             .isEqualTo(CaseLocationCivil.builder()
-                           .baseLocation(CCMCC_EPIMS)
-                           .region(CCMCC_REGION_ID).build());
+                           .baseLocation(CTSC_EPIMS)
+                           .region(CTSC_REGION_ID).build());
     }
 
     @Test

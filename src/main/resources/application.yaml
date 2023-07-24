@@ -92,8 +92,8 @@ genApp:
       appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
-    ccmcc:
-#      claims with value under this amount in pounds are assigned to CCMCC
+    ctsc:
+#      claims with value under this amount in pounds are assigned to CTSC
       amountPounds: 1000
       epimsId: 366774
       regionId: 4

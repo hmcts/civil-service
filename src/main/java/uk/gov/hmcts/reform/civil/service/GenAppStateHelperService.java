@@ -80,7 +80,7 @@ public class GenAppStateHelperService {
                 generalApplication.getCaseManagementLocation().setRegion(finalCaseData.getCaseManagementLocation().getRegion());
                 generalApplication.getCaseManagementLocation().setSiteName(finalCaseData.getLocationName());
                 Map<String, Object> genAppMap = generalApplication.toMap(objectMapper);
-                genAppMap.put("isCcmccLocation", YesOrNo.NO);
+                genAppMap.put("isCtscLocation", YesOrNo.NO);
                 generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
                 genApps.add((generalApplication));
             });

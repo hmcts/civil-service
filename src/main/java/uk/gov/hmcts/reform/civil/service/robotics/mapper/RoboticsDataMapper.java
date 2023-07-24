@@ -96,7 +96,7 @@ public class RoboticsDataMapper {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
             .owningCourtCode("807")
-            .owningCourtName("CCMCC")
+            .owningCourtName("CTSC")
             .caseType("PERSONAL INJURY")
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))

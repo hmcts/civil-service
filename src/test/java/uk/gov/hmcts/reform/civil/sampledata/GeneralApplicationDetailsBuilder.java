@@ -1262,7 +1262,7 @@ public class GeneralApplicationDetailsBuilder {
                                             .CaseLocationCivil.builder()
                                             .baseLocation("34567")
                                             .region("4").build())
-                .isCcmccLocation(YES)
+                .isCtscLocation(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())

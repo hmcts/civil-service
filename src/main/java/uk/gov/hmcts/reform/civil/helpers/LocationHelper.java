@@ -33,18 +33,18 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final BigDecimal ccmccAmount;
-    private final String ccmccRegionId;
-    private final String ccmccEpimsId;
+    private final BigDecimal ctscAmount;
+    private final String ctscRegionId;
+    private final String ctscEpimsId;
 
     public LocationHelper(
-        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
-        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
+        @Value("${genApp.lrd.ctsc.amountPounds}") BigDecimal ctscAmount,
+        @Value("${genApp.lrd.ctsc.epimsId}") String ctscEpimsId,
+        @Value("${genApp.lrd.ctsc.regionId}") String ctscRegionId) {
 
-        this.ccmccAmount = ccmccAmount;
-        this.ccmccRegionId = ccmccRegionId;
-        this.ccmccEpimsId = ccmccEpimsId;
+        this.ctscAmount = ctscAmount;
+        this.ctscRegionId = ctscRegionId;
+        this.ctscEpimsId = ctscEpimsId;
     }
 
     /**
@@ -106,11 +106,11 @@ public class LocationHelper {
         }
 
         Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-        if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+        if (ctscAmount.compareTo(getClaimValue(caseData)) >= 0) {
             return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
-                    .caseLocation(getCcmccCaseLocation()).build())
+                        .caseLocation(getCtscCaseLocation()).build())
                                    .orElseGet(() -> RequestedCourt.builder()
-                                       .caseLocation(getCcmccCaseLocation())
+                                       .caseLocation(getCtscCaseLocation())
                                        .build()));
         } else {
             return byParties;
@@ -134,8 +134,8 @@ public class LocationHelper {
             .orElse(BigDecimal.ZERO);
     }
 
-    private CaseLocationCivil getCcmccCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
+    private CaseLocationCivil getCtscCaseLocation() {
+        return CaseLocationCivil.builder().baseLocation(ctscEpimsId).region(ctscRegionId).build();
     }
 
     /**
