@@ -117,7 +117,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.444'
+        version: '1.12.512'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -136,7 +136,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.6'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:4.3.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:4.9.0"
     }
   }
 
@@ -333,7 +333,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.4'
+  implementation 'com.github.hmcts:civil-commons:1.0.9'
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -347,10 +347,10 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.37.1'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -416,11 +416,11 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.0'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.8'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.21.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.4.2'
-  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.5'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
+  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
