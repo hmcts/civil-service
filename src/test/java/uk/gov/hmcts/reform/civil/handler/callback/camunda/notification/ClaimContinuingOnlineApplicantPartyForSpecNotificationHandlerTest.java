@@ -79,31 +79,14 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         }
 
         @Test
-        void shouldNotifyApplicant1PartyEmail_whenInvoked() {
+        void shouldNotifyApplicant1_whenInvoked() {
             // Given
-            CaseData caseData = getCaseData("testorg@email.com", null);
+            CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
             // When
             handler.handle(params);
 
-            // Then
-            verify(notificationService).sendMail(
-                "testorg@email.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "claim-continuing-online-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicant1_UserDetailsEmail_whenInvoked() {
-            // Given
-            CaseData caseData = getCaseData(null, "testorg@email.com");
-            CallbackParams params = getCallbackParams(caseData);
-
-            // When
-            handler.handle(params);
             // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
@@ -140,19 +123,17 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         return params;
     }
 
-    private CaseData getCaseData(String partyEmail, String claimantUserEmail) {
+    private CaseData getCaseData(String email) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyEmail(partyEmail)
-                            .build())
+                             .build())
             .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                              .build())
             .claimDetailsNotificationDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YesOrNo.NO)
-            .claimantUserDetails(IdamUserDetails.builder().email(claimantUserEmail).build())
+            .claimantUserDetails(IdamUserDetails.builder().email(email).build())
             .build();
-
         return caseData;
     }
 
