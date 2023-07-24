@@ -233,7 +233,9 @@ public class SealedClaimLipResponseForm implements MappableObject {
         Optional.ofNullable(caseData.getSpecDefendant1SelfEmploymentDetails())
             .ifPresent(selfEmployDetails ->
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
-                                                      .amountOwed(MonetaryConversions.penniesToPounds(selfEmployDetails.getAmountOwed()))
+                                                      .amountOwed(selfEmployDetails.getAmountOwed() != null
+                                                                      ? MonetaryConversions.penniesToPounds(selfEmployDetails.getAmountOwed())
+                                                                      : null)
                                                       .annualTurnover(MonetaryConversions.penniesToPounds(selfEmployDetails.getAnnualTurnover()))
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
