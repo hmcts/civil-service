@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -244,6 +245,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         }
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder);
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
