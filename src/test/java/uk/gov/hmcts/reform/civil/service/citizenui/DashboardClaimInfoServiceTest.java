@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
@@ -275,7 +276,7 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
-    void shouldTranslateSubmittedDateToCreateDate() {
+    void shouldTranslateSubmitDateToCreateDate() {
         LocalDateTime now = LocalDateTime.now();
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
@@ -287,5 +288,6 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.size()).isEqualTo(3);
         assertThat(claimsForDefendant.get(2).getCreatedDate()).isEqualTo(now);
+
     }
 }

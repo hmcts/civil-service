@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
@@ -101,7 +102,9 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponsePending() {
-        return !hasResponse() && getResponseDeadline().isAfter(LocalDate.now());
+        return !hasResponse()
+            && getResponseDeadline() != null
+            && getResponseDeadline().isAfter(LocalDate.now());
     }
 
     @Override
@@ -113,7 +116,9 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean hasResponseDueToday() {
-        return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
+        return !hasResponse()
+            && getResponseDeadline() != null
+            && getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isBefore(LocalDate.now().atTime(FOUR_PM));
     }
 
@@ -261,7 +266,9 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     public boolean hasResponseDeadlinePassed() {
-        return !hasResponse() && (getResponseDeadline().isBefore(LocalDate.now())
+        return !hasResponse()
+            && (getResponseDeadline() != null
+            && getResponseDeadline().isBefore(LocalDate.now())
             || isResponseDeadlinePastFourPmToday());
     }
 
@@ -283,11 +290,89 @@ public class CmcClaim implements Claim {
     }
 
     private boolean isResponseDeadlinePastFourPmToday() {
-        return getResponseDeadline().isEqual(LocalDate.now())
+        return getResponseDeadline() != null
+            && getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
     private boolean hasClaimantResponse() {
         return claimantResponse != null;
+    }
+
+    @Override
+    public boolean hasSdoBeenDrawn() {
+        return false;
+    }
+
+    @Override
+    public boolean isBeforeHearing() {
+        return false;
+    }
+
+    @Override
+    public boolean isMoreDetailsRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationSuccessful() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationUnsuccessful() {
+        return false;
+    }
+
+    @Override
+    public boolean isMediationPending() {
+        return false;
+    }
+
+    @Override
+    public boolean isCourtReviewing() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimEnded() {
+        return Objects.nonNull(response)
+            && response.isFullDefence()
+            && Objects.nonNull(claimantResponse)
+            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
+    }
+
+    @Override
+    public boolean isClaimRejectedAndOfferSettleOutOfCourt() {
+        return isFullDefenceWithSubmittedOffer()
+            && Objects.isNull(moneyReceivedOn)
+            && !settlement.isSettled()
+            && !settlement.isThroughAdmissions();
+    }
+
+    private boolean isFullDefenceWithSubmittedOffer() {
+        return Objects.nonNull(settlement)
+            && Objects.nonNull(response)
+            && response.isFullDefence();
+    }
+
+    @Override
+    public boolean claimantAcceptedOfferOutOfCourt() {
+        return isClaimRejectedAndOfferSettleOutOfCourt()
+            && settlement.isAcceptedByClaimant();
+    }
+
+    @Override
+    public boolean hasClaimantRejectOffer() {
+        return isClaimRejectedAndOfferSettleOutOfCourt()
+            && settlement.isRejectedByClaimant();
+    }
+
+    @Override
+    public boolean isPartialAdmissionRejected() {
+        return Objects.nonNull(response)
+            && response.isPartAdmit()
+            && Objects.nonNull(claimantResponse)
+            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
 }
