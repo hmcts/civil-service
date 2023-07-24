@@ -81,7 +81,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         @Test
         void shouldNotifyApplicant1PartyEmail_whenInvoked() {
             // Given
-            CaseData caseData = getCaseDataWithPartyEmail("testorg@email.com");
+            CaseData caseData = getCaseData("testorg@email.com", null);
             CallbackParams params = getCallbackParams(caseData);
 
             // When
@@ -99,7 +99,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         @Test
         void shouldNotifyApplicant1_UserDetailsEmail_whenInvoked() {
             // Given
-            CaseData caseData = getCaseDataWithoutPartyEmail("testorg@email.com");
+            CaseData caseData = getCaseData(null, "testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
             // When
@@ -141,32 +141,17 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         return params;
     }
 
-    private CaseData getCaseDataWithPartyEmail(String email) {
+    private CaseData getCaseData(String partyEmail, String claimantUserEmail) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyEmail(email)
+                            .partyEmail(partyEmail)
                              .build())
             .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                              .build())
             .claimDetailsNotificationDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YesOrNo.NO)
-            .build();
-
-        return caseData;
-    }
-
-    private CaseData getCaseDataWithoutPartyEmail(String email) {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyEmail(null)
-                            .build())
-            .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                             .build())
-            .claimDetailsNotificationDate(LocalDateTime.now())
-            .respondent1ResponseDeadline(LocalDateTime.now())
-            .addRespondent2(YesOrNo.NO)
-            .claimantUserDetails(IdamUserDetails.builder().email(email).build())
+            .claimantUserDetails(IdamUserDetails.builder().email(claimantUserEmail).build())
             .build();
 
         return caseData;
