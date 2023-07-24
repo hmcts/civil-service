@@ -200,12 +200,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -360,8 +360,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -370,7 +368,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         LocalDateTime responseDate = time.now();
@@ -517,6 +514,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
