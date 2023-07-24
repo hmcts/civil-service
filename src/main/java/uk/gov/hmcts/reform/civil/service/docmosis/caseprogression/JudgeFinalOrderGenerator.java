@@ -76,6 +76,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
+            .claimantNames(getClaimantNames(caseData).toString())
+            .defendantNames(getDefendantNames(caseData).toString())
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -418,5 +420,27 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         }
         return "";
     }
+
+
+    public String getClaimantNames(CaseData caseData) {
+
+        StringBuilder claimantNames = new StringBuilder();
+        claimantNames.append(caseData.getApplicant1().getPartyName());
+        if (caseData.getApplicant2() != null) {
+            claimantNames.append(" and ").append(caseData.getApplicant2().getPartyName());
+        }
+        return claimantNames.toString();
+    }
+
+    public StringBuilder getDefendantNames(CaseData caseData) {
+
+        StringBuilder defendantNames = new StringBuilder();
+        defendantNames.append(caseData.getRespondent1().getPartyName());
+        if (caseData.getRespondent2() != null) {
+            defendantNames.append(" and ").append(caseData.getRespondent2().getPartyName());
+        }
+        return defendantNames;
+    }
+
 }
 
