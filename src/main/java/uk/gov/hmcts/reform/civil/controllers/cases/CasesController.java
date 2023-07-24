@@ -137,7 +137,7 @@ public class CasesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<CaseData> submitEvent(
+    public ResponseEntity<CaseDetails> submitEvent(
         @PathVariable("submitterId") String submitterId,
         @PathVariable("caseId") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
@@ -152,9 +152,8 @@ public class CasesController {
             .updates(eventDto.getCaseDataUpdate())
             .build();
         log.info(eventDto.getCaseDataUpdate().toString());
-        CaseData caseData = caseDetailsConverter
-            .toCaseData(caseEventService.submitEvent(params));
-        return new ResponseEntity<>(caseData, HttpStatus.OK);
+        CaseDetails caseDetails = caseEventService.submitEvent(params);
+        return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
     @PostMapping(path = "/response/deadline")
