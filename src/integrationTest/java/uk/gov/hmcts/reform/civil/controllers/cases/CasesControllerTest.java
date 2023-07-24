@@ -200,6 +200,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(extensionDate)))
             .andExpect(status().isOk());
     }
+
     @Test
     @SneakyThrows
     void shouldReturnDeadlineExtensionAgreedDate() {
