@@ -105,7 +105,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private void generatePIPEmail(CaseData caseData) {
         notificationService.sendMail(
-            caseData.getApplicant1Email(),
+            caseData.getRespondent1().getPartyEmail(),
             notificationsProperties.getRespondentDefendantResponseForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
