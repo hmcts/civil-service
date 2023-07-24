@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,12 +21,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
+import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerEventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
@@ -50,6 +57,7 @@ public class CasesController {
     private final CoreCaseDataService coreCaseDataService;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
+    private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @GetMapping(path = {
@@ -166,6 +174,32 @@ public class CasesController {
                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         LocalDate deadlineAgreedDate = coreCaseDataService.getAgreedDeadlineResponseDate(caseId, authorization);
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases")
+    @Operation(summary = "Submits event for new case, for caseworker")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Created"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<CaseDetails> caseworkerSubmitEvent(
+        @PathVariable("userId") String userId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @RequestBody CaseworkerSubmitEventDTo submitEventDto
+    ) {
+        try {
+            CaseworkerEventSubmissionParams params = CaseworkerEventSubmissionParams
+                .builder()
+                .authorisation(authorization)
+                .userId(userId)
+                .event(submitEventDto.getEvent())
+                .updates(submitEventDto.getData())
+                .build();
+            log.info("Updated case data:  " + submitEventDto.getData().toString());
+            CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
+            return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
+        } catch (FeignException.UnprocessableEntity ex) {
+            throw new CaseDataInvalidException();
+        }
     }
 
 }

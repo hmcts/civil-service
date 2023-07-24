@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
@@ -450,6 +452,8 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+
+    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2281,6 +2285,24 @@ public class CaseDataBuilder {
         trialHearingJudgesRecitalDJ = TrialHearingJudgesRecital
             .builder()
             .judgeNameTitle("test name")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
+        HearingDates singleDate = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            .build();
+
+        HearingDates dateRange = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            .build();
+
+        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+            .hearingUnavailableDates(YES)
+            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
         return this;
     }
@@ -5970,6 +5992,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
+            .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .build();
     }
 }
