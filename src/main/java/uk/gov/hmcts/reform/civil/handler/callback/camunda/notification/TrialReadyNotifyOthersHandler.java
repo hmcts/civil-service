@@ -71,22 +71,23 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
         String emailAddress;
-        boolean isLiP = false;
+        boolean isLiP;
         boolean isApplicant = false;
         switch (CaseEvent.valueOf(eventId)) {
             case NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY -> {
                 isApplicant = true;
-                isLiP = isLiP(isApplicant, caseData);
-                emailAddress = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
+                isLiP = isLiP(isApplicant, false, caseData);
+                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
             }
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
-                isLiP = isLiP(isApplicant, caseData);
-                emailAddress = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+                isLiP = isLiP(isApplicant, false, caseData);
+                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
             }
             default -> {
-                emailAddress = caseData.getRespondentSolicitor2EmailAddress();
+                isLiP = isLiP(isApplicant, true, caseData);
+                emailAddress = getEmail(isApplicant, true, isLiP, caseData);
                 if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-                    emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
                 }
             }
         }
@@ -103,9 +104,28 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private boolean isLiP(boolean isApplicant, CaseData caseData) {
-        return isApplicant ? SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isApplicantNotRepresented()
-            : SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
+    private String getEmail(boolean isApplicant, boolean isRespondent2, boolean isLiP, CaseData caseData) {
+        String email;
+        if (isApplicant) {
+            email = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (isRespondent2) {
+            email = isLiP ? caseData.getRespondent2().getPartyEmail() : caseData.getRespondentSolicitor2EmailAddress();
+        } else {
+            email = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+        }
+        return email;
+    }
+
+    private boolean isLiP(boolean isApplicant, boolean isRespondent2, CaseData caseData) {
+        boolean isLiP;
+        if (isApplicant) {
+            isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isApplicantNotRepresented();
+        } else if (isRespondent2) {
+            isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent2LiP();
+        } else {
+            isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
+        }
+        return isLiP;
     }
 
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
