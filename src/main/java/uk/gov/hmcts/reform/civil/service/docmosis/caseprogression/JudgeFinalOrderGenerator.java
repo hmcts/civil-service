@@ -75,8 +75,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
-            .claimantNames(getClaimantNames(caseData))
-            .defendantNames(getDefendantNames(caseData))
+            .claimant1Name(caseData.getApplicant1().getPartyName())
+            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .defendant1Name(caseData.getRespondent1().getPartyName())
+            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -417,26 +419,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         return "";
-    }
-
-    public String getClaimantNames(CaseData caseData) {
-
-        StringBuilder claimantNames = new StringBuilder();
-        claimantNames.append(caseData.getApplicant1().getPartyName());
-        if (caseData.getApplicant2() != null) {
-            claimantNames.append(" and ").append(caseData.getApplicant2().getPartyName());
-        }
-        return claimantNames.toString();
-    }
-
-    public String getDefendantNames(CaseData caseData) {
-
-        StringBuilder defendantNames = new StringBuilder();
-        defendantNames.append(caseData.getRespondent1().getPartyName());
-        if (caseData.getRespondent2() != null) {
-            defendantNames.append(" and ").append(caseData.getRespondent2().getPartyName());
-        }
-        return defendantNames.toString();
     }
 
 }
