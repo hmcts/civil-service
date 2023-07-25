@@ -33,5 +33,5 @@
       "automerge": true
     }
   ],
-  "prConcurrentLimit": 20
+  "prConcurrentLimit": 10
 }
