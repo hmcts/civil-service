@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.bulkclaims.StdRequestId;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -396,7 +395,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -500,7 +499,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 errors.add("Postcode error, bulk claim");
             }});
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
-            dataBuilder.stdRequestId(StdRequestId.builder().createClaimRequestId(caseData.getBulkRequestId()).build());
+            List<Element<String>> stdRequestId = new ArrayList<>();
+            stdRequestId.add(element(caseData.getBulkRequestId()));
+            dataBuilder.stdRequestId(stdRequestId);
             //TODO implement bulk claims that have interest added.
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
