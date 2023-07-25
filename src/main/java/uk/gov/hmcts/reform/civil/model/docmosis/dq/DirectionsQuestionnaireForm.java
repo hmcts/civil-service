@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureReport;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -47,6 +48,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final List<Party> respondents;
     private final List<Party> applicants;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
+    private final FixedRecoverableCosts fixedRecoverableCosts;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
     private final Experts experts;
