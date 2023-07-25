@@ -1712,7 +1712,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldClaimFee_whenInvokedAndBulkClaim() {
+        void shouldSetClaimFee_whenInvokedAndBulkClaim() {
             // Given
             Fee feeData = Fee.builder()
                 .code("FeeCode")
@@ -1730,6 +1730,33 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).extracting("claimFee").extracting("calculatedAmountInPence", "code")
                 .containsExactly(String.valueOf(feeData.getCalculatedAmountInPence()), feeData.getCode());
+        }
+
+        @Test
+        void shouldAddStdRequestId_whenInvokedAndBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .bulkRequestId("bulkRequestId")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("stdRequestId").asString().contains("bulkRequestId");
+        }
+
+        @Test
+        void shouldNotAddStdRequestId_whenInvokedAndNotBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("stdRequestId").isNull();
         }
 
         //TODO implement tests for bulk claims that have interest added.
