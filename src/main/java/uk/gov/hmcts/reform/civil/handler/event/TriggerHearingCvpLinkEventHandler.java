@@ -31,7 +31,13 @@ public class TriggerHearingCvpLinkEventHandler {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         HearingsResponse hearings = hearingService.getHearings(userToken, event.getCaseId(), LISTED.name());
 
-        if (hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0) {
+        if (hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0
+        && hearings.getCaseHearings().stream().filter(hearing -> hearing.getHearingDaySchedule().stream()
+                .filter(hearingDaySchedule -> hearingDaySchedule.getAttendees().stream()
+                .filter(atendee->atendee.getHearingSubChannel().equals("VIDCVP"))
+                    .count() > 0)
+                .count() > 0)
+            .count() > 0) {
             log.info("Triggering 'SEND_CVP_JOIN_LINK' event for case: '{}'", event.getCaseId());
             coreCaseDataService.triggerEvent(event.getCaseId(), SEND_CVP_JOIN_LINK);
         }
