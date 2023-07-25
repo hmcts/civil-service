@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -42,6 +44,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -87,12 +91,34 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::getCaseType)
+            .put(callbackKey(ABOUT_TO_START), this::setOptions)
             .put(callbackKey(MID, createShowCondition), this::createShow)
             .put(callbackKey(MID, pageId), this::validate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
+    }
+
+    CallbackResponse setOptions(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> dynamicListOptions = new ArrayList<>();
+        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)
+        && Objects.nonNull(caseData.getApplicant1())
+        && Objects.nonNull(caseData.getApplicant2())) {
+            dynamicListOptions.add("Claimant 1 - " + caseData.getApplicant1().getPartyName());
+            dynamicListOptions.add("Claimant 2 - " + caseData.getApplicant2().getPartyName());
+            dynamicListOptions.add("Claimants 1 and 2");
+        } else if(Objects.nonNull(caseData.getRespondent1())
+            && Objects.nonNull(caseData.getRespondent2())) {
+            dynamicListOptions.add("Defendant 1 - " + caseData.getRespondent1().getPartyName());
+            dynamicListOptions.add("Defendant 2 - " + caseData.getRespondent2().getPartyName());
+            dynamicListOptions.add("Defendant 1 and 2");
+        }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     CallbackResponse getCaseType(CallbackParams callbackParams) {
@@ -152,6 +178,35 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    ) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        //determine claim path, and assign to CCD object for show hide functionality
+        if (caseData.getClaimType() == null) {
+            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
+        } else {
+            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+        }
+        //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
+        //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
+        //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
+        //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
+        //default flag for respondent 1 solicitor
+        caseDataBuilder.caseTypeFlag("do_not_show");
+        boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
+                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)
+                && multiParts
+                && (caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Claimant 2 - ")
+                    || caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().equals("Claimants 1 and 2"))) {
+            caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
+        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
+                && multiParts
+                && (caseData.getEvidenceUploadOptions()
+                .getValue().getLabel().startsWith("Defendant 2 - ")
+                || caseData.getEvidenceUploadOptions()
+                .getValue().getLabel().equals("Defendant 1 and 2"))){
+            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
+        }
 
         // clears the flag, as otherwise if the user returns to previous screen and unselects an option,
         // which was previously selected, the option will still be shown

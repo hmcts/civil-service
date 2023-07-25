@@ -577,6 +577,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo urgentFlag;
     private final String caseProgAllocatedTrack;
+    private final DynamicList evidenceUploadOptions;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
