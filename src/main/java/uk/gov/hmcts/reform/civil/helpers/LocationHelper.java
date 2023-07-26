@@ -74,8 +74,8 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) &&
-            EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
             log.debug(
                 "Case {}, defendant is a person, so their court request has priority",
                 caseData.getLegacyCaseReference()
