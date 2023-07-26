@@ -143,9 +143,9 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     public String getPartyName(CaseData caseData) {
-        if (taskId.equals("GenerateOrderNotifyApplicantSolicitor1")) {
+        if (taskId.equals(TASK_ID_APPLICANT)) {
             return caseData.getApplicant1().getPartyName();
-        } else if (taskId.equals("GenerateOrderNotifyRespondentSolicitor1")) {
+        } else if (taskId.equals(TASK_ID_RESPONDENT1)) {
             return caseData.getRespondent1().getPartyName();
         } else {
             return caseData.getRespondent2().getPartyName();
