@@ -488,7 +488,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         List<String> errors = new ArrayList<>();
-        if (caseData.getBulkRequestId() != null) {
+        if (caseData.getSdtRequestIdFromSdt() != null) {
             List<String> postcodes = new ArrayList<>();
             postcodes.add(caseData.getApplicant1().getPrimaryAddress().getPostCode());
             postcodes.add(caseData.getRespondent1().getPrimaryAddress().getPostCode());
@@ -499,9 +499,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 errors.add("Postcode error, bulk claim");
             }});
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
-            List<Element<String>> stdRequestId = new ArrayList<>();
-            stdRequestId.add(element(caseData.getBulkRequestId()));
-            dataBuilder.stdRequestId(stdRequestId);
+            List<Element<String>> stdRequestIdList = new ArrayList<>();
+            stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
+            dataBuilder.sdtRequestId(stdRequestIdList);
             //TODO implement bulk claims that have interest added.
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));

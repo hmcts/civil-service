@@ -1649,7 +1649,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkRequestId("bulkRequestId")
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
 
@@ -1667,7 +1667,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim1v2() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkRequestId("bulkRequestId")
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .respondent1(Party.builder()
                                  .individualFirstName("James")
@@ -1698,7 +1698,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenInvokedAndInvalidPostcodeAndIsNotBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkRequestId(null)
+                .sdtRequestIdFromSdt(null)
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
 
@@ -1719,7 +1719,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .calculatedAmountInPence(BigDecimal.valueOf(19990))
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkRequestId("bulkRequestId")
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
@@ -1733,10 +1733,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAddStdRequestId_whenInvokedAndBulkClaim() {
+        void shouldAddSdtRequestId_whenInvokedAndBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .bulkRequestId("bulkRequestId")
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
@@ -1744,11 +1744,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("stdRequestId").asString().contains("bulkRequestId");
+            assertThat(response.getData()).extracting("sdtRequestId").asString().contains("sdtRequestIdFromSdt");
         }
 
         @Test
-        void shouldNotAddStdRequestId_whenInvokedAndNotBulkClaim() {
+        void shouldNotAddSdtRequestId_whenInvokedAndNotBulkClaim() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
                 .build();
@@ -1756,7 +1756,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("stdRequestId").isNull();
+            assertThat(response.getData()).extracting("sdtRequestId").isNull();
         }
 
         //TODO implement tests for bulk claims that have interest added.
