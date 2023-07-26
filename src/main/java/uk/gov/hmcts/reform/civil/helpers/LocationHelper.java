@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -73,7 +74,8 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) &&
+            EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
             log.debug(
                 "Case {}, defendant is a person, so their court request has priority",
                 caseData.getLegacyCaseReference()
