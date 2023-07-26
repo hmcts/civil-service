@@ -47,10 +47,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     }
 
     private boolean isApplicantLip(CaseData caseData) {
-        if (YesOrNo.NO.equals(caseData.getApplicant1Represented())) {
-            return true;
-        }
-        return false;
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented());
     }
 
     @Override
