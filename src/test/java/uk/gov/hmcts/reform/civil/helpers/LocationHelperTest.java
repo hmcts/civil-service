@@ -212,7 +212,8 @@ public class LocationHelperTest {
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
         Assertions.assertThat(court.isPresent()).isTrue();
-        Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
+        Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
+            .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
     }
 
     @Test
@@ -322,6 +323,6 @@ public class LocationHelperTest {
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
-            .isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtCode());
+            .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
     }
 }
