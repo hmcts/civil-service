@@ -233,13 +233,18 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCaseLocation_whenDisposal() {
+        void shouldNotUpdateCaseLocation_whenDisposal() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
+                .region("previous region")
+                .baseLocation("previous base location")
+                .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
                 .disposalHearingMethodInPerson(options)
                 .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
+                .caseManagementLocation(previousManagementLocation)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocationRefData matching = LocationRefData.builder()
@@ -256,20 +261,22 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
-            assertThat(response.getData())
-                .extracting("locationName")
-                .isEqualTo(matching.getSiteName());
+                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
-        void shouldUpdateCaseLocation_whenFastTrack() {
+        void shouldNotUpdateCaseLocation_whenFastTrack() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
+                .region("previous region")
+                .baseLocation("previous base location")
+                .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
                 .fastTrackMethodInPerson(options)
                 .claimsTrack(ClaimsTrack.fastTrack)
+                .caseManagementLocation(previousManagementLocation)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocationRefData matching = LocationRefData.builder()
@@ -286,20 +293,22 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
-            assertThat(response.getData())
-                .extracting("locationName")
-                .isEqualTo(matching.getSiteName());
+                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
-        void shouldUpdateCaseLocation_whenSmallClaims() {
+        void shouldNotUpdateCaseLocation_whenSmallClaims() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
+                .region("previous region")
+                .baseLocation("previous base location")
+                .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
                 .smallClaimsMethodInPerson(options)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .caseManagementLocation(previousManagementLocation)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocationRefData matching = LocationRefData.builder()
@@ -316,21 +325,23 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
-            assertThat(response.getData())
-                .extracting("locationName")
-                .isEqualTo(matching.getSiteName());
+                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
-        void shouldUpdateCaseLocation_whenFastTrackAndOrderRequired() {
+        void shouldNotUpdateCaseLocation_whenFastTrackAndOrderRequired() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
+                .region("previous region")
+                .baseLocation("previous base location")
+                .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
                 .fastTrackMethodInPerson(options)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .caseManagementLocation(previousManagementLocation)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocationRefData matching = LocationRefData.builder()
@@ -346,18 +357,23 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
-        void shouldUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
+        void shouldNotUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
+                .region("previous region")
+                .baseLocation("previous base location")
+                .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
                 .smallClaimsMethodInPerson(options)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .caseManagementLocation(previousManagementLocation)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocationRefData matching = LocationRefData.builder()
@@ -373,7 +389,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+                .containsOnly(previousManagementLocation.getRegion(), previousManagementLocation.getBaseLocation());
         }
 
         @Test
