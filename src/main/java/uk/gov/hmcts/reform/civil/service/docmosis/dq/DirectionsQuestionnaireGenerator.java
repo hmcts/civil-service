@@ -73,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -132,7 +133,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
                     templateId = featureToggleService.isFastTrackUpliftsEnabled()
-                        ? DQ_RESPONSE_1V2_DS : DQ_RESPONSE_1V2_DS;
+                        ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
@@ -553,12 +554,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                               .orElse(null))
                 || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
                                               .map(BusinessProcess::getCamundaEvent)
-                                              .orElse(null))
-                || "CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT".equals(ofNullable(caseData.getBusinessProcess())
-                                                   .map(BusinessProcess::getCamundaEvent)
-                                                   .orElse(null))
-
-            ;
+                                              .orElse(null));
     }
 
     private boolean isClaimantMultipartyProceed(CaseData caseData) {
