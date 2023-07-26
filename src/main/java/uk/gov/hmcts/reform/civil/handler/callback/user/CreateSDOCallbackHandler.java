@@ -816,38 +816,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return null;
     }
 
-    private String getHearingInPersonLocation(CaseData caseData) {
-        if (caseData.getDrawDirectionsOrderRequired() == YesOrNo.YES) {
-            if (caseData.getDrawDirectionsOrderSmallClaims() == YesOrNo.YES) {
-                return getHearingInPersonSmall(caseData);
-            } else {
-                return getHearingInPersonFast(caseData);
-            }
-        } else if (caseData.getClaimsTrack() == ClaimsTrack.fastTrack) {
-            return getHearingInPersonFast(caseData);
-        } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
-            return getHearingInPersonSmall(caseData);
-        } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
-            .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
-            && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
-            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         CaseData caseData = callbackParams.getCaseData();
-
-        String hearingInPersonLocation = getHearingInPersonLocation(caseData);
-        locationRefDataService.getLocationMatchingLabel(
-                hearingInPersonLocation,
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            )
-            .ifPresent(locationRefData -> LocationHelper.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
