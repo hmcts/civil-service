@@ -122,7 +122,7 @@ public class CasesController {
     @Operation(summary = "Gets basic claim information for defendant")
     public ResponseEntity<DashboardDefendantResponse> getClaimsForDefendant(
         @PathVariable("submitterId") String submitterId,
-        @RequestParam(value = "page", defaultValue = "1.0") int currentPage,
+        @RequestParam(value = "page", defaultValue = "1") int currentPage,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) {
         DashboardDefendantResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
