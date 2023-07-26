@@ -14,9 +14,8 @@ public class OrganisationDetailsService {
     private final OrganisationService organisationService;
 
     public String getApplicantLegalOrganizationName(CaseData caseData) {
-
         Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getApplicantOrganisationId());
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
+
 }
