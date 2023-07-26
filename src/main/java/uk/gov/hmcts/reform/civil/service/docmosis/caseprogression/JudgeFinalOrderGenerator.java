@@ -18,8 +18,10 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -41,6 +43,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final IdamClient idamClient;
+
+    private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
@@ -73,6 +77,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
             .claimant1Name(caseData.getApplicant1().getPartyName())
@@ -96,8 +101,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName("Court Name")
-            .courtLocation("Court location");
+            .courtName(locationRefData.getRegion())
+            .courtLocation(locationRefData.getCourtAddress());
         return freeFormOrderBuilder.build();
     }
 
