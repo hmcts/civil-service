@@ -601,8 +601,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // bulk claims
     private final String bulkCustomerId;
-    private final String bulkRequestId;
-    private final List<Element<String>> stdRequestId;
+    private final String sdtRequestIdFromSdt;
+    private final List<Element<String>> sdtRequestId;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

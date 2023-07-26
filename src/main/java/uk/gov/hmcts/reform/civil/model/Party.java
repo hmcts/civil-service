@@ -46,6 +46,7 @@ public class Party {
     private Address primaryAddress;
 
     private String partyName;
+    private String bulkClaimPartyName;
     private String partyTypeDisplayValue;
 
     private String partyEmail;
