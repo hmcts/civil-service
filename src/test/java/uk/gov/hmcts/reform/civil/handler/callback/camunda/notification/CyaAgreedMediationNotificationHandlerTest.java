@@ -17,27 +17,38 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.citizenui.MediationCSVService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     CyaAgreedMediationNotificationHandler.class,
-    MediationCSVService.class
+    MediationCSVLrvLipService.class
 })
 public class CyaAgreedMediationNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    SendGridClient sendGridClient;
+    private static final String SENDER = "sender@gmail.com";
+    private static final String RECIPIENT = "recipient@gmail.com";
 
     @MockBean
-    MediationCSVEmailConfiguration configuration;
+    private SendGridClient sendGridClient;
 
-    @Autowired
-    MediationCSVService service;
+    @MockBean
+    private MediationCSVEmailConfiguration configuration;
+
+    @MockBean
+    private MediationCsvServiceFactory serviceFactory;
+
+    @MockBean
+    private MediationCSVLrvLipService mediationCSVLrvLipService;
 
     @Autowired
     private CyaAgreedMediationNotificationHandler handler;
@@ -47,8 +58,10 @@ public class CyaAgreedMediationNotificationHandlerTest extends BaseCallbackHandl
 
         @BeforeEach
         void setup() {
-            when(configuration.getRecipient()).thenReturn("recipient@gmail.com");
-            when(configuration.getSender()).thenReturn("sender@gmail.com");
+            when(mediationCSVLrvLipService.generateCSVContent(any())).thenReturn("some content");
+            when(serviceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
+            when(configuration.getRecipient()).thenReturn(SENDER);
+            when(configuration.getSender()).thenReturn(RECIPIENT);
         }
 
         @Test
@@ -82,7 +95,8 @@ public class CyaAgreedMediationNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
+            assertNotNull(response);
+            verify(sendGridClient).sendEmail(anyString(), any());
         }
     }
 
