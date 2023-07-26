@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -31,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 public class CoreCaseDataService {
 
     private final ObjectMapper mapper;
-    private static final Integer RETURNED_NUMBER_OF_CASES = 50;
+    private static final Integer RETURNED_NUMBER_OF_CASES = 10;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
@@ -159,9 +160,12 @@ public class CoreCaseDataService {
         return null;
     }
 
-    public SearchResult getCasesUptoMaxsize(String authorization) {
-        String query = new SearchSourceBuilder().size(RETURNED_NUMBER_OF_CASES)
-            .query(QueryBuilders.matchAllQuery()).toString();
+    public SearchResult getCCDDataBasedOnIndex(String authorization, int startIndex) {
+        String query = new SearchSourceBuilder()
+            .query(QueryBuilders.matchAllQuery())
+            .sort("data.submittedDate", SortOrder.DESC)
+            .from(startIndex)
+            .size(RETURNED_NUMBER_OF_CASES).toString();
 
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
