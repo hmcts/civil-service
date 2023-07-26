@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
@@ -135,6 +137,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -450,6 +453,8 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+
+    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2285,6 +2290,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
+        HearingDates singleDate = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            .build();
+
+        HearingDates dateRange = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            .build();
+
+        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+            .hearingUnavailableDates(YES)
+            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
+            .build();
+        return this;
+    }
+
     private DynamicList getHearingMethodList(String key, String value) {
         Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
         DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
@@ -4022,6 +4045,11 @@ public class CaseDataBuilder {
         respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder setMultiTrackClaim() {
+        allocatedTrack = MULTI_CLAIM;
         return this;
     }
 
@@ -5970,6 +5998,7 @@ public class CaseDataBuilder {
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
+            .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .build();
     }
 }
