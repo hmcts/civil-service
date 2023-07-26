@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
@@ -118,13 +120,15 @@ public class CasesController {
 
     @GetMapping(path = "/defendant/{submitterId}")
     @Operation(summary = "Gets basic claim information for defendant")
-    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForDefendant(
+    public ResponseEntity<DashboardDefendantResponse> getClaimsForDefendant(
         @PathVariable("submitterId") String submitterId,
+        @RequestParam(value = "page", defaultValue = "1.0") int currentPage,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) {
-        List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(
+        DashboardDefendantResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
             authorization,
-            submitterId
+            submitterId,
+            currentPage
         );
         return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
     }
