@@ -60,4 +60,8 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
+    public boolean isLipVLipEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+    }
+
 }
