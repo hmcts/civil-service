@@ -293,6 +293,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.LIP_V_LIP_ENABLED.name(), featureToggleService.isLipVLipEnabled());
             })
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
             .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
@@ -300,6 +301,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.LIP_V_LIP_ENABLED.name(), featureToggleService.isLipVLipEnabled());
                 flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
             // Unregistered
