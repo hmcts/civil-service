@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
@@ -23,6 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CVP_JOIN_LINK;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 @ExtendWith(SpringExtension.class)
 class TriggerHearingCvpLinkEventHandlerTest {
@@ -51,14 +55,26 @@ class TriggerHearingCvpLinkEventHandlerTest {
     }
 
     @Test
-    void shouldCallTriggerEventWithExpectedParams_whenThereIsOneCaseHearing() {
+    void shouldCallTriggerEventWithExpectedParams_whenThereIsOneCaseHearingWithVideoHearing() {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
             HearingsResponse.builder()
                 .caseRef("reference")
                 .hmctsServiceCode("AAA7")
-                .caseHearings(List.of(CaseHearing.builder().build()))
+                .caseHearings(List.of(CaseHearing.builder()
+                                          .hearingDaySchedule(List.of(
+                                              HearingDaySchedule.builder()
+                                                  .attendees(List.of(
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(VIDCVP)
+                                                          .build(),
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(null)
+                                                          .build()
+                                                  )).build()
+                                          ))
+                                          .build()))
                 .build());
 
         handler.triggerCvpJoinLinkEvent(event);
@@ -74,15 +90,58 @@ class TriggerHearingCvpLinkEventHandlerTest {
             HearingsResponse.builder()
                 .caseRef("reference")
                 .hmctsServiceCode("AAA7")
-                .caseHearings(List.of(CaseHearing.builder().build(),
-                                      CaseHearing.builder().build(),
-                                      CaseHearing.builder().build())
-                )
+                .caseHearings(List.of(
+                    CaseHearing.builder()
+                        .hearingDaySchedule(List.of(
+                            HearingDaySchedule.builder()
+                                .attendees(List.of(
+                                    Attendees.builder()
+                                        .hearingSubChannel(INTER)
+                                        .build()
+                                )).build()
+                        ))
+                        .build(),
+                    CaseHearing.builder()
+                        .hearingDaySchedule(List.of(
+                            HearingDaySchedule.builder()
+                                .attendees(List.of(
+                                    Attendees.builder()
+                                        .hearingSubChannel(VIDCVP)
+                                        .build()
+                                )).build()
+                        ))
+                        .build()))
                 .build());
 
         handler.triggerCvpJoinLinkEvent(event);
 
         verify(coreCaseDataService, times(1)).triggerEvent(event.getCaseId(), SEND_CVP_JOIN_LINK);
+    }
+
+    @Test
+    void shouldNotCallTriggerEventWithExpectedParams_whenCaseHearingsDoNotContainAVideoHearing() {
+        CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
+
+        when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
+            HearingsResponse.builder()
+                .caseRef("reference")
+                .hmctsServiceCode("AAA7")
+                .caseHearings(List.of(
+                    CaseHearing.builder()
+                        .hearingDaySchedule(List.of(
+                            HearingDaySchedule.builder()
+                                .attendees(List.of(
+                                    Attendees.builder()
+                                        .hearingSubChannel(INTER)
+                                        .build()
+                                )).build()
+                        ))
+                        .build()))
+                .build());
+
+        handler.triggerCvpJoinLinkEvent(event);
+
+        verify(coreCaseDataService, times(0)).triggerEvent(event.getCaseId(), SEND_CVP_JOIN_LINK);
     }
 
     @Test

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CVP_JOIN_LINK;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
 import static uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus.LISTED;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class TriggerHearingCvpLinkEventHandler {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         HearingsResponse hearings = hearingService.getHearings(userToken, event.getCaseId(), LISTED.name());
 
-        if (hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0) {
+        if (includesVideoHearing(hearings)) {
             log.info("Triggering 'SEND_CVP_JOIN_LINK' event for case: '{}'", event.getCaseId());
             coreCaseDataService.triggerEvent(event.getCaseId(), SEND_CVP_JOIN_LINK);
         }

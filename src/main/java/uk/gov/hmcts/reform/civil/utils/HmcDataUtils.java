@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 public class HmcDataUtils {
 
@@ -161,5 +164,25 @@ public class HmcDataUtils {
         } else {
             return null;
         }
+    }
+
+    private static boolean hasHearings(HearingsResponse hearings) {
+        return hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0;
+    }
+
+    private static boolean includesVideoHearing(HearingDaySchedule hearingDay) {
+        return hearingDay.getAttendees().stream().filter(
+            attendee -> attendee.getHearingSubChannel() != null
+                && attendee.getHearingSubChannel().equals(VIDCVP)).count() > 0;
+    }
+
+    private static boolean includesVideoHearing(CaseHearing caseHearing) {
+        return caseHearing.getHearingDaySchedule().stream().filter(day -> includesVideoHearing(day)).count() > 0;
+    }
+
+    public static boolean includesVideoHearing(HearingsResponse hearings) {
+        return hasHearings(hearings)
+            && hearings.getCaseHearings().stream()
+            .filter(hearing -> includesVideoHearing(hearing)).count() > 0;
     }
 }
