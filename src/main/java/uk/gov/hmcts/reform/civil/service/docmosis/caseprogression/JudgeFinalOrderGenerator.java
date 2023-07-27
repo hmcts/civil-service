@@ -29,11 +29,9 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -86,7 +84,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
         if (hasSDOBeenMade(caseData.getCcdState())) {
             locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        }else {
+        } else {
             locationRefData = locationRefDataService.getCcmccLocation(authorisation);
         }
 
