@@ -37,6 +37,8 @@ public class Applicant1DQ implements DQ {
     private FutureApplications applicant1DQFutureApplications;
     private WelshLanguageRequirements applicant1DQLanguageLRspec;
 
+    private RemoteHearing applicant1DQRemoteHearing;
+
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
@@ -158,6 +160,12 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQVulnerabilityQuestions")
     public VulnerabilityQuestions getVulnerabilityQuestions() {
         return applicant1DQVulnerabilityQuestions;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQRemoteHearing")
+    public RemoteHearing getRemoteHearing() {
+        return applicant1DQRemoteHearing;
     }
 
     @Override

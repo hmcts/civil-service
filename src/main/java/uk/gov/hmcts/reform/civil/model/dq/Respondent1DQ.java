@@ -200,6 +200,11 @@ public class Respondent1DQ implements DQ {
     }
 
     @Override
+    public RemoteHearing getRemoteHearing() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("respondent1DQVulnerabilityQuestions")
     public VulnerabilityQuestions getVulnerabilityQuestions() {
         return respondent1DQVulnerabilityQuestions;

@@ -96,6 +96,11 @@ public class Respondent2DQ implements DQ {
     }
 
     @Override
+    public RemoteHearing getRemoteHearing() {
+        return null;
+    }
+
+    @Override
     @JsonProperty("respondent2DQHearing")
     public Hearing getHearing() {
         if (respondent2DQHearing != null) {
