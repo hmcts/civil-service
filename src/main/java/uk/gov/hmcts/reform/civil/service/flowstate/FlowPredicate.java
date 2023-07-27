@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -624,6 +625,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
         caseData.getClaimDismissedDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+
+    public static final Predicate<CaseData> demageMultiClaim = caseData ->
+        AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+        && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
