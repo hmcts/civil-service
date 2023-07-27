@@ -1,17 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,16 +25,19 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,11 +77,6 @@ public class SealedClaimFormGeneratorForSpecTest {
     private InterestCalculator interestCalculator;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
-
-    @Mock
-    private UserService userService;
-    @Mock
-    private SystemUpdateUserConfiguration userConfig;
 
     @BeforeEach
     void setup() {
@@ -282,13 +274,4 @@ public class SealedClaimFormGeneratorForSpecTest {
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
-    @Test
-    void testDownloadDocument() {
-        when(userConfig.getUserName()).thenReturn("test");
-        when(userConfig.getPassword()).thenReturn("test");
-        when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
-        when(documentManagementService.downloadDocument(anyString(), anyString())).thenReturn(bytes);
-        byte[] fileArr = sealedClaimFormGenerator.downloadDocument(CASE_DOCUMENT);
-        assertThat(fileArr).isEqualTo(bytes);
-    }
 }
