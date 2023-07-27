@@ -1328,8 +1328,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -1380,8 +1378,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-            updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
                 Party updatedRespondent2;
@@ -1451,6 +1447,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 

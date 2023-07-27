@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.contactDetailsChange;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.demageMultiClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOffline;
@@ -483,8 +484,15 @@ public class StateFlowEngine {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
-            .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate())).and(applicantOutOfTime.negate()).or(declinedMediation))
-                .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
+            .onlyIf(fullDefenceProceed.and(demageMultiClaim).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                        .and(applicantOutOfTime.negate()).or(declinedMediation))
+            .set(flags -> {
+                flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+            })
+            .transitionTo(FULL_DEFENCE_PROCEED)
+            .onlyIf(fullDefenceProceed.and(demageMultiClaim.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
+                        .and(applicantOutOfTime.negate()).or(declinedMediation))
+            .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(applicantOutOfTime)
