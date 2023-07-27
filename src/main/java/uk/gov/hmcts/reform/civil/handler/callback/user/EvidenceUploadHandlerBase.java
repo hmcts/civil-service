@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -57,22 +58,17 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final String createShowCondition;
     private final ObjectMapper objectMapper;
     private final Time time;
-    private final CoreCaseUserService coreCaseUserService;
-    private final UserService userService;
 
     private static final String SPACE = " ";
     private static final String END = ".";
 
-    protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
-                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
+    protected EvidenceUploadHandlerBase(ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
                                         String createShowCondition) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
         this.events = events;
         this.pageId = pageId;
-        this.coreCaseUserService = coreCaseUserService;
-        this.userService = userService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
@@ -121,36 +117,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 .build();
     }
 
-    CallbackResponse getCaseType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        //determine claim path, and assign to CCD object for show hide functionality
-        if (caseData.getClaimType() == null) {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
-        } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
-        }
-        //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
-        //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
-        //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
-        //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
-        //default flag for respondent 1 solicitor
-        caseDataBuilder.caseTypeFlag("do_not_show");
-        //set flag for respondent2
-        if (coreCaseUserService.userHasCaseRole(caseData
-                                                   .getCcdCaseReference()
-                                                   .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-
-            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
     CallbackResponse createShow(CallbackParams callbackParams) {
         return createShowCondition(callbackParams.getCaseData());
     }
@@ -194,17 +160,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)
                 && multiParts
-                && (caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith("Claimant 2 - ")
-                    || caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().equals("Claimants 1 and 2"))) {
+                && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Claimant 2 - ")) {
             caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
         } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
                 && multiParts
-                && (caseData.getEvidenceUploadOptions()
-                .getValue().getLabel().startsWith("Defendant 2 - ")
-                || caseData.getEvidenceUploadOptions()
-                .getValue().getLabel().equals("Defendant 1 and 2"))){
+                && caseData.getEvidenceUploadOptions()
+                .getValue().getLabel().startsWith("Defendant 2 - ")){
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
 
@@ -474,14 +436,15 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        String selectedRole = getSelectedRole(caseData);
 
         applyDocumentUploadDate(caseDataBuilder, time.now());
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
             updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
         }
 
-        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)) {
+        if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals("RESPONDENTBOTH")) {
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosureList");
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosure");
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), "RespondentOneWitnessStatement");
@@ -499,7 +462,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialDocCorrespondence");
 
         }
-        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+        if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosureList");
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosure");
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessStatement");
@@ -516,7 +479,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), "respondentTwoTrialCosts");
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialDocCorrespondence");
 
-        } else {
+        }
+
+        if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals("APPLICANTBOTH")) {
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosureList");
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosure");
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), "ApplicantWitnessStatement");
@@ -537,6 +502,32 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getSelectedRole(CaseData caseData) {
+        boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
+                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
+            if (multiParts && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Claimant 2 - ")) {
+                return "APPLICANTSOLICITORTWO";
+            }
+            if (multiParts && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().equals("Claimants 1 and 2")) {
+                return "APPLICANTBOTH";
+            }
+            return CaseRole.APPLICANTSOLICITORONE.name();
+        } else {
+            if (multiParts && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Defendant 2 - ")) {
+                return CaseRole.RESPONDENTSOLICITORTWO.name();
+            }
+            if (multiParts && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().equals("Defendant 1 and 2")) {
+                return "RESPONDENTBOTH";
+            }
+            return CaseRole.RESPONDENTSOLICITORONE.name();
+        }
     }
 
     SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
