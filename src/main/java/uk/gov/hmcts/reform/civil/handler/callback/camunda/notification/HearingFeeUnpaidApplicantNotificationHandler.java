@@ -97,7 +97,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
     }
 
     private String getTemplate(boolean isApplicantLip) {
-        return isApplicantLip ? notificationsProperties.getNotifyLipHearingFeeUnpaid()
+        return isApplicantLip ? notificationsProperties.getNotifyLipUpdateTemplate()
             : notificationsProperties.getApplicantHearingFeeUnpaid();
     }
 

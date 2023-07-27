@@ -53,7 +53,7 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getRespondentHearingFeeUnpaid()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipHearingFeeUnpaid()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
