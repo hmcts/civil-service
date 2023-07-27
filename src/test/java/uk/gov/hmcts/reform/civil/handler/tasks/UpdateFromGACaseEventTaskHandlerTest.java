@@ -585,14 +585,27 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void checkIfDocumentExists() {
-        Element<CaseDocument> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
+        Element<?> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
             .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
                        .build()).build();
-        List<Element<CaseDocument>> civilCaseDocumentList = new ArrayList<>();
-        civilCaseDocumentList.add(same);
-        List<Element<CaseDocument>> gaDocumentList = new ArrayList<>();
-        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
         gaDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
+        civilCaseDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
+    }
+
+    @Test
+    void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
+        Element<Document> documentElement = Element.<Document>builder()
+            .id(UUID.randomUUID())
+            .value(Document.builder().documentUrl("string").build()).build();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        gaDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
+        civilCaseDocumentList.add(documentElement);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 

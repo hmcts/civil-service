@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -509,7 +508,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingHearingNotesDJ disposalHearingHearingNotesDJ;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
@@ -589,7 +587,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
-    private final String freeFormRecitalTextArea;
     private final String freeFormRecordedTextArea;
     private final String freeFormOrderedTextArea;
     private final FreeFormOrderValues orderOnCourtInitiative;
@@ -733,7 +730,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
                 || getApplicant1AcceptAdmitAmountPaidSpec() != null
-                || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
     }
@@ -914,7 +910,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
-        return Optional.ofNullable(getApplicant1OrganisationPolicy())
+        return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    public String getRespondent1OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    private String getOrganisationId(Optional<OrganisationPolicy> policy) {
+        return policy
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .orElse("");
