@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -251,27 +252,36 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
 
-        AllocatedTrack allocatedTrack =
-            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
-
-        CaseState newState;
-        if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-            newState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-        } else {
-            boolean proceed = switch (multiPartyScenario) {
-                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
-                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
-                    || caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
-                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
-                    || caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
-            };
-            newState = proceed ? CaseState.JUDICIAL_REFERRAL : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
-            .state(newState.name())
+            .state((shouldMoveToJudicialReferral(caseData)
+                ? CaseState.JUDICIAL_REFERRAL
+                : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
             .build();
+    }
+
+    /**
+     * Computes whether the case data should move to judicial referral or not.
+     *
+     * @param caseData the case data
+     * @return true if and only if the case should move to judicial referral
+     */
+    private boolean shouldMoveToJudicialReferral(CaseData caseData) {
+        AllocatedTrack allocatedTrack =
+            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
+        if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            return false;
+        } else {
+            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+            return switch (multiPartyScenario) {
+                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
+                    && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
+                    && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
+            };
+        }
     }
 
     private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth) {
