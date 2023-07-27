@@ -587,7 +587,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
-    private final String freeFormRecitalTextArea;
     private final String freeFormRecordedTextArea;
     private final String freeFormOrderedTextArea;
     private final FreeFormOrderValues orderOnCourtInitiative;
@@ -911,7 +910,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
-        return Optional.ofNullable(getApplicant1OrganisationPolicy())
+        return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    public String getRespondent1OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    private String getOrganisationId(Optional<OrganisationPolicy> policy) {
+        return policy
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .orElse("");
