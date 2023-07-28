@@ -78,6 +78,7 @@ public class LocationHelper {
                 "Case {}, defendant is a person, so their court request has priority",
                 caseData.getLegacyCaseReference()
             );
+
             getDefendantCourt.get()
                 .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
