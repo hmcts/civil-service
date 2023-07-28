@@ -137,4 +137,70 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
         assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
         assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 1, 1));
     }
+
+    @Test
+    public void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData_BstHearingDate() {
+        CaseData caseData = CaseData.builder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .ccdState(CASE_PROGRESSION)
+            .build();
+        HearingDay hearingDay = HearingDay.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
+            .build();
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
+        HearingGetResponse hearing = HearingGetResponse.builder()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                    List.of(
+                        HearingDaySchedule.builder()
+                            .hearingVenueId(EPIMS)
+                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                            .build()))
+                                 .receivedDateTime(hearingResponseDate)
+                                 .build())
+            .requestDetails(HearingRequestDetails.builder()
+                                .versionNumber(VERSION_NUMBER)
+                                .build())
+            .build();
+        HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
+            .hearingId(HEARING_ID)
+            .caseId(CASE_ID)
+            .build();
+
+        when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
+        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
+        var expectedHearingDays = List.of(
+            HearingDay.builder()
+                .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 10, 0, 0))
+                .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 12, 0, 0))
+                .build()
+        );
+
+        var actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(camundaService).setProcessVariables(
+            PROCESS_INSTANCE_ID,
+            HearingNoticeVariables.builder()
+                .caseId(CASE_ID)
+                .hearingId(HEARING_ID)
+                .caseState(CASE_PROGRESSION.name())
+                .requestVersion(VERSION_NUMBER)
+                .hearingStartDateTime(hearingDay.getHearingStartDateTime().plusHours(1))
+                .hearingLocationEpims(EPIMS)
+                .responseDateTime(hearingResponseDate)
+                .days(expectedHearingDays)
+                .build()
+        );
+
+        CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
+        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
+        assertThat(updatedData.getHearingDate()).isEqualTo(hearingDay.getHearingStartDateTime().toLocalDate());
+        assertThat(updatedData.getHearingDueDate()).isEqualTo(LocalDate.of(2023, 7, 1));
+    }
 }
