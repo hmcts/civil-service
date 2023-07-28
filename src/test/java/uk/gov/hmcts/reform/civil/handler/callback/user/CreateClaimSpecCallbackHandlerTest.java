@@ -1972,6 +1972,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
                 // When
+                Mockito.when(toggleService.isPinInPostEnabled()).thenReturn(true);
+
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
