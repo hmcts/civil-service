@@ -63,9 +63,11 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         var hearingDueDate = paymentFailed ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
+        var hearingLocation = getHearingLocation(HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(), bearerToken);
 
         return HearingNoticeHmc.builder()
-            .hearingLocation(getHearingLocation(HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(), bearerToken))
+            .hearingSiteName(hearingLocation.getSiteName())
+            .hearingLocation(LocationRefDataService.getDisplayEntry(hearingLocation))
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .hearingType(getHearingType(hearing))
@@ -95,11 +97,10 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HEARING_NOTICE_HMC;
     }
 
-    private String getHearingLocation(String venueId, String bearerToken) {
+    private LocationRefData getHearingLocation(String venueId, String bearerToken) {
         List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
-        var location = locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
-
-        return LocationRefDataService.getDisplayEntry(location.get(0));
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
+        return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
     }
 
     private String getHearingType(HearingGetResponse hearing) {
