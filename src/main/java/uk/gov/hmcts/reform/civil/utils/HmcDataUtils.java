@@ -46,9 +46,22 @@ public class HmcDataUtils {
             .orElse(null);
     }
 
+    /**
+     * Return true whenever the Notify Nearing Parties flow needs to be rerun:
+     * 1. If service data or days is null, it could be the first time this hearing
+     *    is notified or the previous run of the flow has failed, the PUT request need to be run/rerun.
+     * 2. If the number of days in the service data differs from the number of days in the get hearing response.
+     * 3. If the number of days match but the location or start/end times are different.
+     * Otherwise, return false as the service data is up-to-date.
+     * @param hearing from the GET response
+     * @param serviceData contains information from the last run of the Notify Nearing Parties flow, or null if it's the first time
+     * @return true/false based on the above scenarios
+     */
     private static boolean hearingDataChanged(HearingGetResponse hearing, PartiesNotifiedServiceData serviceData) {
         List<HearingDaySchedule> schedule = hearing.getHearingResponse().getHearingDaySchedule();
-        if (serviceData != null && serviceData.getDays() != null) {
+        if (serviceData == null || serviceData.getDays() == null) {
+            return true;
+        } else {
             if (serviceData.getDays().size() != schedule.size()) {
                 return true;
             } else {
