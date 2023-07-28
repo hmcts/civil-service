@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.Optional;
@@ -586,6 +587,24 @@ public class CaseDataTest {
         List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
         //Then
         assertThat(results).isNull();
+    }
+
+    @Test
+    void isApplicationDeadlineNotPassed_thenFalse() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        //When
+        //Then
+        assertFalse(caseData.getApplicant1ResponseDeadlinePassed());
+    }
+
+    @Test
+    void isApplicationDeadlinePassed_thenTrue() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline().build();
+        //When
+        //Then
+        assertTrue(caseData.getApplicant1ResponseDeadlinePassed());
     }
 }
 
