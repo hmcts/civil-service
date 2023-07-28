@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -495,9 +496,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             if (caseData.getRespondent2() != null) {
                 postcodes.add(caseData.getRespondent2().getPrimaryAddress().getPostCode());
             }
-            postcodes.forEach(postcode -> {if (!postcodeValidator.validate(postcode).isEmpty()) {
-                errors.add("Postcode error, bulk claim");
-            }});
+            postcodes.forEach(postcode -> {
+                if (!postcodeValidator.validate(postcode).isEmpty()) {
+                    errors.add("Postcode error, bulk claim");
+                }
+            });
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
@@ -505,6 +508,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             //TODO implement bulk claims that have interest added.
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+            //PBA manual selection
+            List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+            dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
+                                                           .value(DynamicListElement.builder()
+                                                                      .label(pbaNumbers.get(0))
+                                                                      .build()).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

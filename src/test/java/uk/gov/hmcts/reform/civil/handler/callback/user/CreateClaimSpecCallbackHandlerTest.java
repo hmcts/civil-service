@@ -149,6 +149,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
+    private final Organisation bulkOrganisation = Organisation.builder()
+        .paymentAccount(List.of("12345", "98765"))
+        .build();
+
     @MockBean
     private Time time;
     @MockBean
@@ -1643,6 +1647,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
+
+            Organisation organisation = Organisation.builder()
+                .paymentAccount(List.of("12345", "98765"))
+                .build();
         }
 
         @Test
@@ -1656,6 +1664,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
@@ -1682,10 +1691,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().postCode("1234567").build())
                                  .build())
                 .build();
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
@@ -1704,6 +1713,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
@@ -1724,6 +1734,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1740,6 +1751,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1757,6 +1769,24 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("sdtRequestId").isNull();
+        }
+
+        @Test
+        void shouldAssignFirstPbaNumber_whenInvokedAndBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            System.out.println(response.getData().get("applicantSolicitor1PbaAccounts"));
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
         }
 
         //TODO implement tests for bulk claims that have interest added.
