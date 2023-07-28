@@ -48,17 +48,19 @@ public class HmcDataUtils {
 
     private static boolean hearingDataChanged(HearingGetResponse hearing, PartiesNotifiedServiceData serviceData) {
         List<HearingDaySchedule> schedule = hearing.getHearingResponse().getHearingDaySchedule();
-        if (serviceData.getDays().size() != schedule.size()) {
-            return true;
-        } else {
-            for (HearingDaySchedule hearingDay : schedule) {
-                HearingDay datesFromHearingDay = HearingDay.builder()
-                    .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                    .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                    .build();
-                if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
-                    || !serviceData.getDays().contains(datesFromHearingDay)) {
-                    return true;
+        if (serviceData != null && serviceData.getDays() != null) {
+            if (serviceData.getDays().size() != schedule.size()) {
+                return true;
+            } else {
+                for (HearingDaySchedule hearingDay : schedule) {
+                    HearingDay datesFromHearingDay = HearingDay.builder()
+                        .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                        .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                        .build();
+                    if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
+                        || !serviceData.getDays().contains(datesFromHearingDay)) {
+                        return true;
+                    }
                 }
             }
         }
