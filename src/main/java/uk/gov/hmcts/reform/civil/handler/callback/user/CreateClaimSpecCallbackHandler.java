@@ -577,10 +577,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
-                : format(LIP_CONFIRMATION_BODY, format(caseDocLocation,
+                :  (toggleService.isPinInPostEnabled()) ? format(LIP_CONFIRMATION_BODY, format(caseDocLocation,
                                                        caseData.getCcdCaseReference()),
                          claimUrlsConfiguration.getResponsePackLink(),
-                         formattedServiceDeadline))
+                         formattedServiceDeadline) : getConfirmationSummary(caseData))
             + exitSurveyContentService.applicantSurvey();
     }
 
@@ -772,14 +772,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
-                : format(SPEC_LIP_CONFIRMATION_BODY,
+                : toggleService.isPinInPostEnabled() ? format(SPEC_LIP_CONFIRMATION_BODY,
                          format(caseDocLocation, caseData.getCcdCaseReference()),
                          claimUrlsConfiguration.getResponsePackLink(),
                          claimUrlsConfiguration.getN9aLink(),
                          claimUrlsConfiguration.getN9bLink(),
                          claimUrlsConfiguration.getN215Link(),
                          formattedServiceDeadline
-        )) + exitSurveyContentService.applicantSurvey();
+        ) : getSpecConfirmationSummary(caseData)) + exitSurveyContentService.applicantSurvey();
     }
 
     private String getSpecConfirmationSummary(CaseData caseData) {
