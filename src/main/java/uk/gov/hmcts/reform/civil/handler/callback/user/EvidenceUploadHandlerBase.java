@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -58,22 +59,27 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final String createShowCondition;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final CoreCaseUserService coreCaseUserService;
+    private final UserService userService;
 
     private static final String SPACE = " ";
     private static final String END = ".";
 
-    protected EvidenceUploadHandlerBase(ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
+    protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
+                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
                                         String createShowCondition) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
         this.events = events;
         this.pageId = pageId;
+        this.coreCaseUserService = coreCaseUserService;
+        this.userService = userService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
 
-    abstract CallbackResponse createShowCondition(CaseData caseData);
+    abstract CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
@@ -97,18 +103,20 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse setOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         List<String> dynamicListOptions = new ArrayList<>();
-        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)
-        && Objects.nonNull(caseData.getApplicant1())
-        && Objects.nonNull(caseData.getApplicant2())) {
-            dynamicListOptions.add("Claimant 1 - " + caseData.getApplicant1().getPartyName());
-            dynamicListOptions.add("Claimant 2 - " + caseData.getApplicant2().getPartyName());
-            dynamicListOptions.add("Claimants 1 and 2");
-        } else if(Objects.nonNull(caseData.getRespondent1())
-            && Objects.nonNull(caseData.getRespondent2())) {
-            dynamicListOptions.add("Defendant 1 - " + caseData.getRespondent1().getPartyName());
-            dynamicListOptions.add("Defendant 2 - " + caseData.getRespondent2().getPartyName());
-            dynamicListOptions.add("Defendant 1 and 2");
+        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
+            if(MultiPartyScenario.isTwoVOne(caseData)) {
+                dynamicListOptions.add("Claimant 1 - " + caseData.getApplicant1().getPartyName());
+                dynamicListOptions.add("Claimant 2 - " + caseData.getApplicant2().getPartyName());
+                dynamicListOptions.add("Claimants 1 and 2");
+            }
+        } else {
+            if(MultiPartyScenario.isOneVTwoLegalRep(caseData)) {
+                dynamicListOptions.add("Defendant 1 - " + caseData.getRespondent1().getPartyName());
+                dynamicListOptions.add("Defendant 2 - " + caseData.getRespondent2().getPartyName());
+                dynamicListOptions.add("Defendant 1 and 2");
+            }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
@@ -118,14 +126,17 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     CallbackResponse createShow(CallbackParams callbackParams) {
-        return createShowCondition(callbackParams.getCaseData());
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        return createShowCondition(callbackParams.getCaseData(), userInfo);
     }
 
     // CCD has limited show hide functionality, we want to show a field based on a fixed listed containing an element,
     // or a second list containing an element, AND with the addition of the user being respondent2 solicitor, the below
     // combines the list condition into one single condition, which can then be used in CCD along with the
     // caseTypeFlag condition
-    CallbackResponse showCondition(CaseData caseData, List<EvidenceUploadWitness> witnessStatementFastTrack,
+    CallbackResponse showCondition(CaseData caseData, UserInfo userInfo,
+                                   List<EvidenceUploadWitness> witnessStatementFastTrack,
                                    List<EvidenceUploadWitness> witnessStatementSmallTrack,
                                    List<EvidenceUploadWitness> witnessSummaryFastTrack,
                                    List<EvidenceUploadWitness> witnessSummarySmallTrack,
@@ -156,18 +167,27 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
         //default flag for respondent 1 solicitor
         caseDataBuilder.caseTypeFlag("do_not_show");
+
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
                 && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
-        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)
-                && multiParts
-                && caseData.getEvidenceUploadOptions()
+        if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
+            //2v1, app2 selected
+            if (multiParts
+                    && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith("Claimant 2 - ")) {
-            caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
-        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
-                && multiParts
-                && caseData.getEvidenceUploadOptions()
-                .getValue().getLabel().startsWith("Defendant 2 - ")){
-            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
+                caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
+            }
+        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)){
+            //1v2 same sol, def2 selected
+            if ((multiParts
+                    && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Defendant 2 - "))
+                    //1v2 dif sol, log in as def2
+                || (!multiParts && coreCaseUserService.userHasCaseRole(caseData
+                    .getCcdCaseReference()
+                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                caseDataBuilder.caseTypeFlag("RespondentTwoFields");
+            }
         }
 
         // clears the flag, as otherwise if the user returns to previous screen and unselects an option,

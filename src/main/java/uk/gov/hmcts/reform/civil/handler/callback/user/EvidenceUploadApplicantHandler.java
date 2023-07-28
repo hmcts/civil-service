@@ -20,19 +20,20 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 
 @Service
 public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
-    public EvidenceUploadApplicantHandler(ObjectMapper objectMapper, Time time) {
-        super(objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
+    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time) {
+        super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
               "validateValuesApplicant", null);
     }
 
     @Override
-    CallbackResponse createShowCondition(CaseData caseData) {
+    CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
         return null;
     }
 
