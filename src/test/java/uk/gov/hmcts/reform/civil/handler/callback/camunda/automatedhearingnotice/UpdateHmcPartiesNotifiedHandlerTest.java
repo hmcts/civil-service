@@ -17,11 +17,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -52,6 +54,10 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
                             .hearingLocationEpims("12345")
+                            .days(List.of(HearingDay.builder()
+                                      .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+                                      .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
+                                      .build()))
                             .hearingStartDateTime(LocalDateTime.of(2022, 11, 7, 15, 15))
                             .requestVersion(10L)
                             .responseDateTime(LocalDateTime.of(2022, 10, 10, 15, 15))
@@ -67,11 +73,14 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        LocalDateTime hearingStart = LocalDateTime.of(2022, 11, 7, 15, 15);
         LocalDateTime receivedDate = LocalDateTime.of(2022, 10, 10, 15, 15);
+        List<HearingDay> hearingDays = List.of(HearingDay.builder()
+                                             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+                                             .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
+                                             .build());
         PartiesNotified partiesNotified = PartiesNotified.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(hearingStart)
+                             .days(hearingDays)
                              .hearingNoticeGenerated(true)
                              .hearingLocation("12345")
                              .build())
