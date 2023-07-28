@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder(toBuilder = true)
 
 public class RemoteHearing {
+
     @Deprecated(forRemoval = true)
     private final YesOrNo hearingToBeHeldRemotely;
     private final String hearingToBeHeldRemotelyReason;
