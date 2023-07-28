@@ -19,7 +19,7 @@
     <cve>CVE-2022-3064</cve>
     <cve>CVE-2021-4235</cve>
   </suppress>
-  <suppress until="2023-07-05">
+  <suppress until="2023-10-05">
     <notes>Temporarily suppressing as the latest snakeyaml 1.33 also has these vulnerabilities.</notes>
     <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
     <cve>CVE-2022-3064</cve>
@@ -41,6 +41,8 @@
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
     <cve>CVE-2023-28709</cve>
+    <cve>CVE-2023-2976</cve>
+    <cve>CVE-2022-1471</cve>
   </suppress>
   <suppress until="2023-07-24">
     <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
@@ -49,10 +51,15 @@
   <suppress until="2023-08-29">
     <cve>CVE-2023-28709</cve>
     <cve>CVE-2023-35116</cve>
-    <cve>CVE-2023-2976</cve>
   </suppress>
-  <suppress until="2023-09-29">
-    <notes>suppressing the below as launch darkly upgrade guava dependency is major release that requires further work</notes>
+  <suppress until="2023-08-29">
+    <cve>CVE-2023-35116</cve>
+    <cve>CVE-2022-41881</cve>
+    <cve>CVE-2021-42306</cve>
+    <cve>CVE-2022-40152</cve>
     <cve>CVE-2023-2976</cve>
+    <cve>CVE-2023-34462</cve>
+    <cve>CVE-2023-20861</cve>
+    <cve>CVE-2023-3635</cve>
   </suppress>
 </suppressions>

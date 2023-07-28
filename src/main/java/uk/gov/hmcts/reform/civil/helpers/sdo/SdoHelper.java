@@ -57,6 +57,7 @@ public class SdoHelper {
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
+                
             case "applicant2":
                 return caseData.getApplicant2() != null;
             case "respondent2":
@@ -79,13 +80,12 @@ public class SdoHelper {
 
     public static boolean hasSmallAdditionalDirections(CaseData caseData, String additionalDirection) {
         SmallTrack additionalDirectionEnum = getSmallClaimsAdditionalDirectionEnum(additionalDirection);
-        List<SmallTrack> smallClaims = caseData.getSmallClaims();
+        List<SmallTrack> smallClaims = caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            ? caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() : caseData.getSmallClaims();
         boolean hasDirection;
 
         if ((smallClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack)
-                && (smallClaims.contains(additionalDirectionEnum));
+            hasDirection = smallClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }
@@ -168,13 +168,12 @@ public class SdoHelper {
 
     public static boolean hasFastAdditionalDirections(CaseData caseData, String additionalDirection) {
         FastTrack additionalDirectionEnum = getFastTrackAdditionalDirectionEnum(additionalDirection);
-        List<FastTrack> fastClaims = caseData.getFastClaims();
+        List<FastTrack> fastClaims = caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            ? caseData.getTrialAdditionalDirectionsForFastTrack() : caseData.getFastClaims();
         boolean hasDirection;
 
         if ((fastClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.fastTrack)
-                && (fastClaims.contains(additionalDirectionEnum));
+            hasDirection = fastClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }

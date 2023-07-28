@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
+import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Slf4j
@@ -42,6 +44,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final HearingFeesService hearingFeesService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -62,14 +65,31 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
-        //ToDo: Replace with AHN logic
-        if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
+
+        if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails())) {
+                try {
+                    SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
+                        .fee(calculateAndApplyFee(
+                            hearingFeesService,
+                            caseData,
+                            caseData.getAllocatedTrack()));
+                    caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
+                } catch (FeignException e) {
+                    log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
+                              caseData.getCcdCaseReference(), e.status(), e);
+                    errors.add(ERROR_MESSAGE);
+                }
+            }
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .errors(errors)
+                .build();
+        }
+
         try {
             if (isHearingFeeServiceRequest(caseData)) {
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
