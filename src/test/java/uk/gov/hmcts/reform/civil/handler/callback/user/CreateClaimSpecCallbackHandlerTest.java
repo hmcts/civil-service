@@ -2160,7 +2160,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // When
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-                when(toggleService.isPinInPostEnabled()).thenReturn(true);
+               // when(toggleService.isPinInPostEnabled()).thenReturn(true);
                 // Then
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
