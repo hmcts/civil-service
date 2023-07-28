@@ -13,16 +13,11 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT1;
@@ -36,10 +31,7 @@ public class AssignCaseToLipUserHandler extends CallbackHandler {
     public static final String TASK_ID = "CaseAssignmentToApplicant1";
     private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
 
-    private final AssignCaseService assignCaseService;
     private final CaseDetailsConverter caseDetailsConverter;
-
-    private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
     @Override
@@ -68,13 +60,12 @@ public class AssignCaseToLipUserHandler extends CallbackHandler {
     private CallbackResponse assignUserCaseRole(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
 
-        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
         IdamUserDetails claimantUserDetails = caseData.getClaimantUserDetails();
         String caseId = caseData.getCcdCaseReference().toString();
-        UserInfo user = userService.getUserInfo(authorisation);
+        String submitId = claimantUserDetails.getId();
 
-        coreCaseUserService.assignCase(caseId, claimantUserDetails.getId(), null, CaseRole.APPLICANTSOLICITORONE);
-        coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, claimantUserDetails.getId(), null);
+        coreCaseUserService.assignCase(caseId, submitId, null, CaseRole.APPLICANTSOLICITORONE);
+        coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitId, null);
 
         return SubmittedCallbackResponse.builder().build();
     }
