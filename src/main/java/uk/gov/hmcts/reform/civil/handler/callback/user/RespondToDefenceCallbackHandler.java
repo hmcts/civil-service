@@ -263,10 +263,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     /**
      * Computes whether the case data should move to judicial referral or not.
      *
-     * @param caseData the case data
+     * @param caseData a case data such that defendants rejected the claim, and claimant(s) wants to proceed
+     *                 vs all the defendants
      * @return true if and only if the case should move to judicial referral
      */
-    private boolean shouldMoveToJudicialReferral(CaseData caseData) {
+    public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
         AllocatedTrack allocatedTrack =
             getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
         if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
@@ -277,8 +278,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
                     && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
-                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
                     && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
             };
         }

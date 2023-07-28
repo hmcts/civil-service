@@ -345,7 +345,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     && ((caseData.hasClaimantNotAgreedToFreeMediation()
                     || caseData.hasDefendantNotAgreedToFreeMediation())
                     || caseData.isFastTrackClaim())) {
-                response.state(CaseState.JUDICIAL_REFERRAL.name());
+                response.state(
+                    RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)
+                        ? CaseState.JUDICIAL_REFERRAL.name()
+                        : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name()
+                );
             } else if (caseData.isPartAdmitClaimSettled()) {
                 response.state(CaseState.CASE_SETTLED.name());
             }
@@ -369,7 +373,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
-        if (caseData.isRespondentResponseFullDefence()) {
+        if (caseData.isRespondentResponseFullDefence()
+            && RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
@@ -659,7 +664,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.handler.callback.user.RespondToDefenceCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -480,18 +481,22 @@ public class StateFlowEngine {
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
-            .set(flags -> {
+            .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                flags.put(FlowFlag.SDO_ENABLED.name(), RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(c));
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(demageMultiClaim).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                         .and(applicantOutOfTime.negate()).or(declinedMediation))
-            .set(flags -> {
+            .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+                flags.put(FlowFlag.SDO_ENABLED.name(), RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(c));
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(demageMultiClaim.negate()).and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                         .and(applicantOutOfTime.negate()).or(declinedMediation))
+            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
+                               RespondToDefenceCallbackHandler::shouldMoveToJudicialReferral))
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
@@ -522,8 +527,10 @@ public class StateFlowEngine {
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
-                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
-                                                                              .and(not(agreedToMediation)))
+                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+            .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
+            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
+                               RespondToDefenceCallbackHandler::shouldMoveToJudicialReferral))
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)
