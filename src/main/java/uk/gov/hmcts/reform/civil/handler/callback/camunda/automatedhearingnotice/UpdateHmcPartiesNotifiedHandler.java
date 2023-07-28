@@ -57,7 +57,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
             .serviceData(PartiesNotifiedServiceData.builder()
                              .hearingNoticeGenerated(true)
                              .hearingLocation(camundaVariables.getHearingLocationEpims())
-                             .hearingDate(camundaVariables.getHearingStartDateTime())
+                             .days(camundaVariables.getDays())
                              .build())
             .build();
 
