@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,5 +44,19 @@ public class DateUtilsTest {
         LocalDate result = DateUtils.addDaysSkippingWeekends(initialDate, daysToAdd);
 
         assertEquals(initialDate, result);
+    }
+
+    @Test
+    public void testConvertFromUTC_withBSTDate() {
+        LocalDateTime utcDate = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
+        LocalDateTime ukDate = DateUtils.convertFromUTC(utcDate);
+        Assertions.assertEquals("2022-07-28T10:00", ukDate.toString());
+    }
+
+    @Test
+    public void testConvertFromUTC_GMTDate() {
+        LocalDateTime utcDate = LocalDateTime.of(2022, 12, 28, 9, 00, 00);
+        LocalDateTime ukDate = DateUtils.convertFromUTC(utcDate);
+        Assertions.assertEquals("2022-12-28T09:00", ukDate.toString());
     }
 }

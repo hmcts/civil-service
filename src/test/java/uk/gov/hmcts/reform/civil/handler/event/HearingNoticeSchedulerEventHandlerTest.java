@@ -246,6 +246,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                                      .builder()
                                      .days(List.of(HearingDay.builder()
                                                        .hearingStartDateTime(HEARING_DATE)
+                                                       .hearingEndDateTime(HEARING_DATE.plusHours(1))
                                                        .build()))
                                      .hearingLocation(VENUE_ID)
                                      .build())
@@ -263,6 +264,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                                                       .hearingLocation(VENUE_ID)
                                                       .days(List.of(HearingDay.builder()
                                                                         .hearingStartDateTime(HEARING_DATE)
+                                                                        .hearingEndDateTime(HEARING_DATE.plusHours(1))
                                                                         .build()))
                                                       .hearingNoticeGenerated(false).build()).build()
         );
@@ -285,6 +287,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .hearingDaySchedule(List.of(
                         HearingDaySchedule.builder()
                             .hearingStartDateTime(HEARING_DATE)
+                            .hearingEndDateTime(HEARING_DATE.plusHours(1))
                             .hearingVenueId(VENUE_ID).build()
                     ))
                     .build())
