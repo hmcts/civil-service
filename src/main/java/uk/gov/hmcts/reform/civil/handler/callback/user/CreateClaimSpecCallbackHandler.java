@@ -572,16 +572,18 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private String getBody(CaseData caseData) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
+        String result = (toggleService.isPinInPostEnabled())
+            ? format(LIP_CONFIRMATION_BODY, format(caseDocLocation, caseData.getCcdCaseReference()),
+                     claimUrlsConfiguration.getResponsePackLink(),
+                     formattedServiceDeadline
+        )
+            : getConfirmationSummary(caseData);
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
-                :  (toggleService.isPinInPostEnabled()) ? format(LIP_CONFIRMATION_BODY, format(caseDocLocation,
-                                                       caseData.getCcdCaseReference()),
-                         claimUrlsConfiguration.getResponsePackLink(),
-                         formattedServiceDeadline) : getConfirmationSummary(caseData))
-            + exitSurveyContentService.applicantSurvey();
+                : result)
+                + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {
@@ -767,19 +769,21 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private String getSpecBody(CaseData caseData) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
+        String result =
+            toggleService.isPinInPostEnabled() ? format(
+                SPEC_LIP_CONFIRMATION_BODY,
+                format(caseDocLocation, caseData.getCcdCaseReference()),
+                claimUrlsConfiguration.getResponsePackLink(),
+                claimUrlsConfiguration.getN9aLink(),
+                claimUrlsConfiguration.getN9bLink(),
+                claimUrlsConfiguration.getN215Link(),
+                formattedServiceDeadline
+            ) : getSpecConfirmationSummary(caseData);
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
-                : toggleService.isPinInPostEnabled() ? format(SPEC_LIP_CONFIRMATION_BODY,
-                         format(caseDocLocation, caseData.getCcdCaseReference()),
-                         claimUrlsConfiguration.getResponsePackLink(),
-                         claimUrlsConfiguration.getN9aLink(),
-                         claimUrlsConfiguration.getN9bLink(),
-                         claimUrlsConfiguration.getN215Link(),
-                         formattedServiceDeadline
-        ) : getSpecConfirmationSummary(caseData)) + exitSurveyContentService.applicantSurvey();
+                : result) + exitSurveyContentService.applicantSurvey();
     }
 
     private String getSpecConfirmationSummary(CaseData caseData) {
