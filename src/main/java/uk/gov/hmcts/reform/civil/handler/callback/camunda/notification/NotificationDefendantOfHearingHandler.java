@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -81,7 +82,13 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         String recipient = caseData.getRespondentSolicitor1EmailAddress();
 
         if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
-            sendEmail(caseData, recipient, true);
+            if (isRespondent1Lip(caseData) && caseData.getRespondent1().getPartyEmail() != null) {
+                recipient = caseData.getRespondent1().getPartyEmail();
+                sendEmail(caseData, recipient, true);
+            }
+            if (!isRespondent1Lip(caseData)) {
+                sendEmail(caseData, recipient, true);
+            }
         } else if (isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING)) {
             if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
@@ -158,6 +165,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             HEARING_TIME,
             time.format(DateTimeFormatter.ofPattern("hh:mma")).replace("AM", "am").replace("PM", "pm")
         ));
+    }
+
+    private boolean isRespondent1Lip(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
 
     public Map<String, String> addPropertiesHmc(final CaseData caseData) {
