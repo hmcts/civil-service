@@ -1339,11 +1339,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && ((RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec())
-            )) {
+            ))) {
             LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());
