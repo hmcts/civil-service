@@ -20,6 +20,6 @@ public enum CallbackVersion {
         List<CallbackVersion> list = Arrays.asList(CallbackVersion.values());
         int indexSelf = list.indexOf(this);
         int indexAnother = list.indexOf(anotherVersion);
-        return indexSelf <= indexAnother;
+        return indexSelf >= indexAnother;
     }
 }
