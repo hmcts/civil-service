@@ -269,16 +269,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
      */
     public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
         AllocatedTrack allocatedTrack =
-            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
+            getAllocatedTrack(
+                CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                    ? caseData.getClaimValue().toPounds()
+                    : caseData.getTotalClaimAmount(),
+                caseData.getClaimType()
+            );
         if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
             return false;
+        } else if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
         } else {
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
             return switch (multiPartyScenario) {
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
                     && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
                     && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
             };
         }
