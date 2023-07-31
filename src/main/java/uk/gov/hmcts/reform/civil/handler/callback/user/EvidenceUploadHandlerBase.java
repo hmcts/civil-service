@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,6 +66,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SPACE = " ";
     private static final String END = ".";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
@@ -402,7 +405,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             String newName = prefix
                     + SPACE
                     + type.getWitnessOptionName()
-                    + (date ? SPACE + type.getWitnessOptionUploadDate() : "")
+                    + (date ? SPACE + type.getWitnessOptionUploadDate()
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)) : "")
                     + END + ext;
             type.getWitnessOptionDocument().setDocumentFileName(newName);
         });
@@ -419,7 +423,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     + SPACE
                     + (single ? type.getExpertOptionExpertise() : type.getExpertOptionExpertises())
                     + SPACE
-                    + type.getExpertOptionUploadDate().format(JacksonConfiguration.DATE_FORMATTER)
+                    + type.getExpertOptionUploadDate()
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
                     + END + ext;
             type.getExpertDocument().setDocumentFileName(newName);
         });
@@ -447,7 +452,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     + SPACE
                     + type.getTypeOfDocument()
                     + SPACE
-                    + type.getDocumentIssuedDate().format(JacksonConfiguration.DATE_FORMATTER)
+                    + type.getDocumentIssuedDate()
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
                     + END + ext;
             type.getDocumentUpload().setDocumentFileName(newName);
         });
@@ -457,7 +463,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        String selectedRole = getSelectedRole(caseData);
+        String selectedRole = getSelectedRole(callbackParams);
 
         applyDocumentUploadDate(caseDataBuilder, time.now());
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
@@ -480,7 +486,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialAuthorities");
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), "respondentOneTrialCosts");
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialDocCorrespondence");
-
+            if (selectedRole.equals("RESPONDENTBOTH")) {
+                //copyResp1ChangesToResp2(caseData);
+            }
         }
         if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosureList");
@@ -524,9 +532,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .build();
     }
 
-    private String getSelectedRole(CaseData caseData) {
+    private String getSelectedRole(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
                 && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
             if (multiParts && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith("Claimant 2 - ")) {
@@ -538,8 +548,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
             return CaseRole.APPLICANTSOLICITORONE.name();
         } else {
-            if (multiParts && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith("Defendant 2 - ")) {
+            if ((multiParts && caseData.getEvidenceUploadOptions()
+                    .getValue().getLabel().startsWith("Defendant 2 - "))
+                || (!multiParts
+                    && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
+                    userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
                 return CaseRole.RESPONDENTSOLICITORTWO.name();
             }
             if (multiParts && caseData.getEvidenceUploadOptions()
