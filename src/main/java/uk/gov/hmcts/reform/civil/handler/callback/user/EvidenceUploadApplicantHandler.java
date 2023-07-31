@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -27,8 +29,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLI
 @Service
 public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
-    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time) {
-        super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
+    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService,
+                                          CaseDetailsConverter caseDetailsConverter,
+                                          CoreCaseDataService coreCaseDataService,
+                                          ObjectMapper objectMapper, Time time) {
+        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
+                objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
               "validateValuesApplicant", null);
     }
 

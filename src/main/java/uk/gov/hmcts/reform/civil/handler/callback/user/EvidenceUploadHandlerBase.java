@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,12 +23,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -63,12 +65,16 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
+    private final CaseDetailsConverter caseDetailsConverter;
+    private final CoreCaseDataService coreCaseDataService;
 
     private static final String SPACE = " ";
     private static final String END = ".";
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
+                                        CaseDetailsConverter caseDetailsConverter,
+                                        CoreCaseDataService coreCaseDataService,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
                                         String createShowCondition) {
         this.objectMapper = objectMapper;
@@ -78,6 +84,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.coreCaseDataService = coreCaseDataService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
@@ -487,7 +495,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), "respondentOneTrialCosts");
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialDocCorrespondence");
             if (selectedRole.equals("RESPONDENTBOTH")) {
-                //copyResp1ChangesToResp2(caseData);
+                caseData = copyResp1ChangesToResp2(caseData, caseDataBuilder);
             }
         }
         if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
@@ -509,7 +517,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
         }
 
-        if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals("APPLICANTBOTH")) {
+        if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name())) {
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosureList");
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosure");
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), "ApplicantWitnessStatement");
@@ -530,6 +538,69 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData copyResp1ChangesToResp2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        CaseData caseDataBefore = caseDetailsConverter
+                .toCaseData(coreCaseDataService.getCase(caseData.getCcdCaseReference()));
+        List<Element<UploadEvidenceDocumentType>> toCopy =
+                compareAndCopy(caseDataBefore.getDocumentDisclosureListRes(),
+                    caseData.getDocumentDisclosureListRes(),
+                    caseData.getDocumentDisclosureListRes2());
+        List<Element<UploadEvidenceDocumentType>> toAdd =
+                deepCopyUploadEvidenceDocumentType(toCopy, "RespondentTwoDisclosureList");
+        builder.documentDisclosureListRes2(toAdd);
+        return builder.build();
+    }
+
+    private List<Element<UploadEvidenceDocumentType>>
+    deepCopyUploadEvidenceDocumentType(final List<Element<UploadEvidenceDocumentType>> toCopy,
+        String theId) {
+        if (Objects.isNull(toCopy)) {
+            return null;
+        }
+        List<Element<UploadEvidenceDocumentType>> toAdd = new ArrayList<>();
+        for(Element<UploadEvidenceDocumentType> from : toCopy) {
+            Document newDoc = Document.builder()
+                    .categoryID(theId)
+                    .documentBinaryUrl(from.getValue().getDocumentUpload().getDocumentBinaryUrl())
+                    .documentFileName(from.getValue().getDocumentUpload().getDocumentFileName())
+                    .documentHash(from.getValue().getDocumentUpload().getDocumentHash())
+                    .documentUrl(from.getValue().getDocumentUpload().getDocumentUrl())
+                    .build();
+            UploadEvidenceDocumentType type = UploadEvidenceDocumentType.builder()
+                    .documentIssuedDate(from.getValue().getDocumentIssuedDate())
+                    .typeOfDocument(from.getValue().getTypeOfDocument())
+                    .createdDatetime(from.getValue().getCreatedDatetime())
+                    .documentUpload(newDoc)
+                    .build();
+            toAdd.add(ElementUtils.element(type));
+        }
+        return toAdd;
+    }
+
+    private <T> List<Element<T>> compareAndCopy(List<Element<T>> before,
+                                    List<Element<T>> after, List<Element<T>> target) {
+        if (Objects.isNull(after) || after.isEmpty()) {
+            return null;
+        }
+        List<Element<T>> different = new ArrayList<>();
+        if (Objects.isNull(before)) {
+            different = after;
+        } else {
+            List<UUID> ids = before.stream().map(Element::getId).toList();
+            for (Element<T> element : after) {
+                if (!ids.contains(element.getId())) {
+                    different.add(element);
+                }
+            }
+        }
+        if (Objects.isNull(target)) {
+            target = different;
+        } else {
+            target.addAll(different);
+        }
+        return target;
     }
 
     private String getSelectedRole(CallbackParams callbackParams) {
