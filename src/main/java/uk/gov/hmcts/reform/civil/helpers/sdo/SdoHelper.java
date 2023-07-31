@@ -16,11 +16,15 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.util.List;
 import java.util.Locale;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class SdoHelper {
 
@@ -28,15 +32,20 @@ public class SdoHelper {
         // Utility class, no instances
     }
 
+    private static final String FAST_TRACK_ALLOCATION_BASE = "The claim is allocated to the Fast Track";
+    private static final String FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY = " and is assigned to complexity %s";
+    private static final String FAST_TRACK_ALLOCATION_NO_COMPLEXITY = " and is not assigned to a complexity band";
+    private static final String FAST_TRACK_ALLOCATION_REASON = " because %s";
+
     public static boolean isSmallClaimsTrack(CaseData caseData) {
         YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
         YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
         ClaimsTrack claimsTrack = caseData.getClaimsTrack();
 
-        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == NO)
             && (claimsTrack == ClaimsTrack.smallClaimsTrack);
-        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
+        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YES)
+            && (drawDirectionsOrderSmallClaims == YES);
 
         return smallClaimsPath1 || smallClaimsPath2;
     }
@@ -47,17 +56,17 @@ public class SdoHelper {
         ClaimsTrack claimsTrack = caseData.getClaimsTrack();
         OrderType orderType = caseData.getOrderType();
 
-        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == NO)
             && (claimsTrack == ClaimsTrack.fastTrack);
-        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
+        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YES)
+            && (drawDirectionsOrderSmallClaims == NO) && (orderType == OrderType.DECIDE_DAMAGES);
 
         return fastTrackPath1 || fastTrackPath2;
     }
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
-                
+
             case "applicant2":
                 return caseData.getApplicant2() != null;
             case "respondent2":
@@ -255,6 +264,34 @@ public class SdoHelper {
         }
 
         return "";
+    }
+
+    public static String getFastTrackAllocation(CaseData caseData, boolean fastTrackUpliftsEnabled) {
+        if (fastTrackUpliftsEnabled) {
+            FastTrackAllocation fastTrackAllocation = caseData.getFastTrackAllocation();
+            String reasons = "";
+            if (fastTrackAllocation != null) {
+                reasons = getFastTrackAllocationReason(fastTrackAllocation, reasons);
+                if (NO.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, FAST_TRACK_ALLOCATION_NO_COMPLEXITY, reasons);
+                } else if (YES.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                    String band = String.format(
+                        FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY,
+                        fastTrackAllocation.getBand().getLabel().toLowerCase()
+                    );
+                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, band, reasons);
+                }
+            }
+        }
+        return "";
+    }
+
+    private static String getFastTrackAllocationReason(FastTrackAllocation fastTrackAllocation, String reasons) {
+        if (fastTrackAllocation.getReasons() != null
+            && !fastTrackAllocation.getReasons().equals("")) {
+            reasons = String.format(FAST_TRACK_ALLOCATION_REASON, fastTrackAllocation.getReasons());
+        }
+        return reasons;
     }
 
     public static String getDisposalHearingFinalDisposalHearingTimeLabel(CaseData caseData) {
