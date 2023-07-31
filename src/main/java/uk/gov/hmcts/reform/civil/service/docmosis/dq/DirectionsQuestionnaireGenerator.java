@@ -95,12 +95,16 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
                 templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+                System.out.println("CLAIMANT_RESPONSE_SPEC" + templateId);
             } else {
                 templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+                System.out.println("DEFENDANT_RESPONSE_SPEC" + templateId);
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
+            System.out.println("Elseeeeee" + templateId);
         }
+        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAA "+templateId);
 
         templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
@@ -119,22 +123,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_DS;
+                    System.out.println("ONE_V_TWO_TWO_LEGAL_REP" + templateId);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_SS;
+                    System.out.println("DQ_RESPONSE_1V2_SS"+ templateId);
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_2V1;
+                    System.out.println("DQ_RESPONSE_2V1" + templateId);
                 }
                 break;
             default:
         }
+        System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB "+templateId);
         return templateId;
     }
 
