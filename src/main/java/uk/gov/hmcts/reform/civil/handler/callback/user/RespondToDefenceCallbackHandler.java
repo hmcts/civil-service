@@ -268,18 +268,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
      * @return true if and only if the case should move to judicial referral
      */
     public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
-        AllocatedTrack allocatedTrack =
-            getAllocatedTrack(
-                CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getClaimValue().toPounds()
-                    : caseData.getTotalClaimAmount(),
-                caseData.getClaimType()
-            );
-        if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-            return false;
-        } else if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
         } else {
+            AllocatedTrack allocatedTrack =
+                getAllocatedTrack(
+                    CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                        ? caseData.getClaimValue().toPounds()
+                        : caseData.getTotalClaimAmount(),
+                    caseData.getClaimType()
+                );
+            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+                return false;
+            }
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
             return switch (multiPartyScenario) {
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
