@@ -57,9 +57,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService toggleService;
 
     @MockBean
-    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-
-    @MockBean
     private SpecReferenceNumberRepository specReferenceNumberRepository;
 
     @MockBean
@@ -112,8 +109,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             System.out.println(response.getData());
             assertThat(response.getData())
-                .containsEntry("issueDate", submittedDate.format(DateTimeFormatter.ISO_DATE))
-                .containsEntry("respondent1ResponseDeadline", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
