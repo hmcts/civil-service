@@ -111,8 +111,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName(locationRefData.getSiteName())
-            .courtLocation(locationRefData.getSiteName().concat(" - ").concat(locationRefData.getCourtAddress()));
+            .courtName(locationRefData.getVenueName())
+            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
     }
 
