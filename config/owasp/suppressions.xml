@@ -62,4 +62,7 @@
     <cve>CVE-2023-20861</cve>
     <cve>CVE-2023-3635</cve>
   </suppress>
+  <suppress until="2023-08-31">
+    <cve>CVE-2023-3782</cve>
+  </suppress>
 </suppressions>
