@@ -36,7 +36,7 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01302.docx", "%s_response_sealed_form.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01301.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01271.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01269.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01320.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01270.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_RESPONSE_2V1("CV-UNS-HRN-ENG-01272.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf"),
