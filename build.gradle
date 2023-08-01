@@ -94,8 +94,8 @@ allprojects {
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.2'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.5'
@@ -130,7 +130,12 @@ allprojects {
       ) {
         entry 'groovy-all'
       }
-
+      // CVE-2023-28709
+      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
+        entry 'tomcat-embed-core'
+        entry 'tomcat-embed-el'
+        entry 'tomcat-embed-websocket'
+      }
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     }
