@@ -1325,7 +1325,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        if (callbackParams.getVersion().isEqualOrGreater(CallbackVersion.V_1)
+        if (Optional.ofNullable(callbackParams.getVersion()).map(v -> v.isEqualOrGreater(CallbackVersion.V_1))
+            .orElse(false)
             && caseData.getTempCorrespondenceAddress() != null
             && StringUtils.isNotBlank(caseData.getTempCorrespondenceAddress().getAddressLine1())) {
             if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
