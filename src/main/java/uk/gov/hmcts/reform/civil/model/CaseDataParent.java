@@ -702,11 +702,11 @@ public class CaseDataParent implements MappableObject {
         }
         if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
             return lowCostAmount;
-        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
-            return midCostAmount;
-        } else {
-            return highCostAmount;
         }
+        if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+            return midCostAmount;
+        }
+        return highCostAmount;
     }
 
     @JsonIgnore
