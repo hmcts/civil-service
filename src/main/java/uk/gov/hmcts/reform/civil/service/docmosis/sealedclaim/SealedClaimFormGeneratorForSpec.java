@@ -53,7 +53,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimFormForSpec> {
@@ -86,25 +88,32 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         if (caseData.getApplicant2() != null) {
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
                 sealedTemplate = N2_2V1_LIP;
+                log.info("N2_2V1_LIP", sealedTemplate);
             } else {
                 sealedTemplate = N2_2V1;
+                log.info("N2_2V1", sealedTemplate);
             }
         } else if (caseData.getRespondent2() != null) {
             if (caseData.getRespondent2SameLegalRepresentative() != null
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
                 sealedTemplate = N2_1V2_SAME_SOL;
+                log.info("N2_1V2_SAME_SOL", sealedTemplate);
             } else {
                 if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL_LIP;
+                    log.info("N2_1V2_DIFFERENT_SOL_LIP", sealedTemplate);
                 } else {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL;
+                    log.info("N2_1V2_DIFFERENT_SOL", sealedTemplate);
                 }
             }
         } else {
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
                 sealedTemplate = N2_LIP;
+                log.info("N2_LIP", sealedTemplate);
             } else {
                 sealedTemplate = N2;
+                log.info("N2", sealedTemplate);
             }
         }
         return sealedTemplate;
