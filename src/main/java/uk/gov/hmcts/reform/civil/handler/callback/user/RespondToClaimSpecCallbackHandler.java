@@ -1325,7 +1325,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        if (CallbackVersion.V_1.isEqualOrGreater(callbackParams.getVersion())
+        if (callbackParams.getVersion().isEqualOrGreater(CallbackVersion.V_1)
             && caseData.getTempCorrespondenceAddress() != null
             && StringUtils.isNotBlank(caseData.getTempCorrespondenceAddress().getAddressLine1())) {
             if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
@@ -1402,21 +1402,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-            if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
-                Party updatedRespondent2;
-
-                if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
-                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
-                } else {
-                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
-                }
-
-                updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
-            }
 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
