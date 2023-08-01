@@ -129,6 +129,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates templateId = DQ_RESPONSE_1V1;
+        log.info("DQ_RESPONSE_1V1", templateId);
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
