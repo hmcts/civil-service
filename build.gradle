@@ -97,6 +97,11 @@ allprojects {
         entry 'netty-common'
         entry 'netty-codec-socks'
       }
+      //CVE-2022-40152
+      dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
+        entry 'woodstox-core'
+      }
+
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
