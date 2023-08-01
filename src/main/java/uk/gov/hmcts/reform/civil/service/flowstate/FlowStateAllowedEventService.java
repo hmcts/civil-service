@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIM_SETTLED_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -830,7 +831,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CLAIM_SETTLED_CUI
             )
         ),
         entry(
