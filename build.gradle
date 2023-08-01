@@ -101,6 +101,10 @@ allprojects {
       dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
         entry 'woodstox-core'
       }
+      //CVE-2023-3635
+      dependencySet(group: 'com.squareup.okio', version: '3.4.0') {
+        entry 'okio-jvm'
+      }
 
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
       // CVE-2018-10237 - Unbounded memory allocation
