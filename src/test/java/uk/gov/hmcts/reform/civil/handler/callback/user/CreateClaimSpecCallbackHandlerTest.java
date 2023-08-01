@@ -95,11 +95,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY_PBA_V3;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -144,7 +140,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
-        + "%n%nFollowing this, you will to file a Certificate of Service and supporting documents "
+        + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
@@ -2197,6 +2193,38 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    + "Claim number: %s", REFERENCE_NUMBER))
                     .confirmationBody(format(
                         SPEC_LIP_CONFIRMATION_SCREEN,
+                        format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                        responsePackLink,
+                        n9aLink,
+                        n9bLink,
+                        n215Link
+                    ) + exitSurveyContentService.applicantSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedConfirmationPageForPBAV3AndNotRegisteredOrg() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1Represented(YES)
+                .respondent1OrgRegistered(NO)
+                .legacyCaseReference("000MC001")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                .build();
+            when(toggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                    .confirmationBody(
+                        format(
+                        SPEC_LIP_CONFIRMATION_BODY_PBAV3,
+                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
                         format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                         responsePackLink,
                         n9aLink,
