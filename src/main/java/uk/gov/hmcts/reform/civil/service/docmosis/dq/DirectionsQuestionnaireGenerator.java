@@ -128,18 +128,21 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_DS;
+                    System.out.println("DQ_RESPONSE_1V2_DS"+templateId);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_SS;
+                    System.out.println("DQ_RESPONSE_1V2_SS"+templateId);
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_2V1;
+                    System.out.println("DQ_RESPONSE_2V1"+templateId);
                 }
                 break;
             default:
