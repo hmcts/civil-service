@@ -514,7 +514,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialAuthorities");
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), "respondentTwoTrialCosts");
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialDocCorrespondence");
-
         }
 
         if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name())) {
@@ -543,13 +542,112 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private CaseData copyResp1ChangesToResp2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseDataBefore = caseDetailsConverter
                 .toCaseData(coreCaseDataService.getCase(caseData.getCcdCaseReference()));
-        List<Element<UploadEvidenceDocumentType>> toCopy =
+        List<Element<UploadEvidenceDocumentType>> evidenceDocToCopy =
                 compareAndCopy(caseDataBefore.getDocumentDisclosureListRes(),
                     caseData.getDocumentDisclosureListRes(),
                     caseData.getDocumentDisclosureListRes2());
-        List<Element<UploadEvidenceDocumentType>> toAdd =
-                deepCopyUploadEvidenceDocumentType(toCopy, "RespondentTwoDisclosureList");
-        builder.documentDisclosureListRes2(toAdd);
+        List<Element<UploadEvidenceDocumentType>> evidenceDocToAdd =
+                deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoDisclosureList");
+        builder.documentDisclosureListRes2(evidenceDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentForDisclosureRes(),
+                                caseData.getDocumentForDisclosureRes(),
+                                caseData.getDocumentForDisclosureRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoDisclosure");
+        builder.documentForDisclosureRes2(evidenceDocToAdd);
+
+        List<Element<UploadEvidenceWitness>> witnessDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentWitnessStatementRes(),
+                    caseData.getDocumentWitnessStatementRes(),
+                    caseData.getDocumentWitnessStatementRes2());
+        List<Element<UploadEvidenceWitness>> witnessDocToAdd =
+                deepCopyUploadEvidenceWitness(witnessDocToCopy, "RespondentTwoWitnessStatement");
+        builder.documentWitnessStatementRes2(witnessDocToAdd);
+
+        witnessDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentWitnessSummaryRes(),
+                        caseData.getDocumentWitnessSummaryRes(),
+                        caseData.getDocumentWitnessSummaryRes2());
+        witnessDocToAdd =
+                deepCopyUploadEvidenceWitness(witnessDocToCopy, "RespondentTwoWitnessSummary");
+        builder.documentWitnessSummaryRes2(witnessDocToAdd);
+
+        witnessDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentHearsayNoticeRes(),
+                        caseData.getDocumentHearsayNoticeRes(),
+                        caseData.getDocumentHearsayNoticeRes2());
+        witnessDocToAdd =
+                deepCopyUploadEvidenceWitness(witnessDocToCopy, "RespondentTwoWitnessHearsay");
+        builder.documentHearsayNoticeRes2(witnessDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentReferredInStatementRes(),
+                caseData.getDocumentReferredInStatementRes(),
+                caseData.getDocumentReferredInStatementRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoWitnessReferred");
+        builder.documentReferredInStatementRes2(evidenceDocToAdd);
+
+        List<Element<UploadEvidenceExpert>> expertDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentExpertReportRes(),
+                        caseData.getDocumentExpertReportRes(),
+                        caseData.getDocumentExpertReportRes2());
+        List<Element<UploadEvidenceExpert>> expertDocToAdd =
+                deepCopyUploadEvidenceExpert(expertDocToCopy, "RespondentTwoExpertReport");
+        builder.documentExpertReportRes2(expertDocToAdd);
+
+        expertDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentJointStatementRes(),
+                        caseData.getDocumentJointStatementRes(),
+                        caseData.getDocumentJointStatementRes2());
+        expertDocToAdd =
+                deepCopyUploadEvidenceExpert(expertDocToCopy, "RespondentTwoExpertJointStatement");
+        builder.documentJointStatementRes2(expertDocToAdd);
+
+        expertDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentQuestionsRes(),
+                        caseData.getDocumentQuestionsRes(),
+                        caseData.getDocumentQuestionsRes2());
+        expertDocToAdd =
+                deepCopyUploadEvidenceExpert(expertDocToCopy, "RespondentTwoExpertQuestions");
+        builder.documentQuestionsRes2(expertDocToAdd);
+
+        expertDocToCopy =
+                compareAndCopy(caseDataBefore.getDocumentAnswersRes(),
+                        caseData.getDocumentAnswersRes(),
+                        caseData.getDocumentAnswersRes2());
+        expertDocToAdd =
+                deepCopyUploadEvidenceExpert(expertDocToCopy, "RespondentTwoExpertAnswers");
+        builder.documentAnswersRes2(expertDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCaseSummaryRes(),
+                caseData.getDocumentCaseSummaryRes(),
+                caseData.getDocumentCaseSummaryRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoPreTrialSummary");
+        builder.documentCaseSummaryRes2(evidenceDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentSkeletonArgumentRes(),
+                caseData.getDocumentSkeletonArgumentRes(),
+                caseData.getDocumentSkeletonArgumentRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoTrialSkeleton");
+        builder.documentSkeletonArgumentRes2(evidenceDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentAuthoritiesRes(),
+                caseData.getDocumentAuthoritiesRes(),
+                caseData.getDocumentAuthoritiesRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoTrialAuthorities");
+        builder.documentAuthoritiesRes2(evidenceDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCostsRes(),
+                caseData.getDocumentCostsRes(),
+                caseData.getDocumentCostsRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "respondentTwoTrialCosts");
+        builder.documentCostsRes2(evidenceDocToAdd);
+
+        evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrialRes(),
+                caseData.getDocumentEvidenceForTrialRes(),
+                caseData.getDocumentEvidenceForTrialRes2());
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, "RespondentTwoTrialDocCorrespondence");
+        builder.documentEvidenceForTrialRes2(evidenceDocToAdd);
+
         return builder.build();
     }
 
@@ -573,6 +671,62 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .typeOfDocument(from.getValue().getTypeOfDocument())
                     .createdDatetime(from.getValue().getCreatedDatetime())
                     .documentUpload(newDoc)
+                    .build();
+            toAdd.add(ElementUtils.element(type));
+        }
+        return toAdd;
+    }
+
+    private List<Element<UploadEvidenceExpert>>
+    deepCopyUploadEvidenceExpert(final List<Element<UploadEvidenceExpert>> toCopy,
+                                       String theId) {
+        if (Objects.isNull(toCopy)) {
+            return null;
+        }
+        List<Element<UploadEvidenceExpert>> toAdd = new ArrayList<>();
+        for(Element<UploadEvidenceExpert> from : toCopy) {
+            Document newDoc = Document.builder()
+                    .categoryID(theId)
+                    .documentBinaryUrl(from.getValue().getExpertDocument().getDocumentBinaryUrl())
+                    .documentFileName(from.getValue().getExpertDocument().getDocumentFileName())
+                    .documentHash(from.getValue().getExpertDocument().getDocumentHash())
+                    .documentUrl(from.getValue().getExpertDocument().getDocumentUrl())
+                    .build();
+            UploadEvidenceExpert type = UploadEvidenceExpert.builder()
+                    .expertOptionName(from.getValue().getExpertOptionName())
+                    .expertOptionExpertise(from.getValue().getExpertOptionExpertise())
+                    .expertOptionExpertises(from.getValue().getExpertOptionExpertises())
+                    .expertOptionOtherParty(from.getValue().getExpertOptionOtherParty())
+                    .expertDocumentQuestion(from.getValue().getExpertDocumentQuestion())
+                    .expertDocumentAnswer(from.getValue().getExpertDocumentAnswer())
+                    .expertOptionUploadDate(from.getValue().getExpertOptionUploadDate())
+                    .expertDocument(newDoc)
+                    .build();
+            toAdd.add(ElementUtils.element(type));
+        }
+        return toAdd;
+    }
+
+    private List<Element<UploadEvidenceWitness>>
+    deepCopyUploadEvidenceWitness(final List<Element<UploadEvidenceWitness>> toCopy,
+                                  String theId) {
+        if (Objects.isNull(toCopy)) {
+            return null;
+        }
+        List<Element<UploadEvidenceWitness>> toAdd = new ArrayList<>();
+        for(Element<UploadEvidenceWitness> from : toCopy) {
+            Document newDoc = Document.builder()
+                    .categoryID(theId)
+                    .documentBinaryUrl(from.getValue().getWitnessOptionDocument().getDocumentBinaryUrl())
+                    .documentFileName(from.getValue().getWitnessOptionDocument().getDocumentFileName())
+                    .documentHash(from.getValue().getWitnessOptionDocument().getDocumentHash())
+                    .documentUrl(from.getValue().getWitnessOptionDocument().getDocumentUrl())
+                    .build();
+            UploadEvidenceWitness type = UploadEvidenceWitness.builder()
+                    .witnessOptionUploadDate(from.getValue().getWitnessOptionUploadDate())
+                    .witnessOptionName(from.getValue().getWitnessOptionName())
+                    .createdDatetime(from.getValue().getCreatedDatetime())
+                    .witnessOptionDocument(newDoc)
                     .build();
             toAdd.add(ElementUtils.element(type));
         }
