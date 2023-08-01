@@ -93,6 +93,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbac
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS_PBAV3;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_PBAV3;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -2037,6 +2039,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts_PBAV3() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+
+                when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            LIP_CONFIRMATION_BODY_PBAV3,
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
             void certificateOfService_shouldReturnExpectedResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent2Represented(YES)
@@ -2054,6 +2079,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(format(
                                 LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts_PBAV3() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            LIP_CONFIRMATION_BODY_COS_PBAV3,
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
                         .build());
