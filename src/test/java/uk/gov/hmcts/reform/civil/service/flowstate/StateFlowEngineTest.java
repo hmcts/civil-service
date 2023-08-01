@@ -2372,12 +2372,22 @@ class StateFlowEngineTest {
                     );
             }
 
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
-            );
+            if (flowState == FlowState.Main.FULL_DEFENCE_NOT_PROCEED) {
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+                );
+            } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                    entry(FlowFlag.SDO_ENABLED.name(), false)
+                );
+            }
         }
 
         //1v2 Different solicitor scenario-first response FullDefence received and with time extension
@@ -2665,11 +2675,12 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
                 entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.SDO_ENABLED.name(), false)
             );
         }
 
@@ -2761,10 +2772,11 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
                 entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry(FlowFlag.SDO_ENABLED.name(), false)
             );
         }
 
@@ -2810,14 +2822,14 @@ class StateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(7).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.IS_MULTI_TRACK.name(), true)
-
+                entry(FlowFlag.IS_MULTI_TRACK.name(), true),
+                entry(FlowFlag.SDO_ENABLED.name(), false)
             );
         }
     }
