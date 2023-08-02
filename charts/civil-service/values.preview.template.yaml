@@ -140,7 +140,7 @@ ccd:
       disableKeyVaults: true
   ccd-data-store-api:
     java:
-      image: 'hmctspublic.azurecr.io/ccd/data-store-api:pr-2286'
+      image: 'hmctspublic.azurecr.io/ccd/data-store-api:pr-2286-4652d21-20230731114727'
       imagePullPolicy: Always
       devcpuRequests: 500m
       devmemoryRequests: 2048Mi
