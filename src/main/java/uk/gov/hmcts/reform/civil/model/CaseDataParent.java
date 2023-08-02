@@ -466,6 +466,22 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
     private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
+    //applicant2
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
