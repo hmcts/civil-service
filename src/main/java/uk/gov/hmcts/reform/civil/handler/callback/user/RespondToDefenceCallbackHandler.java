@@ -236,7 +236,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 

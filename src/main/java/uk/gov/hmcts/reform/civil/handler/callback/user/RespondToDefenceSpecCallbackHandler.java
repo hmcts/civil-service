@@ -319,7 +319,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 

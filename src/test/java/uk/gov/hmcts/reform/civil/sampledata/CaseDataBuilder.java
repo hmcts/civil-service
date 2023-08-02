@@ -455,6 +455,7 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2301,10 +2302,16 @@ public class CaseDataBuilder {
             .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
             .build();
 
-        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+        this.hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
             .hearingUnavailableDates(YES)
             .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
+
+        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
+            .documentName("test")
+            .createdDatetime(LocalDateTime.now())
+            .build()));
+
         return this;
     }
 
@@ -5999,6 +6006,7 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
     }
 }

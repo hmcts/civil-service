@@ -677,6 +677,11 @@ public class CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
 
+    private List<Element<UnavailableDate>> applicant1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
