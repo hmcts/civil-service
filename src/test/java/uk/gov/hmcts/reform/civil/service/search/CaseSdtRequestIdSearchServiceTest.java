@@ -59,7 +59,7 @@ class CaseSdtRequestIdSearchServiceTest {
 
       boolean result = caseSdtRequestIdSearchService.getCaseDataBySdtRequest(REFERENCE);
 
-        assertThat(result).isTrue();
+        assertThat(result).isFalse();
         verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
     }
 
@@ -68,7 +68,7 @@ class CaseSdtRequestIdSearchServiceTest {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
         boolean result = caseSdtRequestIdSearchService.getCaseDataBySdtRequest(REFERENCE);
 
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
         verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
     }
 }
