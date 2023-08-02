@@ -1340,13 +1340,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && ((RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            ))) {
+            && ifResponseTypeIsPartOrFullAdmission(caseData)) {
             LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());
@@ -1509,6 +1503,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
+        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            );
     }
 
     private void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
