@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
+import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestIdSearchService;
 
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ import java.util.Optional;
 public class CaseAssignmentController {
 
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
+    private final CaseSdtRequestIdSearchService caseSdtRequestIdSearchService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final AssignCaseService assignCaseService;
 
@@ -62,6 +64,20 @@ public class CaseAssignmentController {
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         log.info("assigning case with id: {}", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
+    }
+
+    @PostMapping(path = {
+        "/{sdtRequestId}"
+    })
+    @Operation(summary = "Validates SdtRequestId")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Boolean> validateSdtRequestId(
+        @PathVariable("sdtRequestId") String sdtRequestId) {
+        log.info("Sdt Request Id {}", sdtRequestId);
+        boolean requestExists = caseSdtRequestIdSearchService.getCaseDataBySdtRequest(sdtRequestId);
+        return new ResponseEntity<>(requestExists, HttpStatus.OK);
     }
 
 }
