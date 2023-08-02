@@ -2825,7 +2825,8 @@ class StateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(7).contains(
+                entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
