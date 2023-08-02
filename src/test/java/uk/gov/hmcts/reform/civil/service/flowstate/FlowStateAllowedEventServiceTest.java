@@ -647,7 +647,8 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        CREATE_SDO
                     }
                 ),
                 of(
