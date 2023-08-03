@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -60,14 +61,16 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
         CaseData caseData = callbackParams.getCaseData();
 
         boolean isApplicantLip = isApplicantLip(caseData);
+        String recipient = getRecipient(caseData, isApplicantLip);
 
-        notificationService.sendMail(
-            getRecipient(caseData, isApplicantLip),
-            getTemplate(isApplicantLip),
-            isApplicantLip ? addPropertiesApplicantLip(caseData) : addProperties(caseData),
-            getReferenceTemplate(caseData, isApplicantLip)
-        );
-
+        if (nonNull(recipient)) {
+            notificationService.sendMail(
+                getRecipient(caseData, isApplicantLip),
+                getTemplate(isApplicantLip),
+                isApplicantLip ? addPropertiesApplicantLip(caseData) : addProperties(caseData),
+                getReferenceTemplate(caseData, isApplicantLip)
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

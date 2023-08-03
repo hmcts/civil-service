@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_HEARING_FEE_UNPAID;
@@ -69,16 +70,17 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
             && !isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID) ? caseData
                 .getRespondentSolicitor2EmailAddress() : getRecipientRespondent1(caseData);
 
-        notificationService.sendMail(
-            recipient,
-            getTemplate(caseData),
-            isRespondent1Lip(caseData) ? addPropertiesRespondentLip(caseData)
-                : addProperties(caseData),
-            isRespondent1Lip(caseData)
-                ? String.format(REFERENCE_TEMPLATE_DEFENDANT_LIP, caseData.getLegacyCaseReference())
-                : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
+        if (nonNull(recipient)) {
+            notificationService.sendMail(
+                recipient,
+                getTemplate(caseData),
+                isRespondent1Lip(caseData) ? addPropertiesRespondentLip(caseData)
+                    : addProperties(caseData),
+                isRespondent1Lip(caseData)
+                    ? String.format(REFERENCE_TEMPLATE_DEFENDANT_LIP, caseData.getLegacyCaseReference())
+                    : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

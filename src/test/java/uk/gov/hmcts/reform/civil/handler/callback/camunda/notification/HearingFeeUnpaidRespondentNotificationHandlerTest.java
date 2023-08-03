@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
@@ -58,11 +60,12 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
+            //When
             handler.handle(params);
-
+            //Then
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 TEMPLATE_ID,
@@ -73,12 +76,13 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
 
         @Test
         void shouldNotifyRespondetLip_whenIs1v1() {
+            //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
                 .toBuilder().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
+            //When
             handler.handle(params);
-
+            //Then
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 TEMPLATE_ID,
@@ -86,6 +90,20 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
                 "hearing-fee-unpaid-defendantLip-notification-000DC001"
             );
         }
+    }
+
+    @Test
+    void shouldNotNotifyRespondetLip_whenIs1v1AndHadNoEmail() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
+            .toBuilder().respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().type(Party.Type.SOLE_TRADER)
+                             .partyName("Mr. Sole Trader").soleTraderLastName("Trader").build()).build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        //When
+        handler.handle(params);
+        //Then
+        verifyNoInteractions(notificationService);
     }
 
     @NotNull
