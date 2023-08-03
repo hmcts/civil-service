@@ -46,7 +46,6 @@ class AddUnavailableDatesCallbackHandlerTest {
 
         @Test
         void shouldReturnEmptyResponse_whenInvoked() {
-
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
