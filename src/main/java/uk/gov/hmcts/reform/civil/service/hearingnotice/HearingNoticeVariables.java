@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 
 import java.time.LocalDateTime;
 import java.util.List;
