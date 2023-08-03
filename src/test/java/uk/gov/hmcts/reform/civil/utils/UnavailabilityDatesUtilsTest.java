@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class UnavailabilityDatesUtilsTest {
 
     @Nested
-    class UpdateContactDetailsNotEnabled{
+    class UpdateContactDetailsNotEnabled {
         @Test
         public void shouldReturnSingleUnavailabilityDateWhenProvidedForRespondent1() {
             CaseData caseData = CaseDataBuilder.builder()
