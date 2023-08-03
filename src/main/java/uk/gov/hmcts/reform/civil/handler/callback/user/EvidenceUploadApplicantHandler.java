@@ -69,51 +69,100 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureList(), bundleDetails,
                          EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
         );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentDisclosureListApp2(), bundleDetails,
+                EvidenceUploadFiles.DISCLOSURE_LIST.getDocumentTypeDisplayName()
+        );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosure(), bundleDetails,
                          EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentForDisclosureApp2(), bundleDetails,
+                EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.getDocumentTypeDisplayName()
         );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatement(),
                          bundleDetails,
                          EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName()
         );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentReferredInStatementApp2(),
+                bundleDetails,
+                EvidenceUploadFiles.DOCUMENTS_REFERRED.getDocumentTypeDisplayName()
+        );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummary(), bundleDetails,
                          EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentCaseSummaryApp2(), bundleDetails,
+                EvidenceUploadFiles.CASE_SUMMARY.getDocumentTypeDisplayName()
         );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgument(),
                          bundleDetails,
                          EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName()
         );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentSkeletonArgumentApp2(),
+                bundleDetails,
+                EvidenceUploadFiles.SKELETON_ARGUMENT.getDocumentTypeDisplayName()
+        );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentAuthorities(), bundleDetails,
                          EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName()
         );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentAuthoritiesApp2(), bundleDetails,
+                EvidenceUploadFiles.AUTHORITIES.getDocumentTypeDisplayName()
+        );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentCosts(), bundleDetails,
                          EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName()
+        );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentCostsApp2(), bundleDetails,
+                EvidenceUploadFiles.COSTS.getDocumentTypeDisplayName()
         );
         addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrial(),
                          bundleDetails,
                          EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName()
         );
+        addUploadDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentEvidenceForTrialApp2(),
+                bundleDetails,
+                EvidenceUploadFiles.DOCUMENTARY.getDocumentTypeDisplayName()
+        );
         addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatement(),
                           bundleDetails,
                           EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName()
         );
+        addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentWitnessStatementApp2(),
+                bundleDetails,
+                EvidenceUploadFiles.WITNESS_STATEMENT.getDocumentTypeDisplayName()
+        );
         addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummary(), bundleDetails,
                           EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName()
+        );
+        addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentWitnessSummaryApp2(), bundleDetails,
+                EvidenceUploadFiles.WITNESS_SUMMARY.getDocumentTypeDisplayName()
         );
         addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNotice(), bundleDetails,
                           EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName()
         );
+        addWitnessDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentHearsayNoticeApp2(), bundleDetails,
+                EvidenceUploadFiles.NOTICE_OF_INTENTION.getDocumentTypeDisplayName()
+        );
         addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentExpertReport(), bundleDetails,
                          EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentExpertReportApp2(), bundleDetails,
+                EvidenceUploadFiles.EXPERT_REPORT.getDocumentTypeDisplayName()
         );
         addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentJointStatement(), bundleDetails,
                          EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName()
         );
+        addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentJointStatementApp2(), bundleDetails,
+                EvidenceUploadFiles.JOINT_STATEMENT.getDocumentTypeDisplayName()
+        );
         addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentQuestions(), bundleDetails,
                          EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName()
         );
+        addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentQuestionsApp2(), bundleDetails,
+                EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
         addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentAnswers(), bundleDetails,
                          EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName()
+        );
+        addExpertDocList(applicantEvidenceUploadedAfterBundle, caseData.getDocumentAnswersApp2(), bundleDetails,
+                EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDocumentTypeDisplayName()
         );
         caseDataBuilder.applicantDocsUploadedAfterBundle(applicantEvidenceUploadedAfterBundle);
     }
