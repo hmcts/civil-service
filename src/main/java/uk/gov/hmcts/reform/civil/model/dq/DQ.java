@@ -19,6 +19,8 @@ public interface DQ {
 
     ExpertDetails getSmallClaimExperts();
 
+    RemoteHearing getRemoteHearing();
+
     Experts getExperts();
 
     default Experts getExperts(Experts experts) {
