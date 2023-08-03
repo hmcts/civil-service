@@ -3,12 +3,15 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingDay;
+import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
@@ -21,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 class HmcDataUtilsTest {
 
@@ -753,5 +759,102 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getTotalHearingDurationText(hearing);
 
         assertEquals(result, "1 day");
+    }
+
+    @Nested
+    class IncludesVideoHearing {
+        @Test
+        void shouldReturnFalseIfCaseHearingsIsNull() {
+            HearingsResponse hearings = HearingsResponse.builder().build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnFalseIfNoCaseHearingsExist() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of()).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnFalseIfNoVideoHearingsExist() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(INTER)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnTrue_IfVideoHearingsExistOnASingleDay() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(VIDCVP)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertTrue(actual);
+        }
+
+        @Test
+        void shouldReturnTrue_IfVideoHearingsExistOneDayWithinMultipleDays() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(INTER)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build(),
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(VIDCVP)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()
+                    ))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertTrue(actual);
+        }
     }
 }
