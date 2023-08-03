@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
 
 public class HmcDataUtils {
@@ -28,15 +29,15 @@ public class HmcDataUtils {
     public static HearingDaySchedule getHearingStartDay(HearingGetResponse hearing) {
         var scheduledDays = getScheduledDays(hearing);
         return Optional.ofNullable(scheduledDays).orElse(List.of())
-            .stream().min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
+            .stream().min(Comparator.comparing(day -> convertFromUTC(day.getHearingStartDateTime())))
             .orElse(null);
     }
 
     public static List<HearingDay> getHearingDays(HearingGetResponse hearing) {
         return getScheduledDays(hearing).stream()
             .map(day -> HearingDay.builder()
-                .hearingStartDateTime(day.getHearingStartDateTime())
-                .hearingEndDateTime(day.getHearingEndDateTime())
+                .hearingStartDateTime(convertFromUTC(day.getHearingStartDateTime()))
+                .hearingEndDateTime(convertFromUTC(day.getHearingEndDateTime()))
                 .build()).collect(Collectors.toList());
     }
 
@@ -73,8 +74,8 @@ public class HmcDataUtils {
             } else {
                 for (HearingDaySchedule hearingDay : schedule) {
                     HearingDay datesFromHearingDay = HearingDay.builder()
-                        .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                        .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                        .hearingStartDateTime(convertFromUTC(hearingDay.getHearingStartDateTime()))
+                        .hearingEndDateTime(convertFromUTC(hearingDay.getHearingEndDateTime()))
                         .build();
                     if (!serviceData.getHearingLocation().equals(hearingDay.getHearingVenueId())
                         || !serviceData.getDays().contains(datesFromHearingDay)) {
@@ -97,7 +98,8 @@ public class HmcDataUtils {
      * @return duration of the hearing day in hours
      */
     private static int getHearingDayHoursDuration(HearingDaySchedule day) {
-        return ((Long)day.getHearingStartDateTime().until(day.getHearingEndDateTime(), ChronoUnit.HOURS)).intValue();
+        return ((Long)convertFromUTC(day.getHearingStartDateTime()).until(convertFromUTC(day.getHearingEndDateTime()),
+                                                                          ChronoUnit.HOURS)).intValue();
     }
 
     /**
@@ -117,8 +119,9 @@ public class HmcDataUtils {
      * @return e.g. "30 June 2023 at 10:00 for 3 hours"
      */
     private static String formatDay(HearingDaySchedule day) {
-        var dateString = day.getHearingStartDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-        var timeString = day.getHearingStartDateTime().toLocalTime().toString();
+        var dateString = convertFromUTC(day.getHearingStartDateTime()).toLocalDate()
+            .format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        var timeString = convertFromUTC(day.getHearingStartDateTime()).toLocalTime().toString();
         var duration = actualHours(getHearingDayHoursDuration(day));
 
         return String.format("%s at %s for %d %s", dateString, timeString, duration, duration > 1 ? "hours" : "hour");
@@ -130,6 +133,7 @@ public class HmcDataUtils {
      */
     public static List<String> getHearingDaysTextList(HearingGetResponse hearing) {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
+            .sorted(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .map(day -> formatDay(day))
             .collect(Collectors.toList());
     }
