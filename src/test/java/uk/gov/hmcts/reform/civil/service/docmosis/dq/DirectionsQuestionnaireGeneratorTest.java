@@ -1383,7 +1383,6 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .phoneNumber("123456789")
                                                      .emailAddress("respondent2LF@email.com").build())
                     .respondent1ResponseDate(LocalDateTime.now())
-                    .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
