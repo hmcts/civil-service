@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -76,6 +77,10 @@ public class CmcClaim implements Claim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime intentionToProceedDeadline;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
@@ -295,6 +300,13 @@ public class CmcClaim implements Claim {
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(FOUR_PM));
     }
 
+    private boolean isApplicant1ResponseDeadlineEnded() {
+        return Optional.ofNullable(getIntentionToProceedDeadline()).filter(deadline ->
+                                                                               deadline.isBefore(LocalDateTime.now()))
+            .isPresent() && !hasClaimantResponse();
+
+    }
+
     private boolean hasClaimantResponse() {
         return claimantResponse != null;
     }
@@ -335,11 +347,17 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isSDOOrderCreated() {
+        return false;
+    }
+
+    @Override
     public boolean hasClaimEnded() {
-        return Objects.nonNull(response)
+        return (Objects.nonNull(response)
             && response.isFullDefence()
             && Objects.nonNull(claimantResponse)
-            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
+            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION))
+            || isApplicant1ResponseDeadlineEnded();
     }
 
     @Override
