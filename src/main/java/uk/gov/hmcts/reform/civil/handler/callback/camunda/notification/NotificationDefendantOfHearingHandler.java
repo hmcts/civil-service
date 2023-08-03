@@ -109,6 +109,19 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
     }
 
+    public Map<String, String> addPropertiesHmc(final CaseData caseData) {
+        LocalDateTime hearingStartDateTime = camundaService
+            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            HEARING_DATE,
+            NotificationUtils.getFormattedHearingDate(hearingStartDateTime.toLocalDate()),
+            HEARING_TIME,
+            NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString())
+        ));
+    }
+
     private boolean isRespondent1Lip(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
@@ -166,16 +179,4 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         }
     }
 
-    public Map<String, String> addPropertiesHmc(final CaseData caseData) {
-        LocalDateTime hearingStartDateTime = camundaService
-            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
-            HEARING_DATE,
-            NotificationUtils.getFormattedHearingDate(hearingStartDateTime),
-            HEARING_TIME,
-            NotificationUtils.getFormattedHearingTime(hearingStartDateTime)
-        ));
-    }
 }

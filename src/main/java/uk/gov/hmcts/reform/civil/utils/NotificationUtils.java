@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -114,12 +115,11 @@ public class NotificationUtils {
             && caseData.getRespondentSolicitor2EmailAddress() == null;
     }
 
-    public static String getFormattedHearingDate(CaseData caseData) {
-        return caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    public static String getFormattedHearingDate(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
-    public static String getFormattedHearingTime(CaseData caseData) {
-        String hourMinute = caseData.getHearingTimeHourMinute();
+    public static String getFormattedHearingTime(String hourMinute) {
         int hours = Integer.parseInt(hourMinute.substring(0, 2));
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime time = LocalTime.of(hours, minutes, 0);

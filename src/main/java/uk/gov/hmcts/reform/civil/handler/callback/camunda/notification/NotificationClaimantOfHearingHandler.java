@@ -117,8 +117,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     public Map<String, String> addProperties(final CaseData caseData) {
         String reference = "";
         String legacyCaseRef = caseData.getLegacyCaseReference();
-        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData);
-        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData);
+        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
+        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
         Map<String, String> map = new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef,
             HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
         if (!isApplicantLip(caseData)) {
