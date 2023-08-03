@@ -104,7 +104,7 @@ public class HearingsPartyMapperTest {
     @Test
     void shouldBuildIndividualDetails_whenClaimantIsIndividualRespondentSoleTrader() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
+            .atStateApplicantRespondToDefenceAndProceed()
             .applicant1DQWithUnavailableDate()
             .build();
         caseData = rollUpUnavailableDateApplicant(caseData);
@@ -159,7 +159,7 @@ public class HearingsPartyMapperTest {
     @Test
     void shouldBuildOrganisationDetails_whenClaimantIsCompanyRespondentOrganisation() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
+            .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDateRange()
             .build()
             .toBuilder()
