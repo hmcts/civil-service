@@ -15,8 +15,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -27,6 +29,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
@@ -116,8 +120,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .telephoneOrganisedBy(getHearingMethodTelephoneHearingLabel(caseData))
             .videoConferenceOrganisedBy(getHearingMethodVideoConferenceLabel(caseData))
             .disposalHearingTime(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ())
-                                     ? fillDisposalHearingTime(
-                caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
+                                     ? fillDisposalHearingTime(caseData) : null)
             .disposalHearingJudgesRecitalDJ(caseData.getDisposalHearingJudgesRecitalDJ())
             .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
             .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
@@ -267,15 +270,34 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             + "clearly numbered including a case summary limited to 500 words";
     }
 
-    private String fillDisposalHearingTime(DisposalHearingFinalDisposalHearingTimeEstimate type) {
+    private String fillDisposalHearingTime(CaseData caseData) {
+        DisposalHearingFinalDisposalHearingTimeEstimate type = caseData.getDisposalHearingFinalDisposalHearingDJ().getTime();
+
         switch (type) {
             case FIFTEEN_MINUTES:
                 return "15 minutes";
             case THIRTY_MINUTES:
                 return "30 minutes";
+            case OTHER:
+                return getDisposalHearingFinalDisposalHearingTimeLabelForOther(caseData);
             default:
                 return null;
         }
+    }
+
+    private String getDisposalHearingFinalDisposalHearingTimeLabelForOther(CaseData caseData) {
+        DisposalHearingFinalDisposalHearingDJ disposalHearingHearingTime = caseData.getDisposalHearingFinalDisposalHearingDJ();
+        StringBuilder otherLength = new StringBuilder();
+        if (disposalHearingHearingTime.getOtherHours() != null
+            && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
+            otherLength.append(disposalHearingHearingTime.getOtherHours().trim() +
+                                   " hours ");
+        }
+        if (disposalHearingHearingTime.getOtherMinutes() != null
+            && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
+            otherLength.append(disposalHearingHearingTime.getOtherMinutes().trim() + " minutes");
+        }
+        return otherLength.toString();
     }
 
     private boolean getToggleValue(List<DisposalAndTrialHearingDJToggle> toggle) {

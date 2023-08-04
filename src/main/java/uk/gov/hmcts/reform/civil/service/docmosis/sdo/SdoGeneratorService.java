@@ -160,11 +160,9 @@ public class SdoGeneratorService {
 
         sdoDocumentBuilder
             .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
-        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
-            .map(DisposalHearingHearingTime::getTime)
-            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
-            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
+            .disposalHearingTime(caseData.getDisposalHearingHearingTime())
+            .disposalHearingTimeEstimate(SdoHelper.getDisposalHearingTimeLabel(caseData));
+
         if (caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson) {
             sdoDocumentBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
