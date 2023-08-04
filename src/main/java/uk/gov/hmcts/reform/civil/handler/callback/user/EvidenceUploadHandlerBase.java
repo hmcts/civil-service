@@ -61,7 +61,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final List<CaseEvent> events;
     private final String pageId;
     private final String createShowCondition;
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
@@ -114,7 +114,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse setOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         List<String> dynamicListOptions = new ArrayList<>();
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
             if(MultiPartyScenario.isTwoVOne(caseData)) {
@@ -130,6 +129,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        //determine claim path, and assign to CCD object for show hide functionality
+        if (caseData.getClaimType() == null) {
+            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
+        } else {
+            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+        }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -166,12 +171,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    ) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        //determine claim path, and assign to CCD object for show hide functionality
-        if (caseData.getClaimType() == null) {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
-        } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
-        }
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
         //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE

@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 @Service
 public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
@@ -35,12 +39,29 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                                           ObjectMapper objectMapper, Time time) {
         super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
                 objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
-              "validateValuesApplicant", null);
+              "validateValuesApplicant", "createShowCondition");
     }
 
     @Override
     CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
-        return null;
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
+        //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
+        //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
+        //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
+        //default flag for respondent 1 solicitor
+        caseDataBuilder.caseTypeFlag("do_not_show");
+
+        boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
+                && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
+        if (multiParts
+                && caseData.getEvidenceUploadOptions()
+                .getValue().getLabel().startsWith("Claimant 2 - ")) {
+            caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(this.objectMapper))
+                .build();
     }
 
     @Override
