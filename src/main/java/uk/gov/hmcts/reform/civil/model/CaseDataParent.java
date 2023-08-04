@@ -693,19 +693,15 @@ public class CaseDataParent implements MappableObject {
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-        BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
-        BigDecimal highCostAmount = BigDecimal.valueOf(55);
-        if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+
+        if ((!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())|| (claimAmount.compareTo(lowerRangeClaimAmount) < 0))) {
             return ZERO;
-        }
-        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
-            return lowCostAmount;
         }
         if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
             return midCostAmount;
         }
-        return highCostAmount;
+        return BigDecimal.valueOf(55);
     }
 
     @JsonIgnore
