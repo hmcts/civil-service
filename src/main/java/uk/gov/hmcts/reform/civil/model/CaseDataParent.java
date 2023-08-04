@@ -695,7 +695,8 @@ public class CaseDataParent implements MappableObject {
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
 
-        if ((!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())|| (claimAmount.compareTo(lowerRangeClaimAmount) < 0))) {
+        if ((!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
+            || (claimAmount.compareTo(lowerRangeClaimAmount) < 0))) {
             return ZERO;
         }
         if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
