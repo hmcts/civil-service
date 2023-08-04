@@ -16,12 +16,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_LIP_DEFENDANT;
 @Service
 @RequiredArgsConstructor
 public class LipDefendantCaseAssignmentService {
+
     private final FeatureToggleService featureToggleService;
     private final IdamClient idamClient;
     private final CaseEventService caseEventService;
 
     public void addLipDefendantToCaseDefendantUserDetails(String authorisation, String caseId) {
-        if(featureToggleService.isLipVLipEnabled()){
+        if (featureToggleService.isLipVLipEnabled()) {
             UserDetails defendantIdamUserDetails = idamClient.getUserDetails(authorisation);
             IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
                 .id(defendantIdamUserDetails.getId())

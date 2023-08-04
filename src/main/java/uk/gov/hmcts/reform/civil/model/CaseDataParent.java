@@ -696,7 +696,6 @@ public class CaseDataParent implements MappableObject {
         BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
         BigDecimal highCostAmount = BigDecimal.valueOf(55);
-
         if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return ZERO;
         }
