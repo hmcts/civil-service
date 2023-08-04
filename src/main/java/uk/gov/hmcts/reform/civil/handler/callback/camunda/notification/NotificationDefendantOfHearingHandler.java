@@ -86,7 +86,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private void sendEmail(CaseData caseData, String recipient, boolean isDefendant1, boolean isRespondent1Lip, boolean isHmc) {
         Map<String, String> properties;
         if (isHmc) {
-          properties = addPropertiesHmc(caseData);
+            properties = addPropertiesHmc(caseData);
         } else {
             properties = addProperties(caseData);
         }

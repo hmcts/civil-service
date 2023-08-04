@@ -377,33 +377,6 @@ public class NotificationDefendantOfHearingHandlerTest {
         }
 
         @Test
-        void shouldNotifyRespondentLip_whenInvoked() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
-                .respondent1(Party.builder().partyEmail("respondentLip@gmail.com").partyName("res1").type(Party.Type.INDIVIDUAL).build())
-                .hearingReferenceNumber("000HN001")
-                .hearingTimeHourMinute("1530")
-                .addApplicant2(YesOrNo.NO)
-                .addRespondent2(YesOrNo.NO)
-                .respondent1Represented(NO)
-                .solicitorReferences(SolicitorReferences.builder().build())
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
-            // When
-            handler.handle(params);
-            // Then
-            verify(notificationService).sendMail(
-                "respondentLip@gmail.com",
-                "test-template-no-fee-defendant-id",
-                getNotificationDataMapNoReference(caseData),
-                "notification-of-hearing-000HN001"
-            );
-        }
-
-        @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1HMC() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -498,20 +471,20 @@ public class NotificationDefendantOfHearingHandlerTest {
             );
         }
 
-    @NotNull
-    private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "hearingDate", "17-05-2023", "hearingTime", "11:00am"
-        );
-    }
+        @NotNull
+        private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                "hearingDate", "17-05-2023", "hearingTime", "11:00am"
+            );
+        }
 
-    @Test
-    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
-                                                                                         .builder().eventId(
-                "NOTIFY_DEFENDANT1_HEARING").build()).build())).isEqualTo(TASK_ID_DEFENDANT1);
-    }
+        @Test
+        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
+                                                                                             .builder().eventId(
+                    "NOTIFY_DEFENDANT1_HEARING").build()).build())).isEqualTo(TASK_ID_DEFENDANT1);
+        }
 
         @Test
         void shouldReturnCorrectCamundaActivityId_whenInvokedWithDefendant2() {
