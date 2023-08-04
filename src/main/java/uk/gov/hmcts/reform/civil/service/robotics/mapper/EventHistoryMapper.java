@@ -1919,16 +1919,28 @@ public class EventHistoryMapper {
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
+        miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
         if (defendant1ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.receiptOfPartAdmission(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
-            ).miscellaneous(Event.builder()
+            if (YES.equals(caseData.getSpecDefenceAdmittedRequired())
+                && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                builder.statesPaid(
+                    buildDefenceFiledEvent(
+                        builder,
+                        caseData.getRespondent1ResponseDate(),
+                        RESPONDENT_ID,
+                        true
+                    ));
+            } else {
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
+                );
+            }
+            builder.miscellaneous(Event.builder()
                                 .eventSequence(prepareEventSequence(builder.build()))
                                 .eventCode(MISCELLANEOUS.getCode())
                                 .dateReceived(caseData.getRespondent1ResponseDate())
