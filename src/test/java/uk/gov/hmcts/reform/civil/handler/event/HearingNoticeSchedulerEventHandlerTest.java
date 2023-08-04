@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
@@ -169,7 +170,9 @@ class HearingNoticeSchedulerEventHandlerTest {
                 PartiesNotifiedResponse.builder()
                     .serviceData(PartiesNotifiedServiceData
                                      .builder()
-                                     .hearingDate(LocalDateTime.of(2030, 6, 6, 12, 0, 0))
+                                     .days(List.of(HearingDay.builder()
+                                                       .hearingStartDateTime(LocalDateTime.of(2030, 6, 6, 12, 0, 0))
+                                                       .build()))
                                      .hearingLocation(VENUE_ID)
                                      .build())
                     .build()
@@ -204,7 +207,9 @@ class HearingNoticeSchedulerEventHandlerTest {
                 PartiesNotifiedResponse.builder()
                     .serviceData(PartiesNotifiedServiceData
                                      .builder()
-                                     .hearingDate(HEARING_DATE)
+                                     .days(List.of(HearingDay.builder()
+                                                       .hearingStartDateTime(HEARING_DATE)
+                                                       .build()))
                                      .hearingLocation("111111")
                                      .build())
                     .build()
@@ -239,7 +244,10 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .responseReceivedDateTime(LocalDateTime.now())
                     .serviceData(PartiesNotifiedServiceData
                                      .builder()
-                                     .hearingDate(HEARING_DATE)
+                                     .days(List.of(HearingDay.builder()
+                                                       .hearingStartDateTime(HEARING_DATE)
+                                                       .hearingEndDateTime(HEARING_DATE.plusHours(1))
+                                                       .build()))
                                      .hearingLocation(VENUE_ID)
                                      .build())
                     .build()
@@ -254,7 +262,10 @@ class HearingNoticeSchedulerEventHandlerTest {
             RECEIVED_DATETIME,
             PartiesNotified.builder().serviceData(PartiesNotifiedServiceData.builder()
                                                       .hearingLocation(VENUE_ID)
-                                                      .hearingDate(HEARING_DATE)
+                                                      .days(List.of(HearingDay.builder()
+                                                                        .hearingStartDateTime(HEARING_DATE)
+                                                                        .hearingEndDateTime(HEARING_DATE.plusHours(1))
+                                                                        .build()))
                                                       .hearingNoticeGenerated(false).build()).build()
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
@@ -276,6 +287,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .hearingDaySchedule(List.of(
                         HearingDaySchedule.builder()
                             .hearingStartDateTime(HEARING_DATE)
+                            .hearingEndDateTime(HEARING_DATE.plusHours(1))
                             .hearingVenueId(VENUE_ID).build()
                     ))
                     .build())
