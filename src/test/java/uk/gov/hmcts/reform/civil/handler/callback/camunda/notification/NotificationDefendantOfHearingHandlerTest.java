@@ -36,11 +36,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT2_HMC;
 
 @SpringBootTest(classes = {
@@ -252,6 +253,33 @@ public class NotificationDefendantOfHearingHandlerTest {
                 "respondent1email@hmcts.net",
                 "test-template-no-fee-defendant-id",
                 getNotificationDataMap(caseData),
+                "notification-of-hearing-000HN001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLip_whenInvoked() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2022, 10, 7))
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondent1(Party.builder().partyEmail("respondentLip@gmail.com").partyName("res1").type(Party.Type.INDIVIDUAL).build())
+                .hearingReferenceNumber("000HN001")
+                .hearingTimeHourMinute("1530")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(NO)
+                .solicitorReferences(SolicitorReferences.builder().build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "respondentLip@gmail.com",
+                "test-template-no-fee-defendant-id",
+                getNotificationDataMapNoReference(caseData),
                 "notification-of-hearing-000HN001"
             );
         }
