@@ -105,7 +105,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim. <br/>[Pay your claim fee](%s)";
 
-    public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is " +
+    public static final String LIP_CONFIRMATION_BODY_PBAV3 = "<br />Your claim will not be issued until payment is " +
         "confirmed. [Pay your claim fee](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will receive "
         + "an email. The email will also include the date when you need to notify the the Defendant of the Claim."
@@ -118,6 +118,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "of the claim details.%n%n If notification of the claim is processed in the digital portal, the exact date "
         + "when you must notify the claim details will be provided when you first notify the Defendant legal "
         + "representative of the claim.";
+
+    public static final String LIP_CONFIRMATION_BODY = "<br />[Download the sealed claim form](%s)"
+        + "%n%n Your claim will not be issued until payment of the issue fee is confirmed."
+        + " Once payment is confirmed you will receive an email. The email will also include the date when you need"
+        + " to notify the Defendant of the Claim.%n%nYou must notify the Defendant of the claim"
+        + " within 4 months of the claim being issued.%n%nIf the defendant(s) include a litigant in person you"
+        + " must serve the claim outside of the digital portal using the claim form PDF provided on the link above."
+        + " This includes an information page for litigants in person. The claim will remain in the digital portal to"
+        + " allow the litigant in person time to appoint a legal representative who can respond to the claim via the "
+        + " portal.%n%nIf service of the claim and claim details are processed outside of the digital portal you "
+        + "must complete the next steps option 'notify claim' for the service of the claim form and "
+        + "'notify claim details' for service of the claim details. %n%nIf notification of the claim is "
+        + "processed in the digital portal, the exact date when you must notify the claim details will be "
+        + "provided when you first notify the Defendant legal representative of the claim.";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
@@ -566,22 +580,32 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getBody(CaseData caseData) {
-        return  (areRespondentsRepresentedAndRegistered(caseData)
+        return areRespondentsRepresentedAndRegistered(caseData)
                 ? getConfirmationSummary(caseData)
-                : format(LIP_CONFIRMATION_BODY, format("/cases/case-details/%s#Service%%20Request",
-                         caseData.getCcdCaseReference()), format(caseDocLocation, caseData.getCcdCaseReference()),
-                         claimUrlsConfiguration.getResponsePackLink()))
-                         + exitSurveyContentService.applicantSurvey();
-
+                : toggleService.isPbaV3Enabled()
+                 ? format(LIP_CONFIRMATION_BODY_PBAV3,
+                          format("/cases/case-details/%s#Service%%20Request",
+                                 caseData.getCcdCaseReference()),
+                                  format(caseDocLocation,
+                                       caseData.getCcdCaseReference()),
+                         claimUrlsConfiguration.getResponsePackLink())
+                         + exitSurveyContentService.applicantSurvey()
+                : format(LIP_CONFIRMATION_BODY,
+                         format(caseDocLocation,
+                                caseData.getCcdCaseReference(),
+                                claimUrlsConfiguration.getResponsePackLink()))
+               + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {
         if (toggleService.isPbaV3Enabled()) {
             return format(CONFIRMATION_SUMMARY_PBA_V3,
-                          format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()));
+                          format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()))
+                          + exitSurveyContentService.applicantSurvey();
         } else {
             return format(CONFIRMATION_SUMMARY,
-                   format(caseDocLocation, caseData.getCcdCaseReference()));
+                   format(caseDocLocation, caseData.getCcdCaseReference()))
+                  + exitSurveyContentService.applicantSurvey();
         }
     }
 

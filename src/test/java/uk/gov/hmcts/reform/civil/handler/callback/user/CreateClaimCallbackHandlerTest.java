@@ -92,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_PBAV3;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -1730,10 +1731,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -1757,10 +1757,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -1861,10 +1860,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -1885,14 +1883,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
-
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -1923,10 +1918,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                        + "Claim number: %s", REFERENCE_NUMBER))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
-                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
-                        ) + exitSurveyContentService.applicantSurvey())
+                        )  + exitSurveyContentService.applicantSurvey())
                         .build());
             }
 
@@ -1947,10 +1941,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    REFERENCE_NUMBER))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
-                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
-                        ) + exitSurveyContentService.applicantSurvey())
+                        )  + exitSurveyContentService.applicantSurvey())
                         .build());
             }
         }
@@ -1964,14 +1957,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
-
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -1988,17 +1978,16 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
+                when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
                     LIP_CONFIRMATION_BODY,
-                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink
-                ) + exitSurveyContentService.applicantSurvey();
+                )  + exitSurveyContentService.applicantSurvey();
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
@@ -2023,16 +2012,18 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+                when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
-                                                       + "Claim number: %s", REFERENCE_NUMBER))
+                        .confirmationHeader(format(
+                            "# Your claim has been received and will progress offline%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
-                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
-                        ) + exitSurveyContentService.applicantSurvey())
+                        )  + exitSurveyContentService.applicantSurvey())
                         .build());
             }
 
@@ -2051,7 +2042,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
                         .confirmationBody(format(
-                            LIP_CONFIRMATION_BODY,
+                            LIP_CONFIRMATION_BODY_PBAV3,
                             format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
@@ -2067,19 +2058,20 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 assertThat(response).usingRecursiveComparison().isEqualTo(
                     SubmittedCallbackResponse.builder()
-                        .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
-                                                   REFERENCE_NUMBER))
+                        .confirmationHeader(format(
+                            "# Your claim has been received and will progress offline%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
-                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
-                        ) + exitSurveyContentService.applicantSurvey())
+                        )  + exitSurveyContentService.applicantSurvey())
                         .build());
             }
 
@@ -2099,7 +2091,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     SubmittedCallbackResponse.builder()
                         .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
                         .confirmationBody(format(
-                            LIP_CONFIRMATION_BODY,
+                            LIP_CONFIRMATION_BODY_PBAV3,
                             format("/cases/case-details/%s#Service%%20Request", CASE_ID),
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
