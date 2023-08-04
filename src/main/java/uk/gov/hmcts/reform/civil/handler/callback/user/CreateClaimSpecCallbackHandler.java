@@ -138,7 +138,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY_PBAV3 = "<br />Your claim will not be issued until payment " +
-        "is confirmed.[Pay your claim fee](%s) <br/>When the payment is confirmed your claim " +
+        "is confirmed. [Pay your claim fee](%s) <br/>When the payment is confirmed your claim " +
         "will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
         + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
