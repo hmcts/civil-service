@@ -81,7 +81,9 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         String recipient = caseData.getRespondentSolicitor1EmailAddress();
 
         if (isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING)) {
-            sendEmail(caseData, recipient, true);
+            if (nonNull(recipient)) {
+                sendEmail(caseData, recipient, true);
+            }
         } else if (isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING)) {
             if (nonNull(caseData.getRespondentSolicitor2EmailAddress())) {
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
