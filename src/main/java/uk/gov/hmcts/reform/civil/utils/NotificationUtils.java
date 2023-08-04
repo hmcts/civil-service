@@ -120,7 +120,7 @@ public class NotificationUtils {
     }
 
     public static String getFormattedHearingTime(String hourMinute) {
-        hourMinute = hourMinute.replace(":","");
+        hourMinute = hourMinute.replace(":", "");
         int hours = Integer.parseInt(hourMinute.substring(0, 2));
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime time = LocalTime.of(hours, minutes, 0);
