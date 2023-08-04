@@ -252,7 +252,7 @@ class CoreCaseDataServiceTest {
             //Given
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
             String query = new SearchSourceBuilder()
-                .query(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail()))
+                .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
                 .sort("data.submittedDate", SortOrder.DESC)
                 .from(0)
                 .size(RETURNED_NUMBER_OF_CASES).toString();

@@ -173,7 +173,7 @@ public class CoreCaseDataService {
         if (featureToggleService.isLipVLipEnabled()) {
             UserDetails defendantInfo = idamClient.getUserDetails(authorization);
             return new SearchSourceBuilder()
-                .query(QueryBuilders.termQuery("data.defendantUserDetails.email", defendantInfo.getEmail()))
+                .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", defendantInfo.getEmail())))
                 .sort("data.submittedDate", SortOrder.DESC)
                 .from(startIndex)
                 .size(RETURNED_NUMBER_OF_CASES).toString();
