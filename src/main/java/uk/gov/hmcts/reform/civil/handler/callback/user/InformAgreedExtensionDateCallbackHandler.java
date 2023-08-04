@@ -120,6 +120,23 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().isRespondent1(isRespondent1);
+        setMaxAllowedDate(callbackParams, caseData, builder);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    /**
+     * Sets the agreed deadline extension to be the maximum allowed.
+     *
+     * @param callbackParams callback parameters
+     * @param caseData       original case data
+     * @param builder        builder for new case data
+     */
+    private void setMaxAllowedDate(CallbackParams callbackParams,
+                                   CaseData caseData,
+                                   CaseData.CaseDataBuilder<?, ?> builder) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
@@ -141,10 +158,6 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                 caseData.getRespondent2AcknowledgeNotificationDate()
             ));
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {
