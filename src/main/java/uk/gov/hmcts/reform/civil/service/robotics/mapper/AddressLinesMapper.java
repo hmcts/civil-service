@@ -98,7 +98,7 @@ public class AddressLinesMapper {
             Queue<String> addressParts = new LinkedList<>(Splitter.on(CHAR_SPACE).omitEmptyStrings()
                                                               .splitToList(StringUtils.defaultString(overflow).concat(
                                                                   addressLine)));
-            while (addressParts.isEmpty() || retained.concat(STRING_SPACE).concat(addressParts.peek())
+            while (!addressParts.isEmpty() && retained.concat(STRING_SPACE).concat(addressParts.peek())
                 .length() <= LINE_LIMIT) {
                 retained = retained.concat(STRING_SPACE).concat(requireNonNull(addressParts.poll()));
             }
