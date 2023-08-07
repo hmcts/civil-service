@@ -342,6 +342,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         String prefix = null;
         switch (theId) {
             case "ApplicantDisclosure",
+                    "ApplicantTwoDisclosure",
                     "RespondentOneDisclosure",
                     "RespondentTwoDisclosure":
                 prefix = "Document for disclosure";
@@ -349,51 +350,60 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 break;
             case "RespondentOneWitnessReferred",
                     "RespondentTwoWitnessReferred",
-                    "ApplicantWitnessReferred":
+                    "ApplicantWitnessReferred",
+                    "ApplicantTwoWitnessReferred":
                 prefix = "Referred Document";
                 renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneTrialDocCorrespondence",
                     "RespondentTwoTrialDocCorrespondence",
-                    "ApplicantTrialDocCorrespondence":
+                    "ApplicantTrialDocCorrespondence",
+                    "ApplicantTwoTrialDocCorrespondence":
                 prefix = "Documentary Evidence";
                 renameUploadEvidenceDocumentType(documentUpload, prefix);
                 break;
             case "RespondentOneExpertQuestions",
                     "RespondentTwoExpertQuestions",
-                    "ApplicantExpertQuestions":
+                    "ApplicantExpertQuestions",
+                    "ApplicantTwoExpertQuestions":
                 renameUploadEvidenceExpert(documentUpload, true);
                 break;
             case "RespondentOneExpertAnswers",
                     "RespondentTwoExpertAnswers",
-                    "ApplicantExpertAnswers":
+                    "ApplicantExpertAnswers",
+                    "ApplicantTwoExpertAnswers":
                 renameUploadEvidenceExpert(documentUpload, false);
                 break;
             case "ApplicantExpertReport",
+                    "ApplicantTwoExpertReport",
                     "RespondentTwoExpertReport",
                     "RespondentOneExpertReport":
                 prefix = "Experts report";
                 renameUploadReportExpert(documentUpload, prefix, true);
                 break;
             case "ApplicantExpertJointStatement",
+                    "ApplicantTwoExpertJointStatement",
                     "RespondentTwoExpertJointStatement",
                     "RespondentOneExpertJointStatement":
                 prefix = "Joint report";
                 renameUploadReportExpert(documentUpload, prefix, false);
                 break;
             case "ApplicantWitnessStatement",
+                    "ApplicantTwoWitnessStatement",
                     "RespondentOneWitnessStatement",
                     "RespondentTwoWitnessStatement":
                 prefix = "Witness Statement of";
                 renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             case "ApplicantWitnessSummary",
+                    "ApplicantTwoWitnessSummary",
                     "RespondentOneWitnessSummary",
                     "RespondentTwoWitnessSummary":
                 prefix = "Witness Summary of";
                 renameUploadEvidenceWitness(documentUpload, prefix, false);
                 break;
             case "ApplicantWitnessHearsay",
+                    "ApplicantTwoWitnessHearsay",
                     "RespondentOneWitnessHearsay",
                     "RespondentTwoWitnessHearsay":
                 prefix = "Hearsay evidence";
