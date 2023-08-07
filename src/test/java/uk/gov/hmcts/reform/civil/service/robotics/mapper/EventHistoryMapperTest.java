@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -7657,6 +7658,12 @@ class EventHistoryMapperTest {
     class ClaimInMediation {
         @Test
         public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -7666,6 +7673,15 @@ class EventHistoryMapperTest {
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
                 .addRespondent2(NO)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("test")
+                                .build()
+                        ).build()
+                )
                 .build();
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -7694,6 +7710,15 @@ class EventHistoryMapperTest {
                 .totalClaimAmount(claimValue)
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("test")
+                                .build()
+                        ).build()
+                )
                 .respondent1DQ(
                 Respondent1DQ.builder()
                     .respondToCourtLocation(
@@ -7731,24 +7756,6 @@ class EventHistoryMapperTest {
                                               .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
                                               .preferredCourtCode(mapper.getPreferredCourtCode(
                                                   caseData.getRespondent1DQ()))
-                                              .preferredCourtName("")
-                                              .build())
-                            .build(),
-                        Event.builder()
-                            .eventSequence(5)
-                            .eventCode("197")
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .litigiousPartyID(partyID)
-                            .eventDetailsText(mapper.prepareFullDefenceEventText(
-                                caseData.getRespondent1DQ(),
-                                caseData,
-                                true,
-                                caseData.getRespondent1()
-                            ))
-                            .eventDetails(EventDetails.builder()
-                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
-                                              .preferredCourtCode(
-                                                  mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
                                               .preferredCourtName("")
                                               .build())
                             .build()
