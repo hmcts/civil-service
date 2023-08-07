@@ -476,6 +476,13 @@ public class EventHistoryMapper {
                                   .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
                                   .build())
                 .build()));
+
+            if (caseData.isPartAdmitClaimSpec()) {
+                builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                    builder, caseData, caseData.getRespondent1ResponseDate(), RESPONDENT_ID,
+                    caseData.getRespondent1DQ(), caseData.getRespondent1(), true
+                ));
+            }
         }
     }
 
