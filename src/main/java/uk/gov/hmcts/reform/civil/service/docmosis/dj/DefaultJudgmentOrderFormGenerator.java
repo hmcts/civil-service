@@ -279,21 +279,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         }
     }
 
-    private String getDisposalHearingFinalDisposalHearingTimeLabelForOther(CaseData caseData) {
-        DisposalHearingFinalDisposalHearingDJ disposalHearingHearingTime = caseData.getDisposalHearingFinalDisposalHearingDJ();
-        StringBuilder otherLength = new StringBuilder();
-        if (disposalHearingHearingTime.getOtherHours() != null
-            && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
-            otherLength.append(disposalHearingHearingTime.getOtherHours().trim() +
-                                   " hours ");
-        }
-        if (disposalHearingHearingTime.getOtherMinutes() != null
-            && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
-            otherLength.append(disposalHearingHearingTime.getOtherMinutes().trim() + " minutes");
-        }
-        return otherLength.toString();
-    }
-
     private boolean getToggleValue(List<DisposalAndTrialHearingDJToggle> toggle) {
         return nonNull(toggle) && toggle.get(0).equals(SHOW);
     }
