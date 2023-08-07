@@ -75,6 +75,37 @@ allprojects {
 
   dependencyManagement {
     dependencies {
+      //CVE-2022-41881
+      dependencySet(group: 'io.netty', version: '4.1.94.Final') {
+        entry 'netty-handler'
+        entry 'netty-handler-proxy'
+        entry 'netty-transport-native-epoll'
+        entry 'netty-transport-native-kqueue'
+        entry 'netty-codec-http'
+        entry 'netty-codec-http2'
+        entry 'netty-codec'
+        entry 'netty-codec-dns'
+        entry 'netty-transport'
+        entry 'netty-transport-native-unix-common'
+        entry 'netty-transport-classes-epoll'
+        entry 'netty-transport-classes-kqueue'
+        entry 'netty-buffer'
+        entry 'netty-resolver'
+        entry 'netty-resolver-dns-classes-macos'
+        entry 'netty-resolver-dns-native-macos'
+        entry 'netty-resolver-dns'
+        entry 'netty-common'
+        entry 'netty-codec-socks'
+      }
+      //CVE-2022-40152
+      dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
+        entry 'woodstox-core'
+      }
+      //CVE-2023-3635
+      dependencySet(group: 'com.squareup.okio', version: '3.4.0') {
+        entry 'okio-jvm'
+      }
+
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
@@ -130,7 +161,12 @@ allprojects {
       ) {
         entry 'groovy-all'
       }
-
+      // CVE-2023-28709
+      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
+        entry 'tomcat-embed-core'
+        entry 'tomcat-embed-el'
+        entry 'tomcat-embed-websocket'
+      }
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     }
@@ -404,12 +440,13 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
   implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
 
   // JAX-B dependencies for JDK 9+
