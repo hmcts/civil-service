@@ -7655,8 +7655,17 @@ class EventHistoryMapperTest {
 
     @Nested
     class ClaimInMediation {
+
+        final String partyID = "002";
+
         @Test
         public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -7666,17 +7675,48 @@ class EventHistoryMapperTest {
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
                 .addRespondent2(NO)
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
+                                .build()
+                        )
+                        .build()
+                )
                 .build();
+
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(3)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build());
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
         }
 
         @Test
         public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediation() {
-            final String partyID = "002";
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
