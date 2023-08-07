@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
