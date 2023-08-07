@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 
 import static java.util.Objects.nonNull;
@@ -26,6 +27,24 @@ public class DocumentUtils {
                                        " hours ");
             }
             if (hearingTime.getOtherMinutes() != null) {
+                otherLength.append(hearingTime.getOtherMinutes().trim() + " minutes");
+            }
+            return otherLength.toString();
+        }
+        return hearingTimeEstimateLabel;
+    }
+
+    public static String getDisposalHearingTimeEstimateDJ(DisposalHearingFinalDisposalHearingTimeDJ hearingTime) {
+        String hearingTimeEstimateLabel = nonNull(hearingTime) && nonNull(hearingTime.getTime())
+            ? hearingTime.getTime().getLabel() : null;
+
+        if (hearingTimeEstimateLabel != null && hearingTimeEstimateLabel.equals("Other")) {
+            StringBuilder otherLength = new StringBuilder();
+            if (hearingTime.getOtherHours() != null && Integer.parseInt(hearingTime.getOtherHours()) != 0) {
+                otherLength.append(hearingTime.getOtherHours().trim() +
+                                       " hours ");
+            }
+            if (hearingTime.getOtherMinutes() != null && Integer.parseInt(hearingTime.getOtherMinutes()) != 0) {
                 otherLength.append(hearingTime.getOtherMinutes().trim() + " minutes");
             }
             return otherLength.toString();

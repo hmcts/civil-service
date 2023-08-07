@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -36,6 +37,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.OTHER;
 
 public class SdoHelperTest {
 
@@ -229,6 +232,103 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetDisposalHearingTimeLabelTest {
+        @Test
+        void shouldReturnLabel_whenHearingIsNotNull() {
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(FIFTEEN_MINUTES)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("15 minutes");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("6")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherHourZero() {
+            var expected = "20 minutes";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("0")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherMinuteZero() {
+            var expected = "6 hours ";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("6")
+                .otherMinutes("0")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnEmptyString_whenHearingIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("");
         }
     }
 
