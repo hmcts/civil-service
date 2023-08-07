@@ -637,6 +637,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQ() {
         respondent1DQ = Respondent1DQ.builder()
             .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -874,6 +885,17 @@ public class CaseDataBuilder {
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQWithFixedRecoverableCosts() {
+        respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .build()).build();
         return this;
     }
 
