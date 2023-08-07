@@ -2281,7 +2281,7 @@ public class EventHistoryMapper {
                                       getPreferredCourtCode(caseData.getApplicant1DQ())
                                   ))
                                   .build())
-                .collect(Collectors.toList());
+                .toList();
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         }
     }
