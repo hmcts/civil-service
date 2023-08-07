@@ -279,6 +279,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
+                .respondent1DQWithFixedRecoverableCosts()
                 .build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
@@ -348,6 +349,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
+                .respondent1DQWithFixedRecoverableCosts()
                 .build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
@@ -1331,7 +1333,9 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenRespondent2Response_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .respondent2DQWithFixedRecoverableCosts()
+                    .build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder()
                                                     .fullName("Applicant LF")
                                                     .firstName("Applicant")
@@ -1356,7 +1360,9 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenRespondent2LaterResponse_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .respondent2DQWithFixedRecoverableCosts()
+                    .build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder()
                                                     .fullName("Applicant LF")
                                                     .firstName("Applicant")
@@ -1382,7 +1388,9 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenRespondent2SameLegalRepAndRespondentResponseSame_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .respondent1DQWithFixedRecoverableCosts()
+                    .build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder()
                                                     .fullName("Applicant LF")
                                                     .firstName("Applicant")
@@ -1403,8 +1411,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .lastName("LF")
                                                      .phoneNumber("123456789")
                                                      .emailAddress("respondent2LF@email.com").build())
-                    .respondent1ResponseDate(null)
-                    .respondent2ResponseDate(LocalDateTime.now())
+                    .respondent1ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
@@ -1412,6 +1419,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertEquals(templateData.getRespondents(), getRespondents(caseData));
+                assertEquals(
+                    FixedRecoverableCostsSection.from(caseData.getRespondent1DQ().getFixedRecoverableCosts()),
+                    templateData.getFixedRecoverableCosts()
+                );
             }
 
             @Test
@@ -1827,7 +1838,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     () -> assertEquals(templateData.getHearingSupport(), getHearingSupport(dq)),
                     () -> assertEquals(templateData.getWelshLanguageRequirements(), getWelshLanguageRequirements(dq)),
                     () -> assertEquals(templateData.getStatementOfTruth(), dq.getStatementOfTruth()),
-                    () -> assertEquals(templateData.getVulnerabilityQuestions(), dq.getVulnerabilityQuestions())
+                    () -> assertEquals(templateData.getVulnerabilityQuestions(), dq.getVulnerabilityQuestions()),
+                    () -> assertEquals(templateData.getFixedRecoverableCosts(), FixedRecoverableCostsSection.from(dq.getFixedRecoverableCosts()))
                 );
             }
 
