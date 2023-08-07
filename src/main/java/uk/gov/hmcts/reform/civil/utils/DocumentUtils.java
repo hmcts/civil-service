@@ -16,7 +16,20 @@ public class DocumentUtils {
     }
 
     public static String getHearingTimeEstimateLabel(TrialHearingTimeDJ hearingTime) {
-        return nonNull(hearingTime) && nonNull(hearingTime.getHearingTimeEstimate())
+        String hearingTimeEstimateLabel = nonNull(hearingTime) && nonNull(hearingTime.getHearingTimeEstimate())
             ? hearingTime.getHearingTimeEstimate().getLabel() : null;
+
+        if (hearingTimeEstimateLabel != null && hearingTimeEstimateLabel.equals("Other")) {
+            StringBuilder otherLength = new StringBuilder();
+            if (hearingTime.getOtherHours() != null) {
+                otherLength.append(hearingTime.getOtherHours().trim() +
+                                       " hours ");
+            }
+            if (hearingTime.getOtherMinutes() != null) {
+                otherLength.append(hearingTime.getOtherMinutes().trim() + " minutes");
+            }
+            return otherLength.toString();
+        }
+        return hearingTimeEstimateLabel;
     }
 }
