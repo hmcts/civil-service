@@ -147,7 +147,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = DocmosisTemplates.DQ_RESPONSE_2V1;
+                    templateId = featureToggleService.isFastTrackUpliftsEnabled()
+                        ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
                 }
                 break;
             default:
