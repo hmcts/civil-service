@@ -521,8 +521,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
+    private String triggeredBy;
+
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
+    private ContactDetailsUpdatedEvent contactDetailsUpdatedEvent;
 
     @Builder.Default
     private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
