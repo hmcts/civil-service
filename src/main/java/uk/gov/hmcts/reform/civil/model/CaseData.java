@@ -911,7 +911,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
-        return Optional.ofNullable(getApplicant1OrganisationPolicy())
+        return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    public String getRespondent1OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    private String getOrganisationId(Optional<OrganisationPolicy> policy) {
+        return policy
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .orElse("");
@@ -970,5 +980,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public boolean getApplicant1ResponseDeadlinePassed() {
+        return getApplicant1ResponseDeadline() != null
+            && getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
+            && getApplicant1ProceedWithClaim() == null;
+    }
+
+    @JsonIgnore
+    public String getApplicant1Email() {
+        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
 }
