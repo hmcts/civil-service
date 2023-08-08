@@ -248,17 +248,16 @@ class CoreCaseDataServiceTest {
         }
 
         @Test
-        void shouldSearchCasesByDefendantIDAMUser_whenLipVLipEnabled() {
+        void shouldSearchCasesByDefendantUser_whenLipVLipEnabled() {
             //Given
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
+            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
                 .sort("data.submittedDate", SortOrder.DESC)
                 .from(0)
                 .size(RETURNED_NUMBER_OF_CASES).toString();
-
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
             //When
             service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0);
             //Then

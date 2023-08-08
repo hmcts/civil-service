@@ -39,37 +39,37 @@ class LipDefendantCaseAssignmentServiceTest {
     @InjectMocks
     private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
 
-   @Test
+    @Test
     void shouldAddDefendantDetails_whenLipVLipFlagIsEnabled() {
-       //Given
-       given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-       given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
-       IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-           .id(USER_ID)
-           .email(EMAIL)
-           .build();
-       Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails);
-       EventSubmissionParams params = EventSubmissionParams.builder()
-           .caseId(CASE_ID)
-           .userId(USER_ID)
-           .authorisation(AUTHORIZATION)
-           .event(ASSIGN_LIP_DEFENDANT)
-           .updates(data)
-           .build();
-       //When
-       lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
-       //Then
-       verify(idamClient).getUserDetails(AUTHORIZATION);
-       verify(caseEventService).submitEventForClaim(refEq(params));
-   }
+        //Given
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
+        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
+            .id(USER_ID)
+            .email(EMAIL)
+            .build();
+        Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails);
+        EventSubmissionParams params = EventSubmissionParams.builder()
+            .caseId(CASE_ID)
+            .userId(USER_ID)
+            .authorisation(AUTHORIZATION)
+            .event(ASSIGN_LIP_DEFENDANT)
+            .updates(data)
+            .build();
+        //When
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
+        //Then
+        verify(idamClient).getUserDetails(AUTHORIZATION);
+        verify(caseEventService).submitEventForClaim(refEq(params));
+    }
 
-   @Test
+    @Test
     void shouldNotAddDefendantDetails_whenLipVLipIsNotEnabled() {
-       //Given
-       given(featureToggleService.isLipVLipEnabled()).willReturn(false);
-       //When
-       lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
-       verify(idamClient, never()).getUserDetails(AUTHORIZATION);
-       verify(caseEventService, never()).submitEvent(any());
-   }
+        //Given
+        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
+        //When
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
+        verify(idamClient, never()).getUserDetails(AUTHORIZATION);
+        verify(caseEventService, never()).submitEvent(any());
+    }
 }
