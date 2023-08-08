@@ -21,7 +21,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -50,8 +52,10 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -673,13 +677,24 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         });
     }
 
-    @Test
-    void should_do_naming_convention() {
+    @ParameterizedTest
+    @CsvSource({
+            "0",
+            "2",
+    })
+    void should_do_naming_convention(String selected) {
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
 
         String witnessName = "AppWitness";
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
+                EvidenceUploadHandlerBase.OPTION_APP2,
+                EvidenceUploadHandlerBase.OPTION_APP_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addApplicant2(YES)
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
                 .documentWitnessSummary(
                         createWitnessDocs(witnessName, createdDate, witnessDate))
                 .documentWitnessStatement(
@@ -698,10 +713,17 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                 .documentAuthorities(createEvidenceDocs(null, null))
                 .documentCosts(createEvidenceDocs(null, null))
                 .build();
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addApplicant2(YES)
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -738,6 +760,70 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCosts().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+
+        String both = "2";
+        if (selected.equals(both)) {
+            assertThat(updatedData.getDocumentWitnessSummaryApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of AppWitness.pdf");
+            assertThat(updatedData.getDocumentWitnessSummaryApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_WITNESS_SUMMARY);
+            assertThat(updatedData.getDocumentWitnessStatementApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of AppWitness 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentWitnessStatementApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_WITNESS_STATEMENT);
+            assertThat(updatedData.getDocumentHearsayNoticeApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence AppWitness 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentHearsayNoticeApp2().get(0).getValue()
+                    .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_WITNESS_HEARSAY);
+            assertThat(updatedData.getDocumentExpertReportApp2().get(0).getValue()
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentExpertReportApp2().get(0).getValue()
+                    .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_EXPERT_REPORT);
+            assertThat(updatedData.getDocumentJointStatementApp2().get(0).getValue()
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentJointStatementApp2().get(0).getValue()
+                    .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_EXPERT_JOINT_STATEMENT);
+            assertThat(updatedData.getDocumentQuestionsApp2().get(0).getValue()
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other question.pdf");
+            assertThat(updatedData.getDocumentQuestionsApp2().get(0).getValue()
+                    .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_EXPERT_QUESTIONS);
+            assertThat(updatedData.getDocumentAnswersApp2().get(0).getValue()
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other answer.pdf");
+            assertThat(updatedData.getDocumentAnswersApp2().get(0).getValue()
+                    .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_EXPERT_ANSWERS);
+            assertThat(updatedData.getDocumentForDisclosureApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentForDisclosureApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_DISCLOSURE);
+            assertThat(updatedData.getDocumentReferredInStatementApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentReferredInStatementApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_WITNESS_REFERRED);
+            assertThat(updatedData.getDocumentEvidenceForTrialApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
+            assertThat(updatedData.getDocumentEvidenceForTrialApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE);
+            assertThat(updatedData.getDocumentDisclosureListApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+            assertThat(updatedData.getDocumentDisclosureListApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_DISCLOSURE_LIST);
+            assertThat(updatedData.getDocumentCaseSummaryApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+            assertThat(updatedData.getDocumentCaseSummaryApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_PRE_TRIAL_SUMMARY);
+            assertThat(updatedData.getDocumentSkeletonArgumentApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+            assertThat(updatedData.getDocumentSkeletonArgumentApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_SKELETON);
+            assertThat(updatedData.getDocumentAuthoritiesApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+            assertThat(updatedData.getDocumentAuthoritiesApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_AUTHORITIES);
+            assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+            assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_COSTS);
+        }
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {
