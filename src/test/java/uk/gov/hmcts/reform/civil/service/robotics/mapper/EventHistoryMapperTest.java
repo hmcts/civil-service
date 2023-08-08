@@ -8079,14 +8079,10 @@ class EventHistoryMapperTest {
                 );
 
             var eventHistory = mapper.buildEvents(caseData);
-            System.out.println(eventHistory);
-
-            assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("statesPaid").asList()
-                .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
-
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
