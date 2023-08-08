@@ -41,8 +41,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_BULK_CLAIM_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "makeBulkClaimPayment";
-    public static final String DUPLICATE_PAYMENT_MESSAGE
-        = "You attempted to retry the payment to soon. Try again later.";
+    public static final String DUPLICATE_BULK_PAYMENT_MESSAGE = "You attempted to retry the payment to soon. Try again later.";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
@@ -94,18 +93,18 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                     .build();
 
                 log.info("Payment Successfully completed for the case: " + caseData.getCcdCaseReference());
-            } catch (FeignException e) {
-                log.info(String.format("Http Status %s ", e.status()), e);
-                if (e.status() == 403 || e.status() == 422 || e.status() == 504) {
-                    caseData = updateWithBusinessError(caseData, e);
+            } catch (FeignException exception) {
+                log.info(String.format("Http Status %s ", exception.status()), exception);
+                if (exception.status() == 403 || exception.status() == 422 || exception.status() == 504) {
+                    caseData = updateWithBusinessError(caseData, exception);
                 } else {
                     errors.add(ERROR_MESSAGE);
                 }
-            } catch (InvalidPaymentRequestException e) {
+            } catch (InvalidPaymentRequestException exception) {
                 log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
-                                        caseData.getCcdCaseReference(), e.getMessage()
+                                        caseData.getCcdCaseReference(), exception.getMessage()
                 ));
-                caseData = updateWithDuplicatePaymentError(caseData, e);
+                caseData = updateWithDuplicatePaymentError(caseData, exception);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -115,15 +114,15 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
 
     }
 
-    private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
+    private CaseData updateWithBusinessError(CaseData caseData, FeignException exception) {
         try {
-            var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
-            var statusHistory = paymentDto.getStatusHistories()[0];
+            var paymentObject = objectMapper.readValue(exception.contentUTF8(), PaymentDto.class);
+            var status = paymentObject.getStatusHistories()[0];
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
                 .status(FAILED)
-                .errorCode(statusHistory.getErrorCode())
-                .errorMessage(statusHistory.getErrorMessage())
+                .errorCode(status.getErrorCode())
+                .errorMessage(status.getErrorMessage())
                 .build();
 
             return caseData.toBuilder()
@@ -131,10 +130,10 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 .build();
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());
-            log.error(String.format("Unknown payment error for case: %s, response body: %s",
-                                    caseData.getCcdCaseReference(), e.contentUTF8()
+            log.error(String.format("Unknown bulk payment error for case: %s, response body: %s",
+                                    caseData.getCcdCaseReference(), exception.contentUTF8()
             ));
-            throw e;
+            throw exception;
         }
     }
 
@@ -144,7 +143,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
             .orElse(PaymentDetails.builder())
             .status(FAILED)
             .errorCode(null)
-            .errorMessage(DUPLICATE_PAYMENT_MESSAGE)
+            .errorMessage(DUPLICATE_BULK_PAYMENT_MESSAGE)
             .build();
 
         return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
