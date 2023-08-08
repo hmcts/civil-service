@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -137,36 +138,50 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void givenAboutToStart_1v2SameSolicitorWillNotChangeToRespondentTwoFlag() {
+    void givenAboutToStart_2v1_shouldShowOptions() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(YES)
-            .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+                .claimType(null)
+                .totalClaimAmount(BigDecimal.valueOf(12500))
+                .addApplicant2(YES)
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
+                .handle(params);
         // Then
-        assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
+        assertThat(response.getData()).extracting("evidenceUploadOptions").isNotNull();
     }
 
-    @Test
-    void givenAboutToStart_1v1WillNotChangeToRespondentTwoFlag() {
+    @ParameterizedTest
+    @CsvSource({
+            "0",
+            "1",
+            "2",
+    })
+    void givenCreateShow_2v1_ApplicantTwoFlag(String selected) {
         // Given
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
+                EvidenceUploadHandlerBase.OPTION_APP2,
+                EvidenceUploadHandlerBase.OPTION_APP_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+                .addApplicant2(YES)
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
+                .handle(params);
         // Then
-        assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
+        if (!selected.equals("1")) {
+            assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("ApplicantTwoFields");
+        } else {
+            assertThat(response.getData()).extracting("caseTypeFlag").isEqualTo("ApplicantTwoFields");
+        }
     }
 
     @ParameterizedTest

@@ -153,13 +153,32 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("FAST_CLAIM");
     }
 
+    @Test
+    void givenAboutToStart_1v2SameSolicitor_shouldShowOptions() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .claimType(null)
+                .totalClaimAmount(BigDecimal.valueOf(12500))
+                .addRespondent2(YES)
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+        // Then
+        assertThat(response.getData()).extracting("evidenceUploadOptions").isNotNull();
+    }
+
     @ParameterizedTest
     @CsvSource({
             "0",
             "1",
             "2",
     })
-    void givenCreateShow_1v2SameSolicitor_ChooseDef1_WillNotChangeToRespondentTwoFlag(String selected) {
+    void givenCreateShow_1v2SameSolicitor_RespondentTwoFlag(String selected) {
         // Given
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
                 EvidenceUploadHandlerBase.OPTION_DEF2,
