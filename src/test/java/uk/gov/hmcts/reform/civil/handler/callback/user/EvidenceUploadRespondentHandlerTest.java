@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -40,10 +41,13 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -94,6 +98,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -145,26 +153,37 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("FAST_CLAIM");
     }
 
-    @Test
-    void givenAboutToStart_1v2SameSolicitorWillNotChangeToRespondentTwoFlag() {
+    @ParameterizedTest
+    @CsvSource({
+            "0",
+            "1",
+            "2",
+    })
+    void givenCreateShow_1v2SameSolicitor_ChooseDef1_WillNotChangeToRespondentTwoFlag(String selected) {
         // Given
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
+                EvidenceUploadHandlerBase.OPTION_DEF2,
+                EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(YES)
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
         // Then
-        assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
+        if (!selected.equals("1")) {
+            assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
+        } else {
+            assertThat(response.getData()).extracting("caseTypeFlag").isEqualTo("RespondentTwoFields");
+        }
     }
 
     @Test
-    void givenAboutToStart_1v2DifferentSolicitorsWillChangeToRespondentTwoFlag() {
+    void givenCreateShow_1v2DifferentSolicitorsWillChangeToRespondentTwoFlag() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YES)
@@ -173,7 +192,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -182,7 +201,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void givenAboutToStart_1v2DifferentSolicitorsWillChangeToRespondentTwoFlagSpec() {
+    void givenCreateShow_1v2DifferentSolicitorsWillChangeToRespondentTwoFlagSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YES)
@@ -192,7 +211,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -201,13 +220,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void givenAboutToStart_1v1WillNotChangeToRespondentTwoFlag() {
+    void givenCreateShow_1v1WillNotChangeToRespondentTwoFlag() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -266,6 +285,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetWitnessFlag_whenWitnessOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -279,6 +300,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetWitnessFlag_whenWitnessOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -292,6 +315,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetExpertFlag_whenExpertOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -304,6 +329,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetExpertFlag_whenExpertOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -316,6 +343,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetTrialFlag_whenTrialOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -329,6 +358,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetTrialFlag_whenTrialOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -1261,23 +1292,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentWitnessSummaryRes().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 2023-02-10.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 2023-02-10.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentExpertReportRes().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 2023-02-10.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
         assertThat(updatedData.getDocumentJointStatementRes().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 2023-02-10.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
         assertThat(updatedData.getDocumentQuestionsRes().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other question.pdf");
         assertThat(updatedData.getDocumentAnswersRes().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other answer.pdf");
         assertThat(updatedData.getDocumentForDisclosureRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
         assertThat(updatedData.getDocumentReferredInStatementRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
         assertThat(updatedData.getDocumentEvidenceForTrialRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes().get(0).getValue()
@@ -1330,23 +1361,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResTwoWitness.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResTwoWitness 2023-02-10.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResTwoWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes2().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResTwoWitness 2023-02-10.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResTwoWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentExpertReportRes2().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 2023-02-10.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
         assertThat(updatedData.getDocumentJointStatementRes2().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 2023-02-10.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
         assertThat(updatedData.getDocumentQuestionsRes2().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other question.pdf");
         assertThat(updatedData.getDocumentAnswersRes2().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other answer.pdf");
         assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
         assertThat(updatedData.getDocumentReferredInStatementRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
         assertThat(updatedData.getDocumentEvidenceForTrialRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 2023-02-10.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes2().get(0).getValue()

@@ -133,12 +133,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_TRIAL_AUTHORITIES = "ApplicantTwoTrialAuthorities";
     protected static final String APPLICANT_TWO_TRIAL_COSTS = "ApplicantTwoTrialCosts";
 
-    private static final String OPTION_APP1 = "Claimant 1 - ";
-    private static final String OPTION_APP2 = "Claimant 2 - ";
-    private static final String OPTION_APP_BOTH = "Claimants 1 and 2";
-    private static final String OPTION_DEF1 = "Defendant 1 - ";
-    private static final String OPTION_DEF2 = "Defendant 2 - ";
-    private static final String OPTION_DEF_BOTH = "Defendant 1 and 2";
+    protected static final String OPTION_APP1 = "Claimant 1 - ";
+    protected static final String OPTION_APP2 = "Claimant 2 - ";
+    protected static final String OPTION_APP_BOTH = "Claimants 1 and 2";
+    protected static final String OPTION_DEF1 = "Defendant 1 - ";
+    protected static final String OPTION_DEF2 = "Defendant 2 - ";
+    protected static final String OPTION_DEF_BOTH = "Defendant 1 and 2";
     private static final String CASE_TYPE_FLAG_NO = "do_not_show";
 
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
@@ -257,14 +257,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             //2v1, app2 selected
             if (multiParts
                     && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_APP1)) {
+                    .getValue().getLabel().startsWith(OPTION_APP2)) {
                 caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
             }
         } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)){
             //1v2 same sol, def2 selected
             if ((multiParts
                     && caseData.getEvidenceUploadOptions()
-                    .getValue().getLabel().startsWith(OPTION_DEF1))
+                    .getValue().getLabel().startsWith(OPTION_DEF2))
                     //1v2 dif sol, log in as def2
                 || (!multiParts && coreCaseUserService.userHasCaseRole(caseData
                     .getCcdCaseReference()
