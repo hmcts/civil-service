@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1491,6 +1492,22 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+    }
+
+    @Test
+    void should_compareAndCopy() {
+        List<Element<Object>> before = null;
+        List<Element<Object>> after = null;
+        List<Element<Object>> target = null;
+        assertThat(handler.compareAndCopy(before, after, target)).isNull();
+        Element<Object> e1 = Element.builder().id(UUID.randomUUID()).value("1").build();
+        after = List.of(e1);
+        assertThat(handler.compareAndCopy(before, after, target)).hasSize(1);
+        before = List.of(e1);
+        assertThat(handler.compareAndCopy(before, after, target)).isEmpty();
+        Element<Object> e2 = Element.builder().id(UUID.randomUUID()).value("2").build();
+        after = List.of(e1, e2);
+        assertThat(handler.compareAndCopy(before, after, target)).hasSize(1);
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {

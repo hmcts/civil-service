@@ -948,7 +948,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return toAdd;
     }
 
-    private <T> List<Element<T>> compareAndCopy(List<Element<T>> before,
+    protected static <T> List<Element<T>> compareAndCopy(List<Element<T>> before,
                                     List<Element<T>> after, List<Element<T>> target) {
         if (Objects.isNull(after) || after.isEmpty()) {
             return null;
