@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -34,6 +35,7 @@ import java.time.LocalTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
@@ -478,5 +480,18 @@ public class NotificationClaimantOfHearingHandlerTest {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
                 "NOTIFY_CLAIMANT_HEARING_HMC").build()).build())).isEqualTo(TASK_ID_CLAIMANT_HMC);
+    }
+
+    @Test
+    void shouldReturnEventNotFoundMessage_whenInvokedWithInvalidEvent() {
+
+        // Given: an invalid event id
+        CallbackParams callbackParams = CallbackParamsBuilder.builder().request(CallbackRequest.builder()
+                                                                                    .eventId("TRIGGER_LOCATION_UPDATE").build()).build();
+        // When: I call the camundaActivityId
+        // Then: an exception is thrown
+        CallbackException ex = assertThrows(CallbackException.class, () -> handler.camundaActivityId(callbackParams),
+                                            "A CallbackException was expected to be thrown but wasn't.");
+        assertThat(ex.getMessage()).contains("Callback handler received illegal event");
     }
 }
