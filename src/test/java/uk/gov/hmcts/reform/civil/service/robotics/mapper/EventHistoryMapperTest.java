@@ -2052,6 +2052,7 @@ class EventHistoryMapperTest {
                 .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1PartAdmission()
+                .respondent1DQ()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -2077,7 +2078,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(3)
+                    .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText("RPA Reason: Defendant partial admission.")
@@ -2087,6 +2088,25 @@ class EventHistoryMapperTest {
                     .build()
             );
 
+            List<Event> expectedDirectionsQuestionnaireFiled = List.of(
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("197")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .eventDetailsText(mapper.prepareFullDefenceEventText(
+                        caseData.getRespondent1DQ(),
+                        caseData,
+                        true,
+                        caseData.getRespondent1()
+                    ))
+                    .eventDetails(EventDetails.builder()
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                      .preferredCourtName("")
+                                      .build())
+                    .build());
+
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
@@ -2094,6 +2114,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedReceiptOfPartAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2101,8 +2123,7 @@ class EventHistoryMapperTest {
                 "consentExtensionFilingDefence",
                 "defenceAndCounterClaim",
                 "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
+                "replyToDefence"
             );
         }
     }
@@ -2166,11 +2187,19 @@ class EventHistoryMapperTest {
     @Nested
     class RespondentPartAdmission {
 
+        final String partyID = "002";
+        DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+        DynamicList preferredCourt = DynamicList.builder()
+            .listItems(locationValues.getListItems())
+            .value(locationValues.getListItems().get(0))
+            .build();
+
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithRespondentPartAdmissionWithOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .respondent1DQ()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -2213,7 +2242,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(7)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText("RPA Reason: Defendant partial admission.")
@@ -2237,6 +2266,25 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
+            List<Event> expectedDirectionsQuestionnaireFiled = List.of(
+                Event.builder()
+                    .eventSequence(6)
+                    .eventCode("197")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .eventDetailsText(mapper.prepareFullDefenceEventText(
+                        caseData.getRespondent1DQ(),
+                        caseData,
+                        true,
+                        caseData.getRespondent1()
+                    ))
+                    .eventDetails(EventDetails.builder()
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                      .preferredCourtName("")
+                                      .build())
+                    .build());
+
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
@@ -2248,6 +2296,8 @@ class EventHistoryMapperTest {
             );
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
                 .containsExactly(expectedAcknowledgementOfServiceReceived);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2255,8 +2305,7 @@ class EventHistoryMapperTest {
                 "consentExtensionFilingDefence",
                 "defenceAndCounterClaim",
                 "receiptOfAdmission",
-                "replyToDefence",
-                "directionsQuestionnaireFiled"
+                "replyToDefence"
             );
         }
 
@@ -2266,6 +2315,16 @@ class EventHistoryMapperTest {
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1AcknowledgeNotificationDate(null)
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
+                                .build()
+                        )
+                        .build()
+                )
                 .build();
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(4)
@@ -2302,7 +2361,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(5)
+                    .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText("RPA Reason: Defendant partial admission.")
@@ -2311,6 +2370,25 @@ class EventHistoryMapperTest {
                                       .build())
                     .build()
             );
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(5)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build());
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2321,6 +2399,8 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1),
                                  expectedMiscellaneousEvents.get(2), expectedMiscellaneousEvents.get(3)
             );
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2328,7 +2408,6 @@ class EventHistoryMapperTest {
                 "defenceAndCounterClaim",
                 "receiptOfAdmission",
                 "replyToDefence",
-                "directionsQuestionnaireFiled",
                 "consentExtensionFilingDefence",
                 "acknowledgementOfServiceReceived"
             );
@@ -2339,7 +2418,11 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateBothRespondentsSameResponse(PART_ADMISSION)
+                .respondent1DQ()
+                .respondent2Responds1v2DiffSol(PART_ADMISSION)
+                .respondent2DQ()
                 .build();
+
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
                 caseData = caseData.toBuilder()
@@ -2354,7 +2437,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("002")
                     .build(),
                 Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(7)
                     .eventCode("60")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID("003")
@@ -2394,7 +2477,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(5)
+                    .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText(respondent1MiscText)
@@ -2403,12 +2486,49 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(7)
+                    .eventSequence(9)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .eventDetailsText(respondent2MiscText)
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+            );
+
+            List<Event> expectedDirectionsQuestionnaireFiled = List.of(
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("197")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .eventDetailsText(mapper.prepareFullDefenceEventText(
+                        caseData.getRespondent1DQ(),
+                        caseData,
+                        true,
+                        caseData.getRespondent1()
+                    ))
+                    .eventDetails(EventDetails.builder()
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                      .preferredCourtName("")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("197")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .litigiousPartyID("003")
+                    .eventDetailsText(mapper.prepareFullDefenceEventText(
+                        caseData.getRespondent2DQ(),
+                        caseData,
+                        false,
+                        caseData.getRespondent2()
+                    ))
+                    .eventDetails(EventDetails.builder()
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
+                                      .preferredCourtName("")
                                       .build())
                     .build()
             );
@@ -2423,6 +2543,9 @@ class EventHistoryMapperTest {
                                  expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2),
                                  expectedMiscellaneousEvents.get(3), expectedMiscellaneousEvents.get(4)
             );
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .containsExactly(expectedDirectionsQuestionnaireFiled.get(0), expectedDirectionsQuestionnaireFiled.get(1)
+            );
 
             assertEmptyEvents(
                 eventHistory,
@@ -2430,7 +2553,6 @@ class EventHistoryMapperTest {
                 "defenceAndCounterClaim",
                 "receiptOfAdmission",
                 "replyToDefence",
-                "directionsQuestionnaireFiled",
                 "consentExtensionFilingDefence",
                 "acknowledgementOfServiceReceived"
             );
@@ -2447,6 +2569,16 @@ class EventHistoryMapperTest {
                 && caseData.getRespondent2Represented() == null) {
                 caseData = caseData.toBuilder()
                     .respondent2Represented(YES)
+                    .respondent1DQ(
+                        Respondent1DQ.builder()
+                            .respondToCourtLocation(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason")
+                                    .build()
+                            )
+                            .build()
+                    )
                     .build();
             }
             List<Event> expectedReceiptOfPartAdmission = List.of(
@@ -2497,7 +2629,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(8)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText(respondent1MiscText)
@@ -2507,7 +2639,7 @@ class EventHistoryMapperTest {
                     .build(),
 
                 Event.builder()
-                    .eventSequence(7)
+                    .eventSequence(9)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .eventDetailsText(respondent2MiscText)
@@ -2517,6 +2649,26 @@ class EventHistoryMapperTest {
                     .build()
             );
 
+            List<Event> expectedDirectionsQuestionnaireFiled = List.of(
+                Event.builder()
+                            .eventSequence(6)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build());
+
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
@@ -2525,8 +2677,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
                                  expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2),
-                                 expectedMiscellaneousEvents.get(3), expectedMiscellaneousEvents.get(4)
-            );
+                                 expectedMiscellaneousEvents.get(3), expectedMiscellaneousEvents.get(4));
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2534,7 +2687,6 @@ class EventHistoryMapperTest {
                 "defenceAndCounterClaim",
                 "receiptOfAdmission",
                 "replyToDefence",
-                "directionsQuestionnaireFiled",
                 "consentExtensionFilingDefence",
                 "acknowledgementOfServiceReceived"
             );
@@ -2625,8 +2777,7 @@ class EventHistoryMapperTest {
                 "receiptOfAdmission",
                 "receiptOfPartAdmission",
                 "replyToDefence",
-                "consentExtensionFilingDefence",
-                "directionsQuestionnaireFiled"
+                "consentExtensionFilingDefence"
             );
         }
 
@@ -7618,8 +7769,16 @@ class EventHistoryMapperTest {
     @Nested
     class RejectPaymentPlan {
 
+        final String partyID = "002";
+
         @Test
         public void shouldGenerateRPA_PartAdmitRejectPayment() {
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -7627,13 +7786,45 @@ class EventHistoryMapperTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .addRespondent2(NO)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
+                                .build()
+                        )
+                        .build()
+                )
                 .build();
+
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(3)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build());
 
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
         }
 
         @Test
@@ -7656,6 +7847,9 @@ class EventHistoryMapperTest {
 
     @Nested
     class ClaimInMediation {
+
+        final String partyID = "002";
+
         @Test
         public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
@@ -7673,26 +7867,48 @@ class EventHistoryMapperTest {
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
                 .addRespondent2(NO)
-                .applicant1DQ(
-                    Applicant1DQ.builder()
-                        .applicant1DQRequestedCourt(
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
                             RequestedCourt.builder()
                                 .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("test")
+                                .reasonForHearingAtSpecificCourt("Reason")
                                 .build()
-                        ).build()
+                        )
+                        .build()
                 )
                 .build();
+
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(3)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build());
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
         }
 
         @Test
         public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediation() {
-            final String partyID = "002";
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
