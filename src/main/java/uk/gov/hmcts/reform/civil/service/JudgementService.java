@@ -45,7 +45,7 @@ public class JudgementService {
 
     private BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (caseData.isAcceptDefendantPaymentPlanForPartAdmitYes()) {
+        if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
         return claimAmount;
