@@ -127,7 +127,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
                 reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
             }
             map.put(HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()));
-            map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null ? "" : caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null ? "" : NotificationUtils.getFormattedHearingDate(caseData.getHearingDueDate()));
             map.put(CLAIMANT_REFERENCE_NUMBER, reference);
         }
         return map;
