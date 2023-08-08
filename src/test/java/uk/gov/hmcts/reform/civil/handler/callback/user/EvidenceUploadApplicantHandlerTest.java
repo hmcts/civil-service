@@ -55,7 +55,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -160,11 +159,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0",
-            "1",
-            "2",
-    })
+    @CsvSource({"0", "1", "2"})
     void givenCreateShow_2v1_ApplicantTwoFlag(String selected) {
         // Given
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
@@ -176,7 +171,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2(PartyBuilder.builder().individual().build())
                 .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
                 .build();
-        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
+        CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -678,10 +673,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0",
-            "2",
-    })
+    @CsvSource({"0", "2"})
     void should_do_naming_convention(String selected) {
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
 

@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentTyp
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -176,11 +175,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0",
-            "1",
-            "2",
-    })
+    @CsvSource({"0", "1", "2"})
     void givenCreateShow_1v2SameSolicitor_RespondentTwoFlag(String selected) {
         // Given
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
@@ -192,7 +187,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(YES)
             .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
+        CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -214,7 +209,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
+        CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -233,7 +228,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
+        CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -248,7 +243,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        CallbackParams params = callbackParamsOf(caseData, MID,"createShowCondition");
+        CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -1275,10 +1270,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "0",
-            "2",
-    })
+    @CsvSource({"0", "2"})
     void should_do_naming_convention_resp1(String selected) {
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
 

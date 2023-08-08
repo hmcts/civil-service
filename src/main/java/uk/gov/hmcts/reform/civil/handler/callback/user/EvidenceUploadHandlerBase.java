@@ -144,7 +144,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
 
-
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
                                         CoreCaseDataService coreCaseDataService,
@@ -189,13 +188,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> dynamicListOptions = new ArrayList<>();
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
-            if(MultiPartyScenario.isTwoVOne(caseData)) {
+            if (MultiPartyScenario.isTwoVOne(caseData)) {
                 dynamicListOptions.add(OPTION_APP1 + caseData.getApplicant1().getPartyName());
                 dynamicListOptions.add(OPTION_APP2 + caseData.getApplicant2().getPartyName());
                 dynamicListOptions.add(OPTION_APP_BOTH);
             }
         } else {
-            if(MultiPartyScenario.isOneVTwoLegalRep(caseData)) {
+            if (MultiPartyScenario.isOneVTwoLegalRep(caseData)) {
                 dynamicListOptions.add(OPTION_DEF1 + caseData.getRespondent1().getPartyName());
                 dynamicListOptions.add(OPTION_DEF2 + caseData.getRespondent2().getPartyName());
                 dynamicListOptions.add(OPTION_DEF_BOTH);
@@ -260,13 +259,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .getValue().getLabel().startsWith(OPTION_APP2)) {
                 caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
             }
-        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)){
+        } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)) {
             //1v2 same sol, def2 selected
             if ((multiParts
                     && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith(OPTION_DEF2))
                     //1v2 dif sol, log in as def2
-                || (!multiParts && coreCaseUserService.userHasCaseRole(caseData
+                    || (!multiParts && coreCaseUserService.userHasCaseRole(caseData
                     .getCcdCaseReference()
                     .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
                 caseDataBuilder.caseTypeFlag("RespondentTwoFields");
@@ -866,14 +865,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return builder.build();
     }
 
-    private List<Element<UploadEvidenceDocumentType>>
-    deepCopyUploadEvidenceDocumentType(final List<Element<UploadEvidenceDocumentType>> toCopy,
-        String theId) {
+    private List<Element<UploadEvidenceDocumentType>> deepCopyUploadEvidenceDocumentType(
+            final List<Element<UploadEvidenceDocumentType>> toCopy, String theId) {
         if (Objects.isNull(toCopy)) {
             return null;
         }
         List<Element<UploadEvidenceDocumentType>> toAdd = new ArrayList<>();
-        for(Element<UploadEvidenceDocumentType> from : toCopy) {
+        for (Element<UploadEvidenceDocumentType> from : toCopy) {
             Document newDoc = Document.builder()
                     .categoryID(theId)
                     .documentBinaryUrl(from.getValue().getDocumentUpload().getDocumentBinaryUrl())
@@ -892,14 +890,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return toAdd;
     }
 
-    private List<Element<UploadEvidenceExpert>>
-    deepCopyUploadEvidenceExpert(final List<Element<UploadEvidenceExpert>> toCopy,
-                                       String theId) {
+    private List<Element<UploadEvidenceExpert>> deepCopyUploadEvidenceExpert(
+            final List<Element<UploadEvidenceExpert>> toCopy, String theId) {
         if (Objects.isNull(toCopy)) {
             return null;
         }
         List<Element<UploadEvidenceExpert>> toAdd = new ArrayList<>();
-        for(Element<UploadEvidenceExpert> from : toCopy) {
+        for (Element<UploadEvidenceExpert> from : toCopy) {
             Document newDoc = Document.builder()
                     .categoryID(theId)
                     .documentBinaryUrl(from.getValue().getExpertDocument().getDocumentBinaryUrl())
@@ -922,14 +919,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return toAdd;
     }
 
-    private List<Element<UploadEvidenceWitness>>
-    deepCopyUploadEvidenceWitness(final List<Element<UploadEvidenceWitness>> toCopy,
-                                  String theId) {
+    private List<Element<UploadEvidenceWitness>> deepCopyUploadEvidenceWitness(
+            final List<Element<UploadEvidenceWitness>> toCopy, String theId) {
         if (Objects.isNull(toCopy)) {
             return null;
         }
         List<Element<UploadEvidenceWitness>> toAdd = new ArrayList<>();
-        for(Element<UploadEvidenceWitness> from : toCopy) {
+        for (Element<UploadEvidenceWitness> from : toCopy) {
             Document newDoc = Document.builder()
                     .categoryID(theId)
                     .documentBinaryUrl(from.getValue().getWitnessOptionDocument().getDocumentBinaryUrl())
