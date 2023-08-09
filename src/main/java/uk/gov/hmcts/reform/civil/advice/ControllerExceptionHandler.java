@@ -47,12 +47,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(documentUploadException.getMessage());
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> documentUploadException(MaxUploadSizeExceededException maxUploadSizeExceededException) {
         log.error(maxUploadSizeExceededException.getMessage());
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
-
 
     @ExceptionHandler(PartyIdsUpdatedException.class)
     public ResponseEntity<Object> partyIdsUpdatedException(PartyIdsUpdatedException partyIdsUpdatedException) {
