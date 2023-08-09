@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,9 +15,11 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -59,20 +62,35 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
-                                                   .toLocalDate(), DATE)
-        );
+        if (Objects.isNull(caseData.getHelpWithFeesReferenceNumber())) {
+            return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            );
+        }
+        else {
+            return Map.of(
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
+                                                       .toLocalDate(), DATE)
+            );
+        }
+    }
+
+    private String getTemplate(CaseData caseData) {
+        if (Objects.isNull(caseData.getHelpWithFeesReferenceNumber())) {
+            return null;
+        } else {
+            return notificationsProperties.getClaimantClaimContinuingOnlineForSpec();
+        }
     }
 
     private void generateEmail(CaseData caseData) {
         notificationService.sendMail(
-            caseData.getApplicant1().getPartyEmail(),
-            notificationsProperties.getClaimantClaimContinuingOnlineForSpec(),
+            caseData.getApplicant1Email(),
+            getTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
