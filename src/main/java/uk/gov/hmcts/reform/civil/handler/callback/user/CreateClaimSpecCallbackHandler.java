@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.repositories.BulkClaimReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -142,6 +143,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
+
+    private final BulkClaimReferenceNumberRepository bulkClaimReferenceRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final FeatureToggleService featureToggleService;
@@ -555,7 +558,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()) {
-            dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            if (caseData.getSdtRequestIdFromSdt() != null ) {
+                dataBuilder.legacyCaseReference(bulkClaimReferenceRepository.getReferenceNumber());
+            } else {
+                dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            }
             if (!featureToggleService.isPbaV3Enabled()) {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
             } else {

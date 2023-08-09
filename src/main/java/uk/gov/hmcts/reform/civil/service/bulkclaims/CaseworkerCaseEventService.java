@@ -10,6 +10,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
@@ -43,5 +48,17 @@ public class CaseworkerCaseEventService {
                                                    CASE_TYPE,
                                                    true, caseDataContent
         );
+    }
+
+    public Boolean searchCaseForCaseworker(String authorization, String userId, String searchParam ) {
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("data.sdtRequestId",searchParam);
+        List<CaseDetails> caseSearchList = coreCaseDataApi.searchForCaseworker(authorization, authTokenGenerator.generate(),
+                                                                               userId, JURISDICTION, CASE_TYPE, searchCriteria);
+        if (nonNull(caseSearchList))
+            return true;
+
+        return false;
     }
 }
