@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
@@ -990,9 +989,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public String getHelpWithFeesReferenceNumber() {
-        return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getRespondent1LiPResponse)
-            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+    public String getApplicant1Email() {
+        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
 }
