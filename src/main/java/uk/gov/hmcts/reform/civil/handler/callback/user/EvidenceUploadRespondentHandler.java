@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,8 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
     @Override
     CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
-        if (caseData.getCaseTypeFlag().equals("RespondentTwoFields")) {
+        if (Objects.nonNull(caseData.getCaseTypeFlag())
+                && caseData.getCaseTypeFlag().equals("RespondentTwoFields")) {
             return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
                                        caseData.getDocumentWitnessStatementRes2(),
                                        caseData.getDocumentHearsayNoticeRes2(),

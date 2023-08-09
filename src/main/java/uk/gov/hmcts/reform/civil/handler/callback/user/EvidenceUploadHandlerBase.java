@@ -265,9 +265,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith(OPTION_DEF2))
                     //1v2 dif sol, log in as def2
-                    || (!multiParts && coreCaseUserService.userHasCaseRole(caseData
-                    .getCcdCaseReference()
-                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                    || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
+                        && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
+                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
                 caseDataBuilder.caseTypeFlag("RespondentTwoFields");
             }
         }

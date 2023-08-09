@@ -65,15 +65,28 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     @Override
     CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
-        return validateValuesParty(caseData.getDocumentForDisclosure(),
-                                   caseData.getDocumentWitnessStatement(),
-                                   caseData.getDocumentHearsayNotice(),
-                                   caseData.getDocumentReferredInStatement(),
-                                   caseData.getDocumentExpertReport(),
-                                   caseData.getDocumentJointStatement(),
-                                   caseData.getDocumentQuestions(),
-                                   caseData.getDocumentAnswers(),
-                                   caseData.getDocumentEvidenceForTrial());
+        if (Objects.nonNull(caseData.getCaseTypeFlag())
+                && caseData.getCaseTypeFlag().equals("ApplicantTwoFields")) {
+            return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
+                    caseData.getDocumentWitnessStatementApp2(),
+                    caseData.getDocumentHearsayNoticeApp2(),
+                    caseData.getDocumentReferredInStatementApp2(),
+                    caseData.getDocumentExpertReportApp2(),
+                    caseData.getDocumentJointStatementApp2(),
+                    caseData.getDocumentQuestionsApp2(),
+                    caseData.getDocumentAnswersApp2(),
+                    caseData.getDocumentEvidenceForTrialApp2());
+        } else {
+            return validateValuesParty(caseData.getDocumentForDisclosure(),
+                    caseData.getDocumentWitnessStatement(),
+                    caseData.getDocumentHearsayNotice(),
+                    caseData.getDocumentReferredInStatement(),
+                    caseData.getDocumentExpertReport(),
+                    caseData.getDocumentJointStatement(),
+                    caseData.getDocumentQuestions(),
+                    caseData.getDocumentAnswers(),
+                    caseData.getDocumentEvidenceForTrial());
+        }
     }
 
     void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {
