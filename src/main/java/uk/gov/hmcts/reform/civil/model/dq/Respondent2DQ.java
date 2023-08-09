@@ -22,6 +22,7 @@ import java.util.List;
 public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
+    private FixedRecoverableCosts respondent2DQFixedRecoverableCosts;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;
@@ -52,6 +53,12 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
         return respondent2DQFileDirectionsQuestionnaire;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQFixedRecoverableCosts")
+    public FixedRecoverableCosts getFixedRecoverableCosts() {
+        return respondent2DQFixedRecoverableCosts;
     }
 
     @Override

@@ -104,11 +104,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -589,7 +591,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                CREATE_SDO
             )
         ),
         entry(
@@ -828,7 +831,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
@@ -863,7 +867,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
@@ -883,7 +888,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -903,7 +909,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -925,7 +932,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                DEFAULT_JUDGEMENT_SPEC
+                DEFAULT_JUDGEMENT_SPEC,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -946,7 +954,8 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -966,7 +975,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                DEFAULT_JUDGEMENT_SPEC
+                DEFAULT_JUDGEMENT_SPEC,
+                CHANGE_SOLICITOR_EMAIL,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
 
@@ -991,7 +1002,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -1023,7 +1035,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
 
@@ -1041,7 +1055,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
@@ -1124,7 +1139,9 @@ public class FlowStateAllowedEventService {
             IN_MEDIATION.fullName(),
             List.of(
                 MEDIATION_SUCCESSFUL,
-                MEDIATION_UNSUCCESSFUL
+                MEDIATION_UNSUCCESSFUL,
+                CREATE_SDO,
+                CHANGE_SOLICITOR_EMAIL
             )
         ),
         entry(
@@ -1155,7 +1172,23 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                CHANGE_SOLICITOR_EMAIL
+            )
+        ),
+         entry(
+            PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
+            List.of(
+                CREATE_SDO,
+                CHANGE_SOLICITOR_EMAIL
+            )
+        ),
+        entry(
+            RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName(),
+            List.of(
+                CHANGE_SOLICITOR_EMAIL,
+                EXTEND_RESPONSE_DEADLINE
+
             )
         )
     );

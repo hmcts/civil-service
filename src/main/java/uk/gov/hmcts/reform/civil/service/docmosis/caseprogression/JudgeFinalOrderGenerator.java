@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
@@ -18,13 +19,19 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -38,9 +45,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final IdamClient idamClient;
+    private final LocationRefDataService locationRefDataService;
+    private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
+        JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
         DocmosisTemplates docmosisTemplate = null;
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             docmosisTemplate = FREE_FORM_ORDER_PDF;
@@ -63,20 +73,32 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return String.format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
     }
 
-    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData) {
-        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData) : getAssistedOrder(
+    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
+        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData, authorisation) : getAssistedOrder(
             caseData);
     }
 
-    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData) {
+    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        LocationRefData locationRefData;
+
+        if (hasSDOBeenMade(caseData.getCcdState())) {
+            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        } else {
+            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+        }
+
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
+            .claimant1Name(caseData.getApplicant1().getPartyName())
+            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .defendant1Name(caseData.getRespondent1().getPartyName())
+            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .defendantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .freeFormRecitalText(caseData.getFreeFormRecitalTextArea())
             .freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
             .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
             .orderOnCourtsList(caseData.getOrderOnCourtsList())
@@ -87,7 +109,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionTextArea() : null)
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
-                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null);
+                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
+            .judgeNameTitle(userDetails.getFullName())
+            .courtName(locationRefData.getVenueName())
+            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
     }
 
@@ -409,6 +434,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         return "";
+    }
+
+    private boolean hasSDOBeenMade(CaseState state) {
+
+        return !JUDICIAL_REFERRAL.equals(state);
     }
 }
 

@@ -970,6 +970,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -984,6 +986,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                    ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1449,6 +1453,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal interestAmount = BigDecimal.valueOf(100);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))

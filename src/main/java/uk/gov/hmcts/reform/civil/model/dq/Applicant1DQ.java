@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 public class Applicant1DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
+    private FixedRecoverableCosts applicant1DQFixedRecoverableCosts;
     private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant1DQDisclosureReport;
@@ -41,6 +42,12 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
         return applicant1DQFileDirectionsQuestionnaire;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQFixedRecoverableCosts")
+    public FixedRecoverableCosts getFixedRecoverableCosts() {
+        return applicant1DQFixedRecoverableCosts;
     }
 
     @Override

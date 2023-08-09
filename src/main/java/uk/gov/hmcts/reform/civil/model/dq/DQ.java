@@ -9,6 +9,8 @@ public interface DQ {
 
     FileDirectionsQuestionnaire getFileDirectionQuestionnaire();
 
+    FixedRecoverableCosts getFixedRecoverableCosts();
+
     DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments();
 
     DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments();
