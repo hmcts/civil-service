@@ -15,6 +15,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
+    SDO_ORDER_CREATED(
+        Claim::isSDOOrderCreated
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),

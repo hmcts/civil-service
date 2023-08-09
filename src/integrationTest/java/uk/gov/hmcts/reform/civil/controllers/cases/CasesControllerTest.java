@@ -76,7 +76,6 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
@@ -191,7 +190,8 @@ public class CasesControllerTest extends BaseIntegrationTest {
             SUBMIT_EVENT_URL,
             "123",
             "123"
-        ).andExpect(content().json(toJson(expectedCaseDetails))).andExpect(status().isOk());
+        ).andExpect(content().json(toJson(expectedCaseDetails)))
+            .andExpect(status().isOk());
     }
 
     @Test

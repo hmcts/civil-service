@@ -104,6 +104,24 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
             // When
             handler.handle(params);
+
+            // Then
+            verify(notificationService).sendMail(
+                "testorg@email.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant1_UserDetailsEmail_whenInvoked() {
+            // Given
+            CaseData caseData = getCaseData(null, "testorg@email.com");
+            CallbackParams params = getCallbackParams(caseData);
+
+            // When
+            handler.handle(params);
             // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
