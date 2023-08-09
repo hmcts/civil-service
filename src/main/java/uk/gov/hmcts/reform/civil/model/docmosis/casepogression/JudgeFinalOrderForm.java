@@ -20,7 +20,6 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String caseName;
     private final String claimantReference;
     private final String defendantReference;
-    private final String freeFormRecitalText;
     private final String freeFormRecordedText;
     private final String freeFormOrderedText;
     private final OrderOnCourtsList orderOnCourtsList;
@@ -62,4 +61,11 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final LocalDate orderInitiativeOrWithoutNoticeDate;
     private final YesOrNo isReason;
     private final String reasonText;
+    private final String judgeNameTitle;
+    private final String courtLocation;
+    private final String courtName;
+    private final String claimant1Name;
+    private final String claimant2Name;
+    private final String defendant1Name;
+    private final String defendant2Name;
 }
