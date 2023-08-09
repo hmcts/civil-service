@@ -64,7 +64,7 @@ public class AssignCaseToLipUserHandler extends CallbackHandler {
         String caseId = caseData.getCcdCaseReference().toString();
         String submitId = claimantUserDetails.getId();
 
-        coreCaseUserService.assignCase(caseId, submitId, null, CaseRole.APPLICANTSOLICITORONE);
+        coreCaseUserService.assignCase(caseId, submitId, null, CaseRole.CLAIMANT);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitId, null);
 
         return SubmittedCallbackResponse.builder().build();

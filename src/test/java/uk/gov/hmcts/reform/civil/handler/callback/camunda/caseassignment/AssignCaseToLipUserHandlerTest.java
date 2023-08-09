@@ -107,7 +107,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
             caseData.getCcdCaseReference().toString(),
             caseData.getClaimantUserDetails().getId(),
             null,
-            CaseRole.APPLICANTSOLICITORONE
+            CaseRole.CLAIMANT
         );
 
         verify(coreCaseUserService).removeCreatorRoleCaseAssignment(
