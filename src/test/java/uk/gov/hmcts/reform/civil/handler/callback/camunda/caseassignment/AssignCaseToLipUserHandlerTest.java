@@ -55,7 +55,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
     private CaseData caseData;
 
     @Nested
-    class AssignRolesIn1v1LipCase{
+    class AssignRolesIn1v1LipCase {
 
         @Test
         void shouldReturnCorrectCamundaTaskID() {
