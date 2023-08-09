@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -19,7 +18,6 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -81,18 +79,20 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     private String getTemplate(CaseData caseData) {
         if (Objects.isNull(caseData.getHelpWithFeesReferenceNumber())) {
-            return null;
+            return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate();
         } else {
             return notificationsProperties.getClaimantClaimContinuingOnlineForSpec();
         }
     }
 
     private void generateEmail(CaseData caseData) {
-        notificationService.sendMail(
-            caseData.getApplicant1Email(),
-            getTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.getApplicant1Email() != null) {
+            notificationService.sendMail(
+                caseData.getApplicant1Email(),
+                getTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
     }
 }

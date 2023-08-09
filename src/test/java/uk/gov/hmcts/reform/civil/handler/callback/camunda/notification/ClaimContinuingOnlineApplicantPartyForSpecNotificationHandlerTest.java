@@ -12,6 +12,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -69,19 +71,27 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
     @Nested
     class AboutToSubmitCallback {
         private LocalDateTime responseDeadline;
+        private static final String EMAIL_TEMPLATE_1 = "test-notification-id";
+        private static final String EMAIL_TEMPLATE_2 = "test-notification-id-no-help-with-fees";
+        private static final String CLAIMANT_EMAIL_ID = "testorg@email.com";
+        private static final String REFERENCE_NUMBER = "claim-continuing-online-notification-000DC001";
+        private static final String CLAIMANT= "Mr. John Rambo";
+        private static final String RESPONDENT = "Mr. Sole Trader";
 
         @BeforeEach
         void setup() {
             responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getClaimantClaimContinuingOnlineForSpec())
-                .thenReturn("template-id");
+                .thenReturn(EMAIL_TEMPLATE_1);
+            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate())
+                .thenReturn(EMAIL_TEMPLATE_2);
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
         }
 
         @Test
         void shouldNotifyApplicant1PartyEmail_whenInvoked() {
             // Given
-            CaseData caseData = getCaseData("testorg@email.com", null);
+            CaseData caseData = getCaseData(CLAIMANT_EMAIL_ID,null,null);
             CallbackParams params = getCallbackParams(caseData);
 
             // When
@@ -89,17 +99,17 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
             // Then
             verify(notificationService).sendMail(
-                "testorg@email.com",
-                "template-id",
-                getNotificationDataMap(caseData),
-                "claim-continuing-online-notification-000DC001"
+                CLAIMANT_EMAIL_ID,
+                EMAIL_TEMPLATE_2,
+                getNotificationDataMap_NoHelpWithClaimFee(caseData),
+                REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant1_UserDetailsEmail_whenInvoked() {
             // Given
-            CaseData caseData = getCaseData(null, "testorg@email.com");
+            CaseData caseData = getCaseData(null, CLAIMANT_EMAIL_ID, "1111");
             CallbackParams params = getCallbackParams(caseData);
 
             // When
@@ -107,17 +117,35 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
             // Then
             verify(notificationService).sendMail(
-                "testorg@email.com",
-                "template-id",
+                CLAIMANT_EMAIL_ID,
+                EMAIL_TEMPLATE_1,
                 getNotificationDataMap(caseData),
-                "claim-continuing-online-notification-000DC001"
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant1_ClaimIsSubmittedButNotIssue() {
+            // Given
+            CaseData caseData = getCaseData(null, CLAIMANT_EMAIL_ID, null);
+            CallbackParams params = getCallbackParams(caseData);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService).sendMail(
+                CLAIMANT_EMAIL_ID,
+                EMAIL_TEMPLATE_2,
+                getNotificationDataMap_NoHelpWithClaimFee(caseData),
+                REFERENCE_NUMBER
             );
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                RESPONDENT_NAME, "Mr. Sole Trader",
-                CLAIMANT_NAME, "Mr. John Rambo",
+                RESPONDENT_NAME, RESPONDENT,
+                CLAIMANT_NAME, CLAIMANT,
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONSE_DEADLINE, formatLocalDate(
@@ -125,23 +153,29 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
                         .toLocalDate(), DATE)
             );
         }
+
+        private Map<String, String> getNotificationDataMap_NoHelpWithClaimFee(CaseData caseData) {
+            return Map.of(
+                CLAIMANT_NAME, CLAIMANT
+                );
+        }
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                "NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build())
+                NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name()).build())
                                                  .build())).isEqualTo(TASK_ID_Applicant1);
     }
 
     private CallbackParams getCallbackParams(CaseData caseData) {
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-            CallbackRequest.builder().eventId("NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+            CallbackRequest.builder().eventId(NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC.name())
                 .build()).build();
         return params;
     }
 
-    private CaseData getCaseData(String partyEmail, String claimantUserEmail) {
+        private CaseData getCaseData(String partyEmail, String claimantUserEmail, String helpWIthFeeReferenceNumber) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(partyEmail)
@@ -152,6 +186,8 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
             .respondent1ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YesOrNo.NO)
             .claimantUserDetails(IdamUserDetails.builder().email(claimantUserEmail).build())
+            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().helpWithFeesReferenceNumberLip(
+                helpWIthFeeReferenceNumber).build()).build())
             .build();
 
         return caseData;
