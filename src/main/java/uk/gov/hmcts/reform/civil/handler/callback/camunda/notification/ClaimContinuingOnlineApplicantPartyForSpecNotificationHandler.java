@@ -64,8 +64,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
             return Map.of(
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
-        }
-        else {
+        } else {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),

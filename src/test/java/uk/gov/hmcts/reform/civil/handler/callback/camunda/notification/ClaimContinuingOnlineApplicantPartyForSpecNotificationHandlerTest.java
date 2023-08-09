@@ -75,7 +75,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         private static final String EMAIL_TEMPLATE_2 = "test-notification-id-no-help-with-fees";
         private static final String CLAIMANT_EMAIL_ID = "testorg@email.com";
         private static final String REFERENCE_NUMBER = "claim-continuing-online-notification-000DC001";
-        private static final String CLAIMANT= "Mr. John Rambo";
+        private static final String CLAIMANT = "Mr. John Rambo";
         private static final String RESPONDENT = "Mr. Sole Trader";
 
         @BeforeEach
@@ -91,7 +91,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         @Test
         void shouldNotifyApplicant1PartyEmail_whenInvoked() {
             // Given
-            CaseData caseData = getCaseData(CLAIMANT_EMAIL_ID,null,null);
+            CaseData caseData = getCaseData(CLAIMANT_EMAIL_ID, null, null);
             CallbackParams params = getCallbackParams(caseData);
 
             // When
@@ -175,7 +175,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         return params;
     }
 
-        private CaseData getCaseData(String partyEmail, String claimantUserEmail, String helpWIthFeeReferenceNumber) {
+    private CaseData getCaseData(String partyEmail, String claimantUserEmail, String helpWIthFeeReferenceNumber) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(partyEmail)
