@@ -65,6 +65,20 @@ class DocumentUtilsTest {
 
             assertEquals(expected, actual);
         }
+
+        @Test
+        void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateIsGiven() {
+            var expected = "1 hours 20 minutes";
+            var hearingTime = TrialHearingTimeDJ.builder()
+                .hearingTimeEstimate(TrialHearingTimeEstimateDJ.OTHER)
+                .otherHours("1")
+                .otherMinutes("20")
+                .build();
+
+            var actual = DocumentUtils.getHearingTimeEstimateLabel(hearingTime);
+
+            assertEquals(expected, actual);
+        }
     }
 
 }
