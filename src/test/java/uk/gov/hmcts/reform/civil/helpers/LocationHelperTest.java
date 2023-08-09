@@ -134,6 +134,9 @@ public class LocationHelperTest {
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
+            .courtLocation(CourtLocation.builder()
+                               .applicantPreferredCourt("123")
+                               .build())
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
@@ -156,10 +159,11 @@ public class LocationHelperTest {
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
 
         Assertions.assertThat(court.isPresent()).isTrue();
-        Assertions.assertThat(court.get().getCaseLocation())
-            .isEqualTo(CaseLocationCivil.builder()
-                           .baseLocation(CCMCC_EPIMS)
-                           .region(CCMCC_REGION_ID).build());
+        Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
+            .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
+
+
+
     }
 
     @Test

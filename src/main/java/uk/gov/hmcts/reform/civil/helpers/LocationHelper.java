@@ -108,7 +108,8 @@ public class LocationHelper {
         }
 
         Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-        if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
             return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
                     .caseLocation(getCcmccCaseLocation()).build())
                                    .orElseGet(() -> RequestedCourt.builder()
