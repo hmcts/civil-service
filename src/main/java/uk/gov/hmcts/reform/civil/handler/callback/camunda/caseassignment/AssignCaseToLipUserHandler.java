@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLIC
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToLipUserHandler extends CallbackHandler {
+
     private static final List<CaseEvent> EVENTS = List.of(
         ASSIGN_CASE_TO_APPLICANT1);
 
