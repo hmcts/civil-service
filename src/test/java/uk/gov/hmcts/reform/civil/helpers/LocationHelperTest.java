@@ -162,8 +162,6 @@ public class LocationHelperTest {
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
             .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());
 
-
-
     }
 
     @Test
