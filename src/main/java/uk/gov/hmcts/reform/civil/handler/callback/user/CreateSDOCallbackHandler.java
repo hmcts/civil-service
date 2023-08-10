@@ -205,10 +205,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
             DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
                 .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
+            DynamicListElement hearingMethodVideo = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+                .equals(HearingMethod.VIDEO.getLabel())).findFirst().orElse(null);
+            DynamicListElement hearingMethodTelephone = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+                .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null);
             hearingMethodList.setValue(hearingMethodInPerson);
+            hearingMethodList.setValue(hearingMethodVideo);
+            hearingMethodList.setValue(hearingMethodTelephone);
             updatedData.hearingMethodValuesFastTrack(hearingMethodList);
             updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
             updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
+            // add for dj sdo tria, dj sdo trial and fast track disposal
+            updatedData.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
+            updatedData.hearingMethodValuesTrialHearingDJ(hearingMethodList);
         }
 
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
