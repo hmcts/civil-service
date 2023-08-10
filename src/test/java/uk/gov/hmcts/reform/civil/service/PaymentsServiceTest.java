@@ -181,7 +181,7 @@ class PaymentsServiceTest {
 
         caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService
-                .createCreditAccountPayment1(caseData, AUTH_TOKEN);
+                .createPbaPayment(caseData, AUTH_TOKEN);
 
         verify(organisationService).findOrganisationById("OrgId");
         verify(paymentsClient).createPbaPayment(eq("request-reference"), eq(AUTH_TOKEN), any());
