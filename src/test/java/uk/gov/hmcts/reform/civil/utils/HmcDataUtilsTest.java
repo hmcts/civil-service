@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingDay;
+import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
@@ -21,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 class HmcDataUtilsTest {
 
@@ -61,15 +67,61 @@ class HmcDataUtilsTest {
                         List.of(
                             HearingDaySchedule.builder()
                                 .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                .build(),
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 11, 0))
                                 .build()))
                     .build())
             .build();
 
         PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
+                             .days(List.of(
+                                 HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                               .build(),
+                                 HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                               .build()))
+                             .hearingLocation("Venue A")
+                             .build()).build();
+
+        boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void hearingDataChanged_WhenHearingDataChanged_ReturnsTrueExtraDay() {
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(
+                HearingResponse.builder().hearingDaySchedule(
+                        List.of(
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .build(),
+                            HearingDaySchedule.builder()
+                                .hearingVenueId("Venue A")
+                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+                                .build()))
+                    .build())
+            .build();
+
+        PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
+            .serviceData(PartiesNotifiedServiceData.builder()
+                             .hearingDate(LocalDateTime.of(2023, 12, 23, 10, 0))
                              .hearingLocation("Venue B")
+                             .days(List.of(HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                               .build()))
+                             .hearingLocation("Venue A")
                              .build()).build();
 
         boolean result = HmcDataUtils.hearingDataChanged(partiesNotified, hearing);
@@ -85,14 +137,18 @@ class HmcDataUtilsTest {
                         List.of(
                             HearingDaySchedule.builder()
                                 .hearingVenueId("Venue A")
-                                .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+                                .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
                                 .build()))
                     .build())
             .build();
 
         PartiesNotifiedResponse partiesNotified = PartiesNotifiedResponse.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingDate(LocalDateTime.of(2023, 5, 23, 10, 0))
+                             .days(List.of(HearingDay.builder()
+                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                               .build()))
                              .hearingLocation("Venue A")
                              .build()).build();
 
@@ -132,18 +188,18 @@ class HmcDataUtilsTest {
     @Test
     void getHearingDaysText() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -153,9 +209,9 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysText(hearing);
 
-        assertEquals(result, "23 May 2023 at 10:00 for 3 hours\n" +
-            "24 May 2023 at 14:00 for 2 hours\n" +
-            "25 May 2023 at 10:00 for 5 hours");
+        assertEquals(result, "23 December 2023 at 10:00 for 3 hours\n" +
+            "24 December 2023 at 14:00 for 2 hours\n" +
+            "25 December 2023 at 10:00 for 5 hours");
     }
 
     @Nested
@@ -256,7 +312,7 @@ class HmcDataUtilsTest {
     }
 
     @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay() {
+    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay_BstHearingDay() {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -268,14 +324,30 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
-        assertEquals(result, List.of("23 May 2023 at 10:00 for 5 hours"));
+        assertEquals(result, List.of("23 May 2023 at 11:00 for 5 hours"));
+    }
+
+    @Test
+    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay() {
+        var hearingDay = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of("23 December 2023 at 10:00 for 5 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_1Day_Morning() {
         var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -284,14 +356,14 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
-        assertEquals(result, List.of("23 May 2023 at 10:00 for 3 hours"));
+        assertEquals(result, List.of("23 December 2023 at 10:00 for 3 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_1Day_Afternoon() {
         var hearingDay = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -300,19 +372,43 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
-        assertEquals(result, List.of("23 May 2023 at 14:00 for 2 hours"));
+        assertEquals(result, List.of("23 December 2023 at 14:00 for 2 hours"));
+    }
+
+    @Test
+    void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon_BST() {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)).build())
+            .build();
+
+        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+
+        assertEquals(result, List.of(
+            "23 May 2023 at 11:00 for 3 hours",
+            "24 May 2023 at 15:00 for 2 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -323,20 +419,20 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 3 hours",
-            "24 May 2023 at 14:00 for 2 hours"));
+            "23 December 2023 at 10:00 for 3 hours",
+            "24 December 2023 at 14:00 for 2 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndAfternoon() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -347,20 +443,20 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 5 hours",
-            "24 May 2023 at 14:00 for 2 hours"));
+            "23 December 2023 at 10:00 for 5 hours",
+            "24 December 2023 at 14:00 for 2 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndMorning() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -371,20 +467,20 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 5 hours",
-            "24 May 2023 at 10:00 for 3 hours"));
+            "23 December 2023 at 10:00 for 5 hours",
+            "24 December 2023 at 10:00 for 3 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_2Days_Morning() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -395,20 +491,20 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 3 hours",
-            "24 May 2023 at 10:00 for 3 hours"));
+            "23 December 2023 at 10:00 for 3 hours",
+            "24 December 2023 at 10:00 for 3 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_2Days_Afternoon() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -419,25 +515,25 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 14:00 for 2 hours",
-            "24 May 2023 at 14:00 for 2 hours"));
+            "23 December 2023 at 14:00 for 2 hours",
+            "24 December 2023 at 14:00 for 2 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_3Days_FullDays() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -448,26 +544,26 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 5 hours",
-            "24 May 2023 at 10:00 for 5 hours",
-            "25 May 2023 at 10:00 for 5 hours"));
+            "23 December 2023 at 10:00 for 5 hours",
+            "24 December 2023 at 10:00 for 5 hours",
+            "25 December 2023 at 10:00 for 5 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_3Days_FullDayMorningAndAfternoon() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 13, 0))
             .build();
 
         var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -478,26 +574,26 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 10:00 for 5 hours",
-            "24 May 2023 at 10:00 for 3 hours",
-            "25 May 2023 at 14:00 for 2 hours"));
+            "23 December 2023 at 10:00 for 5 hours",
+            "24 December 2023 at 10:00 for 3 hours",
+            "25 December 2023 at 14:00 for 2 hours"));
     }
 
     @Test
     void getHearingDaysText_shouldReturnExpectedText_3Days_Afternoon() {
         var hearingDay1 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
             .build();
 
         var hearingDay2 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 24, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 24, 16, 0))
             .build();
 
         var hearingDay3 = HearingDaySchedule.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 14, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 16, 0))
+            .hearingStartDateTime(LocalDateTime.of(2023, 12, 25, 14, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 12, 25, 16, 0))
             .build();
 
         HearingGetResponse hearing = hearingResponse()
@@ -508,9 +604,9 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing);
 
         assertEquals(result, List.of(
-            "23 May 2023 at 14:00 for 2 hours",
-            "24 May 2023 at 14:00 for 2 hours",
-            "25 May 2023 at 14:00 for 2 hours"));
+            "23 December 2023 at 14:00 for 2 hours",
+            "24 December 2023 at 14:00 for 2 hours",
+            "25 December 2023 at 14:00 for 2 hours"));
     }
 
     @Test
@@ -753,5 +849,102 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getTotalHearingDurationText(hearing);
 
         assertEquals(result, "1 day");
+    }
+
+    @Nested
+    class IncludesVideoHearing {
+        @Test
+        void shouldReturnFalseIfCaseHearingsIsNull() {
+            HearingsResponse hearings = HearingsResponse.builder().build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnFalseIfNoCaseHearingsExist() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of()).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnFalseIfNoVideoHearingsExist() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(INTER)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertFalse(actual);
+        }
+
+        @Test
+        void shouldReturnTrue_IfVideoHearingsExistOnASingleDay() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(VIDCVP)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertTrue(actual);
+        }
+
+        @Test
+        void shouldReturnTrue_IfVideoHearingsExistOneDayWithinMultipleDays() {
+            HearingsResponse hearings = HearingsResponse.builder().caseHearings(List.of(
+                CaseHearing.builder()
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(INTER)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build(),
+                        HearingDaySchedule.builder()
+                            .attendees(List.of(
+                                Attendees.builder()
+                                    .hearingSubChannel(VIDCVP)
+                                    .build(),
+                                Attendees.builder()
+                                    .hearingSubChannel(null)
+                                    .build()
+                            )).build()
+                    ))
+                    .build()
+            )).build();
+
+            boolean actual = includesVideoHearing(hearings);
+
+            assertTrue(actual);
+        }
     }
 }
