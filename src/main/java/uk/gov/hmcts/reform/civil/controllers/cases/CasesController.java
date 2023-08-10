@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
-import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
@@ -57,7 +54,6 @@ public class CasesController {
 
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
@@ -141,7 +137,7 @@ public class CasesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<CaseData> submitEvent(
+    public ResponseEntity<CaseDetails> submitEvent(
         @PathVariable("submitterId") String submitterId,
         @PathVariable("caseId") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
@@ -156,9 +152,8 @@ public class CasesController {
             .updates(eventDto.getCaseDataUpdate())
             .build();
         log.info(eventDto.getCaseDataUpdate().toString());
-        CaseData caseData = caseDetailsConverter
-            .toCaseData(caseEventService.submitEvent(params));
-        return new ResponseEntity<>(caseData, HttpStatus.OK);
+        CaseDetails caseDetails = caseEventService.submitEvent(params);
+        return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
     @PostMapping(path = "/response/deadline")
