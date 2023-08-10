@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
@@ -189,7 +190,8 @@ public class StateFlowEngine {
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -202,7 +204,8 @@ public class StateFlowEngine {
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -218,7 +221,8 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
@@ -228,7 +232,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 1
             .transitionTo(CLAIM_SUBMITTED)
@@ -242,7 +247,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendant 2
             .transitionTo(CLAIM_SUBMITTED)
@@ -255,7 +261,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             // Unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -267,7 +274,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
                         FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
-                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled(),
+                        BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
