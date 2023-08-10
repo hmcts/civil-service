@@ -101,10 +101,14 @@ public class PartyUtils {
     }
 
     private static String getIndividualName(Party party, boolean omitTitle) {
+        if (party.getBulkClaimPartyName() != null) {
+            return party.getBulkClaimPartyName();
+        }
         return (omitTitle ? "" : getTitle(party.getIndividualTitle()))
-            + party.getIndividualFirstName()
-            + " "
-            + party.getIndividualLastName();
+                + party.getIndividualFirstName()
+                + " "
+                + party.getIndividualLastName();
+
     }
 
     private static String getIndividualName(Party party) {
