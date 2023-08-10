@@ -182,7 +182,7 @@ public class CasesController {
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}")
+    @PostMapping(path = "/caseworkers/create-case/{userId}")
     @Operation(summary = "Submits event for new case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
@@ -203,7 +203,8 @@ public class CasesController {
             log.info("Updated case data:  " + submitEventDto.getData().toString());
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
-        } catch (FeignException.UnprocessableEntity ex) {
+        } catch (Exception ex) {
+            log.error("Case  creation unsuccessful:  " + ex.getMessage());
             throw new CaseDataInvalidException();
         }
     }
