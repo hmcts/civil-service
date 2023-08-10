@@ -53,7 +53,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
-    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases";
+    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}";
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final List<DashboardClaimInfo> claimResults =
