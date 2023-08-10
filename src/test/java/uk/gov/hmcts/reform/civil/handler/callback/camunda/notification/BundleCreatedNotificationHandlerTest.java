@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -27,19 +28,23 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NAME;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
     BundleCreatedNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
 class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    public static final String TEMPLATE_ID = "template-id";
 
     @MockBean
     private NotificationService notificationService;
@@ -53,7 +58,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getBundleCreationTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         }
 
         @Test
@@ -61,7 +67,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             //Given: Case data at hearing scheduled state and callback param with Notify applicant event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
             ).build();
 
             //When: handler is called
@@ -69,10 +75,10 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: verify email is sent to applicant
             verify(notificationService).sendMail(
-                    "applicantsolicitor@example.com",
-                    "template-id",
-                    getNotificationDataMap(caseData),
-                    "bundle-created-applicant-notification-000DC001"
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "bundle-created-applicant-notification-000DC001"
             );
         }
 
@@ -81,7 +87,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()
             ).build();
 
             //When: handler is called
@@ -140,6 +146,32 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotifyRespondentLip_whenIsNotRepresented() {
+            //Given: Case data at hearing scheduled state and callback param with Notify respondent1 Lip
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateHearingDateScheduled().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO).respondent1(
+                    Party.builder().partyName("John Doe").partyEmail("doe@doe.com").individualFirstName("John")
+                        .individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()
+            ).build();
+
+            //When: handler is called
+            handler.handle(params);
+
+            //Then: verify email is sent to respondent1 lipy
+            verify(notificationService).sendMail(
+                "doe@doe.com",
+                "template-id",
+                getNotificationLipDataMap(caseData, "John Doe"),
+                "bundle-created-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(
@@ -148,7 +180,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(
-                    NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
+                    NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()).build()))
                 .isEqualTo(TASK_ID_DEFENDANT1);
 
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
@@ -160,7 +192,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED);
-            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED);
+            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED);
             assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED);
         }
 
@@ -169,6 +201,15 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationLipDataMap(CaseData caseData, String name) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+                NAME, name
             );
         }
     }

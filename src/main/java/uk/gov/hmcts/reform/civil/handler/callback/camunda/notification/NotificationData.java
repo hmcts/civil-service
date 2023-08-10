@@ -72,6 +72,7 @@ public interface NotificationData {
     String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
     String COURT_LOCATION = "courtlocation";
     String LEGAL_ORG_NAME = "LegalOrgName";
+    String NAME = "name";
 
     //NoC
     String CASE_NAME = "case name";
