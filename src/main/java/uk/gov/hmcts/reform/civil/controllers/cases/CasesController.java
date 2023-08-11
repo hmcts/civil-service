@@ -178,7 +178,7 @@ public class CasesController {
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases")
+    @PostMapping(path = "/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}")
     @Operation(summary = "Submits event for new case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
