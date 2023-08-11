@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -63,6 +64,7 @@ public class CasesController {
     private final CaseSdtRequestSearchService caseSdtRequestSearchService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    private final PostcodeValidator postcodeValidator;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -182,7 +184,7 @@ public class CasesController {
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}")
+    @PostMapping(path = "/caseworkers/create-case/{userId}")
     @Operation(summary = "Submits event for new case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
@@ -220,7 +222,7 @@ public class CasesController {
         CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
             .authorisation(authorization)
             .userId(userId)
-            .searchCriteria(Map.of("case.claimFee.code", searchParam)).build();
+            .searchCriteria(Map.of("case.claimInterest", searchParam)).build();
         List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
 
         if (caseDetails.size() < 1 && caseDetails.isEmpty() ) {
@@ -229,6 +231,13 @@ public class CasesController {
         return false;
     }
 
-
+    @GetMapping(path = "/caseworker/validatePin")
+    @Operation(summary = "Validate address - PostCode")
+    public List<String> validatePostCode(
+        @RequestParam String postCode
+    ) {
+       List<String> errors =  postcodeValidator.validate(postCode);
+       return errors;
+    }
 
 }
