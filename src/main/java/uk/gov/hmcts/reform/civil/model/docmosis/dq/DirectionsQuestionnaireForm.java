@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
@@ -47,6 +48,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final List<Party> respondents;
     private final List<Party> applicants;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
+    private final FixedRecoverableCostsSection fixedRecoverableCosts;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
     private final Experts experts;
