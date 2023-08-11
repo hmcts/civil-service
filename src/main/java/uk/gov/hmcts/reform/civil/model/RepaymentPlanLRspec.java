@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,7 +25,7 @@ public class RepaymentPlanLRspec {
     @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {
         if (firstRepaymentDate != null && paymentAmount != null && repaymentFrequency != null) {
-            long installmentsAfterFirst = totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING)
+            long installmentsAfterFirst = totalAmount.divide(MonetaryConversions.penniesToPounds(paymentAmount), 0, RoundingMode.CEILING)
                 .longValue() - 1;
             switch (repaymentFrequency) {
                 case ONCE_ONE_WEEK:
