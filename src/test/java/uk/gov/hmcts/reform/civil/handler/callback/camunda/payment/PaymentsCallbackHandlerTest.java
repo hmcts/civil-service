@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -182,7 +183,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             status,
             "exception message",
             Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-            body
+            body,
+            Collections.emptyMap()
         );
     }
 }
