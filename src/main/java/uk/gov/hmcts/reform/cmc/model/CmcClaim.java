@@ -356,7 +356,7 @@ public class CmcClaim implements Claim {
     public boolean isClaimantRejectsRepaymentPlan() {
         log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse);
         log.info("Response :", response);
-        if( Objects.nonNull(response) && !response.isFullDefence()) {
+        if (Objects.nonNull(response) && !response.isFullDefence()) {
             return (response.getPaymentIntention().getPaymentOption() == PaymentOption.BY_SPECIFIED_DATE
                 || response.getPaymentIntention().getPaymentOption() == PaymentOption.INSTALMENTS)
                 && Objects.nonNull(claimantResponse)
