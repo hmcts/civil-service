@@ -77,6 +77,10 @@ public class UnavailableDateValidator implements
         return errors;
     }
 
+    public List<String> validateAdditionalUnavailableDates(List<Element<UnavailableDate>> unavailableDates) {
+        return dateValidation(unavailableDates);
+    }
+
     private boolean checkOneYearValidation(LocalDate localDate) {
         return localDate != null && localDate.isAfter(LocalDate.now().plusYears(1));
     }

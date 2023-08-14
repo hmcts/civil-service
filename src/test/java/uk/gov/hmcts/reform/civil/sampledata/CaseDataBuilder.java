@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.AdditionalDates;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -455,6 +456,8 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+
+    private AdditionalDates addUnavailableDatesScreens;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5731,6 +5734,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addUnavailableDatesScreens(AdditionalDates additionalDates) {
+        this.addUnavailableDatesScreens = additionalDates;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5999,6 +6007,7 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .addUnavailableDatesScreens(addUnavailableDatesScreens)
             .build();
     }
 }
