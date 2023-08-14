@@ -301,7 +301,7 @@ public class CmcClaim implements Claim {
 
     private boolean isApplicant1ResponseDeadlineEnded() {
         return Optional.ofNullable(getIntentionToProceedDeadline()).filter(deadline ->
-                                                                               deadline.isBefore(LocalDateTime.now()))
+                                                                               deadline.isBefore(LocalDate.now()))
             .isPresent() && !hasClaimantResponse();
 
     }
