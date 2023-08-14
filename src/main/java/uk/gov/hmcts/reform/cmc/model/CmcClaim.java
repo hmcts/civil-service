@@ -358,7 +358,7 @@ public class CmcClaim implements Claim {
         log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse.getAcceptPaymentMethod(), claimantResponse.getAcceptCourtOffer());
         log.info("Response :", response);
         log.info("Claimant Response:", claimantResponse);
-        log.info("Repayment plan :", claimantResponse?.getAcceptPaymentMethod());
+        log.info("Repayment plan :", claimantResponse.getAcceptPaymentMethod());
             return  Objects.nonNull(claimantResponse)
                 && claimantResponse.getAcceptPaymentMethod().equals(YesOrNo.NO)
                 && claimantResponse.getAcceptCourtOffer().equals(YesOrNo.NO);
