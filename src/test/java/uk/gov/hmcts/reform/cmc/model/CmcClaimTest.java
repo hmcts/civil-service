@@ -137,7 +137,7 @@ public class CmcClaimTest {
             .response(Response.builder()
                           .responseType(RespondentResponseType.FULL_DEFENCE)
                           .build())
-            .intentionToProceedDeadline(LocalDateTime.now().minusDays(1))
+            .intentionToProceedDeadline(LocalDate.now().minusDays(1))
             .build();
         DashboardClaimStatus status =
             cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
