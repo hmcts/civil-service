@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 import java.math.BigDecimal;
@@ -354,16 +355,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimantRejectsRepaymentPlan() {
-        log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse);
+        log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse.getAcceptPaymentMethod());
         log.info("Response :", response);
-        if (Objects.nonNull(response) && !response.isFullDefence()) {
-            return (response.getPaymentIntention().getPaymentOption() == PaymentOption.BY_SPECIFIED_DATE
-                || response.getPaymentIntention().getPaymentOption() == PaymentOption.INSTALMENTS)
-                && Objects.nonNull(claimantResponse)
-                && claimantResponse.getType() == ClaimantResponseType.REJECTION
-                && (Objects.nonNull(claimantResponse.getClaimantPaymentIntention().getPaymentOption()));
-        }
-        return false;
+        log.info("Repayment plan :", claimantResponse.getAcceptPaymentMethod());
+            return  Objects.nonNull(claimantResponse)
+                && claimantResponse.getAcceptPaymentMethod().equals(YesOrNo.NO);
     }
 
     @Override

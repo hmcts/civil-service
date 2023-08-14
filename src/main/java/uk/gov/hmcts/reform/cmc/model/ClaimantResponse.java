@@ -22,6 +22,7 @@ public class ClaimantResponse {
     private String settleForAmount;
     private PaymentIntention claimantPaymentIntention;
     private CourtDetermination courtDetermination;
+    private AcceptPaymentMethod acceptPaymentMethod;
 
     @JsonIgnore
     public boolean hasCourtDetermination() {
