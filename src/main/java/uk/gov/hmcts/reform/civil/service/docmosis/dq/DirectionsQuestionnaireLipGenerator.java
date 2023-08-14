@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -33,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR
 
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
+
+    private ObjectMapper mapper;
 
     public DirectionsQuestionnaireLipGenerator(DocumentManagementService documentManagementService,
                                                DocumentGeneratorService documentGeneratorService,
