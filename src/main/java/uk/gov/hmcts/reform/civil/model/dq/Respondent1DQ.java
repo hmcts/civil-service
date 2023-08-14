@@ -36,6 +36,7 @@ public class Respondent1DQ implements DQ {
     private Hearing respondent1DQHearingFastClaim;
     private Document respondent1DQDraftDirections;
     private RequestedCourt respondent1DQRequestedCourt;
+    private RemoteHearingLRspec respondent1DQRemoteHearingLRspec;
     private HearingSupport respondent1DQHearingSupport;
     private FurtherInformation respondent1DQFurtherInformation;
     private WelshLanguageRequirements respondent1DQLanguage;
@@ -162,6 +163,12 @@ public class Respondent1DQ implements DQ {
                 .build();
         }
         return respondent1DQRequestedCourt;
+    }
+
+    @Override
+    @JsonProperty("respondent1DQRemoteHearingLRspec")
+    public RemoteHearingLRspec getRemoteHearingLRspec() {
+        return respondent1DQRemoteHearingLRspec;
     }
 
     @Override
