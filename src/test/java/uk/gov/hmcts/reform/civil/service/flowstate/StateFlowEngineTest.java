@@ -1428,6 +1428,38 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnHearingReadiness_whenCaseWentThroughHearingNoticeAndNotOffline() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .takenOfflineDate(null)
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .hearingReferenceNumber("12345")
+                .build();
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(IN_HEARING_READINESS.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(8)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), IN_HEARING_READINESS.fullName()
+                );
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+            );
+        }
+
+        @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedSingleSolicitorIn1v2() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()

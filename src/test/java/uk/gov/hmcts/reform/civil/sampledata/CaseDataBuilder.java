@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
@@ -457,6 +458,9 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+
+    protected String hearingReference;
+    protected ListingOrRelisting listingOrRelisting;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1305,6 +1309,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder issueDate(LocalDate issueDate) {
         this.issueDate = issueDate;
+        return this;
+    }
+
+    public CaseDataBuilder hearingReferenceNumber(String hearingReference) {
+        this.hearingReference = hearingReference;
+        return this;
+    }
+
+    public CaseDataBuilder listingOrRelisting(ListingOrRelisting listingOrRelisting) {
+        this.listingOrRelisting = listingOrRelisting;
         return this;
     }
 
@@ -6045,6 +6059,8 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .hearingReferenceNumber(hearingReference)
+            .listingOrRelisting(listingOrRelisting)
             .build();
     }
 }
