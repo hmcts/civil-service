@@ -360,8 +360,8 @@ public class CmcClaim implements Claim {
             return (Objects.nonNull(response)
                 && !response.isFullDefence()
                 && Objects.nonNull(claimantResponse)
-                && claimantResponse.getAcceptPaymentMethod().equals(YesOrNo.NO)
-                && claimantResponse.getAcceptCourtOffer().equals(YesOrNo.NO));
+                && claimantResponse.getAcceptPaymentMethod().getAccept().equals(YesOrNo.NO)
+                && claimantResponse.getAcceptCourtOffer().getAccept().equals(YesOrNo.NO));
     }
 
     @Override
