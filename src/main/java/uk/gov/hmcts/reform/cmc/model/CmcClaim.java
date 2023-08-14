@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.microsoft.applicationinsights.core.dependencies.apachecommons.logging.Log;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -173,7 +174,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean isSettled() {
-        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !isClaimantRejectsRepaymentPlan());
+        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !isClaimantRejectsRepaymentPlan() && !hasCCJByRedetermination());
     }
 
     @Override
@@ -267,8 +268,12 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
-        return hasClaimantResponse()
-            && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
+        if (hasClaimantResponse()) {
+            log.info("Claimant response type is " + claimantResponse);
+            return hasClaimantResponse()
+                && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
+        }
+        return false;
     }
 
     @JsonIgnore
@@ -359,7 +364,7 @@ public class CmcClaim implements Claim {
             && response.isFullDefence()
             && Objects.nonNull(claimantResponse)
             && claimantAcceptedDefendantResponse()
-            && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.REFER_TO_JUDGE));
+            && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.SETTLEMENT));
     }
 
     @Override
