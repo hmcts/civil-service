@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -77,10 +76,10 @@ public class CmcClaim implements Claim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime intentionToProceedDeadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateSerializer.class)
+    private LocalDate intentionToProceedDeadline;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
