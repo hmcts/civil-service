@@ -217,7 +217,7 @@ public class CasesController {
     public Boolean caseworkerSearchCase(
         @PathVariable("userId") String userId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-        @RequestParam String searchParam
+        @RequestParam(name = "sdtRequestId") String searchParam
     ) {
         CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
             .authorisation(authorization)
@@ -225,7 +225,7 @@ public class CasesController {
             .searchCriteria(Map.of("case.claimInterest", searchParam)).build();
         List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
 
-        if (caseDetails.size() < 1 && caseDetails.isEmpty() ) {
+        if (caseDetails.size() < 1 && caseDetails.isEmpty()) {
             return true;
         }
         return false;
@@ -234,10 +234,10 @@ public class CasesController {
     @GetMapping(path = "/caseworker/validatePin")
     @Operation(summary = "Validate address - PostCode")
     public List<String> validatePostCode(
-        @RequestParam String postCode
+        @RequestParam(name = "postCode") String postCode
     ) {
-       List<String> errors =  postcodeValidator.validate(postCode);
-       return errors;
+        List<String> errors =  postcodeValidator.validate(postCode);
+        return errors;
     }
 
 }
