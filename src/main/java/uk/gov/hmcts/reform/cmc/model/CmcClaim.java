@@ -173,7 +173,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean isSettled() {
-        return moneyReceivedOn != null || claimantAcceptedDefendantResponse();
+        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !isClaimantRejectsRepaymentPlan());
     }
 
     @Override
