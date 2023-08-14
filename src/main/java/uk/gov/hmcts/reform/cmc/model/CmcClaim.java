@@ -246,7 +246,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasCCJByRedetermination() {
         return reDeterminationRequestedAt != null
-            || (hasClaimantResponse() && claimantResponse.hasCourtDetermination())
+            || (hasClaimantResponse() && claimantResponse.hasCourtDetermination() &&  !isClaimantRejectsRepaymentPlan())
             || (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
     }
 
@@ -355,13 +355,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimantRejectsRepaymentPlan() {
-        log.info("Response :", response);
-        log.info("Claimant Response:", claimantResponse);
-            return (Objects.nonNull(response)
-                && !response.isFullDefence()
-                && Objects.nonNull(claimantResponse)
-                && claimantResponse.getAcceptPaymentMethod().getAccept().equals(YesOrNo.NO)
-                && claimantResponse.getAcceptCourtOffer().getAccept().equals(YesOrNo.NO));
+        return (Objects.nonNull(response)
+            && response.isFullDefence()
+            && Objects.nonNull(claimantResponse)
+            && claimantAcceptedDefendantResponse()
+            && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.REFER_TO_JUDGE));
     }
 
     @Override
