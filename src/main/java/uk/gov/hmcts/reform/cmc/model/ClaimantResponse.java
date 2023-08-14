@@ -23,6 +23,7 @@ public class ClaimantResponse {
     private PaymentIntention claimantPaymentIntention;
     private CourtDetermination courtDetermination;
     private AcceptPaymentMethod acceptPaymentMethod;
+    private AcceptPaymentMethod acceptCourtOffer;
 
     @JsonIgnore
     public boolean hasCourtDetermination() {

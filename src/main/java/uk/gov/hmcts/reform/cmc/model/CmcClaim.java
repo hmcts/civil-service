@@ -355,11 +355,12 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimantRejectsRepaymentPlan() {
-        log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse.getAcceptPaymentMethod());
+        log.info("isClaimantRejectsRepaymentPlan : ", claimantResponse.getAcceptPaymentMethod(), claimantResponse.getAcceptCourtOffer());
         log.info("Response :", response);
         log.info("Repayment plan :", claimantResponse.getAcceptPaymentMethod());
             return  Objects.nonNull(claimantResponse)
-                && claimantResponse.getAcceptPaymentMethod().equals(YesOrNo.NO);
+                && claimantResponse.getAcceptPaymentMethod().equals(YesOrNo.NO)
+                && claimantResponse.getAcceptCourtOffer().equals(YesOrNo.NO);
     }
 
     @Override
