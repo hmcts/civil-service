@@ -19,8 +19,10 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_TRIAL_READY;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +63,18 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
 
+        if (isLRvLipToDefendant(callbackParams)) {
+            if (caseData.getRespondent1().getPartyEmail() != null) {
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    notificationsProperties.getNotifyLipUpdateTemplate(),
+                    addPropertiesLRvLip(caseData),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         if (null == respondentEmail && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
             respondentEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
@@ -99,9 +113,24 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
 
     }
 
+    private Map<String, String> addPropertiesLRvLip(CaseData caseData) {
+
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+        );
+    }
+
     private boolean isForRespondentSolicitor1(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_TRIAL_READY.name());
+    }
+
+    private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.isLRvLipOneVOne();
     }
 
     @Override
