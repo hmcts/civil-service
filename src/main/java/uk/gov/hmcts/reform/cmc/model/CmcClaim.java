@@ -400,10 +400,6 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isClaimantRejectsRepaymentPlan() {
-        return (Objects.nonNull(response)
-            && !response.isFullDefence()
-            && Objects.nonNull(claimantResponse)
-            && claimantAcceptedDefendantResponse()
-            && (Objects.nonNull(claimantResponse.getFormaliseOption()) && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.SETTLEMENT)));
+        return false;
     }
 }

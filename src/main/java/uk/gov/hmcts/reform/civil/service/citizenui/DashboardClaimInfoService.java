@@ -41,7 +41,6 @@ public class DashboardClaimInfoService {
 
     public List<DashboardClaimInfo> getOcmcDefendantClaims(String authorisation, String defendantId) {
         log.info("-----------calling ocmc getOCMCDefendantClaims()-------------");
-        log.info("-----------defendantID-------------" + defendantId);
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
         log.info("-----------ocmcClaims received-------------size " + ocmcClaims.size());
         return ocmcClaims;

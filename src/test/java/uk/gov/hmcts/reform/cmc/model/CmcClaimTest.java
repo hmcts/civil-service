@@ -144,17 +144,4 @@ public class CmcClaimTest {
         AssertionsForClassTypes.assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
 
-    @Test
-    void given_claimantRejectsDefendantPaymentPlan() {
-        CmcClaim claim = CmcClaim.builder()
-            .response(Response.builder()
-                          .responseType(RespondentResponseType.PART_ADMISSION)
-                          .build())
-            .claimantResponse(ClaimantResponse.builder()
-                                  .type(ClaimantResponseType.ACCEPTATION)
-                                  .formaliseOption(FormaliseOptionPlan.SETTLEMENT)
-                                  .build())
-            .build();
-        assertTrue(claim.isClaimantRejectsRepaymentPlan());
-    }
 }

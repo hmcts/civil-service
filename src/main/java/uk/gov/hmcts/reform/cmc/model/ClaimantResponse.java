@@ -20,9 +20,7 @@ public class ClaimantResponse {
     private BigDecimal amountPaid;
     private String paymentReceived;
     private String settleForAmount;
-    private PaymentIntention claimantPaymentIntention;
     private CourtDetermination courtDetermination;
-    private FormaliseOptionPlan formaliseOption;
 
     @JsonIgnore
     public boolean hasCourtDetermination() {

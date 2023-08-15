@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cmc.model.ClaimantResponse;
 import uk.gov.hmcts.reform.cmc.model.ClaimantResponseType;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.CourtDetermination;
-import uk.gov.hmcts.reform.cmc.model.FormaliseOptionPlan;
 import uk.gov.hmcts.reform.cmc.model.MadeBy;
 import uk.gov.hmcts.reform.cmc.model.PartyStatement;
 import uk.gov.hmcts.reform.cmc.model.PaymentIntention;
@@ -395,20 +394,4 @@ public class CmcClaimStatusDashboardFactoryTest {
                           .build())
             .build();
     }
-
-    @Test
-    void given_claimantRejectsDefendantPaymentPlan() {
-        CmcClaim claim = CmcClaim.builder()
-            .response(Response.builder()
-                          .responseType(RespondentResponseType.PART_ADMISSION)
-                          .build())
-            .claimantResponse(ClaimantResponse.builder()
-                                  .type(ClaimantResponseType.ACCEPTATION)
-                                  .formaliseOption(FormaliseOptionPlan.SETTLEMENT)
-                                  .build())
-            .build();
-        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTS_REPAYMENT_PLAN);
-    }
-
 }
