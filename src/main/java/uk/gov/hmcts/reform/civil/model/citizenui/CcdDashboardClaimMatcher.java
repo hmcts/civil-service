@@ -88,7 +88,7 @@ public class CcdDashboardClaimMatcher implements Claim {
         return !caseData.isRespondentResponseFullDefence()
             && (caseData.respondent1PaidInFull()
             || caseData.isResponseAcceptedByClaimant())
-            && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
+            && !caseData.isClaimantRejectsClaimAmount();
     }
 
     @Override
