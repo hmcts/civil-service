@@ -171,7 +171,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean isSettled() {
-        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !isClaimantRejectsRepaymentPlan() && !hasCCJByRedetermination());
+        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !hasCCJByRedetermination());
     }
 
     @Override
@@ -183,10 +183,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean claimantRequestedCountyCourtJudgement() {
-        return getCountyCourtJudgmentRequestedAt() != null
-            || (Objects.nonNull(claimantResponse)
-            && claimantAcceptedDefendantResponse()
-            && (Objects.nonNull(claimantResponse.getFormaliseOption()) && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.CCJ)));
+        return getCountyCourtJudgmentRequestedAt() != null;
     }
 
     @Override
@@ -234,7 +231,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately()
-            && claimantAcceptedDefendantResponse() && !isClaimantRejectsRepaymentPlan() && !hasCCJByRedetermination();
+            && claimantAcceptedDefendantResponse() && !hasCCJByRedetermination();
     }
 
     @Override
@@ -247,7 +244,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasCCJByRedetermination() {
         return reDeterminationRequestedAt != null
-            || (hasClaimantResponse() && claimantResponse.hasCourtDetermination() &&  !isClaimantRejectsRepaymentPlan())
+            || (hasClaimantResponse() && claimantResponse.hasCourtDetermination())
             || (settlement != null && settlement.isThroughAdmissions() && countyCourtJudgmentRequestedAt != null);
     }
 
