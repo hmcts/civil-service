@@ -89,10 +89,10 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapWitnessStatements(CaseData caseData, PartType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
-            groupWitnessStatementsByName(caseData.getDocumentWitnessSummary());
         switch (partyType) {
             case CLAIMANT1 -> {
+                Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
+                    groupWitnessStatementsByName(caseData.getDocumentWitnessStatement());
                 List<Element<UploadEvidenceWitness>> witnessStatementSelf = getSelfStatement(witnessStatmentsMap,
                                                                                               caseData.getApplicant1());
                 bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(witnessStatementSelf,
@@ -102,9 +102,13 @@ public class BundleRequestMapper {
                                                                                               BundleFileNameList.WITNESS_STATEMENT_OTHER_DISPLAY_NAME.getDisplayName(),
                                                                                               EvidenceUploadFiles.WITNESS_STATEMENT.name(),
                                                                                               PartType.CLAIMANT1, caseData.getApplicant1()));
-
+                bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(caseData.getDocumentWitnessSummary(),
+                                                                                         BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
+                                                                                         EvidenceUploadFiles.WITNESS_SUMMARY.name(), PartType.CLAIMANT1));
             }
             case CLAIMANT2 -> {
+                Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
+                    groupWitnessStatementsByName(caseData.getDocumentWitnessStatement());
                 List<Element<UploadEvidenceWitness>> witnessStatementSelf = getSelfStatement(witnessStatmentsMap,
                                                                                              caseData.getApplicant2());
                 bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(witnessStatementSelf,
@@ -116,6 +120,8 @@ public class BundleRequestMapper {
                                                                                               PartType.CLAIMANT2, caseData.getApplicant2()));
             }
             case DEFENDANT1 -> {
+                Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
+                    groupWitnessStatementsByName(caseData.getDocumentWitnessStatementRes());
                 List<Element<UploadEvidenceWitness>> witnessStatementSelf = getSelfStatement(witnessStatmentsMap,
                                                                                              caseData.getRespondent1());
                 bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(witnessStatementSelf,
@@ -125,8 +131,14 @@ public class BundleRequestMapper {
                                                                                               BundleFileNameList.WITNESS_STATEMENT_OTHER_DISPLAY_NAME.getDisplayName(),
                                                                                               EvidenceUploadFiles.WITNESS_STATEMENT.name(),
                                                                                               PartType.DEFENDANT1, caseData.getRespondent1()));
+                bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(caseData.getDocumentWitnessSummaryRes(),
+                                                                                         BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
+                                                                                         EvidenceUploadFiles.WITNESS_SUMMARY.name(), PartType.DEFENDANT1));
             }
             case DEFENDANT2 -> {
+                Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
+                    groupWitnessStatementsByName(caseData.getDocumentWitnessStatementRes2());
+
                 List<Element<UploadEvidenceWitness>> witnessStatementSelf = getSelfStatement(witnessStatmentsMap,
                                                                                              caseData.getRespondent2());
                 bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(witnessStatementSelf,
@@ -136,6 +148,9 @@ public class BundleRequestMapper {
                                                                                               BundleFileNameList.WITNESS_STATEMENT_OTHER_DISPLAY_NAME.getDisplayName(),
                                                                                               EvidenceUploadFiles.WITNESS_STATEMENT.name(),
                                                                                               PartType.DEFENDANT2, caseData.getRespondent2()));
+                bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(caseData.getDocumentWitnessSummaryRes2(),
+                                                                                         BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
+                                                                                         EvidenceUploadFiles.WITNESS_SUMMARY.name(), PartType.DEFENDANT2));
             }
             default -> {
                 break;
@@ -316,13 +331,23 @@ public class BundleRequestMapper {
                                                                                    String documentType, PartType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
-            witnessEvidence.sort(Comparator.comparing(
-                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate(),
-                Comparator.reverseOrder()
-            ));
+            if (documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT)) {
+                witnessEvidence.sort(Comparator.comparing(
+                    uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate(),
+                    Comparator.reverseOrder()
+                ));
+            } else {
+                witnessEvidence.sort(Comparator.comparing(
+                    uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getCreatedDatetime().toLocalDate(),
+                    Comparator.reverseOrder()
+                ));
+            }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-                String docName = generateDocName(fileNamePrefix, party.getDisplayName(),
-                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                String docName = generateDocName(fileNamePrefix, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT)
+                                                     ?
+                                                     uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
+                                                     .getValue().getCreatedDatetime().toLocalDate()
                 );
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
                                                  .documentFileName(docName)
