@@ -237,26 +237,26 @@ public class BundleRequestMapper {
         switch (partyType) {
             case CLAIMANT1 -> {
 
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary()!= null ? caseData.getDocumentWitnessSummary() : null,
-                                                                           caseData.getDocumentEvidenceForTrial()!=null ? caseData.getDocumentEvidenceForTrial() : null,
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary() != null ? caseData.getDocumentWitnessSummary() : null,
+                                                                           caseData.getDocumentEvidenceForTrial() != null ? caseData.getDocumentEvidenceForTrial() : null,
                                                                            PartType.CLAIMANT1));
                 break;
             }
             case CLAIMANT2 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary()!= null ? caseData.getDocumentWitnessSummary() : null,
-                                                                           caseData.getDocumentEvidenceForTrial()!=null ? caseData.getDocumentEvidenceForTrial() : null,
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary() != null ? caseData.getDocumentWitnessSummary() : null,
+                                                                           caseData.getDocumentEvidenceForTrial() != null ? caseData.getDocumentEvidenceForTrial() : null,
                                                                            PartType.CLAIMANT1));
                 break;
             }
             case DEFENDANT1 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes()!= null ? caseData.getDocumentWitnessSummaryRes() : null,
-                                                                           caseData.getDocumentEvidenceForTrialRes()!=null ? caseData.getDocumentEvidenceForTrialRes() : null,
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes() != null ? caseData.getDocumentWitnessSummaryRes() : null,
+                                                                           caseData.getDocumentEvidenceForTrialRes() != null ? caseData.getDocumentEvidenceForTrialRes() : null,
                                                                            PartType.DEFENDANT1));
                 break;
             }
             case DEFENDANT2 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes2()!= null ? caseData.getDocumentWitnessSummaryRes2() : null,
-                                                                           caseData.getDocumentEvidenceForTrialRes2()!=null ? caseData.getDocumentEvidenceForTrialRes2() : null,
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes2() != null ? caseData.getDocumentWitnessSummaryRes2() : null,
+                                                                           caseData.getDocumentEvidenceForTrialRes2() != null ? caseData.getDocumentEvidenceForTrialRes2() : null,
                                                                            PartType.DEFENDANT2));
                 break;
             }
@@ -333,7 +333,8 @@ public class BundleRequestMapper {
                                                  .documentLink(DocumentLink.builder()
                                                                    .documentUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentUrl())
                                                                    .documentBinaryUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentBinaryUrl())
-                                                                   .documentFilename(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentFileName()).build())
+                                                                   .documentFilename(uploadEvidenceWitnessElement.getValue()
+                                                                                         .getWitnessOptionDocument().getDocumentFileName()).build())
                                                  .build());
             });
         }
@@ -392,7 +393,8 @@ public class BundleRequestMapper {
                                                  .documentLink(DocumentLink.builder()
                                                                    .documentUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentUrl())
                                                                    .documentBinaryUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentBinaryUrl())
-                                                                   .documentFilename(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()).build())
+                                                                   .documentFilename(uploadEvidenceDocumentTypeElement.getValue()
+                                                                                         .getDocumentUpload().getDocumentFileName()).build())
                                                  .build());
             });
         }
