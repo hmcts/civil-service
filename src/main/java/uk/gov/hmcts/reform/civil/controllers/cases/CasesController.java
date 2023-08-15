@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -58,6 +59,7 @@ public class CasesController {
     private final CaseEventService caseEventService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    private final PostcodeValidator postcodeValidator;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -202,6 +204,15 @@ public class CasesController {
             log.error("Case  creation unsuccessful:  " + ex.getMessage());
             throw new CaseDataInvalidException();
         }
+    }
+
+    @GetMapping(path = "/caseworker/validatePin")
+    @Operation(summary = "Validate address - PostCode")
+    public List<String> validatePostCode(
+        @RequestParam(name = "postCode") String postCode
+    ) {
+        List<String> errors =  postcodeValidator.validate(postCode);
+        return errors;
     }
 
 }
