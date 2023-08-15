@@ -111,18 +111,21 @@ class BundleRequestMapperTest {
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
                                                        .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().get(0))
+                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
                                                        .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames().get(0))
+                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
                                                        .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames().get(0))
+                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         return otherEvidenceDocs;
     }

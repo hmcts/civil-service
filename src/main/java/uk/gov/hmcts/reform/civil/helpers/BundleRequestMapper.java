@@ -276,7 +276,8 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 chronologyDocs,
                 BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(),
-                TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name()
+                TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name(),
+                party
             ));
             List<Element<UploadEvidenceDocumentType>> trialTimeTableDocs =
                 filterDocumentaryEvidenceForTrialDocs(
@@ -286,7 +287,8 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 trialTimeTableDocs,
                 BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(),
-                TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name()
+                TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(),
+                party
             ));
         }
         return bundlingRequestDocuments;
@@ -340,35 +342,9 @@ public class BundleRequestMapper {
 
     }
 
-    private List<BundlingRequestDocument> covertExpertEvidenceToBundleRequestDocs(List<Element<UploadEvidenceExpert>> expertEvidenceList,
-                                                              String fileNamePrefix, String documentType) {
-        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-
-        if (expertEvidenceList != null) {
-            expertEvidenceList.sort(Comparator.comparing(
-                uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate(),
-                Comparator.reverseOrder()
-            ));
-            expertEvidenceList.forEach(uploadEvidenceExpertElement -> {
-                String docName = String.format(
-                    fileNamePrefix,
-                    uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate()
-                );
-                bundlingRequestDocuments.add(BundlingRequestDocument.builder()
-                                                 .documentFileName(docName)
-                                                 .documentType(documentType)
-                                                 .documentLink(DocumentLink.builder()
-                                                                   .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
-                                                                   .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
-                                                                   .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
-                                                 .build());
-            });
-        }
-        return bundlingRequestDocuments;
-    }
-
     private List<BundlingRequestDocument> covertEvidenceUploadTypeToBundleRequestDocs(List<Element<UploadEvidenceDocumentType>> evidenceUploadDocList,
-                                                              String fileNamePrefix, String documentType) {
+                                                                                      String fileNamePrefix, String documentType,
+                                                                                      PartType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
         if (evidenceUploadDocList != null) {
@@ -377,9 +353,8 @@ public class BundleRequestMapper {
                 Comparator.reverseOrder()
             ));
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
-                String docName = String.format(
-                    fileNamePrefix,
-                    uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
+                String docName = generateDocName(fileNamePrefix, party.getDisplayName(),
+                                                 uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
                 );
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
                                                  .documentFileName(docName)
