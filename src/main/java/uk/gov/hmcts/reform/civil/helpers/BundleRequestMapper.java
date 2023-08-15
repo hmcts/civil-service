@@ -189,16 +189,17 @@ public class BundleRequestMapper {
 
     private List<Element<UploadEvidenceWitness>> getSelfStatement(Map<String,
         List<Element<UploadEvidenceWitness>>> witnessStatmentsMap, Party party) {
-        List<Element<UploadEvidenceWitness>> selfStatmentList = new ArrayList<>();
-        if (party != null && party.getPartyName() != null) {
-            selfStatmentList.addAll(
+        List<Element<UploadEvidenceWitness>> selfStatementList = new ArrayList<>();
+        if (party != null && party.getPartyName() != null && witnessStatmentsMap.get(party.getPartyName().trim().toLowerCase()) != null) {
+            selfStatementList.addAll(
                 witnessStatmentsMap.get(party.getPartyName().trim().toLowerCase()));
         }
-        if (party != null && party.isIndividual() && party.getIndividualFirstName() != null) {
-            selfStatmentList.addAll(witnessStatmentsMap.get(party.getIndividualFirstName()
+        if (party != null && party.isIndividual() && party.getIndividualFirstName() != null && witnessStatmentsMap.get(party.getIndividualFirstName()
+                                                                                                                           .trim().toLowerCase()) != null) {
+            selfStatementList.addAll(witnessStatmentsMap.get(party.getIndividualFirstName()
                                                                 .trim().toLowerCase()));
         }
-        return selfStatmentList;
+        return selfStatementList;
     }
 
     private Map<String, List<Element<UploadEvidenceWitness>>> groupWitnessStatementsByName(
