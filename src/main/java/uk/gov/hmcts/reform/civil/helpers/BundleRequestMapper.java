@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,10 +148,13 @@ public class BundleRequestMapper {
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap, String displayName, String documentType,
         PartType partType, Party party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-
-        witnessStatmentsMap.remove(party.getPartyName().trim().toLowerCase());
-        if (party.isIndividual()) {
-            witnessStatmentsMap.remove(party.getIndividualFirstName().trim().toLowerCase());
+        if (party != null) {
+            if (party.getPartyName() != null) {
+                witnessStatmentsMap.remove(party.getPartyName().trim().toLowerCase());
+            }
+            if (party.isIndividual() && party.getIndividualFirstName() != null) {
+                witnessStatmentsMap.remove(party.getIndividualFirstName().trim().toLowerCase());
+            }
         }
         witnessStatmentsMap.forEach((witnessName, witnessEvidence) -> {
             witnessEvidence.sort(Comparator.comparing(
@@ -185,9 +189,12 @@ public class BundleRequestMapper {
 
     private List<Element<UploadEvidenceWitness>> getSelfStatement(Map<String,
         List<Element<UploadEvidenceWitness>>> witnessStatmentsMap, Party party) {
-        List<Element<UploadEvidenceWitness>> selfStatmentList =
-            witnessStatmentsMap.get(party.getPartyName().trim().toLowerCase());
-        if (party.isIndividual()) {
+        List<Element<UploadEvidenceWitness>> selfStatmentList = new ArrayList<>();
+        if (party != null && party.getPartyName() != null) {
+            selfStatmentList =
+                witnessStatmentsMap.get(party.getPartyName().trim().toLowerCase());
+        }
+        if (party != null && party.isIndividual() && party.getIndividualFirstName() != null) {
             selfStatmentList.addAll(witnessStatmentsMap.get(party.getIndividualFirstName()
                                                                 .trim().toLowerCase()));
         }
@@ -196,10 +203,13 @@ public class BundleRequestMapper {
 
     private Map<String, List<Element<UploadEvidenceWitness>>> groupWitnessStatementsByName(
         List<Element<UploadEvidenceWitness>> witnessStatement) {
-        Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementMap =
-            witnessStatement.stream().collect(Collectors
-                                                  .groupingBy(uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement
-                .getValue().getWitnessOptionName().trim().toLowerCase()));
+        Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementMap = new HashMap<String,
+            List<Element<UploadEvidenceWitness>>>();
+        if (witnessStatement != null) {
+            witnessStatementMap = witnessStatement.stream().collect(Collectors
+                                                      .groupingBy(uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement
+                                                          .getValue().getWitnessOptionName().trim().toLowerCase()));
+        }
         return witnessStatementMap;
     }
 
@@ -227,26 +237,26 @@ public class BundleRequestMapper {
         switch (partyType) {
             case CLAIMANT1 -> {
 
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary(),
-                                                                           caseData.getDocumentEvidenceForTrial(),
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary()!= null ? caseData.getDocumentWitnessSummary() : null,
+                                                                           caseData.getDocumentEvidenceForTrial()!=null ? caseData.getDocumentEvidenceForTrial() : null,
                                                                            PartType.CLAIMANT1));
                 break;
             }
             case CLAIMANT2 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary(),
-                                                                           caseData.getDocumentEvidenceForTrial(),
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary()!= null ? caseData.getDocumentWitnessSummary() : null,
+                                                                           caseData.getDocumentEvidenceForTrial()!=null ? caseData.getDocumentEvidenceForTrial() : null,
                                                                            PartType.CLAIMANT1));
                 break;
             }
             case DEFENDANT1 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes(),
-                                                                           caseData.getDocumentEvidenceForTrialRes(),
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes()!= null ? caseData.getDocumentWitnessSummaryRes() : null,
+                                                                           caseData.getDocumentEvidenceForTrialRes()!=null ? caseData.getDocumentEvidenceForTrialRes() : null,
                                                                            PartType.DEFENDANT1));
                 break;
             }
             case DEFENDANT2 -> {
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes2(),
-                                                                           caseData.getDocumentEvidenceForTrialRes2(),
+                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummaryRes2()!= null ? caseData.getDocumentWitnessSummaryRes2() : null,
+                                                                           caseData.getDocumentEvidenceForTrialRes2()!=null ? caseData.getDocumentEvidenceForTrialRes2() : null,
                                                                            PartType.DEFENDANT2));
                 break;
             }
@@ -263,22 +273,28 @@ public class BundleRequestMapper {
 
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(documentWitnessSummary, BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
                                                                                  EvidenceUploadFiles.WITNESS_SUMMARY.name(), party));
-        List<Element<UploadEvidenceDocumentType>> chronologyDocs =
-            filterDocumentaryEvidenceForTrialDocs(documentEvidenceForTrial,
-                                                  TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames()
-            );
-        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(chronologyDocs,
-                                                                                    BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(),
-                                                                                    TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name()
-        ));
-        List<Element<UploadEvidenceDocumentType>> trialTimeTableDocs =
-            filterDocumentaryEvidenceForTrialDocs(documentEvidenceForTrial,
-                                                  TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames()
-            );
-        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(trialTimeTableDocs,
-                                                                                    BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(),
-                                                                                    TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name()
-        ));
+        if (documentEvidenceForTrial != null) {
+            List<Element<UploadEvidenceDocumentType>> chronologyDocs =
+                filterDocumentaryEvidenceForTrialDocs(
+                    documentEvidenceForTrial,
+                    TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames()
+                );
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                chronologyDocs,
+                BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(),
+                TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name()
+            ));
+            List<Element<UploadEvidenceDocumentType>> trialTimeTableDocs =
+                filterDocumentaryEvidenceForTrialDocs(
+                    documentEvidenceForTrial,
+                    TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames()
+                );
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                trialTimeTableDocs,
+                BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(),
+                TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name()
+            ));
+        }
         return bundlingRequestDocuments;
     }
 
@@ -302,23 +318,25 @@ public class BundleRequestMapper {
                                                                                    String fileNamePrefix,
                                                                                    String documentType, PartType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-
-        witnessEvidence.sort(Comparator.comparing(
-            uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate(),
-            Comparator.reverseOrder()
-        ));
-        witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-            String docName = generateDocName(fileNamePrefix, party.getDisplayName(),
-                                             uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate());
-            bundlingRequestDocuments.add(BundlingRequestDocument.builder()
-                                             .documentFileName(docName)
-                                             .documentType(documentType)
-                                             .documentLink(DocumentLink.builder()
-                                                               .documentUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentUrl())
-                                                               .documentBinaryUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentBinaryUrl())
-                                                               .documentFilename(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentFileName()).build())
-                                             .build());
-        });
+        if (witnessEvidence != null) {
+            witnessEvidence.sort(Comparator.comparing(
+                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate(),
+                Comparator.reverseOrder()
+            ));
+            witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
+                String docName = generateDocName(fileNamePrefix, party.getDisplayName(),
+                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                );
+                bundlingRequestDocuments.add(BundlingRequestDocument.builder()
+                                                 .documentFileName(docName)
+                                                 .documentType(documentType)
+                                                 .documentLink(DocumentLink.builder()
+                                                                   .documentUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentUrl())
+                                                                   .documentBinaryUrl(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentBinaryUrl())
+                                                                   .documentFilename(uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument().getDocumentFileName()).build())
+                                                 .build());
+            });
+        }
         return bundlingRequestDocuments;
     }
 
@@ -331,21 +349,26 @@ public class BundleRequestMapper {
                                                               String fileNamePrefix, String documentType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
-        expertEvidenceList.sort(Comparator.comparing(
-            uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate(),
-            Comparator.reverseOrder()
-        ));
-        expertEvidenceList.forEach(uploadEvidenceExpertElement -> {
-            String docName = String.format(fileNamePrefix, uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate());
-            bundlingRequestDocuments.add(BundlingRequestDocument.builder()
-                                             .documentFileName(docName)
-                                             .documentType(documentType)
-                                             .documentLink(DocumentLink.builder()
-                                                               .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
-                                                               .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
-                                                               .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
-                                             .build());
-        });
+        if (expertEvidenceList != null) {
+            expertEvidenceList.sort(Comparator.comparing(
+                uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate(),
+                Comparator.reverseOrder()
+            ));
+            expertEvidenceList.forEach(uploadEvidenceExpertElement -> {
+                String docName = String.format(
+                    fileNamePrefix,
+                    uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate()
+                );
+                bundlingRequestDocuments.add(BundlingRequestDocument.builder()
+                                                 .documentFileName(docName)
+                                                 .documentType(documentType)
+                                                 .documentLink(DocumentLink.builder()
+                                                                   .documentUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentUrl())
+                                                                   .documentBinaryUrl(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
+                                                                   .documentFilename(uploadEvidenceExpertElement.getValue().getExpertDocument().getDocumentFileName()).build())
+                                                 .build());
+            });
+        }
         return bundlingRequestDocuments;
     }
 
@@ -353,21 +376,26 @@ public class BundleRequestMapper {
                                                               String fileNamePrefix, String documentType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
-        evidenceUploadDocList.sort(Comparator.comparing(
-            uploadEvidenceDocumentTypeElement -> uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate(),
-            Comparator.reverseOrder()
-        ));
-        evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
-            String docName = String.format(fileNamePrefix, uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-            bundlingRequestDocuments.add(BundlingRequestDocument.builder()
-                                             .documentFileName(docName)
-                                             .documentType(documentType)
-                                             .documentLink(DocumentLink.builder()
-                                                               .documentUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentUrl())
-                                                               .documentBinaryUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentBinaryUrl())
-                                                               .documentFilename(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()).build())
-                                             .build());
-        });
+        if (evidenceUploadDocList != null) {
+            evidenceUploadDocList.sort(Comparator.comparing(
+                uploadEvidenceDocumentTypeElement -> uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate(),
+                Comparator.reverseOrder()
+            ));
+            evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
+                String docName = String.format(
+                    fileNamePrefix,
+                    uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
+                );
+                bundlingRequestDocuments.add(BundlingRequestDocument.builder()
+                                                 .documentFileName(docName)
+                                                 .documentType(documentType)
+                                                 .documentLink(DocumentLink.builder()
+                                                                   .documentUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentUrl())
+                                                                   .documentBinaryUrl(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentBinaryUrl())
+                                                                   .documentFilename(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()).build())
+                                                 .build());
+            });
+        }
         return bundlingRequestDocuments;
     }
 
