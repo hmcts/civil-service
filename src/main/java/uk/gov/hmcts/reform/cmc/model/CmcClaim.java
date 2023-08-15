@@ -23,7 +23,6 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
@@ -265,12 +264,10 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
-        if (hasClaimantResponse()) {
-            log.info("Claimant response type is " + claimantResponse);
-            return hasClaimantResponse()
-                && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
-        }
-        return false;
+        return hasClaimantResponse()
+            && claimantResponse.getType() != null
+            && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
+
     }
 
     @JsonIgnore
