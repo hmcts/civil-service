@@ -714,7 +714,8 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -728,12 +729,14 @@ class CaseEventTaskHandlerTest {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false
                 );
             }
             return Map.of(FlowFlag.NOTICE_OF_CHANGE.name(), true,
                           FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                          FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                          FlowFlag.CERTIFICATE_OF_SERVICE.name(), true,
+                          FlowFlag.BULK_CLAIM_ENABLED.name(), false
                     );
         }
 
