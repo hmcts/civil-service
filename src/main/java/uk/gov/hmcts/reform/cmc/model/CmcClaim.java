@@ -258,7 +258,7 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        return hasResponse() && response.isPartAdmit();
+        return hasResponse() && response.isPartAdmit() && !hasClaimantResponse();
     }
 
     @Override
