@@ -397,7 +397,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                     .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)))
                 //Acknowledging Claim First
-                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged.and(not(isInHearingReadiness)))
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED)
                     .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
