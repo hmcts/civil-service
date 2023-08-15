@@ -42,11 +42,10 @@ public class ClaimStoreService {
     }
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
-
         cmcClaims.forEach(cmcClaim -> {
-         log.info("CMC_Claim : "+ cmcClaim);
-         log.info("=========================== ");
-         log.info("Claimant Response : "+ cmcClaim.getClaimantResponse());
+                 log.info("CMC_Claim index++ : "+ cmcClaim);
+                 log.info("=========================== ");
+                 log.info("Claimant Response : "+ cmcClaim.getClaimantResponse());
         });
 
         return cmcClaims.stream().map(cmcClaim ->

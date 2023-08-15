@@ -9,13 +9,11 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.logging.Log;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 import java.math.BigDecimal;
@@ -28,7 +26,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -186,7 +183,10 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean claimantRequestedCountyCourtJudgement() {
-        return getCountyCourtJudgmentRequestedAt() != null;
+        return getCountyCourtJudgmentRequestedAt() != null
+            || (Objects.nonNull(claimantResponse)
+            && claimantAcceptedDefendantResponse()
+            && (Objects.nonNull(claimantResponse.getFormaliseOption()) && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.CCJ)));
     }
 
     @Override
@@ -359,15 +359,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isClaimantRejectsRepaymentPlan() {
-        return (Objects.nonNull(response)
-            && response.isFullDefence()
-            && Objects.nonNull(claimantResponse)
-            && claimantAcceptedDefendantResponse()
-            && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.SETTLEMENT));
-    }
-
-    @Override
     public boolean hasClaimEnded() {
         return (Objects.nonNull(response)
             && response.isFullDefence()
@@ -408,5 +399,14 @@ public class CmcClaim implements Claim {
             && response.isPartAdmit()
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
+    }
+
+    @Override
+    public boolean isClaimantRejectsRepaymentPlan() {
+        return (Objects.nonNull(response)
+            && !response.isFullDefence()
+            && Objects.nonNull(claimantResponse)
+            && claimantAcceptedDefendantResponse()
+            && (Objects.nonNull(claimantResponse.getFormaliseOption()) && claimantResponse.getFormaliseOption().equals(FormaliseOptionPlan.SETTLEMENT)));
     }
 }

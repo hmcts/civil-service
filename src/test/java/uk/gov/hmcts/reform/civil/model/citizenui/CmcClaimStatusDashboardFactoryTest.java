@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.cmc.model.ClaimantResponse;
 import uk.gov.hmcts.reform.cmc.model.ClaimantResponseType;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.CourtDetermination;
+import uk.gov.hmcts.reform.cmc.model.FormaliseOptionPlan;
 import uk.gov.hmcts.reform.cmc.model.MadeBy;
 import uk.gov.hmcts.reform.cmc.model.PartyStatement;
 import uk.gov.hmcts.reform.cmc.model.PaymentIntention;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 
@@ -392,6 +394,21 @@ public class CmcClaimStatusDashboardFactoryTest {
                                                 .build())
                           .build())
             .build();
+    }
+
+    @Test
+    void given_claimantRejectsDefendantPaymentPlan() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.PART_ADMISSION)
+                          .build())
+            .claimantResponse(ClaimantResponse.builder()
+                                  .type(ClaimantResponseType.ACCEPTATION)
+                                  .formaliseOption(FormaliseOptionPlan.SETTLEMENT)
+                                  .build())
+            .build();
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTS_REPAYMENT_PLAN);
     }
 
 }
