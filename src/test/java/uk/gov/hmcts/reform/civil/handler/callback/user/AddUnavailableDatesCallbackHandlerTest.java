@@ -198,6 +198,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -215,6 +216,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -248,6 +250,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(expectedDates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -281,6 +284,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(expectedDates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
             }

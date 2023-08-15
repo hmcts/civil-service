@@ -244,34 +244,42 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     }
 
     private void addDateToApplicant1(CaseData caseData, CaseData.CaseDataBuilder updatedData) {
-        updatedData.applicant1(caseData.getApplicant1().toBuilder()
-                                   .unavailableDates(
-                                       addDateToExistingDate(caseData, caseData.getApplicant1().getUnavailableDates())
-                                   ).build());
-        //need to add the tab one too
+        List<Element<UnavailableDate>> accumulatedDates = addDateToExistingDate(
+            caseData, caseData.getApplicant1().getUnavailableDates()
+        );
+
+        updatedData
+            .applicant1(caseData.getApplicant1().toBuilder().unavailableDates(accumulatedDates).build())
+            .applicant1UnavailableDatesForTab(accumulatedDates);
     }
 
     private void addDateToApplicant2(CaseData caseData, CaseData.CaseDataBuilder updatedData) {
-        updatedData.applicant2(caseData.getApplicant2().toBuilder()
-                                   .unavailableDates(
-                                       addDateToExistingDate(caseData, caseData.getApplicant2().getUnavailableDates())
-                                   ).build());
-        //need to add the tab one too
+        List<Element<UnavailableDate>> accumulatedDates = addDateToExistingDate(
+            caseData, caseData.getApplicant2().getUnavailableDates()
+        );
+
+        updatedData
+            .applicant2(caseData.getApplicant2().toBuilder().unavailableDates(accumulatedDates).build())
+            .applicant2UnavailableDatesForTab(accumulatedDates);
     }
 
     private void addDateToDefendant1(CaseData caseData, CaseData.CaseDataBuilder updatedData) {
-        updatedData.respondent1(caseData.getRespondent1().toBuilder()
-                                   .unavailableDates(
-                                       addDateToExistingDate(caseData, caseData.getRespondent1().getUnavailableDates())
-                                   ).build());
-        //need to add the tab one too
+        List<Element<UnavailableDate>> accumulatedDates = addDateToExistingDate(
+            caseData, caseData.getRespondent1().getUnavailableDates()
+        );
+
+        updatedData
+            .respondent1(caseData.getRespondent1().toBuilder().unavailableDates(accumulatedDates).build())
+            .respondent1UnavailableDatesForTab(accumulatedDates);
     }
 
     private void addDateToDefendant2(CaseData caseData, CaseData.CaseDataBuilder updatedData) {
-        updatedData.respondent2(caseData.getRespondent2().toBuilder()
-                                    .unavailableDates(
-                                        addDateToExistingDate(caseData, caseData.getRespondent2().getUnavailableDates())
-                                    ).build());
-        //need to add the tab one too
+        List<Element<UnavailableDate>> accumulatedDates = addDateToExistingDate(
+            caseData, caseData.getRespondent2().getUnavailableDates()
+        );
+
+        updatedData
+            .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(accumulatedDates).build())
+            .respondent2UnavailableDatesForTab(accumulatedDates);
     }
 }
