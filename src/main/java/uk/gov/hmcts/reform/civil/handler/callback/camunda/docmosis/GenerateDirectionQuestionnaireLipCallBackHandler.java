@@ -48,7 +48,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
+        if (caseData.isFullAdmitClaimSpec()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
