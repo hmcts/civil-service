@@ -115,10 +115,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
                 templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
-                log.info("CLAIMANT_RESPONSE_SPEC", templateId);
+                System.out.println("CLAIMANT_RESPONSE_SPEC " + templateId.getTemplate());
             } else {
                 templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
-                log.info("DEFENDANT_RESPONSE_SPEC", templateId);
+                System.out.println("DEFENDANT_RESPONSE_SPEC " + templateId.getTemplate());
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -129,26 +129,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates templateId = DQ_RESPONSE_1V1;
-        log.info("DQ_RESPONSE_1V1", templateId);
+        System.out.println("DQ_RESPONSE_1V1 " + templateId.getTemplate());
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_DS;
-                    log.info("DQ_RESPONSE_1V2_DS", templateId);
+                    System.out.println("DQ_RESPONSE_1V2_DS " + templateId.getTemplate());
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_1V2_SS;
-                    log.info("DQ_RESPONSE_1V2_SS", templateId);
+                    System.out.println("DQ_RESPONSE_1V2_SS " + templateId.getTemplate());
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = DocmosisTemplates.DQ_RESPONSE_2V1;
-                    log.info("DQ_RESPONSE_2V1", templateId);
+                    System.out.println("DQ_RESPONSE_2V1 " + templateId.getTemplate());
                 }
                 break;
             default:
