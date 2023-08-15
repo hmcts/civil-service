@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -86,6 +87,8 @@ class BundleRequestMapperTest {
             .documentJointStatementRes2(expertEvidenceDocs)
             .documentAnswersRes2(expertEvidenceDocs)
             .documentQuestionsRes2(expertEvidenceDocs)
+            .documentEvidenceForTrial(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialRes(getDocumentEvidenceForTrial())
             .orderSDODocumentDJ(Document.builder().documentFileName("DJ SDO Order")
                                     .documentBinaryUrl(TEST_URL).documentUrl(TEST_URL).build())
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
@@ -99,6 +102,29 @@ class BundleRequestMapperTest {
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
+    }
+
+    private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build())
+                                                       .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().get(0))
+                                                       .build()));
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build())
+                                                       .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames().get(0))
+                                                       .build()));
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build())
+                                                       .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames().get(0))
+                                                       .build()));
+        return otherEvidenceDocs;
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {

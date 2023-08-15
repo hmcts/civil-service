@@ -69,7 +69,7 @@ public class BundleRequestMapper {
                     bundleConfigFileName)
                 .claimant1TrialDocuments(mapTrialDocuments(caseData, PartType.CLAIMANT1))
                 .defendant1TrialDocuments(mapTrialDocuments(caseData, PartType.DEFENDANT1))
-                .defendant2TrialDocuments(mapTrialDocuments(caseData, PartType.DEFENDANT1))
+                .defendant2TrialDocuments(mapTrialDocuments(caseData, PartType.DEFENDANT2))
                 .statementsOfCaseDocuments(mapStatmentOfcaseDocs(caseData))
                 .ordersDocuments(mapOrdersDocument(caseData))
                 .claimant1WitnessStatements(mapWitnessStatements(caseData, PartType.CLAIMANT1))
@@ -237,12 +237,6 @@ public class BundleRequestMapper {
         switch (partyType) {
             case CLAIMANT1 -> {
 
-                bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary() != null ? caseData.getDocumentWitnessSummary() : null,
-                                                                           caseData.getDocumentEvidenceForTrial() != null ? caseData.getDocumentEvidenceForTrial() : null,
-                                                                           PartType.CLAIMANT1));
-                break;
-            }
-            case CLAIMANT2 -> {
                 bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(caseData.getDocumentWitnessSummary() != null ? caseData.getDocumentWitnessSummary() : null,
                                                                            caseData.getDocumentEvidenceForTrial() != null ? caseData.getDocumentEvidenceForTrial() : null,
                                                                            PartType.CLAIMANT1));
