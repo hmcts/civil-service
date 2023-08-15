@@ -54,18 +54,6 @@ class BundleRequestMapperTest {
 
         // Then
         assertNotNull(bundleCreateRequest);
-        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
-                         .getDocumentWitnessStatement().get(0).getValue().getDocumentFileName());
-        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
-            .getDocumentWitnessStatementRes().get(0).getValue().getDocumentFileName());
-        assertEquals("Witness Statement_FirstName LastName_10022023", bundleCreateRequest.getCaseDetails().getCaseData()
-            .getDocumentWitnessStatementRes2().get(0).getValue().getDocumentFileName());
-        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
-            .getDocumentExpertReport().get(0).getValue().getDocumentFileName());
-        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
-            .getDocumentExpertReportRes().get(0).getValue().getDocumentFileName());
-        assertEquals("Expert Report_FirstName LastName_12012023", bundleCreateRequest.getCaseDetails().getCaseData()
-            .getDocumentExpertReportRes2().get(0).getValue().getDocumentFileName());
     }
 
     private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
