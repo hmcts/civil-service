@@ -92,8 +92,15 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
 
-        if (caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now())) {
+        if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP) && solicitorRepresentsOnlyRespondent2(callbackParams)) {
+            currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
+        }
+
+        if ((caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now()))
+            || (currentResponseDeadline != null && currentResponseDeadline.toLocalDate().isBefore(LocalDate.now()))) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEADLINE_PAST))
                 .build();
@@ -103,7 +110,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             isRespondent1 = NO;
         }
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
             || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
             && caseData.getRespondent1TimeExtensionDate() != null) {
