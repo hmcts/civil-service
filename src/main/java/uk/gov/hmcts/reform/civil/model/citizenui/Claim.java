@@ -80,5 +80,4 @@ public interface Claim {
 
     boolean isSDOOrderCreated();
 
-    boolean isClaimantRejectsRepaymentPlan();
 }

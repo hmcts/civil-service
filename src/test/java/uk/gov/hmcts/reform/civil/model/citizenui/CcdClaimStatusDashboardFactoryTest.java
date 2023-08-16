@@ -371,6 +371,6 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTS_REPAYMENT_PLAN);
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
     }
 }

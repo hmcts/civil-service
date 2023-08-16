@@ -88,7 +88,8 @@ public class CcdDashboardClaimMatcher implements Claim {
         return !caseData.isRespondentResponseFullDefence()
             && (caseData.respondent1PaidInFull()
             || caseData.isResponseAcceptedByClaimant())
-            && !caseData.isClaimantRejectsClaimAmount();
+            && Objects.isNull(caseData.getCcjPaymentDetails())
+            && !caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override
@@ -236,9 +237,10 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isCourtReviewing() {
-        return !hasSdoBeenDrawn()
+        return (!hasSdoBeenDrawn()
             && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL);
+            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
     @Override
@@ -274,11 +276,6 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isSDOOrderCreated() {
         return hasSdoBeenDrawn() && noHearingScheduled() && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
-    }
-
-    @Override
-    public boolean isClaimantRejectsRepaymentPlan() {
-        return caseData.hasApplicantRejectedRepaymentPlan();
     }
 
 }

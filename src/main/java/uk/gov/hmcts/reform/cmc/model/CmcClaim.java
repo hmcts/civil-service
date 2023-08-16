@@ -394,9 +394,4 @@ public class CmcClaim implements Claim {
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
     }
-
-    @Override
-    public boolean isClaimantRejectsRepaymentPlan() {
-        return false;
-    }
 }
