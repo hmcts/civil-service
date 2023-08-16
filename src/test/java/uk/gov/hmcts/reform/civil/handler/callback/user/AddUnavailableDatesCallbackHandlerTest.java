@@ -97,7 +97,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class LegalRepView {
             AdditionalDates additionalDates = AdditionalDates.builder()
-                .additionalUnavailableDates(dates)
+                .additionalUnavailableDates(new ArrayList<>(dates))
                 .partyChosen(DynamicList.builder().listItems(List.of(DynamicListElement.builder().label("something").build())).build())
                 .build();
 
@@ -160,7 +160,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("res-1-party-id")
-                                         .unavailableDates(existingDates)
+                                         .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -169,7 +169,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(expectedDates);
-                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(expectedDates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -194,7 +194,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .applicant1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("someid")
-                                         .unavailableDates(existingDates)
+                                         .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -203,7 +203,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(expectedDates);
-                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(expectedDates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
             }
@@ -226,6 +226,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -243,9 +245,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                         .handle(params);
 
-                    //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -263,8 +266,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                         .handle(params);
 
-                    //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(null);
                 }
@@ -290,6 +293,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -309,6 +313,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(null);
                 }
@@ -334,7 +339,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("res-2-party-id")
-                                         .unavailableDates(existingDates)
+                                         .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -343,6 +348,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(expectedDates);
+                    assertThat(getCaseData(response).getRespondent2UnavailableDatesForTab()).isEqualTo(expectedDates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
@@ -365,6 +371,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getApplicant2().getUnavailableDates()).isEqualTo(null);
                 }
@@ -385,6 +392,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -399,22 +408,23 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ).map(ElementUtils::element).collect(Collectors.toList());
 
                     List<Element<UnavailableDate>> expectedDates = new ArrayList<>();
-                    expectedDates.addAll(existingDates);
+                    expectedDates.addAll(new ArrayList<>(existingDates));
                     expectedDates.addAll(dates);
 
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence()
                         .addUnavailableDatesScreens(additionalDates)
+                        .multiPartyClaimTwoApplicants()
                         .applicant1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("app-2-party-id")
-                                         .unavailableDates(existingDates)
+                                         .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .applicant2(PartyBuilder.builder()
                                         .soleTrader().build().toBuilder()
                                         .partyID("app-2-party-id")
-                                        .unavailableDates(existingDates)
+                                        .unavailableDates(new ArrayList<>(existingDates))
                                         .build())
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -424,6 +434,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(expectedDates);
                     assertThat(getCaseData(response).getApplicant2().getUnavailableDates()).isEqualTo(expectedDates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(expectedDates);
+                    assertThat(getCaseData(response).getApplicant2UnavailableDatesForTab()).isEqualTo(expectedDates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
             }
@@ -454,8 +466,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                         .handle(params);
 
-                    //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -480,8 +492,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                         .handle(params);
 
-                    //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
             }
@@ -572,6 +584,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
@@ -602,6 +615,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                 }
 
@@ -630,6 +644,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     //Checking for def1 and applicant1 only because it's a 1v1 case
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getRespondent2().getUnavailableDates()).isEqualTo(null);
                 }
@@ -660,6 +675,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .handle(params);
 
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getRespondent1UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(null);
                     assertThat(getCaseData(response).getApplicant2().getUnavailableDates()).isEqualTo(null);
                 }
@@ -688,6 +704,8 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     assertThat(getCaseData(response).getApplicant1().getUnavailableDates()).isEqualTo(dates);
                     assertThat(getCaseData(response).getApplicant2().getUnavailableDates()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant1UnavailableDatesForTab()).isEqualTo(dates);
+                    assertThat(getCaseData(response).getApplicant2UnavailableDatesForTab()).isEqualTo(dates);
                     assertThat(getCaseData(response).getRespondent1().getUnavailableDates()).isEqualTo(null);
                 }
             }
