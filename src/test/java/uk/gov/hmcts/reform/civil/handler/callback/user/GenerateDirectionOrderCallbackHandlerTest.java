@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -193,6 +194,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder()
+                                                                                        .singleDate(LocalDate.now().plusDays(2))
+                                                                                        .build())
+                                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -203,11 +208,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldValidateAssistedOrderDate_onMidEventCallback() {
+        void shouldValidateAssistedOrderSingleDate_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now().plusDays(2)).build())
+                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder()
+                                                                                        .singleDate(LocalDate.now().plusDays(2))
+                                                                                        .build())
+                                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -216,6 +224,45 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             assertThat(response.getErrors())
                 .containsExactly("The date in Order Made may not be later than the established date");
+        }
+
+        @Test
+        void shouldValidateAssistedOrderFromDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                                                                                        .dateRangeFrom(LocalDate.now().plusDays(2))
+                                                                                        .build())
+                                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors())
+                .containsExactly("The date in Order Made may not be later than the established date");
+        }
+
+        @Test
+        void shouldValidateAssistedOrderFromIsBeforeToDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                                                                                       .dateRangeFrom(LocalDate.now().minusDays(20))
+                                                                                       .dateRangeTo(LocalDate.now().minusDays(30))
+                                                                                       .build())
+                                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors())
+                .containsExactly("The date range in Order Made may not have a 'from date', that is after the 'to date'");
         }
     }
 
