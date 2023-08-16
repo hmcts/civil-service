@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -38,6 +40,8 @@ public class CoreCaseDataService {
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
+    private final FeatureToggleService featureToggleService;
+    private final IdamClient idamClient;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -161,12 +165,23 @@ public class CoreCaseDataService {
     }
 
     public SearchResult getCCDDataBasedOnIndex(String authorization, int startIndex) {
-        String query = new SearchSourceBuilder()
+        String query = createQuery(authorization, startIndex);
+        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    }
+
+    private String createQuery(String authorization, int startIndex) {
+        if (featureToggleService.isLipVLipEnabled()) {
+            UserDetails defendantInfo = idamClient.getUserDetails(authorization);
+            return new SearchSourceBuilder()
+                .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", defendantInfo.getEmail())))
+                .sort("data.submittedDate", SortOrder.DESC)
+                .from(startIndex)
+                .size(RETURNED_NUMBER_OF_CASES).toString();
+        }
+        return new SearchSourceBuilder()
             .query(QueryBuilders.matchAllQuery())
             .sort("data.submittedDate", SortOrder.DESC)
             .from(startIndex)
             .size(RETURNED_NUMBER_OF_CASES).toString();
-
-        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
     }
 }
