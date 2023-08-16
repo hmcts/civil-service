@@ -119,7 +119,7 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
             CLAIMANT_V_DEFENDANT, claimantVDefendant,
-            NAME, name
+            PARTY_NAME, name
         );
     }
 
