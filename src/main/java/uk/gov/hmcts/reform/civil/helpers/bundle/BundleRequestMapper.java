@@ -95,30 +95,42 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         switch (partyType) {
             case CLAIMANT1 -> {
-                Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
-                    groupExpertStatementsByName(caseData.getDocumentExpertReport());
-                expertReportMap.forEach((expertName, expertEvidence) -> {
-                    bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
-                                                                                         BundleFileNameList.EXPERT_EVIDENCE.getDisplayName(),
-                                                                                         EvidenceUploadFiles.EXPERT_REPORT.name(), PartyType.CLAIMANT1));
+                if (caseData.getDocumentExpertReport() != null) {
+                    Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
+                        groupExpertStatementsByName(caseData.getDocumentExpertReport());
+                    expertReportMap.forEach((expertName, expertEvidence) -> {
+                        bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
+                                                                                                    BundleFileNameList.EXPERT_EVIDENCE.getDisplayName(),
+                                                                                                    EvidenceUploadFiles.EXPERT_REPORT.name(),
+                                                                                                    PartyType.CLAIMANT1
+                        ));
 
-                });
-                Map<String, List<Element<UploadEvidenceExpert>>> questionsExpertMap =
-                    groupExpertStatementsByName(caseData.getDocumentQuestions());
-                questionsExpertMap.forEach((expertName, expertEvidence) -> {
-                    bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
-                                                                                                BundleFileNameList.QUESTIONS_TO.getDisplayName(),
-                                                                                                EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.name(), PartyType.CLAIMANT1));
+                    });
+                }
+                if (caseData.getDocumentQuestions() != null) {
+                    Map<String, List<Element<UploadEvidenceExpert>>> questionsExpertMap =
+                        groupExpertStatementsByName(caseData.getDocumentQuestions());
+                    questionsExpertMap.forEach((expertName, expertEvidence) -> {
+                        bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
+                                                                                                    BundleFileNameList.QUESTIONS_TO.getDisplayName(),
+                                                                                                    EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.name(),
+                                                                                                    PartyType.CLAIMANT1
+                        ));
 
-                });
-                Map<String, List<Element<UploadEvidenceExpert>>> repliesExpertMap =
-                    groupExpertStatementsByName(caseData.getDocumentAnswers());
-                repliesExpertMap.forEach((expertName, expertEvidence) -> {
-                    bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
-                                                                                                BundleFileNameList.REPLIES_FROM.getDisplayName(),
-                                                                                                EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.name(), PartyType.CLAIMANT1));
+                    });
+                }
+                if (caseData.getDocumentAnswers() != null) {
+                    Map<String, List<Element<UploadEvidenceExpert>>> repliesExpertMap =
+                        groupExpertStatementsByName(caseData.getDocumentAnswers());
+                    repliesExpertMap.forEach((expertName, expertEvidence) -> {
+                        bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
+                                                                                                    BundleFileNameList.REPLIES_FROM.getDisplayName(),
+                                                                                                    EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.name(),
+                                                                                                    PartyType.CLAIMANT1
+                        ));
 
-                });
+                    });
+                }
             }
             default -> {
                 return null;
