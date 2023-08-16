@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
@@ -70,6 +71,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String BODY_1v2 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s"
         + "\n ### Defendant 2 \n %s";
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
+    public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'to date'";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -149,7 +151,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
-        return builder.finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now()).build())
+        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders
+                                                                               .builder().singleDate(LocalDate.now())
+                                                                               .build()).build())
             .assistedOrderCostsDefendantPaySub(
                 AssistedOrderCostDetails.builder().defendantCostStandardDate(advancedDate).build())
             .assistedOrderCostsClaimantPaySub(
@@ -175,9 +179,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
-        if (nonNull(caseData.getFinalOrderDateHeardComplex())
-            && caseData.getFinalOrderDateHeardComplex().getDate().isAfter(LocalDate.now())) {
+        if (nonNull(caseData.getFinalOrderDateHeardComplex().getSingleDateSelection())
+            && caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate().isAfter(LocalDate.now())) {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
+        }
+        if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
+            && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())) {
+            errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
+        } else if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
+                   && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
+            .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
+            errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order Made"));
         }
     }
 
