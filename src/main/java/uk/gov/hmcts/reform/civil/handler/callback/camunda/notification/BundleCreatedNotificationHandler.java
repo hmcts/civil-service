@@ -122,7 +122,7 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            NAME, caseData.getRespondent1().getPartyName()
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 
