@@ -60,6 +60,10 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
 
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
     @Nested
     class AboutToStartCallback {
 
@@ -72,6 +76,83 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked_1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                2);
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                "Claimant");
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                "Defendant");
+        }
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked_1v2SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimOneDefendantSolicitor()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                2);
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                "Claimant");
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                "Defendants");
+        }
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked_1v2DifferentSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                3);
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                "Claimant");
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                "Defendant 1");
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(2).getLabel()).isEqualTo(
+                "Defendant 2");
+        }
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked_2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .multiPartyClaimTwoApplicants()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                2);
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                "Claimants");
+            assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                "Defendant");
         }
     }
 
@@ -712,9 +793,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-            return objectMapper.convertValue(response.getData(), CaseData.class);
-        }
+
 
     }
 }
