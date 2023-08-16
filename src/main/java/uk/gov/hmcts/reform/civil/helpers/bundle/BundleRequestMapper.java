@@ -378,7 +378,7 @@ public class BundleRequestMapper {
                                                                                    PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
-            if (documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT)) {
+            if (documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())) {
                 witnessEvidence.sort(Comparator.comparing(
                     uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate(),
                     Comparator.reverseOrder()
@@ -391,7 +391,7 @@ public class BundleRequestMapper {
             }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
                 String docName = generateDocName(fileNamePrefix, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
-                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT)
+                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
                                                      ?
                                                      uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
                                                      .getValue().getCreatedDatetime().toLocalDate()
