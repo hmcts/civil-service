@@ -222,7 +222,7 @@ public class CasesController {
         CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
             .authorisation(authorization)
             .userId(userId)
-            .searchCriteria(Map.of("case.sdtRequestId", searchParam)).build();
+            .searchCriteria(Map.of("case.claimInterest", searchParam)).build();
         List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
 
         if (caseDetails.size() < 1 && caseDetails.isEmpty()) {
