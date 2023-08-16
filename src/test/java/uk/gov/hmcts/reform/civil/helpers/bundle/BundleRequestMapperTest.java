@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.helpers;
+package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

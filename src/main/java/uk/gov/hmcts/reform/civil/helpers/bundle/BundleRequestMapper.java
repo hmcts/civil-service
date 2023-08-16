@@ -10,14 +10,12 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvide
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseDetails;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
-import uk.gov.hmcts.reform.civil.model.bundle.ServedDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -32,7 +30,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
@@ -153,6 +150,10 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapWitnessStatements(CaseData caseData, PartyType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+
+        List<Element<UploadEvidenceWitness>> witnessStatementList = getWitnessDocsByPartyAndDocType(partyType,
+                                        EvidenceUploadFiles.WITNESS_STATEMENT, caseData);
+        Party party = getPartyByPartyType(partyType, caseData);
         switch (partyType) {
             case CLAIMANT1 -> {
                 Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap =
@@ -222,6 +223,16 @@ public class BundleRequestMapper {
             }
         }
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private Party getPartyByPartyType(PartyType partyType, CaseData caseData) {
+        switch (partyType) {
+            case CLAIMANT1 : return caseData.getApplicant1() != null ? caseData.getApplicant1() : null;
+            case CLAIMANT2: return caseData.getApplicant2() != null ? caseData.getApplicant2() : null;
+            case DEFENDANT1: return caseData.getRespondent1() != null ? caseData.getRespondent1() : null;
+            case DEFENDANT2: return caseData.getRespondent2() != null ? caseData.getRespondent2() : null;
+            default: return null;
+        }
     }
 
     private List<BundlingRequestDocument> covertOtherWitnessEvidenceToBundleRequestDocs(
@@ -485,25 +496,6 @@ public class BundleRequestMapper {
             bundlingCaseData.toBuilder().respondent2(caseData.getRespondent2());
         }
         return bundlingCaseData;
-    }
-
-    private ServedDocument mapServedDocuments(ServedDocumentFiles servedDocumentFiles) {
-        List<BundlingRequestDocument> bundlingServedDocFiles = new ArrayList<>();
-        if (Optional.ofNullable(servedDocumentFiles).isEmpty() || null == servedDocumentFiles.getParticularsOfClaimDocument()) {
-            return ServedDocument.builder().particularsOfClaimDocument(ElementUtils.wrapElements(bundlingServedDocFiles)).build();
-        }
-        servedDocumentFiles.getParticularsOfClaimDocument().forEach(document -> {
-            bundlingServedDocFiles.add(BundlingRequestDocument.builder()
-                                           .documentFileName(document.getValue().getDocumentFileName())
-                                           .documentLink(DocumentLink.builder()
-                                                             .documentUrl(document.getValue().getDocumentUrl())
-                                                             .documentBinaryUrl(document.getValue().getDocumentBinaryUrl())
-                                                             .documentFilename(document.getValue().getDocumentFileName()).build())
-                                           .build());
-
-        });
-        List<Element<BundlingRequestDocument>> particulars = ElementUtils.wrapElements(bundlingServedDocFiles);
-        return ServedDocument.builder().particularsOfClaimDocument(particulars).build();
     }
 
     private List<BundlingRequestDocument> mapSystemGeneratedCaseDocument(List<Element<CaseDocument>> systemGeneratedCaseDocuments, DocumentType documentType, String displayName) {
