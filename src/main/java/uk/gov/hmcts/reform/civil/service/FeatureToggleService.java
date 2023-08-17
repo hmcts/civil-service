@@ -64,4 +64,7 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
+    public boolean isUpdateContactDetailsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+    }
 }

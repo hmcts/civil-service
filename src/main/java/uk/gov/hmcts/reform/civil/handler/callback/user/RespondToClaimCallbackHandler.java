@@ -513,8 +513,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
 
-        addEventAndDateAddedToRespondentExperts(updatedData);
-        addEventAndDateAddedToRespondentWitnesses(updatedData);
+        if (toggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(updatedData);
+            addEventAndDateAddedToRespondentWitnesses(updatedData);
+        }
 
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 

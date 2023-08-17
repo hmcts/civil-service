@@ -240,8 +240,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        addEventAndDateAddedToApplicantExperts(builder);
-        addEventAndDateAddedToApplicantWitnesses(builder);
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
