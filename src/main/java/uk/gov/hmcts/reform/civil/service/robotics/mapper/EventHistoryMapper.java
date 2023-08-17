@@ -1158,8 +1158,8 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
 
-            if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
-               ) {
+            if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack()))
+            {
                 String miscText = "RPA Reason: Multitrack Unspec going offline.";
                 builder.miscellaneous(
                     List.of(
@@ -1172,7 +1172,7 @@ public class EventHistoryMapper {
                                               .miscText(miscText)
                                               .build())
                             .build()));
-                    }
+            }
 
         }
 
