@@ -162,7 +162,7 @@ allprojects {
         entry 'groovy-all'
       }
       // CVE-2023-28709
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.12') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
