@@ -82,7 +82,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -510,6 +512,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
+
+        addEventAndDateAddedToRespondentExperts(updatedData);
+        addEventAndDateAddedToRespondentWitnesses(updatedData);
 
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 

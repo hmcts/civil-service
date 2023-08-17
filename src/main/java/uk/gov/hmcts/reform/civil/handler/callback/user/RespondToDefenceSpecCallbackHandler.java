@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -83,7 +84,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -300,9 +303,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getApplicant1DQ().getSmallClaimExperts());
+            YesOrNo expertRequired = TWO_V_ONE.equals(getMultiPartyScenario(caseData)) ? caseData.getApplicantMPClaimExpertSpecRequired()
+                : caseData.getApplicant1ClaimExpertSpecRequired();
             builder.applicant1DQ(
                 builder.build().getApplicant1DQ().toBuilder()
                     .applicant1DQExperts(Experts.builder()
+                                             .expertRequired(expertRequired)
                                              .details(wrapElements(expert))
                                              .build())
                     .build());
@@ -314,12 +320,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.applicant2DQ(
                 builder.build().getApplicant2DQ().toBuilder()
                     .applicant2DQExperts(Experts.builder()
+                                             .expertRequired(caseData.getApplicantMPClaimExpertSpecRequired())
                                              .details(wrapElements(expert))
                                              .build())
                     .build());
         }
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
