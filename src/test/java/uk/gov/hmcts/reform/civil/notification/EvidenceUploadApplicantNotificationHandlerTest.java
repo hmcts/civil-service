@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -39,6 +41,7 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
         @BeforeEach
         void setup() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn("template-id-lip");
         }
 
         @Test
@@ -53,6 +56,24 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
                     "template-id",
                     getNotificationDataMap(caseData),
                     "evidence-upload-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvoked() {
+            //given: case where applicant litigant in person has email as applicant@example.com
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("Billy").partyEmail("applicant@example.com").build())
+                .build();
+            //when: ApplicantNotificationhandler is called
+            handler.notifyApplicantEvidenceUpload(caseData);
+            //then: email should be sent to applicant
+            verify(notificationService).sendMail(
+                "applicant@example.com",
+                "template-id-lip",
+                getNotificationDataMap(caseData),
+                "evidence-upload-notification-000DC001"
             );
         }
 
