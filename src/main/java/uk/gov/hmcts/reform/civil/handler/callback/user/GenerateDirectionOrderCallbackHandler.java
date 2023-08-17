@@ -184,7 +184,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
         }
         if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
-            && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())) {
+            && (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())
+                || caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo().isAfter(LocalDate.now()))) {
             errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
         } else if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
                    && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
