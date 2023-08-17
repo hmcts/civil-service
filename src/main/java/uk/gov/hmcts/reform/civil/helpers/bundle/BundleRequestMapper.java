@@ -101,7 +101,9 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
                                                                                    EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData),
                                                                                  BundleFileNameList.DISCLOSED_DOC.getDisplayName(),
-                                                                                 EvidenceUploadFiles.WITNESS_STATEMENT.name(), partyType));
+                                                                                 EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.name(),
+                                                                                    partyType));
+
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -122,14 +124,16 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
             groupExpertStatementsByName(getExpertDocsByPartyAndDocType(partyType, evidenceUploadFiles, caseData));
-
-        expertReportMap.forEach((expertName, expertEvidence) -> {
-            bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(expertEvidence,
-                                                                                        bundleFileNameList.getDisplayName(),
-                                                                                        evidenceUploadFiles.name(),
-                                                                                        partyType
-            ));
-        });
+        if (expertReportMap != null) {
+            expertReportMap.forEach((expertName, expertEvidence) -> {
+                bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(
+                    expertEvidence,
+                    bundleFileNameList.getDisplayName(),
+                    evidenceUploadFiles.name(),
+                    partyType
+                ));
+            });
+        }
         return bundlingRequestDocuments;
     }
 
@@ -137,7 +141,7 @@ public class BundleRequestMapper {
         List<Element<UploadEvidenceExpert>> documentExpertReport) {
         Map<String, List<Element<UploadEvidenceExpert>>> expertStatementMap = new HashMap<String,
             List<Element<UploadEvidenceExpert>>>();
-        if (expertStatementMap != null) {
+        if (documentExpertReport != null) {
             expertStatementMap = documentExpertReport.stream().collect(Collectors
                                                                         .groupingBy(uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement
                                                                             .getValue().getExpertOptionName().trim().toLowerCase()));
