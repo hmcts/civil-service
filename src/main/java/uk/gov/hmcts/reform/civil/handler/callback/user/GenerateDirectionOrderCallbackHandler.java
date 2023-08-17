@@ -71,7 +71,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String BODY_1v2 = "The order has been sent to: \n ### Claimant 1 \n %s \n ### Defendant 1 \n %s"
         + "\n ### Defendant 2 \n %s";
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
-    public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'to date'";
+    public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;

@@ -262,7 +262,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getErrors())
-                .containsExactly("The date range in Order Made may not have a 'from date', that is after the 'to date'");
+                .containsExactly("The date range in Order Made may not have a 'from date', that is after the 'date to'");
         }
     }
 
