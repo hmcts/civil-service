@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -70,7 +72,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::emptyCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -149,6 +151,8 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        // Mini migration can happen here first.
 
         if (caseData.getAddUnavailableDatesScreens() != null
             && caseData.getAddUnavailableDatesScreens().getPartyChosen() != null
@@ -275,6 +279,8 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         List<Element<UnavailableDate>> newUnavailableDates = caseData.getAddUnavailableDatesScreens().getAdditionalUnavailableDates();
         List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
 
+        // need to mini migrate everything????
+
         // Mini migration
         // if top level party has existing unavailableDates
         if (!existingUnavailableDates.isEmpty()) {
@@ -307,6 +313,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     }
 
     private Boolean isClaimantIntentionEvent(CaseData caseData) {
+        // what about spec? omg i wanna die
         return caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getHearing() != null
             && YES.equals(caseData.getApplicant1DQ().getHearing().getUnavailableDatesRequired());
@@ -407,5 +414,15 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         updatedData
             .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(accumulatedDates).build())
             .respondent2UnavailableDatesForTab(accumulatedDates);
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        String body = "<br /><h3 class=\"govuk-heading-\">What happens next</h3>"
+            + " %n%n Any dates marked as being unavailable for a hearing are now displayed in the Listing notes tab.";
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(format("# Availability updated"))
+            .confirmationBody(format(body))
+            .build();
     }
 }
