@@ -25,13 +25,16 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
-
 
 @Slf4j
 @Service
@@ -97,7 +100,7 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
                                                                                    EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData),
-                                                                                 BundleFileNameList..getDisplayName(),
+                                                                                 BundleFileNameList.DISCLOSED_DOC.getDisplayName(),
                                                                                  EvidenceUploadFiles.WITNESS_STATEMENT.name(), partyType));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
