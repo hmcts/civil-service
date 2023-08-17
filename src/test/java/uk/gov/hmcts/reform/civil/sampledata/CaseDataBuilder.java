@@ -456,6 +456,7 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     private AdditionalDates addUnavailableDatesScreens;
 
@@ -1472,6 +1473,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1ResponseDate(LocalDateTime date) {
+        this.respondent1ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ResponseDate(LocalDateTime date) {
+        this.respondent2ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ResponseDate(LocalDateTime date) {
+        this.applicant1ResponseDate = date;
+        return this;
+    }
+
     public CaseDataBuilder atState(FlowState.Main flowState) {
         return atState(flowState, ONE_V_ONE);
     }
@@ -2304,10 +2320,15 @@ public class CaseDataBuilder {
             .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
             .build();
 
-        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+        this.hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
             .hearingUnavailableDates(YES)
             .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
+
+        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
+                                                              .documentName("test")
+                                                              .createdDatetime(LocalDateTime.now())
+                                                              .build()));
         return this;
     }
 
@@ -6008,6 +6029,7 @@ public class CaseDataBuilder {
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .addUnavailableDatesScreens(addUnavailableDatesScreens)
+            .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
     }
 }
