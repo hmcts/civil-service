@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_UNAVAILABLE_DATES
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -152,7 +153,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        // Mini migration can happen here first.
+        copyDatesIntoListingTabFields(caseData, updatedData);
 
         if (caseData.getAddUnavailableDatesScreens() != null
             && caseData.getAddUnavailableDatesScreens().getPartyChosen() != null
@@ -173,6 +174,132 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.build().toMap(objectMapper)).build();
     }
 
+    private List<Element<UnavailableDate>> getExistingDates(List<Element<UnavailableDate>> partyDates, String event, LocalDate date) {
+        List<Element<UnavailableDate>> existingUnavailableDates = ofNullable(partyDates).orElse(newArrayList());
+        List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
+
+        // Mini migration
+//        // if top level party has existing unavailableDates
+        if (!existingUnavailableDates.isEmpty()) {
+            for (Element<UnavailableDate> existingDate : existingUnavailableDates) {
+                // only add dateAdded and eventAdded if they do not already exist.
+                if (existingDate.getValue() != null
+                    && existingDate.getValue().getEventAdded() == null
+                    && existingDate.getValue().getDateAdded() == null) {
+                    updatedUnavailableDates.addAll(wrapElements(existingDate.getValue().toBuilder()
+                                                                    .dateAdded(date)
+                                                                    .eventAdded(event).build()));
+                } else {
+                    updatedUnavailableDates.add(existingDate);
+                }
+            }
+        }
+
+        return updatedUnavailableDates;
+    }
+
+    private void copyDatesIntoListingTabFields(CaseData caseData, CaseData.CaseDataBuilder updatedData) {
+        // if unavailable dates exist but listingTab fields are null
+        if (caseData.getApplicant1().getUnavailableDates() != null
+            && caseData.getApplicant1UnavailableDatesForTab() == null) {
+            copyDatesIntoListingTabFieldsForApplicant(caseData, updatedData, true);
+        }
+
+        if (caseData.getApplicant2() != null
+            && caseData.getApplicant2().getUnavailableDates() != null
+            && caseData.getApplicant1UnavailableDatesForTab() == null) {
+            // applicant 1 and 2 share the same dates in 2v1 scenario
+            copyDatesIntoListingTabFieldsForApplicant(caseData, updatedData, false);
+        }
+
+        if (caseData.getRespondent1().getUnavailableDates() != null
+            && caseData.getRespondent1UnavailableDatesForTab() == null) {
+            copyDatesIntoListingTabFieldsForRespondent1(caseData, updatedData);
+        }
+
+        if (caseData.getRespondent2() != null
+            && caseData.getRespondent2().getUnavailableDates() != null
+            && caseData.getRespondent2UnavailableDatesForTab() == null) {
+            copyDatesIntoListingTabFieldsForRespondent2(caseData, updatedData);
+        }
+    }
+
+    private void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, Boolean isApplicant1) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        if (isClaimantIntentionEvent(caseData)) {
+            eventAdded = CLAIMANT_INTENTION_EVENT;
+            dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
+        } else if (isDJEvent(caseData)) {
+            eventAdded = DJ_EVENT;
+            dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
+        }
+
+        List<Element<UnavailableDate>> dates = getExistingDates(
+            caseData.getApplicant1().getUnavailableDates(),
+            eventAdded,
+            dateAdded
+        );
+
+        if (isApplicant1) {
+            updatedData
+                .applicant1(caseData.getApplicant1().toBuilder().unavailableDates(dates).build())
+                .applicant1UnavailableDatesForTab(dates);
+        } else {
+            updatedData
+                .applicant2(caseData.getApplicant2().toBuilder().unavailableDates(dates).build())
+                .applicant2UnavailableDatesForTab(dates);
+        }
+    }
+
+    private void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        // No DJ check because only claimant solicitor can run DJ
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getHearing() != null
+            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())) {
+            eventAdded = DEFENDANT_RESPONSE_EVENT;
+            dateAdded = caseData.getRespondent1ResponseDate().toLocalDate();
+        }
+
+        List<Element<UnavailableDate>> dates = getExistingDates(
+            caseData.getRespondent1().getUnavailableDates(),
+            eventAdded,
+            dateAdded
+        );
+
+        updatedData
+            .respondent1(caseData.getRespondent1().toBuilder().unavailableDates(dates).build())
+            .respondent1UnavailableDatesForTab(dates);
+    }
+
+    private void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        // No DJ check because only claimant solicitor can run DJ
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getHearing() != null
+            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())) {
+            eventAdded = DEFENDANT_RESPONSE_EVENT;
+            dateAdded = caseData.getRespondent2ResponseDate().toLocalDate();
+        }
+
+        List<Element<UnavailableDate>> dates = getExistingDates(
+            caseData.getRespondent2().getUnavailableDates(),
+            eventAdded,
+            dateAdded
+        );
+
+        updatedData
+            .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build())
+            .respondent2UnavailableDatesForTab(dates);
+    }
+
+
     private void addDatesAdminScenario(String partyChosen, CaseData caseData, CaseData.CaseDataBuilder updatedData) {
         switch (partyChosen) {
             case ("Claimants"): {
@@ -184,16 +311,16 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             case ("Defendants"): {
-                addDateToDefendant2(caseData, updatedData);
+                addDateToRespondent2(caseData, updatedData);
             }
             // FALL-THROUGH
             case ("Defendant"):
             case ("Defendant 1"): {
-                addDateToDefendant1(caseData, updatedData);
+                addDateToRespondent1(caseData, updatedData);
                 break;
             }
             case ("Defendant 2") : {
-                addDateToDefendant2(caseData, updatedData);
+                addDateToRespondent2(caseData, updatedData);
                 break;
             }
             default: {
@@ -215,7 +342,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         switch (multiPartyScenario) {
             case ONE_V_ONE: {
                 if (isRespondentSolicitorOne(roles)) {
-                    addDateToDefendant1(caseData, updatedData);
+                    addDateToRespondent1(caseData, updatedData);
                 } else {
                     // Claimant Solicitor
                     addDateToApplicant1(caseData, updatedData);
@@ -224,8 +351,8 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
             case ONE_V_TWO_ONE_LEGAL_REP: {
                 if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
-                    addDateToDefendant1(caseData, updatedData);
-                    addDateToDefendant2(caseData, updatedData);
+                    addDateToRespondent1(caseData, updatedData);
+                    addDateToRespondent2(caseData, updatedData);
                 } else {
                     // Claimant Solicitor
                     addDateToApplicant1(caseData, updatedData);
@@ -234,9 +361,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
             case ONE_V_TWO_TWO_LEGAL_REP: {
                 if (isRespondentSolicitorOne(roles)) {
-                    addDateToDefendant1(caseData, updatedData);
+                    addDateToRespondent1(caseData, updatedData);
                 } else if (isRespondentSolicitorTwo(roles)) {
-                    addDateToDefendant2(caseData, updatedData);
+                    addDateToRespondent2(caseData, updatedData);
                 } else {
                     // Claimant Solicitor
                     addDateToApplicant1(caseData, updatedData);
@@ -245,7 +372,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
             case TWO_V_ONE: {
                 if (isRespondentSolicitorOne(roles)) {
-                    addDateToDefendant1(caseData, updatedData);
+                    addDateToRespondent1(caseData, updatedData);
                 } else {
                     // Claimant Solicitor
                     addDateToApplicant1(caseData, updatedData);
@@ -274,28 +401,14 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         return roles.stream().anyMatch(role.getFormattedName()::contains);
     }
 
-    private List<Element<UnavailableDate>> addDatesToExistingDates(CaseData caseData, List<Element<UnavailableDate>> partyDates, String event, LocalDate date) {
+    private List<Element<UnavailableDate>> addDatesToExistingDates(CaseData caseData, List<Element<UnavailableDate>> partyDates) {
+        // see what comes in here
         List<Element<UnavailableDate>> existingUnavailableDates = ofNullable(partyDates).orElse(newArrayList());
         List<Element<UnavailableDate>> newUnavailableDates = caseData.getAddUnavailableDatesScreens().getAdditionalUnavailableDates();
         List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
 
-        // need to mini migrate everything????
-
-        // Mini migration
-        // if top level party has existing unavailableDates
         if (!existingUnavailableDates.isEmpty()) {
-            for (Element<UnavailableDate> existingDate : existingUnavailableDates) {
-                // only add dateAdded and eventAdded if they do not already exist.
-                if (existingDate.getValue() != null
-                    && existingDate.getValue().getEventAdded() == null
-                    && existingDate.getValue().getDateAdded() == null) {
-                    updatedUnavailableDates.addAll(wrapElements(existingDate.getValue().toBuilder()
-                                                                    .dateAdded(date)
-                                                                    .eventAdded(event).build()));
-                } else {
-                    updatedUnavailableDates.add(existingDate);
-                }
-            }
+            updatedUnavailableDates.addAll(existingUnavailableDates);
         }
 
         for (Element<UnavailableDate> newDate : newUnavailableDates) {
@@ -313,29 +426,16 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     }
 
     private Boolean isClaimantIntentionEvent(CaseData caseData) {
-        // what about spec? omg i wanna die
+        // what about spec?
         return caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getHearing() != null
             && YES.equals(caseData.getApplicant1DQ().getHearing().getUnavailableDatesRequired());
     }
 
     private void addDateToApplicant1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        String eventAdded = null;
-        LocalDate dateAdded = null;
-
-        if (isClaimantIntentionEvent(caseData)) {
-            eventAdded = CLAIMANT_INTENTION_EVENT;
-            dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
-        } else if (isDJEvent(caseData)) {
-            eventAdded = DJ_EVENT;
-            dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
-        }
-
         List<Element<UnavailableDate>> accumulatedDates = addDatesToExistingDates(
             caseData,
-            caseData.getApplicant1().getUnavailableDates(),
-            eventAdded,
-            dateAdded
+            updatedData.build().getApplicant1().getUnavailableDates()
         );
 
         updatedData
@@ -344,23 +444,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     }
 
     private void addDateToApplicant2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        String eventAdded = null;
-        LocalDate dateAdded = null;
-
-        // Check Applicant1DQ() because applicants share the same solicitor and claimant response date
-        if (isClaimantIntentionEvent(caseData)) {
-            eventAdded = CLAIMANT_INTENTION_EVENT;
-            dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
-        } else if (isDJEvent(caseData)) {
-            eventAdded = DJ_EVENT;
-            dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
-        }
-
         List<Element<UnavailableDate>> accumulatedDates = addDatesToExistingDates(
             caseData,
-            caseData.getApplicant2().getUnavailableDates(),
-            eventAdded,
-            dateAdded
+            updatedData.build().getApplicant2().getUnavailableDates()
         );
 
         updatedData
@@ -368,23 +454,10 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             .applicant2UnavailableDatesForTab(accumulatedDates);
     }
 
-    private void addDateToDefendant1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        String eventAdded = null;
-        LocalDate dateAdded = null;
-
-        // No DJ check because only claimant solicitor can run DJ
-        if (caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())) {
-            eventAdded = DEFENDANT_RESPONSE_EVENT;
-            dateAdded = caseData.getRespondent1ResponseDate().toLocalDate();
-        }
-
+    private void addDateToRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         List<Element<UnavailableDate>> accumulatedDates = addDatesToExistingDates(
             caseData,
-            caseData.getRespondent1().getUnavailableDates(),
-            eventAdded,
-            dateAdded
+            updatedData.build().getRespondent1().getUnavailableDates()
         );
 
         updatedData
@@ -392,23 +465,10 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             .respondent1UnavailableDatesForTab(accumulatedDates);
     }
 
-    private void addDateToDefendant2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        String eventAdded = null;
-        LocalDate dateAdded = null;
-
-        // No DJ check because only claimant solicitor can run DJ
-        if (caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())) {
-            eventAdded = DEFENDANT_RESPONSE_EVENT;
-            dateAdded = caseData.getRespondent2ResponseDate().toLocalDate();
-        }
-
+    private void addDateToRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         List<Element<UnavailableDate>> accumulatedDates = addDatesToExistingDates(
             caseData,
-            caseData.getRespondent2().getUnavailableDates(),
-            eventAdded,
-            dateAdded
+            updatedData.build().getRespondent2().getUnavailableDates()
         );
 
         updatedData
