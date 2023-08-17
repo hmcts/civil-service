@@ -233,7 +233,28 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
                                                                                         .dateRangeFrom(LocalDate.now().plusDays(2))
+                                                                                        .dateRangeTo(LocalDate.now().minusDays(4))
                                                                                         .build())
+                                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors())
+                .containsExactly("The date in Order Made may not be later than the established date");
+        }
+
+        @Test
+        void shouldValidateAssistedOrderFromToDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                                                                                       .dateRangeFrom(LocalDate.now().minusDays(2))
+                                                                                       .dateRangeTo(LocalDate.now().plusDays(2))
+                                                                                       .build())
                                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
