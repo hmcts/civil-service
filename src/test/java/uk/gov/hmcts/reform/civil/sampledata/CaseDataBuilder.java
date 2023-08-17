@@ -458,6 +458,7 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private IdamUserDetails claimantUserDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5796,6 +5797,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimantUserDetails(IdamUserDetails claimantUserDetails) {
+        this.claimantUserDetails = claimantUserDetails;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6065,6 +6071,7 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .claimantUserDetails(claimantUserDetails)
             .build();
     }
 }
