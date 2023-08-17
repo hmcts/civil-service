@@ -7,7 +7,9 @@ public enum TypeOfDocDocumentaryEvidenceOfTrial {
 
     CHRONOLOGY("Chronology"),
     TIMETABLE("timetable", "time table", "time-table"),
-    PART18("Part 18");
+    PART18("Part 18"),
+    NOTICE_TO_ADMIT_FACTS("Notice to admit facts"),
+    RESPONSE("Response");
     List<String> displayNames;
 
     public List<String> getDisplayNames() {

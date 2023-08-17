@@ -40,6 +40,8 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> defendant2WitnessStatements;
     @JsonProperty("claimant1ExpertEvidence")
     private final List<Element<BundlingRequestDocument>> claimant1ExpertEvidence;
+    @JsonProperty("claimant2ExpertEvidence")
+    private final List<Element<BundlingRequestDocument>> claimant2ExpertEvidence;
     @JsonProperty("defendant1ExpertEvidence")
     private final List<Element<BundlingRequestDocument>> defendant1ExpertEvidence;
     @JsonProperty("defendant2ExpertEvidence")
