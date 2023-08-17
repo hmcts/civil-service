@@ -173,17 +173,21 @@ public class BundleRequestMapper {
                                                                                  BundleFileNameList.HEARSAY_NOTICE.getDisplayName(),
                                                                                  EvidenceUploadFiles.NOTICE_OF_INTENTION.name(),
                                                                                  partyType));
-        List<Element<UploadEvidenceDocumentType>> noticeToAdmitFactsDocs =
-            filterDocumentaryEvidenceForTrialDocs(
-                getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
-                TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.getDisplayNames()
-            );
-        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
-            noticeToAdmitFactsDocs,
-            BundleFileNameList.NOTICE_TO_ADMIT_FACTS.getDisplayName(),
-            TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.name(),
-            partyType
-        ));
+        List<Element<UploadEvidenceDocumentType>> list = getEvidenceUploadDocsByPartyAndDocType(partyType,
+            EvidenceUploadFiles.DOCUMENTARY, caseData);
+        if (list != null) {
+            List<Element<UploadEvidenceDocumentType>> noticeToAdmitFactsDocs =
+                filterDocumentaryEvidenceForTrialDocs(
+                    list,
+                    TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.getDisplayNames()
+                );
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                noticeToAdmitFactsDocs,
+                BundleFileNameList.NOTICE_TO_ADMIT_FACTS.getDisplayName(),
+                TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.name(),
+                partyType
+            ));
+        }
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
