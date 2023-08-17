@@ -17,6 +17,19 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 class WitnessUtilsTest {
 
     @Test
+    void shouldNotAddEventAndDateAddedToRespondentWitnesses_1v1WhenNoWitnessesExist() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .build();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        addEventAndDateAddedToRespondentWitnesses(caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+        Witnesses respondent1DQWitnesses = updatedCaseData.getRespondent1DQ().getRespondent1DQWitnesses();
+
+        assertThat(respondent1DQWitnesses.getDetails()).isNull();
+    }
+
+    @Test
     void shouldAddEventAndDateAddedToRespondentWitnesses_1v1() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .addRespondent1ExpertsAndWitnesses()

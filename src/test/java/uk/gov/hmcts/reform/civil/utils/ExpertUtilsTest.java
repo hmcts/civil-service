@@ -17,6 +17,19 @@ import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedTo
 class ExpertUtilsTest {
 
     @Test
+    void shouldNotAddEventAndDateAddedToRespondentExperts_1v1WhenNoExpertsExist() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .build();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        addEventAndDateAddedToRespondentExperts(caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+        Experts respondent1DQExperts = updatedCaseData.getRespondent1DQ().getRespondent1DQExperts();
+
+        assertThat(respondent1DQExperts.getDetails()).isNull();
+    }
+
+    @Test
     void shouldAddEventAndDateAddedToRespondentExperts_1v1() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .addRespondent1ExpertsAndWitnesses()
