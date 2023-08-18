@@ -17,14 +17,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
-import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
-import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.finalorders.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
@@ -151,7 +144,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
-        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders
+        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
                                                                                .build()).build())
             .assistedOrderCostsDefendantPaySub(
@@ -163,7 +156,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .assistedOrderCostsClaimantSum(
                 AssistedOrderCostDetails.builder().claimantCostSummarilyDate(advancedDate).build())
             .finalOrderFurtherHearingComplex(
-                FinalOrderFurtherHearing.builder().alternativeHearingList(getLocationsFromList(locations)).build())
+                FinalOrderFurtherHearing.builder()
+                    .alternativeHearingDropdown(CourtLocationDropdown.builder()
+                                                    .finalOrderFurtherHearingCourtLocationList(getLocationsFromList(locations))
+                                                    .build())
+                    .datesToAvoidDateDropdown(DatesFinalOrders.builder()
+                                           .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
             .orderMadeOnDetailsOrderCourt(
                 OrderMadeOnDetails.builder().ownInitiativeDate(
                     LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())

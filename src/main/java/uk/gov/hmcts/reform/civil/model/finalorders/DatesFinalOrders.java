@@ -11,10 +11,11 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateHeardFinalOrders {
+public class DatesFinalOrders {
 
     private LocalDate singleDate;
     private LocalDate dateRangeFrom;
     private LocalDate dateRangeTo;
+    private LocalDate datesToAvoidDates;
 }
 
