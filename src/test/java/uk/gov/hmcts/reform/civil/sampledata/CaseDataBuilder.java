@@ -196,6 +196,7 @@ public class CaseDataBuilder {
     protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
+    protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
@@ -458,6 +459,7 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private IdamUserDetails claimantUserDetails;
 
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
@@ -1364,6 +1366,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
+        this.applicant1Represented = isRepresented;
         return this;
     }
 
@@ -5791,6 +5798,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimantUserDetails(IdamUserDetails claimantUserDetails) {
+        this.claimantUserDetails = claimantUserDetails;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6050,6 +6062,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .applicant1Represented(applicant1Represented)
             .caseDataLiP(caseDataLiP)
             .claimant2ResponseFlag(claimant2ResponseFlag)
             .specClaimResponseTimelineList(specClaimResponseTimelineList)
@@ -6061,6 +6074,7 @@ public class CaseDataBuilder {
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .hearingReferenceNumber(hearingReference)
             .listingOrRelisting(listingOrRelisting)
+            .claimantUserDetails(claimantUserDetails)
             .build();
     }
 }
