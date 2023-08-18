@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.math.BigDecimal;
@@ -56,7 +57,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/create-case/{userId}";
+    private static final String CASEWORKER_SEARCH_CASE_URL = "/cases/caseworker/searchCaseForSDT/{userId}?sdtRequestId=isUnique";
     private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin/?postCode=rfft";
+
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final List<DashboardClaimInfo> claimResults =
@@ -93,6 +96,8 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseworkerCaseEventService caseworkerCaseEventService;
+    @MockBean
+    private CaseSdtRequestSearchService caseSdtRequestSearchService;
 
     @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
@@ -275,6 +280,42 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isUnprocessableEntity())
             .andExpect(content().string("Submit claim unsuccessful, Invalid Case data"))
             .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseExists() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Arrays.asList(caseDetails));
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(false);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseNotExists() {
+
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Lists.newArrayList());
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(true);
 
     }
 
