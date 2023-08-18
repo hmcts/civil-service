@@ -459,8 +459,9 @@ public class CaseDataBuilder {
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+    private IdamUserDetails claimantUserDetails;
 
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private AdditionalDates addUnavailableDatesScreens;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -5807,6 +5808,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimantUserDetails(IdamUserDetails claimantUserDetails) {
+        this.claimantUserDetails = claimantUserDetails;
+        return this;
+    }
+
     public CaseDataBuilder addUnavailableDatesScreens(AdditionalDates additionalDates) {
         this.addUnavailableDatesScreens = additionalDates;
         return this;
@@ -6081,6 +6087,7 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .claimantUserDetails(claimantUserDetails)
             .addUnavailableDatesScreens(addUnavailableDatesScreens)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
