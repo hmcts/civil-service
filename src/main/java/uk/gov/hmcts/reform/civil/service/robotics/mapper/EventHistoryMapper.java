@@ -1224,9 +1224,9 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
-                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
@@ -1248,9 +1248,9 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
-                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
@@ -1275,9 +1275,9 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
-                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case TWO_V_ONE:
@@ -1299,9 +1299,9 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimants proceed.");
-                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             default:
