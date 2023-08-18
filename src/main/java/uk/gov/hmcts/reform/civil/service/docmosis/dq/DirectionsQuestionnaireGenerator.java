@@ -323,6 +323,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private List<Party> getApplicants(CaseData caseData) {
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();
         var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
@@ -339,6 +340,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .legalRepHeading(legalRepHeading)
                                    .build(),
                                Party.builder()
                                    .name(applicant2.getPartyName())
@@ -350,6 +352,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .legalRepHeading(legalRepHeading)
                                    .build());
             }
         }
@@ -365,11 +368,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                    .orElse(""))
                            .phoneNumber(applicant.getPartyPhone())
                            .emailAddress(applicant.getPartyEmail())
+                           .legalRepHeading(legalRepHeading)
                            .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
-
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant2();
         var litigationFriend = caseData.getApplicant2LitigationFriend();
         var applicant2PartyBuilder = Party.builder()
@@ -397,12 +401,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                          .orElse(""))
             .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""));
+                                              .orElse(""))
+            .legalRepHeading(legalRepHeading);
+
         return applicant2PartyBuilder.build();
     }
 
     private Party getApplicant1DQParty(CaseData caseData) {
-
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var litigationFriend = caseData.getApplicant1LitigationFriend();
         var applicant1PartyBuilder = Party.builder()
@@ -430,7 +436,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                              .orElse(""))
             .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""));
+                                              .orElse(""))
+            .legalRepHeading(legalRepHeading);
         return applicant1PartyBuilder.build();
     }
 
