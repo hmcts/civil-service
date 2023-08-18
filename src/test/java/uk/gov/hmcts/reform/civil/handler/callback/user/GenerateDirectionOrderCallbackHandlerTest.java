@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -194,7 +194,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder()
+                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
                                                                                         .singleDate(LocalDate.now().plusDays(2))
                                                                                         .build())
                                                 .build())
@@ -212,7 +212,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder()
+                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
                                                                                         .singleDate(LocalDate.now().plusDays(2))
                                                                                         .build())
                                                 .build())
@@ -231,7 +231,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
                                                                                         .dateRangeFrom(LocalDate.now().plusDays(2))
                                                                                         .dateRangeTo(LocalDate.now().minusDays(4))
                                                                                         .build())
@@ -251,7 +251,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
                                                                                        .dateRangeFrom(LocalDate.now().minusDays(2))
                                                                                        .dateRangeTo(LocalDate.now().plusDays(2))
                                                                                        .build())
@@ -271,7 +271,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DateHeardFinalOrders.builder()
+                .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
                                                                                        .dateRangeFrom(LocalDate.now().minusDays(20))
                                                                                        .dateRangeTo(LocalDate.now().minusDays(30))
                                                                                        .build())
