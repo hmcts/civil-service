@@ -295,6 +295,8 @@ notifications:
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
