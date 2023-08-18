@@ -1106,6 +1106,22 @@ public class EventHistoryMapper {
             ));
     }
 
+    private void buildTakenOfflineMultitrackUnspec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            String miscText = "RPA Reason:Multitrack Unspec going offline.";
+            builder.miscellaneous(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MISCELLANEOUS.getCode())
+                        .dateReceived(caseData.getSubmittedDate())
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build());
+        }
+    }
+
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
@@ -1157,22 +1173,6 @@ public class EventHistoryMapper {
                                   .build())
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
-
-            if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-                String miscText = "RPA Reason: Multitrack Unspec going offline.";
-                builder.miscellaneous(
-                    List.of(
-                        Event.builder()
-                            .eventSequence(prepareEventSequence(builder.build()))
-                            .eventCode(MISCELLANEOUS.getCode())
-                            .dateReceived(caseData.getSubmittedDate())
-                            .eventDetailsText(miscText)
-                            .eventDetails(EventDetails.builder()
-                                              .miscText(miscText)
-                                              .build())
-                            .build()));
-            }
-
         }
 
         YesOrNo proceedRespondent1;
@@ -1224,6 +1224,7 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                 }
@@ -1247,6 +1248,7 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                 }
@@ -1273,6 +1275,7 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimant proceeds.");
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                 }
@@ -1296,6 +1299,7 @@ public class EventHistoryMapper {
                 } else {
                     List<String> applicantProceedsText = new ArrayList<>();
                     applicantProceedsText.add("Claimants proceed.");
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
                 }
