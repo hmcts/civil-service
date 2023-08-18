@@ -1113,7 +1113,7 @@ public class EventHistoryMapper {
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode(MISCELLANEOUS.getCode())
-                        .dateReceived(caseData.getSubmittedDate())
+                        .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(miscText)
                         .eventDetails(EventDetails.builder()
                                           .miscText(miscText)
