@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.AdditionalDates;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -104,7 +104,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getHidePartyChoice()).isEqualTo(YES);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getHidePartyChoice()).isEqualTo(YES);
             }
         }
 
@@ -126,7 +126,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getHidePartyChoice()).isEqualTo(NO);
+                assertThat(getCaseData(response).getUpdateDetailsForm().getHidePartyChoice()).isEqualTo(NO);
             }
 
             @Test
@@ -139,11 +139,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
                     2);
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
                     "Defendant");
             }
 
@@ -158,11 +158,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
                     2);
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
                     "Defendants");
             }
 
@@ -177,13 +177,13 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
                     3);
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimant");
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
                     "Defendant 1");
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(2).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(2).getLabel()).isEqualTo(
                     "Defendant 2");
             }
 
@@ -198,11 +198,11 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().size()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().size()).isEqualTo(
                     2);
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(0).getLabel()).isEqualTo(
                     "Claimants");
-                assertThat(getCaseData(response).getAddUnavailableDatesScreens().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
+                assertThat(getCaseData(response).getUpdateDetailsForm().getPartyChosen().getListItems().get(1).getLabel()).isEqualTo(
                     "Defendant");
             }
 
@@ -247,7 +247,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class LegalRepView {
-            AdditionalDates additionalDates = AdditionalDates.builder()
+            UpdateDetailsForm form = UpdateDetailsForm.builder()
                 .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                 .partyChosen(DynamicList.builder().listItems(List.of(DynamicListElement.builder().label("something").build())).build())
                 .build();
@@ -260,7 +260,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -278,7 +278,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -324,7 +324,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .respondent1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("res-1-party-id")
@@ -381,7 +381,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .applicant1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("someid")
@@ -456,7 +456,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                         .partyID("someid")
                                         .unavailableDates(new ArrayList<>(existingDates))
                                         .build())
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -516,7 +516,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .applicant1(PartyBuilder.builder()
                                         .soleTrader().build().toBuilder()
                                         .partyID("someid")
@@ -549,7 +549,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -570,7 +570,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -591,7 +591,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -615,7 +615,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -635,7 +635,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -682,7 +682,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .respondent2(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
                                          .partyID("res-2-party-id")
@@ -716,7 +716,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoApplicants()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -736,7 +736,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoApplicants()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -784,7 +784,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .multiPartyClaimTwoApplicants()
                         .applicant1(PartyBuilder.builder()
                                          .soleTrader().build().toBuilder()
@@ -873,7 +873,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                         .partyID("app-2-party-id")
                                         .unavailableDates(new ArrayList<>(existingDates))
                                         .build())
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -895,7 +895,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVOne {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant").build())
@@ -907,7 +907,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -921,7 +921,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
@@ -933,7 +933,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -950,7 +950,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVTwoSameSolicitor {
                 @Test
                 void shouldPopulateRespondentOneAndTwoDates_whenDefendantsChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendants").build())
@@ -963,7 +963,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -978,7 +978,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
@@ -991,7 +991,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimOneDefendantSolicitor()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -1009,7 +1009,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVTwoDifferentSolicitor {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendant1ChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant 1").build())
@@ -1023,7 +1023,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -1039,7 +1039,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateRespondentTwoDates_whenDefendant2ChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant 2").build())
@@ -1053,7 +1053,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -1069,7 +1069,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
@@ -1083,7 +1083,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -1102,7 +1102,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class TwoVOne {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant").build())
@@ -1115,7 +1115,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoApplicants()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -1130,7 +1130,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantsChoiceIsSelected() {
-                    AdditionalDates additionalDates = AdditionalDates.builder()
+                    UpdateDetailsForm form = UpdateDetailsForm.builder()
                         .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
                         .partyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimants").build())
@@ -1143,7 +1143,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
                         .multiPartyClaimTwoApplicants()
-                        .addUnavailableDatesScreens(additionalDates)
+                        .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

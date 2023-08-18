@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.model.AdditionalDates;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -462,7 +462,7 @@ public class CaseDataBuilder {
     private IdamUserDetails claimantUserDetails;
 
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
-    private AdditionalDates addUnavailableDatesScreens;
+    private UpdateDetailsForm updateDetailsForm;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5813,8 +5813,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder addUnavailableDatesScreens(AdditionalDates additionalDates) {
-        this.addUnavailableDatesScreens = additionalDates;
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
+        this.updateDetailsForm = additionalDates;
         return this;
     }
 
@@ -6088,7 +6088,7 @@ public class CaseDataBuilder {
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .claimantUserDetails(claimantUserDetails)
-            .addUnavailableDatesScreens(addUnavailableDatesScreens)
+            .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
     }

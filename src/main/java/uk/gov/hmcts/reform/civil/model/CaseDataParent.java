@@ -699,7 +699,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
 
     @JsonUnwrapped
-    private final AdditionalDates addUnavailableDatesScreens;
+    private final UpdateDetailsForm updateDetailsForm;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

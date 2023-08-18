@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdditionalDates {
+public class UpdateDetailsForm {
 
     @JsonProperty("partyChosen")
     private DynamicList partyChosen;

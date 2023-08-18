@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.AdditionalDates;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -84,7 +84,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         );
 
         if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isApplicantSolicitorOne(roles)) {
-            caseDataBuilder.addUnavailableDatesScreens(AdditionalDates.builder()
+            caseDataBuilder.updateDetailsForm(UpdateDetailsForm.builder()
                                                            .hidePartyChoice(YES)
                                                            .build());
 
@@ -123,7 +123,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
         }
 
-        caseDataBuilder.addUnavailableDatesScreens(AdditionalDates.builder()
+        caseDataBuilder.updateDetailsForm(UpdateDetailsForm.builder()
                                                        .hidePartyChoice(YesOrNo.NO)
                                                        .partyChosen(DynamicList.fromList(dynamicListOptions))
                                                        .build());
@@ -137,7 +137,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> errors = unavailableDateValidator.validateAdditionalUnavailableDates(
-            caseData.getAddUnavailableDatesScreens().getAdditionalUnavailableDates()
+            caseData.getUpdateDetailsForm().getAdditionalUnavailableDates()
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -151,12 +151,12 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
 
         copyDatesIntoListingTabFields(caseData, updatedData);
 
-        if (caseData.getAddUnavailableDatesScreens() != null
-            && caseData.getAddUnavailableDatesScreens().getPartyChosen() != null
-            && caseData.getAddUnavailableDatesScreens().getPartyChosen().getValue() != null
+        if (caseData.getUpdateDetailsForm() != null
+            && caseData.getUpdateDetailsForm().getPartyChosen() != null
+            && caseData.getUpdateDetailsForm().getPartyChosen().getValue() != null
         ) {
             // Admin Screens
-            addDatesAdminScenario(caseData.getAddUnavailableDatesScreens().getPartyChosen().getValue().getLabel(),
+            addDatesAdminScenario(caseData.getUpdateDetailsForm().getPartyChosen().getValue().getLabel(),
                                   caseData, updatedData);
 
         } else {
@@ -165,7 +165,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         }
 
         // clear form
-        updatedData.addUnavailableDatesScreens(null);
+        updatedData.updateDetailsForm(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.build().toMap(objectMapper)).build();
     }
@@ -273,7 +273,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
 
     private List<Element<UnavailableDate>> addDatesToExistingDates(CaseData caseData, List<Element<UnavailableDate>> partyDates) {
         List<Element<UnavailableDate>> existingUnavailableDates = ofNullable(partyDates).orElse(newArrayList());
-        List<Element<UnavailableDate>> newUnavailableDates = caseData.getAddUnavailableDatesScreens().getAdditionalUnavailableDates();
+        List<Element<UnavailableDate>> newUnavailableDates = caseData.getUpdateDetailsForm().getAdditionalUnavailableDates();
         List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
 
         if (!existingUnavailableDates.isEmpty()) {
