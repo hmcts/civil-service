@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,12 +95,12 @@ class BundleRequestMapperTest {
                                     .documentBinaryUrl(TEST_URL).documentUrl(TEST_URL).build())
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .servedDocumentFiles(servedDocumentFiles)
-            .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(Party.builder().individualLastName("lastname").partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(Party.builder().individualLastName("lastname").partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
@@ -125,7 +126,7 @@ class BundleRequestMapperTest {
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
-                                                       .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames().get(0))
+                                                       .typeOfDocument("Agreed Directions")
                                                        .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         return otherEvidenceDocs;
@@ -175,12 +176,13 @@ class BundleRequestMapperTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
             CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+                TEST_URL).documentFileName(TEST_FILE_NAME).build()).createdDatetime(LocalDateTime.now()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
             CaseDocument.builder()
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.now()).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
@@ -189,8 +191,9 @@ class BundleRequestMapperTest {
     void testBundleCreateRequestMapperForEmptyDetails() {
         // Given
         CaseData caseData = CaseData.builder().ccdCaseReference(1L)
-            .applicant1(Party.builder().partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("respondent1").type(Party.Type.INDIVIDUAL).build()).hearingDate(LocalDate.now())
+            .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
 
@@ -212,6 +215,8 @@ class BundleRequestMapperTest {
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
+            .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
             .build();
 
         // When: mapCaseDataToBundleCreateRequest is called
@@ -223,5 +228,13 @@ class BundleRequestMapperTest {
         // Then: hasApplicant2 and hasRespondant2 should return false
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
         assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+    }
+
+    @Test
+    void shouldFilterEvidenceForTrial() {
+        List<Element<UploadEvidenceDocumentType>> list =
+            bundleRequestMapper.filterDocumentaryEvidenceForTrialDocs(getDocumentEvidenceForTrial(),
+                                                                      TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true);
+        assertEquals(1, list.size());
     }
 }
