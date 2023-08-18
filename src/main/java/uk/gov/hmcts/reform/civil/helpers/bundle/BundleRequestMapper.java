@@ -48,9 +48,7 @@ public class BundleRequestMapper {
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
                                                                 String caseTypeId, Long id) {
-        String fileNameIdentifier =
-            caseData.getApplicant1().getIndividualLastName() + "v" + caseData.getRespondent1().getIndividualLastName() +
-                "- Bundle" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
+        String fileNameIdentifier = generateFileName(caseData);
         BundleCreateRequest bundleCreateRequest = BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
                              .caseData(mapCaseData(
@@ -63,6 +61,15 @@ public class BundleRequestMapper {
             .caseTypeId(caseTypeId)
             .jurisdictionId(jurisdiction).build();
         return bundleCreateRequest;
+    }
+
+    private String generateFileName(CaseData caseData) {
+        String applicantName = caseData.getApplicant1().isIndividual() ?
+            caseData.getApplicant1().getIndividualLastName() : caseData.getApplicant1().getPartyName();
+        String respondentName = caseData.getApplicant1().isIndividual() ?
+            caseData.getRespondent1().getIndividualLastName() : caseData.getRespondent1().getPartyName();
+        return applicantName + "v" + respondentName +
+            "- Bundle" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
