@@ -1087,6 +1087,8 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .litigationFriendLastName("LF")
                                    .litigationFriendEmailAddress("respondentLF@email.com")
                                    .litigationFriendPhoneNumber("1234567890")
+                                   .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                        ? "Name" : "Organisation name")
                                    .build());
             }
 
