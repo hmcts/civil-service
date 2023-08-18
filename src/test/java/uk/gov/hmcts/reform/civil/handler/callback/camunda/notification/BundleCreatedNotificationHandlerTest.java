@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BundleCreatedNotificationHandler.TASK_ID_DEFENDANT1;
@@ -87,7 +87,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
             ).build();
 
             //When: handler is called
@@ -156,7 +156,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()
             ).build();
 
             //When: handler is called
@@ -180,7 +180,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
                 CallbackRequest.builder().eventId(
-                    NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name()).build()).build()))
+                    NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
                 .isEqualTo(TASK_ID_DEFENDANT1);
 
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
@@ -192,7 +192,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED);
-            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED);
+            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED);
             assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED);
         }
 

@@ -20,7 +20,7 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +30,11 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED,
-        NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED,
         CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED
     );
     public static final String TASK_ID_APPLICANT = "BundleCreationNotifyApplicantSolicitor1";
-    public static final String TASK_ID_DEFENDANT1 = "BundleCreationNotifyRespondent1";
+    public static final String TASK_ID_DEFENDANT1 = "BundleCreationNotifyRespondentSolicitor1";
     public static final String TASK_ID_DEFENDANT2 = "BundleCreationNotifyRespondentSolicitor2";
 
     @Override
@@ -48,7 +48,7 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
     public String camundaActivityId(CallbackParams callbackParams) {
         if (callbackParams.getRequest().getEventId().equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name())) {
             return TASK_ID_APPLICANT;
-        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT1_FOR_BUNDLE_CREATED.name())) {
+        } else if (callbackParams.getRequest().getEventId().equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name())) {
             return TASK_ID_DEFENDANT1;
         } else {
             return TASK_ID_DEFENDANT2;
