@@ -113,10 +113,9 @@ public class PaymentsService {
         }
     }
 
-    private PBAServiceRequestDTO buildRequest1(CaseData caseData) {
+    private PBAServiceRequestDTO buildPbaPaymentRequest(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = null;
         FeeDto srFee = null;
-
         if (caseData.getHearingDate() == null) {
             serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
             srFee = caseData.getClaimFee().toFeeDto();
@@ -147,14 +146,14 @@ public class PaymentsService {
 
     }
 
-    public PBAServiceRequestResponse createCreditAccountPayment1(CaseData caseData, String authToken) {
+    public PBAServiceRequestResponse createPbaPayment(CaseData caseData, String authToken) {
         String serviceReqReference = null;
         if (caseData.getHearingDate() == null) {
             serviceReqReference = caseData.getClaimIssuedPBADetails().getServiceReqReference();
         } else {
             serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         }
-        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest1(caseData));
+        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildPbaPaymentRequest(caseData));
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {

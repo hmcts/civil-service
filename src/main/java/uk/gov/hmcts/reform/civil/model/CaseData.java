@@ -577,6 +577,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo urgentFlag;
     private final String caseProgAllocatedTrack;
+    private final DynamicList evidenceUploadOptions;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
@@ -596,6 +597,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Document finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
+
+    // bulk claims
+    private final String bulkCustomerId;
+    private final String sdtRequestIdFromSdt;
+    private final List<Element<String>> sdtRequestId;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
