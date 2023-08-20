@@ -1380,7 +1380,9 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .emailAddress("respondent2LF@email.com").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual().build())
+
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
@@ -1414,7 +1416,10 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .phoneNumber("123456789")
                                                      .emailAddress("respondent2LF@email.com").build())
                     .respondent1ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
                     .build();
@@ -1891,6 +1896,8 @@ class DirectionsQuestionnaireGeneratorTest {
                         .litigationFriendLastName("LF")
                         .litigationFriendEmailAddress("respondentLF@email.com")
                         .litigationFriendPhoneNumber("1234567890")
+                        .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                             ? "Name" : "Organisation name")
                         .build(),
                     Party.builder()
                         .name(respondent2.getPartyName())
@@ -1903,6 +1910,8 @@ class DirectionsQuestionnaireGeneratorTest {
                         .litigationFriendLastName("LF")
                         .litigationFriendPhoneNumber("123456789")
                         .litigationFriendEmailAddress("respondent2LF@email.com")
+                        .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                             ? "Name" : "Organisation name")
                         .build()
                 );
             }
