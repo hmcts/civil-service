@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
@@ -77,6 +80,40 @@ class ManageContactInformationUtilsTest {
         addApplicant1Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicant1Options(true, true));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1OrganisationAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addApplicant1LitigationFriend()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1(Party.builder()
+                            .organisationName("Test Inc")
+                            .type(ORGANISATION)
+                            .build())
+            .build();
+
+        List<String> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
+    }
+
+    @Test
+    void shouldAddCorrectOptions_forClaimant1CompanyAsAdmin() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addApplicant1LitigationFriend()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1(Party.builder()
+                            .companyName("Test Inc")
+                            .type(COMPANY)
+                            .build())
+            .build();
+
+        List<String> options = new ArrayList<>();
+        addApplicant1Options(options, caseData, true);
+
+        assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
     }
 
     @Test
@@ -213,6 +250,18 @@ class ManageContactInformationUtilsTest {
         List<String> list = new ArrayList<>();
         list.add("CLAIMANT 1: Mr. John Rambo");
         list.add("CLAIMANT 1: Litigation Friend: Applicant Litigation Friend");
+        list.add("CLAIMANT 1: Individuals attending for the legal representative");
+        if (withExpertsAndWitnesses || isAdmin) {
+            list.add("CLAIMANT 1: Witnesses");
+            list.add("CLAIMANT 1: Experts");
+        }
+        return list;
+    }
+
+    private List<String> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<String> list = new ArrayList<>();
+        list.add("CLAIMANT 1: Test Inc");
+        list.add("CLAIMANT 1: Individuals attending for the organisation");
         list.add("CLAIMANT 1: Individuals attending for the legal representative");
         if (withExpertsAndWitnesses || isAdmin) {
             list.add("CLAIMANT 1: Witnesses");
