@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.*;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -88,13 +89,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsForDefaultJudgments(authToken));
-            caseDataBuilder = populateFields(caseDataBuilder, locations);
+            caseDataBuilder = populateFields(caseDataBuilder, locations, caseData);
         } else {
             caseDataBuilder = populateFreeFormFields(caseDataBuilder);
         }
@@ -141,8 +141,24 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                             .toList());
     }
 
+    private DynamicList getLocationsFromList2(CaseData caseData) {
+
+        DynamicList list = DynamicList.builder()
+            .listItems(List.of(DynamicListElement.builder()
+                                   .code("LOCATION_LIST")
+                                   .label(caseData.getLocationName())
+                                   .build(),
+                               DynamicListElement.builder()
+                                   .code("OTHER_LOCATION")
+                                   .label("Other location")
+                                   .build()))
+            .build();
+
+        return list;
+    }
+
     private CaseData.CaseDataBuilder<?, ?> populateFields(
-        CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations) {
+        CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
@@ -157,9 +173,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 AssistedOrderCostDetails.builder().claimantCostSummarilyDate(advancedDate).build())
             .finalOrderFurtherHearingComplex(
                 FinalOrderFurtherHearing.builder()
-                    .alternativeHearingDropdown(CourtLocationDropdown.builder()
-                                                    .finalOrderFurtherHearingCourtLocationList(getLocationsFromList(locations))
-                                                    .build())
+                    .hearingLocationList(getLocationsFromList2(caseData))
+                    .alternativeHearingList(getLocationsFromList(locations))
                     .datesToAvoidDateDropdown(DatesFinalOrders.builder()
                                            .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
             .orderMadeOnDetailsOrderCourt(

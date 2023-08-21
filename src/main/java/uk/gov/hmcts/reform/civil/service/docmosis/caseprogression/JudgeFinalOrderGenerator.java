@@ -164,10 +164,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
             .furtherHearingLength(getFurtherHearingLength(caseData))
             .furtherHearingToDate(getFurtherHearingDate(caseData, false))
-            .furtherHearingLocation(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingDropdown())
+            .furtherHearingLocation(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
                                         ?
-                                        caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingDropdown()
-                                            .getFinalOrderFurtherHearingCourtLocationList().getValue().getLabel() : "")
+                                        caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : "")
             .furtherHearingMethod(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
                                   ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "")
             .appealToggle(nonNull(caseData.getFinalOrderAppealToggle())
