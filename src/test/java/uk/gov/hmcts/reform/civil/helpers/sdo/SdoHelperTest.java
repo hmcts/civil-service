@@ -25,10 +25,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -196,6 +199,78 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            SmallClaimsHearing smallClaimsHearing = SmallClaimsHearing.builder()
+                .input1("input1")
+                .input2("input2")
+                .time(SmallClaimsTimeEstimate.OTHER)
+                .otherHours(new BigDecimal(6))
+                .otherMinutes(new BigDecimal(20))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .smallClaimsHearing(smallClaimsHearing)
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnEmptyString_whenHearingIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetFastClaimsHearingTimeLabelTest {
+        @Test
+        void shouldReturnLabel_whenHearingIsNotNull() {
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.FOUR_HOURS)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo("4 hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.OTHER)
+                .otherHours("6")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test

@@ -27,6 +27,7 @@ import java.util.Map;
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 
@@ -72,13 +73,14 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         );
 
         var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
+        var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
 
         buildDocument(callbackParams, caseDataBuilder, hearing);
 
         camundaService.setProcessVariables(
             processInstanceId,
             camundaVars.toBuilder()
-                .hearingStartDateTime(hearingStartDay.getHearingStartDateTime())
+                .hearingStartDateTime(hearingStartDate)
                 .hearingLocationEpims(hearingStartDay.getHearingVenueId())
                 .days(getHearingDays(hearing))
                 .requestVersion(hearing.getRequestDetails().getVersionNumber())
@@ -89,8 +91,8 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
-                      .hearingDate(hearingStartDay.getHearingStartDateTime().toLocalDate())
-                      .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDay.getHearingStartDateTime().toLocalDate()))
+                      .hearingDate(hearingStartDate.toLocalDate())
+                      .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()))
                       .build().toMap(objectMapper))
             .build();
     }
