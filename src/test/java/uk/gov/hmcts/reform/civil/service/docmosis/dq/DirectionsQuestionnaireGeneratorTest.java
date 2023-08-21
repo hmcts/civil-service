@@ -1056,6 +1056,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     .litigationFriendLastName("LF")
                     .litigationFriendEmailAddress("applicantLF@email.com")
                     .litigationFriendPhoneNumber("1234567890")
+                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                         ? "Name" : "Organisation name")
                     .build();
             }
 
@@ -1071,6 +1073,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     .litigationFriendLastName("LF")
                     .litigationFriendEmailAddress("applicant2LF@email.com")
                     .litigationFriendPhoneNumber("1234567890")
+                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                         ? "Name" : "Organisation name")
                     .build();
             }
 
@@ -1352,7 +1356,10 @@ class DirectionsQuestionnaireGeneratorTest {
                                                      .phoneNumber("123456789")
                                                      .emailAddress("respondent2LF@email.com").build())
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
@@ -1381,7 +1388,9 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder()
-                                     .individual().build())
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
 
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -1445,7 +1454,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
@@ -1484,7 +1496,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1523,7 +1538,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent1ResponseDate(createdDate)
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1562,7 +1580,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent1ResponseDate(createdDate)
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1602,7 +1623,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1641,7 +1665,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1681,7 +1708,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(createdDate)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1705,7 +1735,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
                     .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .respondent2ResponseDate(null)
@@ -1732,7 +1765,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent1ResponseDate(createdDate)
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
@@ -1768,7 +1804,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
@@ -1862,6 +1901,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     .litigationFriendLastName("LF")
                     .litigationFriendEmailAddress("applicantLF@email.com")
                     .litigationFriendPhoneNumber("1234567890")
+                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                         ? "Name" : "Organisation name")
                     .build();
             }
 
@@ -1878,6 +1919,8 @@ class DirectionsQuestionnaireGeneratorTest {
                                    .litigationFriendLastName("LF")
                                    .litigationFriendPhoneNumber("123456789")
                                    .litigationFriendEmailAddress("respondent2LF@email.com")
+                                   .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                        ? "Name" : "Organisation name")
                                    .build());
             }
 
