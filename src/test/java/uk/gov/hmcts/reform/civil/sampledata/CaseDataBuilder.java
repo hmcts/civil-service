@@ -4106,6 +4106,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
+        applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = NO;
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        respondent2ClaimResponseIntentionType = FULL_DEFENCE;
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
@@ -4748,6 +4762,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setClaimTypeToUnspecClaim() {
         this.caseAccessCategory = UNSPEC_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimTypeToMultiTrackClaim() {
+        this.caseAccessCategory = CaseCategory.MULTI_CLAIM;
         return this;
     }
 

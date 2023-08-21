@@ -68,6 +68,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
@@ -4544,6 +4546,79 @@ class EventHistoryMapperTest {
 
         @Nested
         class OneVOne {
+
+            @Test   //Indu
+            void shouldPrepareMiscellaneousEvents_whenClaimantProceedsForMultiTrackClaim() {
+
+                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
+                    + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
+                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
+                    + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .caseAccessCategory(MULTI_CLAIM)
+                    .totalClaimAmount(BigDecimal.valueOf(25500.00))
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_ONE)
+                    //.atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .build();
+
+                List<Event> expectedMiscEvents = List.of(
+                    Event.builder()
+                        .eventSequence(1)
+                        .eventCode("999")
+                        .dateReceived(caseData.getIssueDate().atStartOfDay())
+                        .eventDetailsText("Claim issued in CCD.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim issued in CCD.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(2)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimNotificationDate())
+                        .eventDetailsText("Claimant has notified defendant.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claimant has notified defendant.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(3)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimDetailsNotificationDate())
+                        .eventDetailsText("Claim details notified.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim details notified.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(8)
+                        .eventCode("999")
+                        .dateReceived(caseData.getApplicant1ResponseDate())
+                        .eventDetailsText(expectedMiscText1)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(expectedMiscText1)
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(9)
+                        .eventCode("999")
+                        .dateReceived(caseData.getApplicant1ResponseDate())
+                        .eventDetailsText(expectedMiscText2)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(expectedMiscText2)
+                                          .build())
+                        .build()
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                     expectedMiscEvents.get(2),
+                                     expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+            }
+
             @Test
             void shouldPrepareExpectedEvents_whenClaimWithFullDefenceSDO() {
 

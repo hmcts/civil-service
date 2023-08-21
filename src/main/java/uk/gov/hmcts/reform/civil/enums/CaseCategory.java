@@ -7,5 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CaseCategory {
     UNSPEC_CLAIM,
-    SPEC_CLAIM;
+    SPEC_CLAIM,
+    MULTI_CLAIM;
+
 }
