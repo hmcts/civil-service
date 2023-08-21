@@ -207,7 +207,7 @@ public class ManageContactInformationUtils {
             if (isAdmin
                 || (caseData.getRespondent1DQ() != null && shouldAddExperts(caseData.getRespondent1DQ().getExperts()))
                 || (caseData.getRespondent2DQ() != null && shouldAddExperts(caseData.getRespondent2DQ().getExperts()))) {
-                addExperts(list, EXPERTS);
+                addExperts(list, DEFENDANTS);
             }
         }
     }
