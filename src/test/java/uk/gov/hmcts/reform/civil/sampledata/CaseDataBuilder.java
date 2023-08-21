@@ -99,6 +99,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -151,6 +152,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.ComplexityBand.BAND_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -193,6 +195,7 @@ public class CaseDataBuilder {
     protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
+    protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
@@ -456,6 +459,7 @@ public class CaseDataBuilder {
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+    private IdamUserDetails claimantUserDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -633,6 +637,17 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder cosNotifyClaimDefendant2(CertificateOfService cosNotifyClaimDefendant) {
         this.cosNotifyClaimDefendant2 = cosNotifyClaimDefendant;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
         return this;
     }
 
@@ -876,6 +891,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQWithFixedRecoverableCosts() {
+        respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder respondent2DQ() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -1099,6 +1125,28 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1DQWithFixedRecoverableCosts() {
+        applicant1DQ = applicant1DQ.toBuilder()
+            .applicant1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQWithFixedRecoverableCosts() {
+        applicant2DQ = applicant2DQ.toBuilder()
+            .applicant2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithLocationWithoutExperts() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -1305,6 +1353,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
+        this.applicant1Represented = isRepresented;
         return this;
     }
 
@@ -5738,6 +5791,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimantUserDetails(IdamUserDetails claimantUserDetails) {
+        this.claimantUserDetails = claimantUserDetails;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5997,6 +6055,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .applicant1Represented(applicant1Represented)
             .caseDataLiP(caseDataLiP)
             .claimant2ResponseFlag(claimant2ResponseFlag)
             .specClaimResponseTimelineList(specClaimResponseTimelineList)
@@ -6007,6 +6066,7 @@ public class CaseDataBuilder {
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
+            .claimantUserDetails(claimantUserDetails)
             .build();
     }
 }
