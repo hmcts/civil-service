@@ -9,4 +9,3 @@ public enum CaseCategory {
     UNSPEC_CLAIM,
     SPEC_CLAIM;
 }
-
