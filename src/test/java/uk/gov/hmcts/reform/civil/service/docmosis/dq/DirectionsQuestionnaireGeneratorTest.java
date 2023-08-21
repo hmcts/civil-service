@@ -1804,10 +1804,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .respondent2ResponseDate(LocalDateTime.now())
-                    .respondent2(PartyBuilder.builder()
-                                     .individual()
-                                     .legalRepHeading()
-                                     .build())
+                    .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
