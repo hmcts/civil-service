@@ -131,14 +131,11 @@ public class BundleCreatedNotificationHandler extends CallbackHandler implements
     }
 
     private boolean isLip(CaseData caseData, String taskId) {
-        if(taskId.equals(TASK_ID_APPLICANT)) {
+        if (taskId.equals(TASK_ID_APPLICANT)) {
             return false;
-        }
-        else if(taskId.equals(TASK_ID_DEFENDANT1))
-        {
+        } else if (taskId.equals(TASK_ID_DEFENDANT1)) {
             return isRespondent1Lip(caseData);
-        }
-        else {
+        } else {
             return false;
         }
     }
