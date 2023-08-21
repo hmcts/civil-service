@@ -1041,7 +1041,7 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_CASE_NOTE,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
                 CHANGE_SOLICITOR_EMAIL
             )
         ),
@@ -1146,7 +1146,7 @@ public class FlowStateAllowedEventService {
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
                 CREATE_SDO,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
                 CHANGE_SOLICITOR_EMAIL
             )
         ),
@@ -1179,7 +1179,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
                 CHANGE_SOLICITOR_EMAIL
             )
         ),
