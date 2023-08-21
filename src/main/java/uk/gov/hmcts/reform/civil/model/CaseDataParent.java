@@ -693,6 +693,9 @@ public class CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
 
+    @JsonUnwrapped
+    private final UpdateDetailsForm updateDetailsForm;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
