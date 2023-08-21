@@ -4544,7 +4544,6 @@ class EventHistoryMapperTest {
 
         @Nested
         class OneVOne {
-
             @Test
             void shouldPrepareExpectedEvents_whenClaimWithFullDefenceSDO() {
 
