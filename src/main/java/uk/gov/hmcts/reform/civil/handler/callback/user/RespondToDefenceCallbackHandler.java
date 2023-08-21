@@ -270,7 +270,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
-            .state(CaseState.JUDICIAL_REFERRAL.name())
+            .state(newState.name())
             .build();
     }
 
