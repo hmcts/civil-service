@@ -41,11 +41,17 @@ public class DocumentUtils {
         if (hearingTimeEstimateLabel != null && hearingTimeEstimateLabel.equals("Other")) {
             StringBuilder otherLength = new StringBuilder();
             if (hearingTime.getOtherHours() != null && Integer.parseInt(hearingTime.getOtherHours()) != 0) {
-                otherLength.append(hearingTime.getOtherHours().trim() +
-                                       " hours ");
+                String hourString = Integer.parseInt(hearingTime.getOtherHours()) == 1
+                    ? " hour" : " hours";
+                otherLength.append(hearingTime.getOtherHours().trim() + hourString);
             }
             if (hearingTime.getOtherMinutes() != null && Integer.parseInt(hearingTime.getOtherMinutes()) != 0) {
-                otherLength.append(hearingTime.getOtherMinutes().trim() + " minutes");
+                String minuteString = Integer.parseInt(hearingTime.getOtherMinutes()) == 1
+                    ? " minute" : " minutes";
+                String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
+                otherLength.append(spaceBeforeMinute
+                                       + hearingTime.getOtherMinutes().trim()
+                                       + minuteString);
             }
             return otherLength.toString();
         }

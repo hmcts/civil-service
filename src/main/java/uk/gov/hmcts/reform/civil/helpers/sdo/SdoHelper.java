@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
@@ -119,12 +120,18 @@ public class SdoHelper {
                 StringBuilder otherLength = new StringBuilder();
                 if (disposalHearingHearingTime.getOtherHours() != null
                     && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
-                    otherLength.append(disposalHearingHearingTime.getOtherHours().trim() +
-                                           " hours ");
+                    String hourString = Integer.parseInt(disposalHearingHearingTime.getOtherHours()) == 1
+                        ? " hour" : " hours";
+                    otherLength.append(disposalHearingHearingTime.getOtherHours().trim() + hourString);
                 }
                 if (disposalHearingHearingTime.getOtherMinutes() != null
                     && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
-                    otherLength.append(disposalHearingHearingTime.getOtherMinutes().trim() + " minutes");
+                    String minuteString = Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) == 1
+                        ? " minute" : " minutes";
+                    String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
+                    otherLength.append(spaceBeforeMinute
+                                           + disposalHearingHearingTime.getOtherMinutes().trim()
+                                           + minuteString);
                 }
                 return otherLength.toString();
             }

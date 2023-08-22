@@ -38,9 +38,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.OTHER;
-
 
 public class SdoHelperTest {
 
@@ -304,7 +305,7 @@ public class SdoHelperTest {
 
         @Test
         void shouldReturnLabel_whenHearingOtherMinuteZero() {
-            var expected = "6 hours ";
+            var expected = "6 hours";
             DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
                 .input("input")
                 .time(OTHER)
