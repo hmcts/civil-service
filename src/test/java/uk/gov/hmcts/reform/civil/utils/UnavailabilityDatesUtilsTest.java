@@ -122,7 +122,7 @@ public class UnavailabilityDatesUtilsTest {
         }
 
         @Test
-        public void shouldUnavailabilityDateWhenProvidedForApplicantDJ() {
+        public void shouldRollUpUnavailabilityDateWhenProvidedForApplicantDJ() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimantRequestsDJWithUnavailableDates()
@@ -292,11 +292,13 @@ public class UnavailabilityDatesUtilsTest {
         }
 
         @Test
-        public void shouldUnavailabilityDateWhenProvidedForApplicantDJ() {
+        public void shouldReturnUnavailabilityDateWhenProvidedForApplicantDJ() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimantRequestsDJWithUnavailableDates()
                 .build();
+
+            LocalDate dateAdded = LocalDate.now();
 
             CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(builder, true);
@@ -304,7 +306,7 @@ public class UnavailabilityDatesUtilsTest {
             UnavailableDate expectedSingleDate = UnavailableDate.builder()
                 .unavailableDateType(SINGLE_DATE)
                 .date(LocalDate.of(2023, 8, 20))
-                .dateAdded(caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate())
+                .dateAdded(dateAdded)
                 .eventAdded(DJ_EVENT)
                 .build();
 
@@ -312,7 +314,7 @@ public class UnavailabilityDatesUtilsTest {
                 .unavailableDateType(DATE_RANGE)
                 .fromDate(LocalDate.of(2023, 8, 20))
                 .toDate(LocalDate.of(2023, 8, 22))
-                .dateAdded(caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate())
+                .dateAdded(dateAdded)
                 .eventAdded(DJ_EVENT)
                 .build();
 
@@ -329,13 +331,15 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateClaimantRequestsDJWithUnavailableDates()
                 .build();
 
+            LocalDate dateAdded = LocalDate.now();
+
             CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(builder, true);
 
             UnavailableDate expectedSingleDate = UnavailableDate.builder()
                 .unavailableDateType(SINGLE_DATE)
                 .date(LocalDate.of(2023, 8, 20))
-                .dateAdded(caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate())
+                .dateAdded(dateAdded)
                 .eventAdded(DJ_EVENT)
                 .build();
 
@@ -343,7 +347,7 @@ public class UnavailabilityDatesUtilsTest {
                 .unavailableDateType(DATE_RANGE)
                 .fromDate(LocalDate.of(2023, 8, 20))
                 .toDate(LocalDate.of(2023, 8, 22))
-                .dateAdded(caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate())
+                .dateAdded(dateAdded)
                 .eventAdded(DJ_EVENT)
                 .build();
 

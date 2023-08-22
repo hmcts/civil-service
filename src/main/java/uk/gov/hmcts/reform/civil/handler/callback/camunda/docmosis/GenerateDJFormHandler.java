@@ -12,10 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +39,6 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -73,9 +70,6 @@ public class GenerateDJFormHandler extends CallbackHandler {
         } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             buildDocument(callbackParams, caseDataBuilder);
         }
-
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder,
-                                                                         featureToggleService.isUpdateContactDetailsEnabled());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

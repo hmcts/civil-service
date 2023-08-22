@@ -140,8 +140,7 @@ public class UnavailabilityDatesUtils {
             List<UnavailableDate> unavailableDates = new ArrayList<>();
             List<HearingDates> unavailableDatesDJ = unwrapElements(caseData.getHearingSupportRequirementsDJ().getHearingDates());
 
-            // Date added will be the date documents were added during DJ journey
-            LocalDate dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
+            LocalDate dateAdded = LocalDate.now();
 
             for (HearingDates unavailableDate : unavailableDatesDJ) {
                 LocalDate fromDate = unavailableDate.getHearingUnavailableFrom();
