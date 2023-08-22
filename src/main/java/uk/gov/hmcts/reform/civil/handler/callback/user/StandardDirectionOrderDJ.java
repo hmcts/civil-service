@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -111,6 +112,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
+    private final LocationHelper locationHelper;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -201,9 +203,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
-        DynamicList locationsList = getLocationsFromList(locations);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        DynamicList locationsList = getLocationList(callbackParams, preferredCourt.orElse(null));
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
 
@@ -630,6 +631,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private DynamicList getLocationList(CallbackParams callbackParams,
+                                        RequestedCourt preferredCourt) {
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
+        return DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+                                    matchingLocation.orElse(null), true
+        );
     }
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {

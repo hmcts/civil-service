@@ -196,7 +196,7 @@ public class LocationHelper {
      * @return first matching location
      */
 
-    private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
+    public Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
         }

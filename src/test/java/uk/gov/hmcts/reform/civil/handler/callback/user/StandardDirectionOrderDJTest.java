@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -64,7 +65,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
     JacksonAutoConfiguration.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    LocationHelper.class
 })
 
 public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
