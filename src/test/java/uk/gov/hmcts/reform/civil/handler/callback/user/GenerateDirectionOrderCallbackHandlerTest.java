@@ -20,11 +20,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2v1;
@@ -65,6 +69,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
     @MockBean
     private JudgeFinalOrderGenerator judgeFinalOrderGenerator;
+
+    @MockBean
+    private DocumentHearingLocationHelper locationHelper;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -89,6 +96,18 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
+
+    private static LocationRefData locationRefDataAfterSdo =   LocationRefData.builder().siteName("SiteName after Sdo")
+        .courtAddress("1").postcode("1")
+        .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
+        .courtTypeId("10").courtLocationCode("121")
+        .epimmsId("000000").build();
+
+    private static LocationRefData locationRefDataBeforeSdo =   LocationRefData.builder().siteName("SiteName before Sdo")
+        .courtAddress("1").postcode("1")
+        .courtName("Court Name Ccmc").region("Region").regionId("4").courtVenueId("000")
+        .courtTypeId("10").courtLocationCode("121")
+        .epimmsId("000000").build();
 
     @Nested
     class AboutToStartCallback {
@@ -128,15 +147,17 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldPopulateFields_whenIsCalled() {
+        void shouldPopulateFields_whenIsCalledAfterSdo() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
@@ -168,6 +189,55 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("appealGranted")
                 .extracting("appealDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("hearingLocationList").asString().contains("SiteName after Sdo");
+        }
+
+        @Test
+        void shouldPopulateFields_whenIsCalledBeforeSdo() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(JUDICIAL_REFERRAL)
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            String advancedDate = LocalDate.now().plusDays(14).toString();
+            when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefDataBeforeSdo);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantPaySub")
+                .extracting("defendantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantPaySub")
+                .extracting("claimantCostStandardDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsDefendantSum")
+                .extracting("defendantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("assistedOrderCostsClaimantSum")
+                .extracting("claimantCostSummarilyDate")
+                .isEqualTo(advancedDate);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeText")
+                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
+                .extracting("ownInitiativeDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeText")
+                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
+            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
+                .extracting("withOutNoticeDate")
+                .isEqualTo(LocalDate.now().toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGranted")
+                .extracting("appealDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
+                .extracting("hearingLocationList").asString().contains("SiteName before Sdo");
         }
     }
 
@@ -284,6 +354,45 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             assertThat(response.getErrors())
                 .containsExactly("The date range in Order Made may not have a 'from date', that is after the 'date to'");
+        }
+
+        @Test
+        void shouldValidateAssistedFurtherHearingPastDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                     .datesToAvoidDateDropdown(DatesFinalOrders.builder()
+                                                                                   .datesToAvoidDates(LocalDate.now().minusDays(2))
+                                                                                   .build())
+                                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors())
+                .containsExactly("The date in Further hearing may not be before the established date");
+        }
+
+        @Test
+        void shouldValidateAssistedFurtherHearingValidDate_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                     .datesToAvoidDateDropdown(DatesFinalOrders.builder()
+                                                                                   .datesToAvoidDates(LocalDate.now().plusDays(10))
+                                                                                   .build())
+                                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
