@@ -59,66 +59,87 @@ public class BundleRequestMapper {
                 .servedDocumentFiles(mapServedDocuments(caseData.getServedDocumentFiles()))
                 .documentWitnessStatement(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatement(),
                                                                       EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
+                .documentWitnessStatementApp2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementApp2(),
+                            EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
                 .documentWitnessStatementRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes(),
                                                                          EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
                 .documentWitnessStatementRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessStatementRes2(),
                                                                           EvidenceUploadFiles.WITNESS_STATEMENT.getDisplayName()))
                 .documentWitnessSummary(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummary(),
                                                                     EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
+                .documentWitnessSummaryApp2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryApp2(),
+                            EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
                 .documentWitnessSummaryRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes(),
                                                                        EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
                 .documentWitnessSummaryRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentWitnessSummaryRes2(),
                                                                         EvidenceUploadFiles.WITNESS_SUMMARY.getDisplayName()))
                 .documentHearsayNotice(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNotice(),
                                                                    EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
+                .documentHearsayNoticeApp2(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeApp2(),
+                            EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
                 .documentHearsayNoticeRes(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes(),
                                                                       EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
                 .documentHearsayNoticeRes2(mapUploadEvidenceWitnessDoc(caseData.getDocumentHearsayNoticeRes2(),
                                                                        EvidenceUploadFiles.NOTICE_OF_INTENTION.getDisplayName()))
                 .documentReferredInStatement(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatement()))
+                .documentReferredInStatementApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatementApp2()))
                 .documentReferredInStatementRes(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatementRes()))
                 .documentReferredInStatementRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentReferredInStatementRes2()))
                 .documentExpertReport(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReport(),
                                                                  EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
+                .documentExpertReportApp2(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportApp2(),
+                            EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
                 .documentExpertReportRes(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes(),
                                                                     EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
                 .documentExpertReportRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentExpertReportRes2(),
                                                                      EvidenceUploadFiles.EXPERT_REPORT.getDisplayName()))
                 .documentJointStatement(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatement(),
                                                                    EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
+                .documentJointStatementApp2(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementApp2(),
+                            EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
                 .documentJointStatementRes(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes(),
                                                                       EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
                 .documentJointStatementRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentJointStatementRes2(),
                                                                        EvidenceUploadFiles.JOINT_STATEMENT.getDisplayName()))
                 .documentQuestions(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestions(),
                                                               EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
+                .documentQuestionsApp2(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsApp2(),
+                            EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
                 .documentQuestionsRes(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes(),
                                                                  EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
                 .documentQuestionsRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentQuestionsRes2(),
                                                                   EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS.getDisplayName()))
                 .documentAnswers(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswers(),
                                                             EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
+                .documentAnswersApp2(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersApp2(),
+                            EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
                 .documentAnswersRes(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes(),
                                                                EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
                 .documentAnswersRes2(mapUploadEvidenceExpertDoc(caseData.getDocumentAnswersRes2(),
                                                                 EvidenceUploadFiles.ANSWERS_FOR_EXPERTS.getDisplayName()))
                 .documentDisclosureList(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureList()))
+                .documentDisclosureListApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListApp2()))
                 .documentDisclosureListRes(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes()))
                 .documentDisclosureListRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentDisclosureListRes2()))
                 .documentForDisclosure(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosure()))
+                .documentForDisclosureApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosureApp2()))
                 .documentForDisclosureRes(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosureRes()))
                 .documentForDisclosureRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentForDisclosureRes2()))
                 .documentCaseSummary(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummary()))
+                .documentCaseSummaryApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummaryApp2()))
                 .documentCaseSummaryRes(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummaryRes()))
                 .documentCaseSummaryRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentCaseSummaryRes2()))
                 .documentSkeletonArgument(mapUploadEvidenceOtherDoc(caseData.getDocumentSkeletonArgument()))
+                .documentSkeletonArgumentApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentSkeletonArgumentApp2()))
                 .documentSkeletonArgumentRes(mapUploadEvidenceOtherDoc(caseData.getDocumentSkeletonArgumentRes()))
                 .documentSkeletonArgumentRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentSkeletonArgumentRes2()))
                 .generalOrderDocument(new ArrayList<>())
                 .documentAuthorities(mapUploadEvidenceOtherDoc(caseData.getDocumentAuthorities()))
+                .documentAuthoritiesApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentAuthoritiesApp2()))
                 .documentAuthoritiesRes(mapUploadEvidenceOtherDoc(caseData.getDocumentAuthoritiesRes()))
                 .documentAuthoritiesRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentAuthoritiesRes2()))
                 .documentEvidenceForTrial(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrial()))
+                .documentEvidenceForTrialApp2(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialApp2()))
                 .documentEvidenceForTrialRes(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialRes()))
                 .documentEvidenceForTrialRes2(mapUploadEvidenceOtherDoc(caseData.getDocumentEvidenceForTrialRes2()))
                 .defendantResponseDocuments(mapSystemGeneratedcaseDocument(caseData.getDefendantResponseDocuments(),
