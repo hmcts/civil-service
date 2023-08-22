@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -137,7 +136,7 @@ public class CmcClaimTest {
             .response(Response.builder()
                           .responseType(RespondentResponseType.FULL_DEFENCE)
                           .build())
-            .intentionToProceedDeadline(LocalDateTime.now().minusDays(1))
+            .intentionToProceedDeadline(LocalDate.now().minusDays(1))
             .build();
         DashboardClaimStatus status =
             cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
