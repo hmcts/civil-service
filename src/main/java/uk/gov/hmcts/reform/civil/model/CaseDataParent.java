@@ -113,6 +113,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
@@ -700,6 +701,8 @@ public class CaseDataParent implements MappableObject {
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
+
+    private FastTrackAllocation fastTrackAllocation;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
