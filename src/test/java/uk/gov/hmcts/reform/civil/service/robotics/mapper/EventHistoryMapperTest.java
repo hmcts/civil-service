@@ -7249,7 +7249,7 @@ class EventHistoryMapperTest {
     }
 
     @Nested
-    class DemagesMultitrack{
+    class DemagesMultitrack {
 
         @Test   // Demages Multiclaim one v one
         void shouldPrepareMiscellaneousEvents_whenClaimantProceedsForMultiTrackClaim() {
@@ -7453,8 +7453,7 @@ class EventHistoryMapperTest {
                                  expectedMiscEvents.get(3), expectedMiscEvents.get(4));
         }
 
-}
-
+    }
 
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
