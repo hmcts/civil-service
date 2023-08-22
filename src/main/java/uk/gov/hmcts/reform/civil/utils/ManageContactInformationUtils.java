@@ -33,27 +33,27 @@ public class ManageContactInformationUtils {
     private static final String LEGAL_REP_INDIVIDUALS = "Individuals attending for the legal representative";
 
     public static void addApplicant1Options(List<String> list, CaseData caseData, boolean isAdmin) {
-        addApplicant1Options(list, caseData);
+        addApplicant1PartyOptions(list, caseData);
         addApplicantLegalRepIndividuals(list, false);
         addApplicant1ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
     public static void addApplicantOptions2v1(List<String> list, CaseData caseData, boolean isAdmin) {
-        addApplicant1Options(list, caseData);
-        addApplicant2Options(list, caseData);
+        addApplicant1PartyOptions(list, caseData);
+        addApplicant2PartyOptions(list, caseData);
         addApplicantLegalRepIndividuals(list, true);
         addApplicantExpertsAndWitnesses2v1(list, caseData, isAdmin);
     }
 
     public static void addDefendantOptions1v2SameSolicitor(List<String> list, CaseData caseData, boolean isAdmin) {
-        addDefendant1Options(list, caseData);
-        addDefendant2Options(list, caseData);
+        addDefendant1PartyOptions(list, caseData);
+        addDefendant2PartyOptions(list, caseData);
         addDefendantLegalRepIndividuals1v2Same(list);
         addDefendantExpertsAndWitnesses1v2SameSolicitor(list, caseData, isAdmin);
     }
 
     public static void addDefendant1Options(List<String> list, CaseData caseData, boolean isAdmin) {
-        addDefendant1Options(list, caseData);
+        addDefendant1PartyOptions(list, caseData);
         if (YES.equals(caseData.getRespondent1Represented())) {
             addLegalRepIndividuals(list, DEFENDANT_ONE);
         }
@@ -61,14 +61,14 @@ public class ManageContactInformationUtils {
     }
 
     public static void addDefendant2Options(List<String> list, CaseData caseData, boolean isAdmin) {
-        addDefendant2Options(list, caseData);
+        addDefendant2PartyOptions(list, caseData);
         if (YES.equals(caseData.getRespondent2Represented())) {
             addLegalRepIndividuals(list, DEFENDANT_TWO);
         }
         addDefendant2ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
-    private static void addApplicant1Options(List<String> list, CaseData caseData) {
+    private static void addApplicant1PartyOptions(List<String> list, CaseData caseData) {
         // applicant 1 party name
         list.add(String.format("%s %s", CLAIMANT_ONE, caseData.getApplicant1().getPartyName()));
         // applicant 1 litigation friend
@@ -84,7 +84,7 @@ public class ManageContactInformationUtils {
         }
     }
 
-    private static void addApplicant2Options(List<String> list, CaseData caseData) {
+    private static void addApplicant2PartyOptions(List<String> list, CaseData caseData) {
         // applicant 2 party name
         list.add(String.format("%s %s", CLAIMANT_TWO, caseData.getApplicant2().getPartyName()));
         // applicant 2 litigation friend
@@ -100,7 +100,7 @@ public class ManageContactInformationUtils {
         }
     }
 
-    private static void addDefendant1Options(List<String> list, CaseData caseData) {
+    private static void addDefendant1PartyOptions(List<String> list, CaseData caseData) {
         // defendant 1 party name
         list.add(String.format("%s %s", DEFENDANT_ONE, caseData.getRespondent1().getPartyName()));
         // defendant 1 litigation friend
@@ -116,7 +116,7 @@ public class ManageContactInformationUtils {
         }
     }
 
-    private static void addDefendant2Options(List<String> list, CaseData caseData) {
+    private static void addDefendant2PartyOptions(List<String> list, CaseData caseData) {
         // defendant 2 party name
         list.add(String.format("%s %s", DEFENDANT_TWO, caseData.getRespondent2().getPartyName()));
         // defendant 2 litigation friend
@@ -176,7 +176,7 @@ public class ManageContactInformationUtils {
                 addWitnesses(list, DEFENDANT_ONE);
             }
             if (isAdmin
-                ||caseData.getRespondent1DQ() != null && shouldAddExperts(caseData.getRespondent1DQ().getExperts())) {
+                || caseData.getRespondent1DQ() != null && shouldAddExperts(caseData.getRespondent1DQ().getExperts())) {
                 addExperts(list, DEFENDANT_ONE);
             }
         }
@@ -190,7 +190,7 @@ public class ManageContactInformationUtils {
                 addWitnesses(list, DEFENDANT_TWO);
             }
             if (isAdmin
-                ||caseData.getRespondent2DQ() != null && shouldAddExperts(caseData.getRespondent2DQ().getExperts())) {
+                || caseData.getRespondent2DQ() != null && shouldAddExperts(caseData.getRespondent2DQ().getExperts())) {
                 addExperts(list, DEFENDANT_TWO);
             }
         }

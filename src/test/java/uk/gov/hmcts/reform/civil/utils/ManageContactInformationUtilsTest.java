@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -68,7 +67,6 @@ class ManageContactInformationUtilsTest {
         addApplicantOptions2v1(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicants2v1Options(false, false));
     }
-
 
     @Test
     void shouldAddCorrectOptions_forClaimant1AsAdmin() {
