@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -27,6 +29,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAllocation;
+
 @Service
 @RequiredArgsConstructor
 public class SdoGeneratorService {
@@ -35,6 +39,7 @@ public class SdoGeneratorService {
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
     private final DocumentHearingLocationHelper locationHelper;
+    private final FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -54,7 +59,8 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_FAST;
+            docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
+                ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
@@ -278,7 +284,8 @@ public class SdoGeneratorService {
             )
             .fastTrackMethodToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
-            );
+            )
+            .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()));
 
         sdoDocumentFormBuilder
             .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
