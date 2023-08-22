@@ -20,8 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,7 +58,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -247,8 +244,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         }
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder,
-                                                                         featureToggleService.isUpdateContactDetailsEnabled());
+
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
