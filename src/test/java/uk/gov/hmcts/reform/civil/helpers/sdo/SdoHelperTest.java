@@ -280,6 +280,27 @@ public class SdoHelperTest {
 
             assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
+        @Test
+        void shouldReturnLabel_whenHearingOtherAsOneHourOneMinute() {
+            var expected = "1 hour 1 minute";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("1")
+                .otherMinutes("1")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
 
         @Test
         void shouldReturnLabel_whenHearingOtherHourZero() {
@@ -312,6 +333,28 @@ public class SdoHelperTest {
                 .dateFrom(LocalDate.parse("2022-01-01"))
                 .dateFrom(LocalDate.parse("2022-01-02"))
                 .otherHours("6")
+                .otherMinutes("0")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherMinuteZeroOneHour() {
+            var expected = "1 hour";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("1")
                 .otherMinutes("0")
                 .build();
 
