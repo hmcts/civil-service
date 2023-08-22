@@ -280,6 +280,7 @@ public class SdoHelperTest {
 
             assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
+
         @Test
         void shouldReturnLabel_whenHearingOtherAsOneHourOneMinute() {
             var expected = "1 hour 1 minute";
