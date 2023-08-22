@@ -75,16 +75,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         UserInfo userInfo = userService.getUserInfo(authToken);
-
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
-
         boolean isAdmin = isAdmin(authToken);
 
         List<String> errors = isAwaitingClaimantIntention(caseData)
-            && isAdmin ? List.of(INVALID_CASE_STATE_ERROR) : null;
+            && !isAdmin ? List.of(INVALID_CASE_STATE_ERROR) : null;
 
         if (errors != null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -94,6 +88,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         List<String> dynamicListOptions = new ArrayList<>();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
 
         if (isAdmin) {
             switch (multiPartyScenario) {
@@ -154,5 +153,4 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return userService.getUserInfo(userAuthToken).getRoles()
             .stream().anyMatch(ADMIN_ROLES::contains);
     }
-
 }
