@@ -24,6 +24,8 @@ public class BundlingCaseData {
     private final ServedDocument servedDocumentFiles;
     @JsonProperty("documentReferredInStatement")
     private final List<Element<BundlingRequestDocument>> documentReferredInStatement;
+    @JsonProperty("documentReferredInStatementApp2")
+    private final List<Element<BundlingRequestDocument>> documentReferredInStatementApp2;
     @JsonProperty("defendantResponseDocuments")
     private final List<Element<BundlingRequestDocument>> defendantResponseDocuments;
     @JsonProperty("documentReferredInStatementRes")
@@ -32,8 +34,12 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> documentReferredInStatementRes2;
     @JsonProperty("documentDisclosureList")
     private final List<Element<BundlingRequestDocument>> documentDisclosureList;
+    @JsonProperty("documentDisclosureListApp2")
+    private final List<Element<BundlingRequestDocument>> documentDisclosureListApp2;
     @JsonProperty("documentForDisclosure")
     private final List<Element<BundlingRequestDocument>> documentForDisclosure;
+    @JsonProperty("documentForDisclosureApp2")
+    private final List<Element<BundlingRequestDocument>> documentForDisclosureApp2;
     @JsonProperty("documentDisclosureListRes")
     private final List<Element<BundlingRequestDocument>> documentDisclosureListRes;
     @JsonProperty("documentForDisclosureRes")
@@ -44,10 +50,16 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> documentForDisclosureRes2;
     @JsonProperty("documentWitnessStatement")
     private final List<Element<BundlingRequestDocument>> documentWitnessStatement;
+    @JsonProperty("documentWitnessStatementApp2")
+    private final List<Element<BundlingRequestDocument>> documentWitnessStatementApp2;
     @JsonProperty("documentWitnessSummary")
     private final List<Element<BundlingRequestDocument>> documentWitnessSummary;
+    @JsonProperty("documentWitnessSummaryApp2")
+    private final List<Element<BundlingRequestDocument>> documentWitnessSummaryApp2;
     @JsonProperty("documentHearsayNotice")
     private final List<Element<BundlingRequestDocument>> documentHearsayNotice;
+    @JsonProperty("documentHearsayNoticeApp2")
+    private final List<Element<BundlingRequestDocument>> documentHearsayNoticeApp2;
     @JsonProperty("documentWitnessStatementRes")
     private final List<Element<BundlingRequestDocument>> documentWitnessStatementRes;
     @JsonProperty("documentWitnessSummaryRes")
@@ -62,12 +74,20 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> documentHearsayNoticeRes2;
     @JsonProperty("documentExpertReport")
     private final List<Element<BundlingRequestDocument>> documentExpertReport;
+    @JsonProperty("documentExpertReportApp2")
+    private final List<Element<BundlingRequestDocument>> documentExpertReportApp2;
     @JsonProperty("documentQuestions")
     private final List<Element<BundlingRequestDocument>> documentQuestions;
+    @JsonProperty("documentQuestionsApp2")
+    private final List<Element<BundlingRequestDocument>> documentQuestionsApp2;
     @JsonProperty("documentAnswers")
     private final List<Element<BundlingRequestDocument>> documentAnswers;
+    @JsonProperty("documentAnswersApp2")
+    private final List<Element<BundlingRequestDocument>> documentAnswersApp2;
     @JsonProperty("documentJointStatement")
     private final List<Element<BundlingRequestDocument>> documentJointStatement;
+    @JsonProperty("documentJointStatementApp2")
+    private final List<Element<BundlingRequestDocument>> documentJointStatementApp2;
     @JsonProperty("documentExpertReportRes")
     private final List<Element<BundlingRequestDocument>> documentExpertReportRes;
     @JsonProperty("documentQuestionsRes")
@@ -86,12 +106,16 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> documentJointStatementRes2;
     @JsonProperty("documentCaseSummary")
     private final List<Element<BundlingRequestDocument>> documentCaseSummary;
+    @JsonProperty("documentCaseSummaryApp2")
+    private final List<Element<BundlingRequestDocument>> documentCaseSummaryApp2;
     @JsonProperty("documentCaseSummaryRes")
     private final List<Element<BundlingRequestDocument>> documentCaseSummaryRes;
     @JsonProperty("documentCaseSummaryRes2")
     private final List<Element<BundlingRequestDocument>> documentCaseSummaryRes2;
     @JsonProperty("documentSkeletonArgument")
     private final List<Element<BundlingRequestDocument>> documentSkeletonArgument;
+    @JsonProperty("documentSkeletonArgumentApp2")
+    private final List<Element<BundlingRequestDocument>> documentSkeletonArgumentApp2;
     @JsonProperty("documentSkeletonArgumentRes")
     private final List<Element<BundlingRequestDocument>> documentSkeletonArgumentRes;
     @JsonProperty("documentSkeletonArgumentRes2")
@@ -100,12 +124,16 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> generalOrderDocument;
     @JsonProperty("documentAuthorities")
     private final List<Element<BundlingRequestDocument>> documentAuthorities;
+    @JsonProperty("documentAuthoritiesApp2")
+    private final List<Element<BundlingRequestDocument>> documentAuthoritiesApp2;
     @JsonProperty("documentAuthoritiesRes")
     private final List<Element<BundlingRequestDocument>> documentAuthoritiesRes;
     @JsonProperty("documentAuthoritiesRes2")
     private final List<Element<BundlingRequestDocument>> documentAuthoritiesRes2;
     @JsonProperty("documentEvidenceForTrial")
     private final List<Element<BundlingRequestDocument>> documentEvidenceForTrial;
+    @JsonProperty("documentEvidenceForTrialApp2")
+    private final List<Element<BundlingRequestDocument>> documentEvidenceForTrialApp2;
     @JsonProperty("documentEvidenceForTrialRes")
     private final List<Element<BundlingRequestDocument>> documentEvidenceForTrialRes;
     @JsonProperty("documentEvidenceForTrialRes2")
