@@ -388,14 +388,16 @@ public class BundleRequestMapper {
                                                                            Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
         if (caseData.getServedDocumentFiles() != null && caseData.getServedDocumentFiles().getScheduleOfLoss() != null) {
-            bundlingRequestDocuments.addAll(mapServedDocumentFiles(
-                caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()
-            ));
+            bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
+                                                                               .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                                                                                   .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
+                                                                                   Collectors.toList()),
+                                                                           BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()));
         }
-
+        List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
+        clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
-            getSortedDefendantDefenceAndClaimantReply(caseData.getSystemGeneratedCaseDocuments());
+            getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
             String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
