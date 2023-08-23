@@ -108,7 +108,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         CaseData tempUpdatedCaseData = caseDataBuilder.build();
 
-
         if (!is1v1(tempUpdatedCaseData)) {
             if (isSameSolicitorScenario(tempUpdatedCaseData)) {
                 caseDataBuilder.respondent2SameLegalRepresentative(YES);
