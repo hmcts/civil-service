@@ -146,7 +146,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             ) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
-                if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
+                if (caseData.getRespondent1ResponseDate() == null || MultiPartyScenario.getMultiPartyScenario(caseData)
                     .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
                 } else {
