@@ -871,22 +871,37 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse validateInputValue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
-        String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
         List<String> errors = new ArrayList<>();
+        if(caseData.getClaimsTrack().equals("smallClaimsTrack")) {
+            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
+            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
+            if (validateNegativeWitness(errors, inputValue1, inputValue2)) return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+        else if(caseData.getClaimsTrack().equals("fastTrack")) {
+            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
+            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
+            if (validateNegativeWitness(errors, inputValue1, inputValue2))
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private boolean validateNegativeWitness(List<String> errors, String inputValue1, String inputValue2) {
         if (inputValue1 != null && inputValue2 != null) {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
                 errors.add("The number entered cannot be less than zero");
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
+                return true;
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return false;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

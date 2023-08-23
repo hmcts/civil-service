@@ -1464,4 +1464,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_SDO);
     }
+
+    @Test
+    void shouldThrowErrorWhenEnteringNegativeNumberOfWitness(){
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = callbackParamsOf(caseData, MID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors().contains("The number entered cannot be less than zero"));
+    }
 }
