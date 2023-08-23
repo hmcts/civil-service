@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -15,11 +16,13 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
@@ -36,7 +39,8 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
     public static final String TASK_ID_RESPONDENT2 = "HearingFeeUnpaidNotifyRespondentSolicitor2";
     private static final String REFERENCE_TEMPLATE =
         "hearing-fee-unpaid-respondent-notification-%s";
-
+    private static final String REFERENCE_TEMPLATE_DEFENDANT_LIP =
+        "hearing-fee-unpaid-defendantLip-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
@@ -64,15 +68,19 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
         CaseData caseData = callbackParams.getCaseData();
         String recipient = !is1v1Or2v1Case(caseData)
             && !isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID) ? caseData
-                .getRespondentSolicitor2EmailAddress() : caseData.getRespondentSolicitor1EmailAddress();
+                .getRespondentSolicitor2EmailAddress() : getRecipientRespondent1(caseData);
 
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentHearingFeeUnpaid(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
+        if (nonNull(recipient)) {
+            notificationService.sendMail(
+                recipient,
+                getTemplate(caseData),
+                isRespondent1Lip(caseData) ? addPropertiesRespondentLip(caseData)
+                    : addProperties(caseData),
+                isRespondent1Lip(caseData)
+                    ? String.format(REFERENCE_TEMPLATE_DEFENDANT_LIP, caseData.getLegacyCaseReference())
+                    : String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -82,5 +90,29 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
         );
+    }
+
+    public Map<String, String> addPropertiesRespondentLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
+            PARTY_NAME, caseData.getRespondent1().getPartyName()
+        );
+    }
+
+    private String getRecipientRespondent1(CaseData caseData) {
+        return isRespondent1Lip(caseData) ? caseData.getRespondent1().getPartyEmail()
+            : caseData.getRespondentSolicitor1EmailAddress();
+    }
+
+    private String getTemplate(CaseData caseData) {
+        if (isRespondent1Lip(caseData)) {
+            return notificationsProperties.getNotifyLipUpdateTemplate();
+        }
+        return notificationsProperties.getRespondentHearingFeeUnpaid();
+    }
+
+    private boolean isRespondent1Lip(CaseData caseData) {
+        return (YesOrNo.NO.equals(caseData.getRespondent1Represented()));
     }
 }
