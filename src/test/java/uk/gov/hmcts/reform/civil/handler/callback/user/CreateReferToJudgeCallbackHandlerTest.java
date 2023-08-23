@@ -51,9 +51,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateReferToJudge
 public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
-    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
-    private static final String CCMCC_REGION_ID = "ccmccRegionId";
-    private static final String CCMCC_EPIMS = "ccmccEpims";
     @MockBean
     private LocationHelper helper;
     @MockBean
@@ -64,7 +61,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     private CreateReferToJudgeCallbackHandler handler;
     @MockBean
     private LocationRefDataService locationservice;
-
 
     @Nested
     class AboutToStartCallback {
