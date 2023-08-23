@@ -76,9 +76,7 @@ public class BundleRequestMapper {
         BundlingCaseData bundlingCaseData =
             BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
                     bundleConfigFileName)
-                    .claimant1TrialDocuments(mapTrialDocuments(caseData, PartyType.CLAIMANT1))
-                    .defendant1TrialDocuments(mapTrialDocuments(caseData, PartyType.DEFENDANT1))
-                    .defendant2TrialDocuments(mapTrialDocuments(caseData, PartyType.DEFENDANT2))
+                    .trialDocuments(mapTrialDocuments(caseData))
                     .statementsOfCaseDocuments(mapStatmentOfcaseDocs(caseData))
                     .ordersDocuments(mapOrdersDocument(caseData))
                     .claimant1WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT1))
@@ -437,49 +435,38 @@ public class BundleRequestMapper {
         return sortedDefendantDefenceAndClaimantReply;
     }
 
-    private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData, PartyType partyType) {
+    private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(getAllTrialDocsByPartyType(getWitnessDocsByPartyAndDocType(partyType,
-                                                                                                       EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
-                                            getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                                   EvidenceUploadFiles.DOCUMENTARY,
-                                                                                   caseData), partyType));
-        return ElementUtils.wrapElements(bundlingRequestDocuments);
-    }
-
-    private List<BundlingRequestDocument> getAllTrialDocsByPartyType(List<Element<UploadEvidenceWitness>> documentWitnessSummary,
-                                                                     List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, PartyType party) {
-        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-
-        bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(documentWitnessSummary, BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
-                                                                                 EvidenceUploadFiles.WITNESS_SUMMARY.name(), party));
-        if (documentEvidenceForTrial != null) {
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
+            bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType,
+                                                                                                                     EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
+                                                                                     BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
+                                                                                     EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType));
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
-                getDocumentaryEvidenceByType(documentEvidenceForTrial,
+                getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames(), false),
-                BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(),
-                TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name(),
-                party
+                BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name(), partyType
             ));
-
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
-                getDocumentaryEvidenceByType(documentEvidenceForTrial,
+                getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames(), false),
-                BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(),
-                TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(),
-                party
+                BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(), partyType
             ));
-        }
-        return bundlingRequestDocuments;
+        });
+        return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
     private List<Element<UploadEvidenceDocumentType>> getDocumentaryEvidenceByType(
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, List<String> displayNames, boolean doesNotMatchType) {
-        return
-            filterDocumentaryEvidenceForTrialDocs(
-                documentEvidenceForTrial,
-                displayNames, doesNotMatchType
-            );
+        if (documentEvidenceForTrial != null) {
+            return
+                filterDocumentaryEvidenceForTrialDocs(
+                    documentEvidenceForTrial,
+                    displayNames, doesNotMatchType
+                );
+        } else {
+            return null;
+        }
     }
 
     public List<Element<UploadEvidenceDocumentType>> filterDocumentaryEvidenceForTrialDocs(

@@ -18,14 +18,8 @@ public class BundlingCaseData {
     public String bundleConfiguration;
     @JsonProperty("id")
     public long id;
-    @JsonProperty("claimant1TrialDocuments")
-    private final List<Element<BundlingRequestDocument>> claimant1TrialDocuments;
-    @JsonProperty("claimant2TrialDocuments")
-    private final List<Element<BundlingRequestDocument>> claimant2TrialDocuments;
-    @JsonProperty("defendant1TrialDocuments")
-    private final List<Element<BundlingRequestDocument>> defendant1TrialDocuments;
-    @JsonProperty("defendant2TrialDocuments")
-    private final List<Element<BundlingRequestDocument>> defendant2TrialDocuments;
+    @JsonProperty("trialDocuments")
+    private final List<Element<BundlingRequestDocument>> trialDocuments;
     @JsonProperty("statementsOfCaseDocuments")
     private final List<Element<BundlingRequestDocument>> statementsOfCaseDocuments;
     @JsonProperty("ordersDocuments")
