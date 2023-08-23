@@ -485,6 +485,7 @@ public class BundleRequestMapper {
                 BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(), partyType
             ));
         });
+        log.info("Trial docs list : " + bundlingRequestDocuments.size());
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -565,8 +566,8 @@ public class BundleRequestMapper {
             sortEvidenceUploadByDate(evidenceUploadDocList, false);
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
                 String docName = fileNamePrefix.equals(DOC_FILE_NAME)
-                    ? generateDocName(uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument()
-                                          + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(),
+                    ?
+                    generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName() + "%s",
                                       null, uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
                     : generateDocName(fileNamePrefix, party.getDisplayName(),
                                                  uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
