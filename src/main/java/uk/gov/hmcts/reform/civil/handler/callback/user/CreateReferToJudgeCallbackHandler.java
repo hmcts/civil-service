@@ -13,22 +13,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -36,8 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -71,15 +64,11 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
-        Supplier<Optional<RequestedCourt>> getDefendantCourt;
+
         if (leadDefendantIs1) {
             getDefendantType = caseData.getRespondent1()::getType;
-            getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent1DQ())
-                .map(Respondent1DQ::getRespondent1DQRequestedCourt);
         } else {
             getDefendantType = caseData.getRespondent2()::getType;
-            getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent2DQ())
-                .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
         if ( CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
