@@ -119,6 +119,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
+            //given(handler.hasInfo(any())).willReturn(true);
+
             given(time.now()).willReturn(submittedDate);
         }
 
@@ -129,10 +131,32 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
+
         }
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmittedSmallClaim()
+                .setClaimTypeToUnspecClaim()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+
+            assertThat(handler.hasInfo(RequestedCourt.builder()
+                                           .responseCourtCode("123")
+                                           .build())).isTrue();
+            assertThat(handler.hasInfo(RequestedCourt.builder()
+                                           .responseCourtCode("123")
+                                           .build())).isNotNull();
+
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
@@ -142,10 +166,15 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
+
+            assertThat(handler.hasInfo(RequestedCourt.builder()
+                                           .responseCourtCode("123")
+                                           .build())).isTrue();
+            assertThat(handler.hasInfo(RequestedCourt.builder()
+                                           .responseCourtCode("123")
+                                           .build())).isNotNull();
+
         }
-
-
-
     }
 
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
