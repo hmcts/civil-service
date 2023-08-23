@@ -113,6 +113,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
@@ -466,6 +467,22 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
     private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
+    //applicant2
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
@@ -677,6 +694,8 @@ public class CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
 
+    private FastTrackAllocation fastTrackAllocation;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -685,6 +704,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
+    private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
@@ -692,20 +712,16 @@ public class CaseDataParent implements MappableObject {
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-        BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
-        BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
-        if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+        if ((!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
+            || (claimAmount.compareTo(lowerRangeClaimAmount) < 0))) {
             return ZERO;
         }
-        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
-            return lowCostAmount;
-        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+        if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
             return midCostAmount;
-        } else {
-            return highCostAmount;
         }
+        return BigDecimal.valueOf(55);
     }
 
     @JsonIgnore
