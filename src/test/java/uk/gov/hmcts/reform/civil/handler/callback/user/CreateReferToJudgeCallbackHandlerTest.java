@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -48,12 +51,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateReferToJudge
 public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
+    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
+    private static final String CCMCC_REGION_ID = "ccmccRegionId";
+    private static final String CCMCC_EPIMS = "ccmccEpims";
+    @MockBean
+    private LocationHelper helper;
     @MockBean
     private Time time;
     @MockBean
     private IdamClient idamClient;
     @Autowired
     private CreateReferToJudgeCallbackHandler handler;
+    @MockBean
+    private LocationRefDataService locationservice;
+
 
     @Nested
     class AboutToStartCallback {
@@ -84,6 +95,9 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
+
+            given(helper.leadDefendantIs1(any()))
+                    .willReturn(true);
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
