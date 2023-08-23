@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -1132,6 +1134,44 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                       .responseCourtLocations(courtLocationList)
                                                       .build())
                                               .build());
+        }
+
+        if (caseData.getRespondent1DQ().getRespondent1DQVulnerabilityQuestions() != null
+            && caseData.getRespondent1DQ()
+            .getRespondent1DQHearingSupport().getSupportRequirements() != null) {
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                                              .respondent1DQVulnerabilityQuestions(
+                                                  VulnerabilityQuestions.builder()
+                                                      .vulnerabilityAdjustmentsRequired(caseData.getRespondent1DQ().getVulnerabilityQuestions()
+                                                                                            .getVulnerabilityAdjustmentsRequired())
+                                                      .vulnerabilityAdjustments(caseData.getRespondent1DQ().getVulnerabilityQuestions()
+                                                                                    .getVulnerabilityAdjustments()).build())
+                                              .respondent1DQHearingSupport(HearingSupport.builder()
+                                                                               .supportRequirements(caseData.getRespondent1DQ()
+                                                                                                        .getHearingSupport()
+                                                                                                        .getSupportRequirements())
+                                                                               .supportRequirementsAdditional(caseData.getRespondent1DQ()
+                                                                                                                  .getHearingSupport()
+                                                                                                                  .getSupportRequirementsAdditional())
+                                                                               .build()).build());
+        } else if (caseData.getRespondent2DQ().getRespondent2DQVulnerabilityQuestions() != null
+            && caseData.getRespondent2DQ()
+            .getRespondent2DQHearingSupport().getSupportRequirements() != null {
+            updatedCaseData.respondent2DQ(Respondent2DQ.builder()
+                                              .respondent2DQVulnerabilityQuestions(
+                                                  VulnerabilityQuestions.builder()
+                                                      .vulnerabilityAdjustmentsRequired(caseData.getRespondent2DQ().getVulnerabilityQuestions()
+                                                                                            .getVulnerabilityAdjustmentsRequired())
+                                                      .vulnerabilityAdjustments(caseData.getRespondent1DQ().getVulnerabilityQuestions()
+                                                                                    .getVulnerabilityAdjustments()).build())
+                                              .respondent2DQHearingSupport(HearingSupport.builder()
+                                                                               .supportRequirements(caseData.getRespondent2DQ()
+                                                                                                        .getHearingSupport()
+                                                                                                        .getSupportRequirements())
+                                                                               .supportRequirementsAdditional(caseData.getRespondent2DQ()
+                                                                                                                  .getHearingSupport()
+                                                                                                                  .getSupportRequirementsAdditional())
+                                                                               .build()).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
