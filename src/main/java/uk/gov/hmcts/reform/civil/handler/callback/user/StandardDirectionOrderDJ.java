@@ -8,57 +8,32 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.*;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.service.CategoryService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvidenceDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -66,27 +41,17 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -101,7 +66,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -168,25 +132,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public String caseParticipants(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         switch (multiPartyScenario) {
-
-            case ONE_V_ONE:
+            case ONE_V_ONE ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName());
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                    .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-                break;
-            case TWO_V_ONE:
+            case TWO_V_ONE ->
                 participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
                     .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
-                break;
-            default:
-                throw new CallbackException(String.format("Invalid participants"));
+            default -> throw new CallbackException("Invalid participants");
         }
         return participantString;
 
@@ -659,15 +614,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
-        LocationRefData location = null;
         if (nonNull(locations)) {
-            location = fillPreferredLocationData(locations, getLocationListFromCaseData(
+            LocationRefData location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
             Optional.ofNullable(location)
-                .map(LocationHelper::buildCaseLocation)
-                .ifPresent(caseDataBuilder::caseManagementLocation);
-            Optional.ofNullable(location)
-                .map(value -> value.getSiteName())
+                .map(LocationRefData::getSiteName)
                 .ifPresent(caseDataBuilder::locationName);
 
         }
@@ -766,15 +717,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingTrialDJToggle(checkList);
 
         return caseDataBuilder.build();
-    }
-
-    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream()
-                            .map(location -> location.getSiteName()
-                                + " - " + location.getCourtAddress()
-                                + " - " + location.getPostcode())
-                            .sorted()
-                            .collect(Collectors.toList()));
     }
 
     private DynamicList deleteLocationList(DynamicList list) {

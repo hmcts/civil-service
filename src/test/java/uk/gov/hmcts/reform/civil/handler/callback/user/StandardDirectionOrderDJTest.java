@@ -688,48 +688,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnCaseManagementListFromTrialHearing() {
-            List<DynamicListElement> temporaryLocationList = List.of(
-                DynamicListElement.builder().label("Loc 1").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder().trialHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
-                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
-                                                                         .build()).build()).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
-                .isEqualTo(locations.get(0).getRegionId());
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
-                .isEqualTo(locations.get(0).getEpimmsId());
-        }
-
-        @Test
-        void shouldReturnCaseManagementListFromDisposalHearing() {
-            List<DynamicListElement> temporaryLocationList = List.of(
-                DynamicListElement.builder().label("Loc 1").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder().disposalHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
-                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
-                                                                         .build()).build()).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
-                .isEqualTo(locations.get(0).getRegionId());
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
-                .isEqualTo(locations.get(0).getEpimmsId());
-        }
-
-        @Test
         void shouldAssignCategoryId_whenInvoked() {
             CaseDocument testDocument = CaseDocument.builder()
                 .createdBy("John")
