@@ -146,7 +146,7 @@ public class LocationHelper {
      * @param caseData case data
      * @return true if defendant 1 is lead defendant
      */
-    private boolean leadDefendantIs1(CaseData caseData) {
+    public boolean leadDefendantIs1(CaseData caseData) {
         if (caseData.getRespondent2ResponseDate() == null) {
             return true;
         }
@@ -166,7 +166,7 @@ public class LocationHelper {
      * @param caseData case data
      * @return requested court object for the lead claimant
      */
-    private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
+    public Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return getSpecClaimantRequestedCourt(caseData);
         } else {
@@ -198,7 +198,7 @@ public class LocationHelper {
      * @return first matching location
      */
 
-    private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
+    public Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
         }
