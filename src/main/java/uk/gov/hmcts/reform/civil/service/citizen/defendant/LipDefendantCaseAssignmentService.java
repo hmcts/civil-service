@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.citizen.defendant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
