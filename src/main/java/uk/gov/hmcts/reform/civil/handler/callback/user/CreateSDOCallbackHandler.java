@@ -874,7 +874,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
         String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
         List<String> errors = new ArrayList<>();
-        if(inputValue1 !=null && inputValue2 !=null) {
+        if (inputValue1 != null && inputValue2 != null) {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
