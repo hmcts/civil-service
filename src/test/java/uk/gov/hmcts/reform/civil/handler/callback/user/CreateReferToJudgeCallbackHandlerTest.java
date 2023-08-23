@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -110,10 +111,24 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPound() {
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmittedSmallClaim()
+                .setClaimTypeToUnspecClaim()
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
