@@ -123,7 +123,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private void unassignCaseFromDefendantLip(CaseData caseData) {
-        if(caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null){
+        if (caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null) {
             coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
         }
     }
