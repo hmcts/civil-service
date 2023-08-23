@@ -1156,7 +1156,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                                                .build()).build());
         } else if (caseData.getRespondent2DQ().getRespondent2DQVulnerabilityQuestions() != null
             && caseData.getRespondent2DQ()
-            .getRespondent2DQHearingSupport().getSupportRequirements() != null {
+            .getRespondent2DQHearingSupport().getSupportRequirements() != null) {
             updatedCaseData.respondent2DQ(Respondent2DQ.builder()
                                               .respondent2DQVulnerabilityQuestions(
                                                   VulnerabilityQuestions.builder()
