@@ -148,6 +148,20 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
     }
 
+    protected List<LocationRefData> getSampleCourLocationsRefObject() {
+        return new ArrayList<>(List.of(
+            LocationRefData.builder()
+                .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
+                .courtLocationCode("court1").build(),
+            LocationRefData.builder()
+                .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
+                .courtLocationCode("court2").build(),
+            LocationRefData.builder()
+                .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
+                .courtLocationCode("court3").build()
+        ));
+    }
+
     @Nested
     class SubmittedCallback {
         @Test
