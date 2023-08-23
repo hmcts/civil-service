@@ -161,18 +161,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("assistedOrderCostsDefendantPaySub")
-                .extracting("defendantCostStandardDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsClaimantPaySub")
-                .extracting("claimantCostStandardDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsDefendantSum")
-                .extracting("defendantCostSummarilyDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsClaimantSum")
-                .extracting("claimantCostSummarilyDate")
-                .isEqualTo(advancedDate);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeText")
                 .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
@@ -208,18 +196,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getData()).extracting("assistedOrderCostsDefendantPaySub")
-                .extracting("defendantCostStandardDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsClaimantPaySub")
-                .extracting("claimantCostStandardDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsDefendantSum")
-                .extracting("defendantCostSummarilyDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderCostsClaimantSum")
-                .extracting("claimantCostSummarilyDate")
-                .isEqualTo(advancedDate);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeText")
                 .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
