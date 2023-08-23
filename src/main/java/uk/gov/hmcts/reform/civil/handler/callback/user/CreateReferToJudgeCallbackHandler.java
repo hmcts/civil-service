@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
