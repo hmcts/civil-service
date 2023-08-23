@@ -74,15 +74,16 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             getDefendantType = caseData.getRespondent2()::getType;
         }
 
-        if ( CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+        if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && PEOPLE.contains(getDefendantType.get())) {
 
             locationHelper.getClaimantRequestedCourt(caseData)
                 .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
-                    locationHelper.getMatching(locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(BEARER_TOKEN).toString()) , requestedCourt )
-                        .ifPresent(matchingLocation -> LocationHelper.updateWithLocation(dataBuilder, matchingLocation ) );
-                    });
+                    locationHelper.getMatching(locationRefDataService.getCourtLocationsForDefaultJudgments(
+                        callbackParams.getParams().get(BEARER_TOKEN).toString()), requestedCourt)
+                        .ifPresent(matchingLocation -> LocationHelper.updateWithLocation(dataBuilder, matchingLocation));
+                });
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -96,7 +97,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             .map(DynamicList::getValue).isPresent();
     }
 
-     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
