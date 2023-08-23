@@ -63,13 +63,4 @@ class LipDefendantCaseAssignmentServiceTest {
         verify(caseEventService).submitEventForClaim(refEq(params));
     }
 
-    @Test
-    void shouldNotAddDefendantDetails_whenLipVLipIsNotEnabled() {
-        //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
-        //When
-        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
-        verify(idamClient, never()).getUserDetails(AUTHORIZATION);
-        verify(caseEventService, never()).submitEvent(any());
-    }
 }

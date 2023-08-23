@@ -92,9 +92,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         if (isApplicantSolicitorRole) {
             updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails);
         } else {
-            if(caseData.isRespondent1LiP()){
-
-            }
+            unassignCaseFromDefendantLip(caseData);
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
             } else {
@@ -122,6 +120,12 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void unassignCaseFromDefendantLip(CaseData caseData) {
+        if(caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null){
+            coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
+        }
     }
 
     private void updateOrgPolicyReferences(CaseData caseData,
