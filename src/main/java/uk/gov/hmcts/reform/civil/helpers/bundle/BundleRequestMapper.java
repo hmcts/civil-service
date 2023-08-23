@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
@@ -380,11 +381,18 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapStatmentOfcaseDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        log.info("System generated docs : " + caseData.getSystemGeneratedCaseDocuments());
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
                                                                            .equals(DocumentType.SEALED_CLAIM)).collect(
                                                                            Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
+        if (caseData.getServedDocumentFiles() != null && caseData.getServedDocumentFiles().getScheduleOfLoss() != null) {
+            bundlingRequestDocuments.addAll(mapServedDocumentFiles(
+                caseData.getServedDocumentFiles().getScheduleOfLoss(),
+                BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()
+            ));
+        }
 
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             getSortedDefendantDefenceAndClaimantReply(caseData.getSystemGeneratedCaseDocuments());
@@ -406,7 +414,29 @@ public class BundleRequestMapper {
                                                                       .documentFilename(caseDocumentElement.getValue().getDocumentLink().getDocumentFileName()).build())
                                                     .build());
         });
+        bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
+                                                                           .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                                                                               .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
+                                                                               Collectors.toList()),
+                                                                       BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private List<BundlingRequestDocument> mapServedDocumentFiles(List<Element<DocumentWithRegex>> scheduleOfLoss, String displayName) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        if (scheduleOfLoss != null) {
+            scheduleOfLoss.forEach(caseDocumentElement -> {
+                bundlingRequestDocuments.add(BundlingRequestDocument.builder()
+                                                        .documentFileName(caseDocumentElement.getValue().getDocument().getDocumentFileName())
+                                                        .documentLink(DocumentLink.builder()
+                                                                          .documentUrl(caseDocumentElement.getValue().getDocument().getDocumentUrl())
+                                                                          .documentBinaryUrl(caseDocumentElement.getValue().getDocument().getDocumentBinaryUrl())
+                                                                          .documentFilename(caseDocumentElement.getValue().getDocument().getDocumentFileName()).build())
+                                                        .build());
+            });
+        }
+
+        return bundlingRequestDocuments;
     }
 
     private List<Element<CaseDocument>> getSortedDefendantDefenceAndClaimantReply(List<Element<CaseDocument>> systemGeneratedCaseDocuments) {
