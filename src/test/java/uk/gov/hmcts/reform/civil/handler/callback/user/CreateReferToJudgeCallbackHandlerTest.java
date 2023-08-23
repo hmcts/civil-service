@@ -108,6 +108,18 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
         }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPound() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmittedSmallClaim()
+                .setClaimTypeToUnspecClaim()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+        }
     }
 
     @Nested
