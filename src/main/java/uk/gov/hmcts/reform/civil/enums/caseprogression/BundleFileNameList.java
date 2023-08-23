@@ -34,7 +34,6 @@ public enum BundleFileNameList {
     REPLIES_FROM("Replies from %s %s"),
     JOINT_STATEMENTS_OF_EXPERTS("Joint statements of experts/Single joint expert report"),
     CL1_DOCUMENTS_THEY_INTEND_TO_RELY_ON("CL 1 Documents they intend to rely on"),
-    DISCLOSED_DOC("DISCLOSED"),
     INVOICE("Invoice"),
     CL2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("CL 2 Documents they intend to rely on"),
     DF1_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 1 Documents they intend to rely on"),

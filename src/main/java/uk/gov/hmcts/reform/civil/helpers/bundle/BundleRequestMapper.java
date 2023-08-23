@@ -45,6 +45,8 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getW
 @RequiredArgsConstructor
 public class BundleRequestMapper {
 
+    private static final String DOC_FILE_NAME = "DOC_FILE_NAME";
+
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
                                                                 String caseTypeId, Long id) {
@@ -120,7 +122,7 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
                                                                                    EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData),
-                                                                                 BundleFileNameList.DISCLOSED_DOC.getDisplayName(),
+                                                                                    DOC_FILE_NAME,
                                                                                  EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE.name(),
                                                                                     partyType));
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialList =
@@ -532,7 +534,11 @@ public class BundleRequestMapper {
         if (evidenceUploadDocList != null) {
             sortEvidenceUploadByDate(evidenceUploadDocList, false);
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
-                String docName = generateDocName(fileNamePrefix, party.getDisplayName(),
+                String docName = fileNamePrefix.equals(DOC_FILE_NAME)
+                    ? generateDocName(uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument()
+                                          + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(),
+                                      null, uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
+                    : generateDocName(fileNamePrefix, party.getDisplayName(),
                                                  uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
                 );
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
