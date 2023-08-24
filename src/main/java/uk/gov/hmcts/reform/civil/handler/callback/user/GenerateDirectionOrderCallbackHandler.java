@@ -159,7 +159,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         } else {
             locationRefData = locationRefDataService.getCcmccLocation(authorisation);
         }
-
         return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                    .code("LOCATION_LIST")
                                    .label(locationRefData.getSiteName())
@@ -168,6 +167,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                    .code("OTHER_LOCATION")
                                    .label("Other location")
                                    .build()))
+            .value(DynamicListElement.builder()
+                       .code("LOCATION_LIST")
+                       .label(locationRefData.getSiteName())
+                       .build())
             .build();
     }
 
