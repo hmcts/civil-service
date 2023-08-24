@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -154,6 +156,21 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                                            .responseCourtCode("123")
                                            .build())).isTrue();
 
+        }
+
+        @Test
+        public void thereIsAMatchingLocation() {
+            CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+
+            helper.updateWithLocation(updatedData, LocationRefData.builder()
+                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
+
+            Assertions.assertThat(updatedData.build().getCaseManagementLocation())
+                .isNotNull()
+                .isEqualTo(CaseLocationCivil.builder()
+                               .region("regionId")
+                               .baseLocation("epimms")
+                               .build());
         }
     }
 
