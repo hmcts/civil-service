@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
+import java.util.Arrays;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -47,14 +49,14 @@ class SendSDOBulkPrintServiceTest {
 
         // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
-
         // then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
-                SDO_ORDER_PACK_LETTER_TYPE
+                SDO_ORDER_PACK_LETTER_TYPE,
+                Arrays.asList("recipients")
             );
     }
 
