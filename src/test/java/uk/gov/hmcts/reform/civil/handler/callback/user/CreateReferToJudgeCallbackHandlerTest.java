@@ -16,9 +16,7 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -51,15 +49,11 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
     public static final String REFERENCE_NUMBER = "000DC001";
     @MockBean
-    private LocationHelper helper;
-    @MockBean
     private Time time;
     @MockBean
     private IdamClient idamClient;
     @Autowired
     private CreateReferToJudgeCallbackHandler handler;
-    @MockBean
-    private LocationRefDataService locationservice;
 
     @Nested
     class AboutToStartCallback {
@@ -91,9 +85,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
-            given(helper.leadDefendantIs1(any()))
-                    .willReturn(true);
-
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
@@ -103,18 +94,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldReturnExpectedAboutToSubmitResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response).isNotNull();
-        }
-
-        @Test
-        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPound() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .atStateClaimSubmittedSmallClaim()
-                .setClaimTypeToUnspecClaim()
-                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
