@@ -145,6 +145,9 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
                 .build();
 
+            given(helper.leadDefendantIs1(any()))
+                .willReturn(false);
+
             given(helper.getClaimantRequestedCourt(any()))
                 .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
 
