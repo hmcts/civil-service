@@ -141,13 +141,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
             if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
                 && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                caseData.getRespondent2ClaimResponseTypeForSpec()))
+                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
             ) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
-                if (caseData.getRespondent1ResponseDate() == null || MultiPartyScenario.getMultiPartyScenario(caseData)
-                    .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
                 } else {
                     emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
