@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -86,7 +87,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        List<String> dynamicListOptions = new ArrayList<>();
+        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
         List<String> roles = coreCaseUserService.getUserCaseRoles(
@@ -137,7 +138,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().updateDetailsForm(
             UpdateDetailsForm.builder()
-                .partyChosen(DynamicList.fromList(dynamicListOptions))
+                .partyChosen(DynamicList.fromDynamicListElementList(dynamicListOptions))
                 .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()

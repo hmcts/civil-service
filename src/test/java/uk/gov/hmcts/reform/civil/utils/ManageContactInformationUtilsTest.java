@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
@@ -33,11 +35,11 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseDataWithExpertsAndWitnesses, false);
         assertThat(options).isEqualTo(expectedApplicant1Options(true, false));
 
-        List<String> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
+        List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addApplicant1Options(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicant1Options(false, false));
     }
@@ -59,11 +61,11 @@ class ManageContactInformationUtilsTest {
             .addApplicant2LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicantOptions2v1(options, caseDataWithExpertsAndWitnesses, false);
         assertThat(options).isEqualTo(expectedApplicants2v1Options(true, false));
 
-        List<String> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
+        List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addApplicantOptions2v1(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedApplicants2v1Options(false, false));
     }
@@ -74,7 +76,7 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicant1Options(true, true));
@@ -91,7 +93,7 @@ class ManageContactInformationUtilsTest {
                             .build())
             .build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
@@ -108,7 +110,7 @@ class ManageContactInformationUtilsTest {
                             .build())
             .build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicant1Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicant1OrgOptions(true, true));
@@ -122,7 +124,7 @@ class ManageContactInformationUtilsTest {
             .multiPartyClaimTwoApplicants()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addApplicantOptions2v1(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedApplicants2v1Options(true, true));
@@ -140,11 +142,11 @@ class ManageContactInformationUtilsTest {
             .addRespondent1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendant1Options(options, caseDataWithExpertsAndWitnesses, false);
         assertThat(options).isEqualTo(expectedDefendant1Options(true, false));
 
-        List<String> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
+        List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addDefendant1Options(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedDefendant1Options(false, false));
     }
@@ -155,7 +157,7 @@ class ManageContactInformationUtilsTest {
             .addRespondent1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendant1Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedDefendant1Options(true, true));
@@ -179,11 +181,11 @@ class ManageContactInformationUtilsTest {
             .addRespondent2LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendant2Options(options, caseDataWithExpertsAndWitnesses, false);
         assertThat(options).isEqualTo(expectedDefendant2Options(true, false));
 
-        List<String> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
+        List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addDefendant2Options(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedDefendant2Options(false, false));
     }
@@ -197,7 +199,7 @@ class ManageContactInformationUtilsTest {
             .addRespondent2LitigationFriend()
             .respondent2Responds(FULL_DEFENCE).build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendant2Options(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedDefendant2Options(true, true));
@@ -220,11 +222,11 @@ class ManageContactInformationUtilsTest {
             .addRespondent2LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendantOptions1v2SameSolicitor(options, caseDataWithExpertsAndWitnesses, false);
         assertThat(options).isEqualTo(expectedDefendants1v2SameSolicitorOptions(true, false));
 
-        List<String> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
+        List<DynamicListElement> optionsWithoutExpertsAndWitnesses = new ArrayList<>();
         addDefendantOptions1v2SameSolicitor(optionsWithoutExpertsAndWitnesses, caseDataWithoutExpertsAndWitnesses, false);
         assertThat(optionsWithoutExpertsAndWitnesses).isEqualTo(expectedDefendants1v2SameSolicitorOptions(false, false));
     }
@@ -238,84 +240,84 @@ class ManageContactInformationUtilsTest {
             .addRespondent1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
 
-        List<String> options = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
         addDefendantOptions1v2SameSolicitor(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedDefendants1v2SameSolicitorOptions(true, true));
     }
 
-    private List<String> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("CLAIMANT 1: Mr. John Rambo");
-        list.add("CLAIMANT 1: Litigation Friend: Applicant Litigation Friend");
-        list.add("CLAIMANT 1: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATIONFRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("CLAIMANT 1: Witnesses");
-            list.add("CLAIMANT 1: Experts");
+            list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
+            list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
         }
         return list;
     }
 
-    private List<String> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("CLAIMANT 1: Test Inc");
-        list.add("CLAIMANT 1: Individuals attending for the organisation");
-        list.add("CLAIMANT 1: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Test Inc"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSORG", "CLAIMANT 1: Individuals attending for the organisation"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("CLAIMANT 1: Witnesses");
-            list.add("CLAIMANT 1: Experts");
+            list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
+            list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
         }
         return list;
     }
 
-    private List<String> expectedApplicants2v1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("CLAIMANT 1: Mr. John Rambo");
-        list.add("CLAIMANT 1: Litigation Friend: Applicant Litigation Friend");
-        list.add("CLAIMANT 2: Mr. Jason Rambo");
-        list.add("CLAIMANT 2: Litigation Friend: Applicant Two Litigation Friend");
-        list.add("CLAIMANTS: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedApplicants2v1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATIONFRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_2", "CLAIMANT 2: Mr. Jason Rambo"));
+        list.add(dynamicElementFromCode("CLAIMANT_2_LITIGATIONFRIEND", "CLAIMANT 2: Litigation Friend: Applicant Two Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANTS: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("CLAIMANTS: Witnesses");
-            list.add("CLAIMANTS: Experts");
+            list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANTS: Witnesses"));
+            list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANTS: Experts"));
         }
         return list;
     }
 
-    private List<String> expectedDefendant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("DEFENDANT 1: Mr. Sole Trader");
-        list.add("DEFENDANT 1: Litigation Friend: Litigation Friend");
-        list.add("DEFENDANT 1: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedDefendant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATIONFRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_INDIVIDUALSSOLICITORORG", "DEFENDANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("DEFENDANT 1: Witnesses");
-            list.add("DEFENDANT 1: Experts");
+            list.add(dynamicElementFromCode("DEFENDANT_1_WITNESSES", "DEFENDANT 1: Witnesses"));
+            list.add(dynamicElementFromCode("DEFENDANT_1_EXPERTS", "DEFENDANT 1: Experts"));
         }
         return list;
     }
 
-    private List<String> expectedDefendant2Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("DEFENDANT 2: Mr. John Rambo");
-        list.add("DEFENDANT 2: Litigation Friend: Litigation Friend");
-        list.add("DEFENDANT 2: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedDefendant2Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("DEFENDANT_2", "DEFENDANT 2: Mr. John Rambo"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATIONFRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_INDIVIDUALSSOLICITORORG", "DEFENDANT 2: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("DEFENDANT 2: Witnesses");
-            list.add("DEFENDANT 2: Experts");
+            list.add(dynamicElementFromCode("DEFENDANT_2_WITNESSES", "DEFENDANT 2: Witnesses"));
+            list.add(dynamicElementFromCode("DEFENDANT_2_EXPERTS", "DEFENDANT 2: Experts"));
         }
         return list;
     }
 
-    private List<String> expectedDefendants1v2SameSolicitorOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
-        List<String> list = new ArrayList<>();
-        list.add("DEFENDANT 1: Mr. Sole Trader");
-        list.add("DEFENDANT 1: Litigation Friend: Litigation Friend");
-        list.add("DEFENDANT 2: Mr. John Rambo");
-        list.add("DEFENDANT 2: Litigation Friend: Litigation Friend");
-        list.add("DEFENDANTS: Individuals attending for the legal representative");
+    private List<DynamicListElement> expectedDefendants1v2SameSolicitorOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
+        List<DynamicListElement> list = new ArrayList<>();
+        list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATIONFRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_2", "DEFENDANT 2: Mr. John Rambo"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATIONFRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_INDIVIDUALSSOLICITORORG", "DEFENDANTS: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
-            list.add("DEFENDANTS: Witnesses");
-            list.add("DEFENDANTS: Experts");
+            list.add(dynamicElementFromCode("DEFENDANT_1_WITNESSES", "DEFENDANTS: Witnesses"));
+            list.add(dynamicElementFromCode("DEFENDANT_1_EXPERTS", "DEFENDANTS: Experts"));
         }
         return list;
     }
