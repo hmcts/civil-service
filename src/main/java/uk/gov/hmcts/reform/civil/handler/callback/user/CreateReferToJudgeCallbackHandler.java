@@ -90,7 +90,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    public boolean hasInfo(RequestedCourt requestedCourt) {
+    private boolean hasInfo(RequestedCourt requestedCourt) {
         return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
             || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
             .map(DynamicList::getValue).isPresent();

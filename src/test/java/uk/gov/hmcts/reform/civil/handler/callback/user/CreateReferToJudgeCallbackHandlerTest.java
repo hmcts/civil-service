@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -107,8 +108,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-            //given(handler.hasInfo(any())).willReturn(true);
-
             given(time.now()).willReturn(submittedDate);
         }
 
@@ -129,14 +128,18 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .setClaimTypeToUnspecClaim()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
                 .build();
+
+
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
+
+            given(helper.getMatching(any(),any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-
-            assertThat(handler.hasInfo(RequestedCourt.builder()
-                                           .responseCourtCode("123")
-                                           .build())).isTrue();
 
         }
 
@@ -152,9 +155,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
 
-            assertThat(handler.hasInfo(RequestedCourt.builder()
-                                           .responseCourtCode("123")
-                                           .build())).isTrue();
 
         }
 
@@ -178,13 +178,13 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         return new ArrayList<>(List.of(
             LocationRefData.builder()
                 .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                .courtLocationCode("court1").build(),
+                .courtLocationCode("123").build(),
             LocationRefData.builder()
                 .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                .courtLocationCode("court2").build(),
+                .courtLocationCode("321").build(),
             LocationRefData.builder()
                 .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("court3").build()
+                .courtLocationCode("324").build()
         ));
     }
 
