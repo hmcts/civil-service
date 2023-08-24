@@ -135,9 +135,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(handler.hasInfo(RequestedCourt.builder()
                                            .responseCourtCode("123")
                                            .build())).isTrue();
-            assertThat(handler.hasInfo(RequestedCourt.builder()
-                                           .responseCourtCode("123")
-                                           .build())).isNotNull();
 
         }
 
@@ -156,9 +153,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(handler.hasInfo(RequestedCourt.builder()
                                            .responseCourtCode("123")
                                            .build())).isTrue();
-            assertThat(handler.hasInfo(RequestedCourt.builder()
-                                           .responseCourtCode("123")
-                                           .build())).isNotNull();
 
         }
     }
