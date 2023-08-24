@@ -246,7 +246,6 @@ public class LocationHelper {
             .locationName(location.getSiteName());
     }
 
-
     /**
      * The caseManagementLocation is given by the requestedCourt's caseLocation field. If there is a matching location,
      * we can also populate the locationName field.
