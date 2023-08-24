@@ -102,9 +102,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(helper.leadDefendantIs1(any()))
                     .willReturn(true);
 
-            given(locationService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
@@ -128,7 +125,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .setClaimTypeToUnspecClaim()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
                 .build();
-
 
             given(helper.getClaimantRequestedCourt(any()))
                 .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
@@ -155,7 +151,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
 
-
         }
 
         @Test
@@ -172,20 +167,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                                .baseLocation("epimms")
                                .build());
         }
-    }
-
-    protected List<LocationRefData> getSampleCourLocationsRefObject() {
-        return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                .courtLocationCode("123").build(),
-            LocationRefData.builder()
-                .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                .courtLocationCode("321").build(),
-            LocationRefData.builder()
-                .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("324").build()
-        ));
     }
 
     @Nested
