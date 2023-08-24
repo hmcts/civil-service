@@ -150,7 +150,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                     caseData.getLegacyCaseReference(),
                     caseData.getLegacyCaseReference(),
                     "first-contact-pack",
-                    Arrays.asList("recipients")
+                    Arrays.asList(caseData.getRespondent1().getPartyName())
                 );
         }
 

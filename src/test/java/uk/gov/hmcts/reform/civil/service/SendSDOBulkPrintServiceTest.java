@@ -56,7 +56,7 @@ class SendSDOBulkPrintServiceTest {
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
                 SDO_ORDER_PACK_LETTER_TYPE,
-                Arrays.asList("recipients")
+                Arrays.asList(caseData.getRespondent1().getPartyName())
             );
     }
 
