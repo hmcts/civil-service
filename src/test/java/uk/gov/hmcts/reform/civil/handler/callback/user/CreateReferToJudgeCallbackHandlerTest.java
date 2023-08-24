@@ -32,8 +32,6 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -129,7 +127,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             given(helper.getClaimantRequestedCourt(any()))
                 .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
 
-            given(helper.getMatching(any(),any()))
+            given(helper.getMatching(any(), any()))
                 .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
