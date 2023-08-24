@@ -76,13 +76,13 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && PEOPLE.contains(getDefendantType.get())) {
 
-              locationHelper.getClaimantRequestedCourt(caseData)
-                .filter(this::hasInfo)
-                .ifPresent(requestedCourt -> {
+             locationHelper.getClaimantRequestedCourt(caseData)
+                  .filter(this::hasInfo)
+                  .ifPresent(requestedCourt -> {
                     locationHelper.getMatching(locationRefDataService.getCourtLocationsForDefaultJudgments(
                         callbackParams.getParams().get(BEARER_TOKEN).toString()), requestedCourt)
                         .ifPresent(matchingLocation -> LocationHelper.updateWithLocation(dataBuilder, matchingLocation));
-                });
+             });
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
