@@ -83,9 +83,10 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSettled() {
-        return !caseData.isRespondentResponseFullDefence()
+        return (!caseData.isRespondentResponseFullDefence()
             && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant());
+            || caseData.isResponseAcceptedByClaimant()))
+            || caseData.isPartAdmitClaimSettled();
     }
 
     @Override
