@@ -870,7 +870,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateInputValue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         if (caseData.getClaimsTrack().name().equals("smallClaimsTrack")) {
             String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();

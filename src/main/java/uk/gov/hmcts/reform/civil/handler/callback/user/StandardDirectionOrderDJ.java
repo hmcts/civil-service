@@ -807,7 +807,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse validateInputValue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
         String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
         List<String> errors = new ArrayList<>();
