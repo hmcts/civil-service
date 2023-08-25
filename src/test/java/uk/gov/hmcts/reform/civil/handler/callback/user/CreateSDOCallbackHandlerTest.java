@@ -143,9 +143,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDynamicListsCorrectly() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
-            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
@@ -547,7 +549,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
-            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class))).thenReturn(newDate);
+            when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class))).thenReturn(
+                newDate);
         }
 
         private final LocalDate date = LocalDate.of(2020, 1, 15);
@@ -561,9 +564,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
-            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -1015,10 +1020,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
             assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
-                .isEqualTo(String.format("This order has been made without hearing. "
-                                             + "Each party has the right to apply to have this Order set aside or varied. "
-                                             + "Any such application must be received by the Court (together with the "
-                                             + "appropriate fee) by 4pm on %s.",
+                .isEqualTo(String.format(
+                    "This order has been made without hearing. "
+                        + "Each party has the right to apply to have this Order set aside or varied. "
+                        + "Any such application must be received by the Court (together with the "
+                        + "appropriate fee) by 4pm on %s.",
                     date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
                 ));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
@@ -1037,12 +1043,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the contents of the bundle before it is filed. The bundle will include a case "
                                + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
-                .isEqualTo(String.format("This order has been made without hearing. "
-                                             + "Each party has the right to apply "
-                                             + "to have this Order set aside or varied. Any such application must be "
-                                             + "received by the Court (together with the appropriate fee) by 4pm "
-                                             + "on %s.",
-                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+                .isEqualTo(String.format(
+                    "This order has been made without hearing. "
+                        + "Each party has the right to apply "
+                        + "to have this Order set aside or varied. Any such application must be "
+                        + "received by the Court (together with the appropriate fee) by 4pm "
+                        + "on %s.",
+                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+                ));
         }
 
         @Test
@@ -1465,14 +1473,41 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(handler.handledEvents()).contains(CREATE_SDO);
     }
 
-    @Test
-    void shouldThrowErrorWhenEnteringNegativeNumberOfWitness(){
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams params = callbackParamsOf(caseData, MID);
+    @Nested
+    class MidEventNegativeNumberOfWitness {
+        private static final String PAGE_ID = "validateInputValue";
 
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors().contains("The number entered cannot be less than zero"));
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
     }
 }
+

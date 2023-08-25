@@ -91,6 +91,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -123,7 +124,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -455,6 +458,9 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
 
@@ -2858,6 +2864,36 @@ public class CaseDataBuilder {
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithNegativeInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atTrialHearingWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.trialHearingWitnessOfFactDJ = TrialHearingWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
         return this;
     }
 
@@ -6045,6 +6081,9 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
+            .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
+            .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
             .build();
     }
 }
