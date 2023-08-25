@@ -12,30 +12,32 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -129,6 +131,27 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
             // Then
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldGenerateAndPrintLetterSuccessfully() {
+            // Given
+            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
+            CaseData caseData = getCaseData("testorg@email.com");
+            CallbackParams params = getCallbackParams(caseData);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(bulkPrintService)
+                .printLetter(
+                    LETTER_CONTENT,
+                    caseData.getLegacyCaseReference(),
+                    caseData.getLegacyCaseReference(),
+                    "first-contact-pack",
+                    Arrays.asList(caseData.getRespondent1().getPartyName())
+                );
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
