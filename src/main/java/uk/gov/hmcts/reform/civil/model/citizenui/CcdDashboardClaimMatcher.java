@@ -184,7 +184,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     private boolean noHearingScheduled() {
-        return caseData.getSmallClaimsHearing() == null && caseData.getFastTrackHearingTime() == null;
+        return (isBeforeSmallClaimHearing() || isBeforeFastTrackHearing()) || noHearingScheduled();
     }
 
     private boolean isBeforeSmallClaimHearing() {
