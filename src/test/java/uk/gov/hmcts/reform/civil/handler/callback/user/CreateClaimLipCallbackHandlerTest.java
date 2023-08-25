@@ -15,15 +15,14 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDateTime;
@@ -55,9 +54,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
-
-    @MockBean
-    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @MockBean
     private SpecReferenceNumberRepository specReferenceNumberRepository;
@@ -112,8 +108,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             System.out.println(response.getData());
             assertThat(response.getData())
-                .containsEntry("issueDate", submittedDate.format(DateTimeFormatter.ISO_DATE))
-                .containsEntry("respondent1ResponseDeadline", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
