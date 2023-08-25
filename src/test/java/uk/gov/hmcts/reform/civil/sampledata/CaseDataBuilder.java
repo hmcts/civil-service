@@ -2887,6 +2887,26 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithPositiveInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atTrialHearingWitnessOfFactWithNegativeInputs() {
         atStateClaimNotified();
         this.trialHearingWitnessOfFactDJ = TrialHearingWitnessOfFact.builder()

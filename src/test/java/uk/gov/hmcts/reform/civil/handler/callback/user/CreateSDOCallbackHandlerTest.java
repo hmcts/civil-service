@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -1507,6 +1509,40 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
         }
     }
 }
