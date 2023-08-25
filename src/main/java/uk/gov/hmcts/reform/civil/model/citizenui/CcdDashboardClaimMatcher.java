@@ -179,9 +179,9 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isBeforeHearing() {
-        return isBeforeSmallClaimHearing()
+        return (isBeforeSmallClaimHearing()
             || isBeforeFastTrackHearing()
-            || noHearingScheduled();
+            || noHearingScheduled());
     }
 
     private boolean noHearingScheduled() {
