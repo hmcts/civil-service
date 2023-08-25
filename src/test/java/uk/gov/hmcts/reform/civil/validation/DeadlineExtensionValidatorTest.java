@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.validation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,6 +197,51 @@ class DeadlineExtensionValidatorTest {
 
             assertThat(errors)
                 .containsOnly("The agreed extension date cannot be more than 28 days after the current deadline");
+        }
+    }
+
+    @Nested
+    class CalculateDate {
+        @Test
+        public void maxDateWhenAcknowledge() {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime ack = now.minusDays(5L);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+            Assertions.assertEquals(
+                now.plusDays(56).toLocalDate(),
+                validator.getMaxDate(now, ack)
+            );
+        }
+
+        @Test
+        public void maxDateWhenAcknowledge1Holiday() {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime ack = now.minusDays(5L);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false, true);
+            Assertions.assertEquals(
+                now.plusDays(57).toLocalDate(),
+                validator.getMaxDate(now, ack)
+            );
+        }
+
+        @Test
+        public void maxDateWhenNoAcknowledge() {
+            LocalDateTime now = LocalDateTime.now();
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+            Assertions.assertEquals(
+                now.plusDays(42).toLocalDate(),
+                validator.getMaxDate(now, null)
+            );
+        }
+
+        @Test
+        public void maxDateWhenNoAcknowledge1Holiday() {
+            LocalDateTime now = LocalDateTime.now();
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false, true);
+            Assertions.assertEquals(
+                now.plusDays(43).toLocalDate(),
+                validator.getMaxDate(now, null)
+            );
         }
     }
 }
