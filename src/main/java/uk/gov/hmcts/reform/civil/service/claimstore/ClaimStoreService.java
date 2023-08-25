@@ -51,7 +51,10 @@ public class ClaimStoreService {
                                               .claimantName(cmcClaim.getClaimantName())
                                               .defendantName(cmcClaim.getDefendantName())
                                               .responseDeadline(cmcClaim.getResponseDeadline())
-                                              .responseDeadlineTime(LocalDateTime.from(cmcClaim.getResponseDeadline()))
+                                              .responseDeadlineTime(null
+                                                                        != cmcClaim.getResponseDeadline()
+                                                                        ? cmcClaim.getResponseDeadline().atStartOfDay()
+                                                                        : null)
                                               .claimAmount(cmcClaim.getTotalAmountTillToday())
                                               .paymentDate(cmcClaim.getBySpecifiedDate())
                                               .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
