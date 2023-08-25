@@ -170,7 +170,6 @@ public class LocationHelper {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return getSpecClaimantRequestedCourt(caseData);
         } else {
-            System.out.println("inside the first method");
             return getUnspecClaimantRequestedCourt(caseData);
         }
     }
@@ -181,7 +180,6 @@ public class LocationHelper {
     }
 
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
-        System.out.println("inside second method " + caseData.getCourtLocation());
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YesOrNo.YES)
