@@ -7,14 +7,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -153,9 +151,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .costReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
                                   ?
                                   caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : "")
-//            .paidByDate(getPaidByDate(caseData))
-//            .costProtection(getCostProtection(caseData))
-//            .costAmount(getCostAmount(caseData))
             .bespokeText(nonNull(caseData.getAssistedOrderCostsBespoke())
                              ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : "")
             .furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle())
@@ -292,30 +287,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         }
         return "";
     }
-
-//    public LocalDate getPaidByDate(CaseData caseData) {
-//       if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyDate();
-//        } else {
-//            return null;
-//        }
-//    }
-//
-//    public YesOrNo getCostProtection(CaseData caseData) {
-//        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyProtectionOption();
-//        } else {
-//            return null;
-//        }
-//    }
-//
-//    public String getCostAmount(CaseData caseData) {
-//       if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyText();
-//        } else {
-//            return null;
-//        }
-//    }
 
     private String getNotAttendedText(CaseData caseData, String party) {
         if (caseData.getFinalOrderRepresentation() == null) {

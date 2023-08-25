@@ -623,6 +623,8 @@ public class CaseDataParent implements MappableObject {
     private AssistedCostTypesList assistedOrderCostList;
     private AssistedOrderCostDetails assistedOrderCostsReserved;
     private AssistedOrderCostDetails assistedOrderCostsBespoke;
+    private AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts;
+    private YesOrNo publicFundingCostsProtection;
     private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
     private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
     private HearingLengthFinalOrderList lengthList;

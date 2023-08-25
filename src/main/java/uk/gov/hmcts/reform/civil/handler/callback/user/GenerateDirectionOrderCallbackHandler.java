@@ -160,7 +160,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         } else {
             locationRefData = locationRefDataService.getCcmccLocation(authorisation);
         }
-
         return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                    .code("LOCATION_LIST")
                                    .label(locationRefData.getSiteName())
@@ -169,11 +168,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                    .code("OTHER_LOCATION")
                                    .label("Other location")
                                    .build()))
+            .value(DynamicListElement.builder()
+                       .code("LOCATION_LIST")
+                       .label(locationRefData.getSiteName())
+                       .build())
             .build();
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
-
         return !JUDICIAL_REFERRAL.equals(state);
     }
 
@@ -195,6 +197,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
                     LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .assistedOrderCostsFirstDropdownDate(advancedDate)
+                                                  .assistedOrderAssessmentThirdDropdownDate(advancedDate)
+                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .build())
+            .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
                                          .appealGranted(
                 AppealGrantedRefused.builder().appealDate(LocalDate.now().plusDays(21)).build())
@@ -226,6 +234,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 && caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown().getDatesToAvoidDates()
                 .isBefore(LocalDate.now()))) {
             errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Further hearing"));
+        }
+        //validate make an order for costs dates
+        if (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && ((nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate().isBefore(LocalDate.now()))
+            || (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
+            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Make an order for detailed/summary costs"));
         }
     }
 

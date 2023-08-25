@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementS
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
@@ -435,53 +434,6 @@ public class JudgeFinalOrderGeneratorTest {
             }
         }
     }
-
-//    @Test
-//    void testGetCostAmount() {
-//        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-//            if (assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-//                    .finalOrderRecitals(null)
-//                    .assistedOrderCostList(assistedCostTypesList)
-//                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyText("12.12").build())
-//                    .build();
-//                String response = generator.getCostAmount(caseData);
-//                assertEquals("12.12", response);
-//            }
-//        }
-//    }
-
-//    @Test
-//    void testGetCostProtection() {
-//        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-//            if (assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-//                    .finalOrderRecitals(null)
-//                    .assistedOrderCostList(assistedCostTypesList)
-//                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyProtectionOption(
-//                        YesOrNo.NO).build())
-//                    .build();
-//                YesOrNo response = generator.getCostProtection(caseData);
-//                assertEquals(YesOrNo.NO, response);
-//            }
-//        }
-//    }
-
-//    @Test
-//    void testGetPaidByDate() {
-//        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-//            if (assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-//                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-//                    .finalOrderRecitals(null)
-//                    .assistedOrderCostList(assistedCostTypesList)
-//                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyDate(
-//                        LocalDate.of(2022, 1, 1)).build())
-//                    .build();
-//                LocalDate response = generator.getPaidByDate(caseData);
-//                assertEquals(LocalDate.of(2022, 1, 1), response);
-//            }
-//        }
-//    }
 
     @Test
     void testGetAppealReasonGranted() {
