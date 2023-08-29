@@ -215,8 +215,7 @@ public class CasesController {
     public ResponseEntity<List<String>> getUserInfo(
         @PathVariable("caseId") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<String> roles = userInformationService.getUserCaseRoles(caseId, authorization);
-        return new ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
+        return ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
     }
 
 }
