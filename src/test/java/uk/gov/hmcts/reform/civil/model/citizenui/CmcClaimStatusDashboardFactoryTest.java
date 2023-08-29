@@ -393,5 +393,4 @@ public class CmcClaimStatusDashboardFactoryTest {
                           .build())
             .build();
     }
-
 }

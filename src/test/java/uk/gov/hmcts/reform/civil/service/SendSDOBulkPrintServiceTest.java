@@ -10,8 +10,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+
+import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -41,20 +45,23 @@ class SendSDOBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
+        Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build()))
+            .respondent1(respondent1)
+            .build();
         given(documentDownloadService.downloadDocument(any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
-
         // then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
-                SDO_ORDER_PACK_LETTER_TYPE
+                SDO_ORDER_PACK_LETTER_TYPE,
+                Arrays.asList(caseData.getRespondent1().getPartyName())
             );
     }
 

@@ -47,6 +47,10 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (caseData.isFullAdmitClaimSpec()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument sealedDQForm = directionsQuestionnaireLipGenerator.generate(
             caseData,
@@ -57,6 +61,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             sealedDQForm,
             caseData
         ));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

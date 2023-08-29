@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
+import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
@@ -38,6 +39,7 @@ public class CaseAssignmentController {
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final AssignCaseService assignCaseService;
+    private final LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -62,6 +64,7 @@ public class CaseAssignmentController {
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         log.info("assigning case with id: {}", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
     }
 
 }

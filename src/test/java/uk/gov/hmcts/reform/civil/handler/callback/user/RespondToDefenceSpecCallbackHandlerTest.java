@@ -730,6 +730,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                       .build())
                     .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                         ExpertDetails.builder().build()).build())
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .build(),
                 ABOUT_TO_SUBMIT
             );
@@ -782,6 +783,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
                     .applicant2DQSmallClaimExperts()
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -803,6 +805,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
                     .applicant2DQSmallClaimExperts()
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -1453,6 +1456,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal interestAmount = BigDecimal.valueOf(100);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
