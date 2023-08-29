@@ -62,7 +62,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -238,6 +240,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         assembleResponseDocuments(caseData, builder);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
