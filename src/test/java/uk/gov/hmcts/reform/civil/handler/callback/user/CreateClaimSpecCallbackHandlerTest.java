@@ -85,6 +85,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -100,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCal
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY_PBA_V3;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_LIP_CONFIRMATION_BODY_PBAV3;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -144,9 +146,13 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
-        + "%n%nFollowing this, you will to file a Certificate of Service and supporting documents "
+        + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
+
+    private final Organisation bulkOrganisation = Organisation.builder()
+        .paymentAccount(List.of("12345", "98765"))
+        .build();
 
     @MockBean
     private Time time;
@@ -1642,7 +1648,149 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
+
+            Organisation organisation = Organisation.builder()
+                .paymentAccount(List.of("12345", "98765"))
+                .build();
         }
+
+        @Test
+        void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).containsExactly("Postcode error, bulk claim",
+                                                             "Postcode error, bulk claim");
+        }
+
+        @Test
+        void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim1v2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .respondent1(Party.builder()
+                                 .individualFirstName("James")
+                                 .individualLastName("Smith")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .primaryAddress(Address.builder().postCode("1234567").build())
+                                 .build())
+                .respondent2(Party.builder()
+                                 .individualFirstName("Debbie")
+                                 .individualLastName("Smith")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .primaryAddress(Address.builder().postCode("1234567").build())
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).containsExactly("Postcode error, bulk claim",
+                                                             "Postcode error, bulk claim",
+                                                             "Postcode error, bulk claim");
+        }
+
+        @Test
+        void shouldNotReturnErrors_whenInvokedAndInvalidPostcodeAndIsNotBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt(null)
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            verifyNoInteractions(postcodeValidator);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldSetClaimFee_whenInvokedAndBulkClaim() {
+            // Given
+            Fee feeData = Fee.builder()
+                .code("FeeCode")
+                .calculatedAmountInPence(BigDecimal.valueOf(19990))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("claimFee").extracting("calculatedAmountInPence", "code")
+                .containsExactly(String.valueOf(feeData.getCalculatedAmountInPence()), feeData.getCode());
+        }
+
+        @Test
+        void shouldAddSdtRequestId_whenInvokedAndBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("sdtRequestId").asString().contains("sdtRequestIdFromSdt");
+        }
+
+        @Test
+        void shouldNotAddSdtRequestId_whenInvokedAndNotBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("sdtRequestId").isNull();
+        }
+
+        @Test
+        void shouldAssignFirstPbaNumber_whenInvokedAndBulkClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
+                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
+                .totalClaimAmount(BigDecimal.valueOf(1999))
+                .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            System.out.println(response.getData().get("applicantSolicitor1PbaAccounts"));
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
+        }
+
+        //TODO implement tests for bulk claims that have interest added.
 
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {
@@ -2197,6 +2345,38 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    + "Claim number: %s", REFERENCE_NUMBER))
                     .confirmationBody(format(
                         SPEC_LIP_CONFIRMATION_SCREEN,
+                        format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                        responsePackLink,
+                        n9aLink,
+                        n9bLink,
+                        n215Link
+                    ) + exitSurveyContentService.applicantSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedConfirmationPageForPBAV3AndNotRegisteredOrg() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1Represented(YES)
+                .respondent1OrgRegistered(NO)
+                .legacyCaseReference("000MC001")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                .build();
+            when(toggleService.isPbaV3Enabled()).thenReturn(true);
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                    .confirmationBody(
+                        format(
+                        SPEC_LIP_CONFIRMATION_BODY_PBAV3,
+                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
                         format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                         responsePackLink,
                         n9aLink,

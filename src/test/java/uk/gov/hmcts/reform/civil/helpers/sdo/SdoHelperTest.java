@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -24,15 +24,21 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class SdoHelperTest {
 
@@ -44,7 +50,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
@@ -57,8 +63,8 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaims(YES)
                 .build();
 
             assertThat(SdoHelper.isSmallClaimsTrack(caseData)).isTrue();
@@ -82,7 +88,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
@@ -95,8 +101,8 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaims(NO)
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
 
@@ -138,7 +144,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .smallClaims(directions)
                 .build();
@@ -154,7 +160,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .smallClaims(directions)
                 .build();
@@ -169,7 +175,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
@@ -196,6 +202,78 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            SmallClaimsHearing smallClaimsHearing = SmallClaimsHearing.builder()
+                .input1("input1")
+                .input2("input2")
+                .time(SmallClaimsTimeEstimate.OTHER)
+                .otherHours(new BigDecimal(6))
+                .otherMinutes(new BigDecimal(20))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .smallClaimsHearing(smallClaimsHearing)
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnEmptyString_whenHearingIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetFastClaimsHearingTimeLabelTest {
+        @Test
+        void shouldReturnLabel_whenHearingIsNotNull() {
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.FOUR_HOURS)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo("4 hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.OTHER)
+                .otherHours("6")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -382,7 +460,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -398,7 +476,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -414,7 +492,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -430,7 +508,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -446,7 +524,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -462,7 +540,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -478,7 +556,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -493,7 +571,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
@@ -543,7 +621,7 @@ public class SdoHelperTest {
                 .atStateSdoFastTrackTrial()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
@@ -864,6 +942,85 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetFastTrackAllocationText {
+        @Test
+        void shouldReturnText_whenComplexityBandChosenWithReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(YES)
+                .band(ComplexityBand.BAND_2)
+                .reasons("some reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2 because some reasons";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenComplexityBandChosenNoReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(YES)
+                .band(ComplexityBand.BAND_2)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenNoComplexityBandChosenNoReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(NO)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenNoComplexityBandChosenWithReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(NO)
+                .reasons("some more reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band because some more reasons";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
         }
     }
 
