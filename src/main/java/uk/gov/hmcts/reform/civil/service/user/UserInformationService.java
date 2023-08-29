@@ -14,6 +14,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserInformationService {
+
     Logger log = LoggerFactory.getLogger(UserInformationService.class);
 
     private final UserService userService;
