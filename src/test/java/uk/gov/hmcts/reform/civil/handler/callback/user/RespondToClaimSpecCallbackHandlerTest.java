@@ -844,12 +844,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void defendantResponsePopulatesWitnessesData() {
             // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-            var res1witnesses = Witnesses.builder().details(
+            Witnesses res1witnesses = Witnesses.builder().details(
                 wrapElements(
                     Witness.builder()
                         .firstName("Witness")
@@ -857,10 +860,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .emailAddress("test-witness-one@example.com")
                         .phoneNumber("07865456789")
                         .reasonForWitness("great reasons")
+                        .eventAdded("Defendant Response Event")
+                        .dateAdded(date)
                         .build())
             ).build();
 
-            var res2witnesses = Witnesses.builder().details(
+            Witnesses res2witnesses = Witnesses.builder().details(
                 wrapElements(
                     Witness.builder()
                         .firstName("Witness")
@@ -868,6 +873,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .emailAddress("test-witness-two@example.com")
                         .phoneNumber("07532628263")
                         .reasonForWitness("good reasons")
+                        .eventAdded("Defendant Response Event")
+                        .dateAdded(date)
                         .build())
             ).build();
 
@@ -883,7 +890,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .respondent1DQWitnessesSmallClaim(res1witnesses)
                 .respondent2DQWitnessesSmallClaim(res2witnesses)
-                .build();
+                .build().toBuilder()
+                .respondent2ResponseDate(dateTime)
+                .respondent1ResponseDate(dateTime).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
@@ -893,14 +902,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
             // Then
             assertThat(response.getData())
                 .extracting("respondent1DQWitnesses")
-                .isEqualTo(new ObjectMapper().convertValue(res1witnesses, new TypeReference<>() {
+                .isEqualTo(objectMapper.convertValue(res1witnesses, new TypeReference<>() {
                 }));
             assertThat(response.getData())
                 .extracting("respondent2DQWitnesses")
-                .isEqualTo(new ObjectMapper().convertValue(res2witnesses, new TypeReference<>() {
+                .isEqualTo(objectMapper.convertValue(res2witnesses, new TypeReference<>() {
                 }));
         }
 
