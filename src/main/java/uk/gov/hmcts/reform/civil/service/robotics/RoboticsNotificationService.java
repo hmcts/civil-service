@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
@@ -149,10 +150,22 @@ public class RoboticsNotificationService {
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            subject = String.format(
-                "LR v LiP Case Data for %s",
-                caseData.getLegacyCaseReference()
-            );
+            if (nonNull(caseData.getPaymentTypeSelection())) {
+                subject = String.format(
+                    "LR v LiP Default Judgement Case Data for %s",
+                    caseData.getLegacyCaseReference()
+                );
+            } else if (caseData.isCcjRequestJudgmentByAdmission()) {
+                subject = String.format(
+                    "LR v LiP Judgement by Admission Case Data for %s",
+                    caseData.getLegacyCaseReference()
+                );
+            } else {
+                subject = String.format(
+                    "LR v LiP Case Data for %s",
+                    caseData.getLegacyCaseReference()
+                );
+            }
         } else if (isMultiParty) {
             subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                     caseData.getLegacyCaseReference(),
