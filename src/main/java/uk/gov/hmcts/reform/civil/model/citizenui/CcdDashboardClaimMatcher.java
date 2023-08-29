@@ -56,13 +56,15 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
         return hasResponseFullAdmit()
-            && caseData.isPayBySetDate();
+            && caseData.isPayBySetDate()
+            && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
         return hasResponseFullAdmit()
-            && caseData.isPayByInstallment();
+            && caseData.isPayByInstallment()
+            && (Objects.isNull(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()));
     }
 
     @Override
@@ -85,7 +87,9 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isSettled() {
         return !caseData.isRespondentResponseFullDefence()
             && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant());
+            || caseData.isResponseAcceptedByClaimant())
+            && Objects.isNull(caseData.getCcjPaymentDetails())
+            && !caseData.hasApplicantRejectedRepaymentPlan();
     }
 
     @Override
@@ -147,13 +151,14 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasCCJByRedetermination() {
-        return false;
+        return caseData.hasApplicantAcceptedRepaymentPlan();
     }
 
     @Override
     public boolean hasDefendantStatedTheyPaid() {
         return defendantRespondedWithPartAdmit()
-            && isPayImmediately() && !caseData.getApplicant1ResponseDeadlinePassed();
+            && isPayImmediately() && !caseData.getApplicant1ResponseDeadlinePassed()
+            && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
     }
 
     private boolean isPayImmediately() {
@@ -163,7 +168,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean defendantRespondedWithPartAdmit() {
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
-            && !caseData.getApplicant1ResponseDeadlinePassed();
+            && !caseData.getApplicant1ResponseDeadlinePassed()
+            && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
     }
 
     @Override
@@ -231,9 +237,10 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isCourtReviewing() {
-        return !hasSdoBeenDrawn()
+        return (!hasSdoBeenDrawn()
             && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL);
+            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
     @Override
@@ -270,4 +277,5 @@ public class CcdDashboardClaimMatcher implements Claim {
         return hasSdoBeenDrawn() && noHearingScheduled() && caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
     }
+
 }

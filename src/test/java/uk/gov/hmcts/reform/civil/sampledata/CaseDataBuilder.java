@@ -2128,6 +2128,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedMultiClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = MULTI_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedSpec() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -3333,6 +3344,19 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondentResponseIsSame(NO);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateDivergentResponseWithRespondent2FullDefence1v2SameSol_NotSingleDQ() {
+        atStateRespondentFullAdmission();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
