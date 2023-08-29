@@ -30,16 +30,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerEventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -62,8 +60,7 @@ public class CasesController {
     private final CaseEventService caseEventService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-    private final UserService userService;
-    private final CoreCaseUserService coreCaseUserService;
+    private final UserInformationService userInformationService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -208,18 +205,18 @@ public class CasesController {
             throw new CaseDataInvalidException();
         }
     }
-    @GetMapping(path = "/{caseId}/getType")
-    @Operation(summary = "Get user information")
+
+    @GetMapping(path = "/{caseId}/userCaseRoles")
+    @Operation(summary = "Get user Roles for a case")
     @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Not Found"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-  public ResponseEntity<List<String>> getUserInfo(
-      @PathVariable("caseId") String caseId,
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        UserInfo userInfo = userService.getUserInfo(authorization);
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            caseId,
-            userInfo.getUid()
-        );
+    public ResponseEntity<List<String>> getUserInfo(
+        @PathVariable("caseId") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<String> roles = userInformationService.getUserCaseRoles(caseId, authorization);
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
+
 }

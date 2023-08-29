@@ -13,11 +13,17 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class UserInformationServiceTest {
+
     public static final UserInfo USER_INFO = UserInfo.builder().uid("uid").build();
     public static final String AUTHORIZATION = "token";
     public static final String CASE_ID = "123";
@@ -28,6 +34,7 @@ class UserInformationServiceTest {
     private CoreCaseUserService coreCaseUserService;
 
     private UserInformationService userInformationService;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
