@@ -63,10 +63,9 @@ public class DashboardClaimInfo {
 
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
-        if (null != responseDeadlineTime) {
-            return ChronoUnit.DAYS.between(LocalDateTime.now(), responseDeadlineTime);
-        }
-        return 0L;
+        return Optional.ofNullable(responseDeadlineTime).map(
+            time -> ChronoUnit.DAYS.between(LocalDateTime.now(), responseDeadlineTime)
+        ).orElse(0L);
     }
 
     @JsonGetter("numberOfDaysOverdue")
