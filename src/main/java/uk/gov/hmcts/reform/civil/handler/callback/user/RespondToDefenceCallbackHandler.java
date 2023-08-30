@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -61,7 +62,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -238,6 +241,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
+        if (featureToggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToApplicantExperts(builder);
+            addEventAndDateAddedToApplicantWitnesses(builder);
+        }
+
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
         if (featureToggleService.isHmcEnabled()) {
@@ -251,27 +259,45 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
 
-        AllocatedTrack allocatedTrack =
-            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
-
-        CaseState newState;
-        if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-            newState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-        } else {
-            boolean proceed = switch (multiPartyScenario) {
-                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
-                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
-                    || caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
-                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
-                    || caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
-            };
-            newState = proceed ? CaseState.JUDICIAL_REFERRAL : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
-            .state(newState.name())
+            .state((shouldMoveToJudicialReferral(caseData)
+                ? CaseState.JUDICIAL_REFERRAL
+                : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
             .build();
+    }
+
+    /**
+     * Computes whether the case data should move to judicial referral or not.
+     *
+     * @param caseData a case data such that defendants rejected the claim, and claimant(s) wants to proceed
+     *                 vs all the defendants
+     * @return true if and only if the case should move to judicial referral
+     */
+    public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+        } else {
+            AllocatedTrack allocatedTrack =
+                getAllocatedTrack(
+                    CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                        ? caseData.getClaimValue().toPounds()
+                        : caseData.getTotalClaimAmount(),
+                    caseData.getClaimType()
+                );
+            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+                return false;
+            }
+            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+            return switch (multiPartyScenario) {
+                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
+                    && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                    caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
+                    && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
+            };
+        }
     }
 
     private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth) {

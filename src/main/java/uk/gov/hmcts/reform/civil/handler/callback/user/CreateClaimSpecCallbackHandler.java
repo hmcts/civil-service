@@ -18,7 +18,18 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
+import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -503,17 +514,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         List<String> errors = new ArrayList<>();
         if (caseData.getSdtRequestIdFromSdt() != null) {
-            List<String> postcodes = new ArrayList<>();
-            postcodes.add(caseData.getApplicant1().getPrimaryAddress().getPostCode());
-            postcodes.add(caseData.getRespondent1().getPrimaryAddress().getPostCode());
-            if (caseData.getRespondent2() != null) {
-                postcodes.add(caseData.getRespondent2().getPrimaryAddress().getPostCode());
-            }
-            postcodes.forEach(postcode -> {
-                if (!postcodeValidator.validate(postcode).isEmpty()) {
-                    errors.add("Postcode error, bulk claim");
-                }
-            });
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
