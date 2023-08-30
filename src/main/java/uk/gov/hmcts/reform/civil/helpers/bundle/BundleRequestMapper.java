@@ -573,7 +573,9 @@ public class BundleRequestMapper {
                     generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName() + "%s",
                                       null, uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
                     : generateDocName(fileNamePrefix, party.getDisplayName(),
-                                                 uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
+                                                documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
+                                      ? uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :
+                                                    uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
                 );
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
                                                  .documentFileName(docName)
