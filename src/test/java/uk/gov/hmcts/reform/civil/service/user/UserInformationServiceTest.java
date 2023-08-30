@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
@@ -16,11 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 class UserInformationServiceTest {
@@ -35,16 +30,11 @@ class UserInformationServiceTest {
     @Mock
     private CoreCaseUserService coreCaseUserService;
 
+    @InjectMocks
     private UserInformationService userInformationService;
 
-    @BeforeAll
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        userInformationService = new UserInformationService(userService, coreCaseUserService);
-    }
-
     @Test
-    public void should_find_Success() {
+    public void should_getUserCaseRoles_Success() {
         List<String> expectedRoles = List.of("role1", "role2");
 
         when(userService.getUserInfo(AUTHORIZATION)).thenReturn(USER_INFO);
