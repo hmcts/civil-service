@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
@@ -463,6 +464,9 @@ public class CaseDataBuilder {
 
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private UpdateDetailsForm updateDetailsForm;
+
+    protected String hearingReference;
+    protected ListingOrRelisting listingOrRelisting;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1314,6 +1318,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hearingReferenceNumber(String hearingReference) {
+        this.hearingReference = hearingReference;
+        return this;
+    }
+
+    public CaseDataBuilder listingOrRelisting(ListingOrRelisting listingOrRelisting) {
+        this.listingOrRelisting = listingOrRelisting;
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineDate(LocalDateTime takenOfflineDate) {
         this.takenOfflineDate = takenOfflineDate;
         return this;
@@ -2140,6 +2154,17 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         allocatedTrack = FAST_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedMultiClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = MULTI_CLAIM;
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = SUBMITTED_DATE_TIME;
@@ -3357,6 +3382,19 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondentResponseIsSame(NO);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateDivergentResponseWithRespondent2FullDefence1v2SameSol_NotSingleDQ() {
+        atStateRespondentFullAdmission();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
@@ -6087,6 +6125,8 @@ public class CaseDataBuilder {
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
             .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .hearingReferenceNumber(hearingReference)
+            .listingOrRelisting(listingOrRelisting)
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)

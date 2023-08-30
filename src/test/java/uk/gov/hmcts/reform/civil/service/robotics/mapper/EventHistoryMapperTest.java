@@ -7248,6 +7248,213 @@ class EventHistoryMapperTest {
         }
     }
 
+    @Nested
+    class DemagesMultitrack {
+
+        @Test   // Demages Multiclaim one v one
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsForMultiTrackClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(25500.00))
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_ONE)
+                .atStateApplicantRespondToDefenceAndProceed()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0),
+                                 expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlyFirstDefendantForMultiClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendantForMultiTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+    }
+
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
             eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
