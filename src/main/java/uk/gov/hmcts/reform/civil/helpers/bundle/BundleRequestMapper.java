@@ -577,7 +577,7 @@ public class BundleRequestMapper {
                                                                                       String fileNamePrefix, String documentType,
                                                                                       PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-
+        log.info("Filename : " + fileNamePrefix + "partyname :" + party.getDisplayName());
         if (evidenceUploadDocList != null) {
             sortEvidenceUploadByDate(evidenceUploadDocList, false);
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
