@@ -65,6 +65,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserNotFoundOnCaseException.class)
     public ResponseEntity<Object> userNotFoundOnCaseException(UserNotFoundOnCaseException userNotFoundOnCaseException) {
         log.error(userNotFoundOnCaseException.getMessage());
-        return new ResponseEntity<>("User not found on case", new HttpHeaders(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }

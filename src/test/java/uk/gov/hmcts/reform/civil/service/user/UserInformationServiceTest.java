@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -27,6 +28,7 @@ class UserInformationServiceTest {
     public static final UserInfo USER_INFO = UserInfo.builder().uid("uid").build();
     public static final String AUTHORIZATION = "token";
     public static final String CASE_ID = "123";
+
     @Mock
     private UserService userService;
 
@@ -56,12 +58,25 @@ class UserInformationServiceTest {
     }
 
     @Test
-    public void testGetUserCaseRoles_CaseNotFound() {
+    public void should_getUserCaseRoles_throw_case_not_found() {
 
         when(userService.getUserInfo(AUTHORIZATION)).thenThrow(new CaseNotFoundException());
 
         assertThrows(CaseNotFoundException.class, () -> userInformationService.getUserCaseRoles(CASE_ID, AUTHORIZATION));
         verify(userService, times(1)).getUserInfo(AUTHORIZATION);
         verify(coreCaseUserService, never()).getUserCaseRoles(anyString(), anyString());
+    }
+
+    @Test
+    public void should_getUserCaseRoles_throw_user_not_found_on_case_exception() {
+
+        List<String> expectedRoles = List.of();
+
+        when(userService.getUserInfo(AUTHORIZATION)).thenReturn(USER_INFO);
+        when(coreCaseUserService.getUserCaseRoles(CASE_ID, USER_INFO.getUid())).thenReturn(expectedRoles);
+
+        assertThrows(UserNotFoundOnCaseException.class, () -> userInformationService.getUserCaseRoles(CASE_ID, AUTHORIZATION));
+        verify(userService, times(1)).getUserInfo(AUTHORIZATION);
+        verify(coreCaseUserService, times(1)).getUserCaseRoles(CASE_ID, USER_INFO.getUid());
     }
 }

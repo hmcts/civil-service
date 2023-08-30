@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
@@ -17,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserInformationService {
 
-    Logger log = LoggerFactory.getLogger(UserInformationService.class);
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
@@ -30,11 +27,10 @@ public class UserInformationService {
                 userInfo.getUid()
             );
             if(roles.isEmpty()){
-                throw new UserNotFoundOnCaseException(userInfo.getName());
+                throw new UserNotFoundOnCaseException(userInfo.getUid());
             }
             return roles;
         } catch (RemoteProcessEngineException e) {
-            log.error(String.format("No case found for %s", caseId));
             throw new CaseNotFoundException();
         }
     }

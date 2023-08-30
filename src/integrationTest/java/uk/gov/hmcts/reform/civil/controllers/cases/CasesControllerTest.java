@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
@@ -308,6 +309,23 @@ public class CasesControllerTest extends BaseIntegrationTest {
         )
             .andExpect(status().isBadRequest())
             .andExpect(content().string("Case was not found"))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowUserNotFoundOnCaseExceptionWhenRolesIsEmpty() {
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .thenThrow(new UserNotFoundOnCaseException("111"));
+
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("User with Id: 111 was not found on case"))
             .andReturn();
 
     }
