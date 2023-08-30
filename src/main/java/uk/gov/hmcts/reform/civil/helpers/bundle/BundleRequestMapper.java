@@ -472,10 +472,11 @@ public class BundleRequestMapper {
     private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
-            bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType,
-                                                                                                                     EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
+                                                                                                                     EvidenceUploadFiles.CASE_SUMMARY, caseData),
                                                                                      BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
-                                                                                     EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType));
+                                                                                     EvidenceUploadFiles.CASE_SUMMARY.name(),
+                                                                                        partyType));
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames(), false),
@@ -534,9 +535,7 @@ public class BundleRequestMapper {
                 sortWitnessListByDate(witnessEvidence, true);
             }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-                String docName = generateDocName(fileNamePrefix,
-                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
-                                                 ? uploadEvidenceWitnessElement.getValue().getWitnessOptionName() : party.getDisplayName(),
+                String docName = generateDocName(fileNamePrefix, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                  documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
                                                      ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
                                                      .getValue().getCreatedDatetime().toLocalDate());
