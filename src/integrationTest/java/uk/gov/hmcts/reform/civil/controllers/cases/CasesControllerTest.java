@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
-import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
