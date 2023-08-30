@@ -12,5 +12,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppealChoiceSecondDropdown {
+
     private LocalDate appealGrantedRefusedDate;
 }

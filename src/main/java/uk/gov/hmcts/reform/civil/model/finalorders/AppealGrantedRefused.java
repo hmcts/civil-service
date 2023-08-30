@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppealGrantedRefused {
+
     private AppealChoiceSecondDropdown appealChoiceSecondDropdownA;
     private AppealChoiceSecondDropdown appealChoiceSecondDropdownB;
 }
