@@ -2349,6 +2349,9 @@ class StateFlowEngineTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atState(flowState)
                 .takenOfflineDate(LocalDateTime.now())
+                // ensure no ambiguous transitions between HEARING_READINESS and TAKEN_OFFLINE_AFTER_SDO
+                .hearingReferenceNumber("12345")
+                .listingOrRelisting(ListingOrRelisting.LISTING)
                 .build();
 
             // When
