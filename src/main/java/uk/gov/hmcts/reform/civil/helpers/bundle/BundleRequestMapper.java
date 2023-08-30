@@ -534,7 +534,9 @@ public class BundleRequestMapper {
                 sortWitnessListByDate(witnessEvidence, true);
             }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-                String docName = generateDocName(fileNamePrefix, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                String docName = generateDocName(fileNamePrefix,
+                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
+                                                 ? uploadEvidenceWitnessElement.getValue().getWitnessOptionName() : party.getDisplayName(),
                                                  documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
                                                      ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
                                                      .getValue().getCreatedDatetime().toLocalDate());
