@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
+import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -9,6 +10,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -25,7 +28,11 @@ import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,7 +63,10 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
-    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}";
+    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/create-case/{userId}";
+    private static final String CASEWORKER_SEARCH_CASE_URL = "/cases/caseworker/searchCaseForSDT/{userId}?sdtRequestId=isUnique";
+    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin/?postCode=rfft";
+
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
@@ -94,12 +104,17 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseworkerCaseEventService caseworkerCaseEventService;
+    @MockBean
+    private CaseSdtRequestSearchService caseSdtRequestSearchService;
 
     @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
+
+    @MockBean
+    PostcodeValidator postcodeValidator;
 
     @MockBean
     private UserInformationService userInformationService;
@@ -281,6 +296,72 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseExists() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Arrays.asList(caseDetails));
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(false);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseNotExists() {
+
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Lists.newArrayList());
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(true);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldValidatePostCodeSuccessfullyWhenInEnglandOrWales() {
+
+        when(postcodeValidator.validate(any())).thenReturn(Lists.newArrayList());
+
+        doGet(
+            BEARER_TOKEN,
+            VALIDATE_POSTCODE_URL
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(Lists.newArrayList());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldValidatePostCodeAndSendErrorsWhenNotInEnglandOrWales() {
+
+        when(postcodeValidator.validate(any())).thenReturn(
+            Lists.newArrayList("Postcode must be in England or Wales"));
+
+        doGet(
+            BEARER_TOKEN,
+            VALIDATE_POSTCODE_URL
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(
+                Arrays.asList("Postcode must be in England or Wales"));
+    }
+
+    @Test
+    @SneakyThrows
     void shouldGetUserInfoSuccessfully() {
         List<String> expectedRoles = List.of("role1", "role2");
         when(userInformationService.getUserCaseRoles(anyString(), anyString()))
@@ -329,4 +410,5 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andReturn();
 
     }
+
 }
