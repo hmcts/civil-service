@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getW
 public class BundleRequestMapper {
 
     private static final String DOC_FILE_NAME = "DOC_FILE_NAME";
+    private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
 
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
@@ -113,7 +114,7 @@ public class BundleRequestMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
                                                                                                                            EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData),
-                                                                                    BundleFileNameList.CL1_COSTS_BUDGET.getDisplayName(),
+                                                                                    DOC_FILE_NAME_WITH_DATE,
                                                                                     EvidenceUploadFiles.COSTS.name(),
                                                                                     partyType));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
@@ -420,7 +421,8 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames(), false),
-                BundleFileNameList.REPLY_TO_PART_18.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(), partyType
+                BundleFileNameList.REPLY_TO_PART_18.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.PART18.name(),
+                partyType
             ));
         });
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
@@ -582,6 +584,10 @@ public class BundleRequestMapper {
                 String docName = fileNamePrefix.equals(DOC_FILE_NAME)
                     ?
                     uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()
+                    : fileNamePrefix.equals(DOC_FILE_NAME_WITH_DATE)
+                    ?
+                    generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(), null,
+                                    uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
                     : generateDocName(fileNamePrefix, party.getDisplayName(),
                                                 documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
                                       ? uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :

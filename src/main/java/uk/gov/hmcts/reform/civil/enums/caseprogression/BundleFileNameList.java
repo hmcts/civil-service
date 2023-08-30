@@ -34,11 +34,7 @@ public enum BundleFileNameList {
     INVOICE("Invoice"),
     CL2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("CL 2 Documents they intend to rely on"),
     DF1_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 1 Documents they intend to rely on"),
-    DF2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 2 Documents they intend to rely on"),
-    CL1_COSTS_BUDGET("CL 1 Costs Budget"),
-    CL2_COSTS_BUDGET("CL 2 Costs Budget"),
-    DF1_COSTS_BUDGET("DF 1 Costs Budget"),
-    DF2_COSTS_BUDGET("DF 2 Costs Budget");
+    DF2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 2 Documents they intend to rely on");
 
     String displayName;
 
