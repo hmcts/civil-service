@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -7245,6 +7248,213 @@ class EventHistoryMapperTest {
         }
     }
 
+    @Nested
+    class DemagesMultitrack {
+
+        @Test   // Demages Multiclaim one v one
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsForMultiTrackClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(25500.00))
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_ONE)
+                .atStateApplicantRespondToDefenceAndProceed()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0),
+                                 expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlyFirstDefendantForMultiClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendantForMultiTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                .atStateClaimSubmittedMultiClaim()
+                .build();
+            List<Event> expectedMiscEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimDetailsNotificationDate())
+                    .eventDetailsText("Claim details notified.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim details notified.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(8)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("Claimant proceeds.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant proceeds.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(9)
+                    .eventCode("999")
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText("RPA Reason:Multitrack Unspec going offline.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason:Multitrack Unspec going offline.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                 expectedMiscEvents.get(2),
+                                 expectedMiscEvents.get(3), expectedMiscEvents.get(4));
+        }
+
+    }
+
     private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
         Stream.of(eventNames).forEach(
             eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
@@ -7866,6 +8076,15 @@ class EventHistoryMapperTest {
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
                 .addRespondent2(NO)
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("test")
+                                .build()
+                        ).build()
+                )
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -7925,6 +8144,15 @@ class EventHistoryMapperTest {
                 .totalClaimAmount(claimValue)
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("test")
+                                .build()
+                        ).build()
+                )
                 .respondent1DQ(
                 Respondent1DQ.builder()
                     .respondToCourtLocation(
@@ -7964,24 +8192,6 @@ class EventHistoryMapperTest {
                                                   caseData.getRespondent1DQ()))
                                               .preferredCourtName("")
                                               .build())
-                            .build(),
-                        Event.builder()
-                            .eventSequence(5)
-                            .eventCode("197")
-                            .dateReceived(caseData.getRespondent1ResponseDate())
-                            .litigiousPartyID(partyID)
-                            .eventDetailsText(mapper.prepareFullDefenceEventText(
-                                caseData.getRespondent1DQ(),
-                                caseData,
-                                true,
-                                caseData.getRespondent1()
-                            ))
-                            .eventDetails(EventDetails.builder()
-                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
-                                              .preferredCourtCode(
-                                                  mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
-                                              .preferredCourtName("")
-                                              .build())
                             .build()
                 );
 
@@ -7999,6 +8209,92 @@ class EventHistoryMapperTest {
                 .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
         }
 
+        @Test
+        public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediationNoLegalRep() {
+            BigDecimal claimValue = BigDecimal.valueOf(1500);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .specClaim1v1LrVsLip()
+                .atStateSpec1v1ClaimSubmitted()
+                .respondent1(PartyBuilder.builder().company().build())
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .responseClaimMediationSpecRequired(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+                .respondent1AcknowledgeNotificationDate(null)
+                .totalClaimAmount(claimValue)
+                .respondent1Represented(null)
+                .specRespondent1Represented(NO)
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().build())
+                .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
+                    ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
+                .applicant1DQ(
+                    Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("test")
+                                .build()
+                        ).build()
+                )
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
+                                .build()
+                        )
+                        .build()
+                )
+                .build().toBuilder()
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(BigDecimal.valueOf(100000))
+                                    .build())
+                .build();
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(2)
+                .eventCode("49")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID(partyID)
+                .build();
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(3)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(partyID)
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build()
+                );
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+        }
     }
 
     @Nested
