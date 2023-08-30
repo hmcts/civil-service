@@ -30,11 +30,13 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -465,6 +467,12 @@ public class CaseDataBuilder {
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private IdamUserDetails claimantUserDetails;
+
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+    private UpdateDetailsForm updateDetailsForm;
+
+    protected String hearingReference;
+    protected ListingOrRelisting listingOrRelisting;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1316,6 +1324,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hearingReferenceNumber(String hearingReference) {
+        this.hearingReference = hearingReference;
+        return this;
+    }
+
+    public CaseDataBuilder listingOrRelisting(ListingOrRelisting listingOrRelisting) {
+        this.listingOrRelisting = listingOrRelisting;
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineDate(LocalDateTime takenOfflineDate) {
         this.takenOfflineDate = takenOfflineDate;
         return this;
@@ -1525,6 +1543,21 @@ public class CaseDataBuilder {
                        .label(defaultValue)
                        .build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ResponseDate(LocalDateTime date) {
+        this.respondent1ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ResponseDate(LocalDateTime date) {
+        this.respondent2ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ResponseDate(LocalDateTime date) {
+        this.applicant1ResponseDate = date;
         return this;
     }
 
@@ -2371,10 +2404,15 @@ public class CaseDataBuilder {
             .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
             .build();
 
-        hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+        this.hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
             .hearingUnavailableDates(YES)
             .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
+
+        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
+                                                              .documentName("test")
+                                                              .createdDatetime(LocalDateTime.now())
+                                                              .build()));
         return this;
     }
 
@@ -5869,6 +5907,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
+        this.updateDetailsForm = additionalDates;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6141,7 +6184,11 @@ public class CaseDataBuilder {
             .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
             .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
             .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
+            .hearingReferenceNumber(hearingReference)
+            .listingOrRelisting(listingOrRelisting)
             .claimantUserDetails(claimantUserDetails)
+            .updateDetailsForm(updateDetailsForm)
+            .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
     }
 }
