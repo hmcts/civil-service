@@ -246,8 +246,9 @@ public class CasesController {
     @Operation(summary = "Get user Roles for a case")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Not Found"),
-        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+        @ApiResponse(responseCode = "400", description = "Bad request for caseId"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "404", description = "User not found on case"),})
     public ResponseEntity<List<String>> getUserInfo(
         @PathVariable("caseId") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
