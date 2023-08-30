@@ -133,8 +133,8 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(documentEvidenceForTrialList,
                                              TypeOfDocDocumentaryEvidenceOfTrial.getAllDocsDisplayNames(), true),
-                BundleFileNameList.NOTICE_TO_ADMIT_FACTS.getDisplayName(),
-                TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.name(),
+                DOC_FILE_NAME,
+                EvidenceUploadFiles.DOCUMENTARY.name(),
                 partyType
             ));
         }
