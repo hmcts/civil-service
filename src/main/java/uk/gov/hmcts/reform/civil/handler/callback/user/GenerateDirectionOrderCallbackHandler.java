@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
@@ -204,11 +205,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .appealGranted(
-                AppealGrantedRefused.builder().appealDate(LocalDate.now().plusDays(21)).build())
-                                         .appealRefused(
-                AppealGrantedRefused.builder().refusedText("[name] court")
-                    .appealDate(LocalDate.now().plusDays(21)).build()).build());
+                                         .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                                           .appealChoiceSecondDropdownA(
+                                                                               AppealChoiceSecondDropdown.builder()
+                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .build())
+                                                                           .appealChoiceSecondDropdownB(
+                                                                               AppealChoiceSecondDropdown.builder()
+                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .build())
+                                                                           .build()).build());
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
@@ -242,6 +248,15 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             || (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate())
             && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
             errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Make an order for detailed/summary costs"));
+        }
+        //validate appeal granted refused dates
+        if (nonNull(caseData.getFinalOrderAppealComplex())
+            && (nonNull(caseData.getFinalOrderAppealComplex().getAppealGrantedRefusedDropdown()))
+            && (nonNull(caseData.getFinalOrderAppealComplex().getAppealGrantedRefusedDropdown().getAppealChoiceSecondDropdownA())
+            && caseData.getFinalOrderAppealComplex().getAppealGrantedRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate().isBefore(LocalDate.now())
+            || nonNull(caseData.getFinalOrderAppealComplex().getAppealGrantedRefusedDropdown().getAppealChoiceSecondDropdownB())
+            && caseData.getFinalOrderAppealComplex().getAppealGrantedRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate().isBefore(LocalDate.now()))) {
+            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Appeal notice date"));
         }
     }
 

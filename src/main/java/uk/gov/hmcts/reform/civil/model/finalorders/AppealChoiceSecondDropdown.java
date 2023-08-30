@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppealGrantedRefused {
-    private AppealChoiceSecondDropdown appealChoiceSecondDropdownA;
-    private AppealChoiceSecondDropdown appealChoiceSecondDropdownB;
+public class AppealChoiceSecondDropdown {
+    private LocalDate appealGrantedRefusedDate;
 }

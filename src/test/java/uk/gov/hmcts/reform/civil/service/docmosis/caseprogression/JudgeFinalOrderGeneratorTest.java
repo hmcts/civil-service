@@ -289,8 +289,6 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().alternativeHearingList(dynamicList).build())
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED)
-                                         .appealGranted(AppealGrantedRefused.builder().reasonsText("Test").build()).build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
             .finalOrderAppealToggle(toggleList)
@@ -433,30 +431,6 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
             }
         }
-    }
-
-    @Test
-    void testGetAppealReasonGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED).appealGranted(
-                AppealGrantedRefused.builder().reasonsText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
-    }
-
-    @Test
-    void testGetAppealReasonNotGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.REFUSED).appealRefused(
-                AppealGrantedRefused.builder().refusedText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
     }
 
     @Test

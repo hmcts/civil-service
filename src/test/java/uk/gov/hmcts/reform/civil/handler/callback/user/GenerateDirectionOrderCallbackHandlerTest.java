@@ -22,8 +22,11 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -190,8 +193,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGranted")
-                .extracting("appealDate")
+                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
                 .extracting("hearingLocationList").asString().contains("SiteName after Sdo");
@@ -236,8 +245,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGranted")
-                .extracting("appealDate")
+                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
                 .extracting("hearingLocationList").asString().contains("SiteName before Sdo");
@@ -365,6 +380,38 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                               .build())
                         .build(),
                     "The date in Make an order for detailed/summary costs may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                       .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
+                                                                                                                        .build())
+                                                                                       .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                        .build())
+                                                                                       .build())
+                                                     .build())
+                        .build(),
+                    "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                       .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                        .build())
+                                                                                       .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().minusDays(3))
+                                                                                                                        .build())
+                                                                                       .build())
+                                                     .build())
+                        .build(),
+                    "The date in Appeal notice date may not be before the established date"
                 )
             );
         }
