@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +38,7 @@ class UserInformationServiceTest {
 
     private UserInformationService userInformationService;
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         userInformationService = new UserInformationService(userService, coreCaseUserService);
