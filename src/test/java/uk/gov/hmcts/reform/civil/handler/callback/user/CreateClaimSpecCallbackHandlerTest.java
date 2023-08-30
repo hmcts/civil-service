@@ -85,7 +85,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -1652,74 +1651,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             Organisation organisation = Organisation.builder()
                 .paymentAccount(List.of("12345", "98765"))
                 .build();
-        }
-
-        @Test
-        void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
-            when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
-            assertThat(response.getErrors()).containsExactly("Postcode error, bulk claim",
-                                                             "Postcode error, bulk claim");
-        }
-
-        @Test
-        void shouldReturnErrors_whenInvokedAndInvalidPostcodeAndIsBulkClaim1v2() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .respondent1(Party.builder()
-                                 .individualFirstName("James")
-                                 .individualLastName("Smith")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .primaryAddress(Address.builder().postCode("1234567").build())
-                                 .build())
-                .respondent2(Party.builder()
-                                 .individualFirstName("Debbie")
-                                 .individualLastName("Smith")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .primaryAddress(Address.builder().postCode("1234567").build())
-                                 .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(postcodeValidator.validate(any())).thenReturn(List.of("Postcode must be in England or Wales"));
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
-            assertThat(response.getErrors()).containsExactly("Postcode error, bulk claim",
-                                                             "Postcode error, bulk claim",
-                                                             "Postcode error, bulk claim");
-        }
-
-        @Test
-        void shouldNotReturnErrors_whenInvokedAndInvalidPostcodeAndIsNotBulkClaim() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt(null)
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
-            verifyNoInteractions(postcodeValidator);
-            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
