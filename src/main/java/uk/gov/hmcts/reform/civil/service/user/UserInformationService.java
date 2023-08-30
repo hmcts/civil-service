@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserInformationService {
 
-
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
@@ -26,7 +25,7 @@ public class UserInformationService {
                 caseId,
                 userInfo.getUid()
             );
-            if(roles.isEmpty()){
+            if (roles.isEmpty()) {
                 throw new UserNotFoundOnCaseException(userInfo.getUid());
             }
             return roles;

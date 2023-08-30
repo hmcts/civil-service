@@ -40,8 +40,6 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
-import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
-
 
 import java.time.LocalDate;
 import java.util.List;
