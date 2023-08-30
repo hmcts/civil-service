@@ -263,9 +263,13 @@ class CaseEventTaskHandlerTest {
         void shouldTriggerCCDEvent_whenClaimIsPendingUnRepresented(FlowState.Main state) {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, state.fullName());
+            Map<String, Boolean> flags = new HashMap<>(getFlowFlags(state));
+            if (state == FULL_DEFENCE_PROCEED) {
+                flags.put(FlowFlag.SDO_ENABLED.name(), false);
+            }
             variables.putValue(
                 FLOW_FLAGS,
-                getFlowFlags(state)
+                flags
             );
 
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
