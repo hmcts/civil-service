@@ -581,8 +581,7 @@ public class BundleRequestMapper {
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
                 String docName = fileNamePrefix.equals(DOC_FILE_NAME)
                     ?
-                    generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName() + "%s",
-                                      null, uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
+                    uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()
                     : generateDocName(fileNamePrefix, party.getDisplayName(),
                                                 documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
                                       ? uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :
