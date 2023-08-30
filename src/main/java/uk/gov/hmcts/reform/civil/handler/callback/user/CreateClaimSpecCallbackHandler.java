@@ -18,20 +18,9 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -210,7 +199,17 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(
                 callbackKey(MID, "specRespondentCorrespondenceAddress"),
-                this::validateCorrespondenceRespondentAddress
+                params -> validateCorrespondenceRespondentAddress(
+                    params,
+                    CaseData::getSpecRespondentCorrespondenceAddressRequired,
+                    CaseData::getSpecRespondentCorrespondenceAddressdetails)
+            )
+            .put(
+                callbackKey(MID, "specRespondent2CorrespondenceAddress"),
+                params -> validateCorrespondenceRespondentAddress(
+                    params,
+                    CaseData::getSpecRespondent2CorrespondenceAddressRequired,
+                    CaseData::getSpecRespondent2CorrespondenceAddressdetails)
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
@@ -669,10 +668,32 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
+    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams,
+                                                                     Function<CaseData, YesOrNo> required,
+                                                                     Function<CaseData, Address> address) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (YES.equals(required.apply(caseData))) {
+            return validatePostCode(address.apply(caseData).getPostCode());
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
+    }
+
     private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getSpecRespondentCorrespondenceAddressRequired().equals(YES)) {
+        if (YES.equals(caseData.getSpecRespondentCorrespondenceAddressRequired())) {
             return validatePostCode(caseData.getSpecRespondentCorrespondenceAddressdetails().getPostCode());
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
+    }
+
+    private CallbackResponse validateCorrespondenceRespondent2Address(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (YES.equals(caseData.getSpecRespondent2CorrespondenceAddressRequired())) {
+            return validatePostCode(caseData.getSpecRespondent2CorrespondenceAddressdetails().getPostCode());
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();

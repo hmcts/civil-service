@@ -693,7 +693,8 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
-
+    private final Address specRespondent2CorrespondenceAddressdetails;
+    private final YesOrNo specRespondent2CorrespondenceAddressRequired;
     private FastTrackAllocation fastTrackAllocation;
 
     @JsonIgnore
