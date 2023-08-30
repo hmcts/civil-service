@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderMade {
+public class DateHeardFinalOrders {
 
-    private DatesFinalOrders singleDateSelection;
-    private DatesFinalOrders dateRangeSelection;
-
+    private LocalDate singleDate;
+    private LocalDate dateRangeFrom;
+    private LocalDate dateRangeTo;
 }
 

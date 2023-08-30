@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -104,6 +106,40 @@ public class SdoHelper {
         }
 
         return hasDirection;
+    }
+
+    public static String getDisposalHearingTimeLabel(CaseData caseData) {
+        DisposalHearingHearingTime disposalHearingHearingTime = caseData.getDisposalHearingHearingTime();
+
+        String hearingTimeEstimateLabel = "";
+
+        if (Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel).isPresent()) {
+            if (disposalHearingHearingTime.getTime().getLabel().equals("Other")) {
+                StringBuilder otherLength = new StringBuilder();
+                if (disposalHearingHearingTime.getOtherHours() != null
+                    && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
+                    String hourString = Integer.parseInt(disposalHearingHearingTime.getOtherHours()) == 1
+                        ? " hour" : " hours";
+                    otherLength.append(disposalHearingHearingTime.getOtherHours().trim() + hourString);
+                }
+                if (disposalHearingHearingTime.getOtherMinutes() != null
+                    && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
+                    String minuteString = Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) == 1
+                        ? " minute" : " minutes";
+                    String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
+                    otherLength.append(spaceBeforeMinute
+                                           + disposalHearingHearingTime.getOtherMinutes().trim()
+                                           + minuteString);
+                }
+                return otherLength.toString();
+            }
+
+            hearingTimeEstimateLabel = disposalHearingHearingTime.getTime().getLabel().toLowerCase(Locale.ROOT);
+        }
+
+        return hearingTimeEstimateLabel;
     }
 
     public static String getSmallClaimsHearingTimeLabel(CaseData caseData) {
