@@ -213,7 +213,7 @@ public class BundleRequestMapper {
         if (documentEvidenceForTrial != null) {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(documentEvidenceForTrial,
-                                             TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames(), false),
+                                             TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.getDisplayNames(), false),
                 BundleFileNameList.NOTICE_TO_ADMIT_FACTS.getDisplayName(),
                 TypeOfDocDocumentaryEvidenceOfTrial.NOTICE_TO_ADMIT_FACTS.name(),
                 partyType
@@ -416,6 +416,13 @@ public class BundleRequestMapper {
                                                                       .documentFilename(caseDocumentElement.getValue().getDocumentLink().getDocumentFileName()).build())
                                                     .build());
         });
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
+                                             TypeOfDocDocumentaryEvidenceOfTrial.PART18.getDisplayNames(), false),
+                BundleFileNameList.REPLY_TO_PART_18.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(), partyType
+            ));
+        });
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
                                                                                .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
@@ -477,11 +484,15 @@ public class BundleRequestMapper {
                                                                                      BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME.getDisplayName(),
                                                                                      EvidenceUploadFiles.CASE_SUMMARY.name(),
                                                                                         partyType));
+        });
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames(), false),
                 BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.name(), partyType
             ));
+        });
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
                                              TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.getDisplayNames(), false),
