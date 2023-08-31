@@ -677,9 +677,9 @@ public class BundleRequestMapper {
             evidenceUploadExpert.forEach(expertElement -> {
                 String docName = generateDocName(fileNamePrefix,
                                                  expertElement.getValue().getExpertOptionName(),
-                                                 documentType.equals(EvidenceUploadFiles.EXPERT_REPORT)
+                                                 documentType.equals(EvidenceUploadFiles.EXPERT_REPORT.name())
                                                      ? expertElement.getValue().getExpertOptionExpertise() :
-                                                     documentType.equals(EvidenceUploadFiles.JOINT_STATEMENT)
+                                                     documentType.equals(EvidenceUploadFiles.JOINT_STATEMENT.name())
                                                          ? expertElement.getValue().getExpertOptionExpertises() : null,
                                                  expertElement.getValue().getExpertOptionUploadDate()
                 );
