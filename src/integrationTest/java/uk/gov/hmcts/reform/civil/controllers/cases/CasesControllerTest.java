@@ -10,6 +10,10 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.math.BigDecimal;
@@ -62,6 +67,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
+    private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -107,6 +113,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     PostcodeValidator postcodeValidator;
+
+    @MockBean
+    private UserInformationService userInformationService;
 
     @Test
     @SneakyThrows
@@ -347,6 +356,57 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString().equals(
                 Arrays.asList("Postcode must be in England or Wales"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetUserInfoSuccessfully() {
+        List<String> expectedRoles = List.of("role1", "role2");
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .then(invocation -> expectedRoles);
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(toJson(expectedRoles)))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowNotFoundExceptionWhenGetUserInfo() {
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .thenThrow(CaseNotFoundException.class);
+
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("Case was not found"))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowUserNotFoundOnCaseExceptionWhenRolesIsEmpty() {
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .thenThrow(new UserNotFoundOnCaseException("111"));
+
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("User with Id: 111 was not found on case"))
+            .andReturn();
+
     }
 
 }
