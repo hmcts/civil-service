@@ -22,20 +22,14 @@ public enum BundleFileNameList {
     WITNESS_STATEMENT_OTHER_DISPLAY_NAME("Witness Statement %s"),
     WITNESS_STATEMENT("Witness Statement"),
     WITNESS_SUMMARY("Witness Summary %s %s"),
-    HEARSAY_NOTICE("Hearsay notice %s"),
+    HEARSAY_NOTICE("Hearsay notice %s %s"),
     NOTICE_TO_ADMIT_FACTS("Notice to admit facts %s %s"),
     DF_RESPONSE("DF Response %s"),
     CL_1_EXPERTS("CL 1 Experts"),
     EXPERT_EVIDENCE("Expert Evidence %s %s"),
     QUESTIONS_TO("Questions to %s %s"),
     REPLIES_FROM("Replies from %s %s"),
-    JOINT_STATEMENTS_OF_EXPERTS("Joint statements of experts/Single joint expert report"),
-    CL1_DOCUMENTS_THEY_INTEND_TO_RELY_ON("CL 1 Documents they intend to rely on"),
-    INVOICE("Invoice"),
-    CL2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("CL 2 Documents they intend to rely on"),
-    DF1_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 1 Documents they intend to rely on"),
-    DF2_DOCUMENTS_THEY_INTEND_TO_RELY_ON("DF 2 Documents they intend to rely on");
-
+    JOINT_STATEMENTS_OF_EXPERTS("Joint statements of experts/Single joint expert report");
     String displayName;
 
     public String getDisplayName() {
