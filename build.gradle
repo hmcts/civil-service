@@ -459,9 +459,9 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.5.0'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.5.0'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.4'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.4'
 
