@@ -691,16 +691,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
     }
 
-    private CallbackResponse validateCorrespondenceRespondent2Address(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (YES.equals(caseData.getSpecRespondent2CorrespondenceAddressRequired())) {
-            return validatePostCode(caseData.getSpecRespondent2CorrespondenceAddressdetails().getPostCode());
-        } else {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
-    }
-
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getSpecApplicantCorrespondenceAddressRequired().equals(YES)) {
