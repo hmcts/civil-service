@@ -142,4 +142,5 @@ public class CmcClaimTest {
             cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         AssertionsForClassTypes.assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
+
 }
