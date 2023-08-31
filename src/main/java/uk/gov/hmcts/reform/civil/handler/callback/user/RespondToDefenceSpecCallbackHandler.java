@@ -326,7 +326,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
