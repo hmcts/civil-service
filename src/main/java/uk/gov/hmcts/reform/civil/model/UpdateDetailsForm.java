@@ -20,6 +20,12 @@ public class UpdateDetailsForm {
     @JsonProperty("partyChosen")
     private DynamicList partyChosen;
 
+    @JsonProperty("partyChosenId")
+    private String partyChosenId;
+
+    @JsonProperty("partyChosenType")
+    private String partyChosenType;
+
     @JsonProperty("additionalUnavailableDates")
     private List<Element<UnavailableDate>> additionalUnavailableDates;
 

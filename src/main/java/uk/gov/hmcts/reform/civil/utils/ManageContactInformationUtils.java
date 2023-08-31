@@ -34,25 +34,25 @@ public class ManageContactInformationUtils {
     private static final String ORG_INDIVIDUALS = "Individuals attending for the organisation";
     private static final String LEGAL_REP_INDIVIDUALS = "Individuals attending for the legal representative";
 
-    private static final String CLAIMANT_ONE_ID = "CLAIMANT_1";
+    public static final String CLAIMANT_ONE_ID = "CLAIMANT_1";
     private static final String CLAIMANT_ONE_LITIGATION_FRIEND_ID = "CLAIMANT_1_LITIGATIONFRIEND";
     private static final String CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSSOLICITORORG";
     private static final String CLAIMANT_ONE_ORG_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSORG";
     private static final String CLAIMANT_ONE_WITNESSES_ID = "CLAIMANT_1_WITNESSES";
     private static final String CLAIMANT_ONE_EXPERTS_ID = "CLAIMANT_1_EXPERTS";
 
-    private static final String CLAIMANT_TWO_ID = "CLAIMANT_2";
+    public static final String CLAIMANT_TWO_ID = "CLAIMANT_2";
     private static final String CLAIMANT_TWO_LITIGATION_FRIEND_ID = "CLAIMANT_2_LITIGATIONFRIEND";
     private static final String CLAIMANT_TWO_ORG_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSORG";
 
-    private static final String DEFENDANT_ONE_ID = "DEFENDANT_1";
+    public static final String DEFENDANT_ONE_ID = "DEFENDANT_1";
     private static final String DEFENDANT_ONE_LITIGATION_FRIEND_ID = "DEFENDANT_1_LITIGATIONFRIEND";
     private static final String DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_1_INDIVIDUALSSOLICITORORG";
     private static final String DEFENDANT_ONE_ORG_INDIVIDUALS_ID = "DEFENDANT_1_INDIVIDUALSORG";
     private static final String DEFENDANT_ONE_WITNESSES_ID = "DEFENDANT_1_WITNESSES";
     private static final String DEFENDANT_ONE_EXPERTS_ID = "DEFENDANT_1_EXPERTS";
 
-    private static final String DEFENDANT_TWO_ID = "DEFENDANT_2";
+    public static final String DEFENDANT_TWO_ID = "DEFENDANT_2";
     private static final String DEFENDANT_TWO_LITIGATION_FRIEND_ID = "DEFENDANT_2_LITIGATIONFRIEND";
     private static final String DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_2_INDIVIDUALSSOLICITORORG";
     private static final String DEFENDANT_TWO_ORG_INDIVIDUALS_ID = "DEFENDANT_2_INDIVIDUALSORG";
@@ -93,6 +93,32 @@ public class ManageContactInformationUtils {
             addLegalRepIndividuals(list, DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID, DEFENDANT_TWO);
         }
         addDefendant2ExpertsAndWitnesses(list, caseData, isAdmin);
+    }
+
+    public static String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
+        String user = isAdmin ? "ADMIN" : "LR";
+
+        switch (partyChosen) {
+            case (CLAIMANT_ONE_ID): {
+                return formatId(partyChosen, user, caseData.getApplicant1());
+            }
+            case(CLAIMANT_TWO_ID): {
+                return formatId(partyChosen, user, caseData.getApplicant2());
+            }
+            case (DEFENDANT_ONE_ID): {
+                return formatId(partyChosen, user, caseData.getRespondent1());
+            }
+            case(DEFENDANT_TWO_ID): {
+                return formatId(partyChosen, user, caseData.getRespondent2());
+            }
+            default: {
+                throw new IllegalArgumentException("Manage Contact Information party chosen ID does not exist");
+            }
+        }
+    }
+
+    private static String formatId(String partyChosen, String isAdmin, Party party) {
+        return String.format("%s_%s_%s", partyChosen, isAdmin, party.getType().toString());
     }
 
     private static void addApplicant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
@@ -239,7 +265,6 @@ public class ManageContactInformationUtils {
             }
         }
     }
-
     private static boolean shouldAddExperts(Experts experts) {
         return YES.equals(experts.getExpertRequired())
             && experts.getDetails() != null

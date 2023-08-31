@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -14,14 +15,17 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant2Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
-
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
 class ManageContactInformationUtilsTest {
 
     @Test
@@ -244,6 +248,29 @@ class ManageContactInformationUtilsTest {
         addDefendantOptions1v2SameSolicitor(options, caseData, true);
 
         assertThat(options).isEqualTo(expectedDefendants1v2SameSolicitorOptions(true, true));
+    }
+
+    @Nested
+    class AppendCorrectUserAndType {
+        @Test
+        void shouldHaveCorrectID_CLAIMANT_1_ADMIN_INDIVIDUAL() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build()).build();
+
+            String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
+
+            assertThat(result).isEqualTo("CLAIMANT_1_ADMIN_INDIVIDUAL");
+        }
+
+        @Test
+        void shouldHaveCorrectID_CLAIMANT_1_ADMIN_SOLE_TRADER() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(SOLE_TRADER).build()).build();
+
+            String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
+
+            assertThat(result).isEqualTo("CLAIMANT_1_ADMIN_SOLE_TRADER");
+        }
     }
 
     private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
