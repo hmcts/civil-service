@@ -98,6 +98,18 @@ public class BundleFileNameHelper {
                         ? caseData.getDocumentAnswersRes2() : null;
                 };
             }
+            case JOINT_STATEMENT: {
+                return switch (partyType) {
+                    case CLAIMANT1 -> caseData.getDocumentJointStatement() != null
+                        ? caseData.getDocumentJointStatement() : null;
+                    case CLAIMANT2 -> caseData.getDocumentJointStatementApp2() != null
+                        ? caseData.getDocumentJointStatementApp2() : null;
+                    case DEFENDANT1 -> caseData.getDocumentJointStatementRes() != null
+                        ? caseData.getDocumentJointStatementRes() : null;
+                    case DEFENDANT2 -> caseData.getDocumentJointStatementRes2() != null
+                        ? caseData.getDocumentJointStatementRes2() : null;
+                };
+            }
             default: return null;
         }
     }
