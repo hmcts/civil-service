@@ -89,7 +89,8 @@ public class CcdDashboardClaimMatcher implements Claim {
             && (caseData.respondent1PaidInFull()
             || caseData.isResponseAcceptedByClaimant())
             && Objects.isNull(caseData.getCcjPaymentDetails())
-            && !caseData.hasApplicantRejectedRepaymentPlan();
+            && !caseData.hasApplicantRejectedRepaymentPlan()
+            || caseData.isPartAdmitClaimSettled();
     }
 
     @Override
@@ -184,7 +185,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isBeforeHearing() {
-        return (isBeforeSmallClaimHearing() || isBeforeFastTrackHearing()) || noHearingScheduled();
+        return isBeforeSmallClaimHearing() || (isBeforeFastTrackHearing() || noHearingScheduled());
     }
 
     private boolean noHearingScheduled() {

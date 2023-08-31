@@ -969,8 +969,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isInHearingReadiness = caseData ->
         caseData.getHearingReferenceNumber() != null
         && caseData.getListingOrRelisting() != null
+        && caseData.getListingOrRelisting().equals(LISTING)
         && caseData.getCaseDismissedHearingFeeDueDate() == null
-        && caseData.getListingOrRelisting().equals(LISTING);
-
+        && caseData.getTakenOfflineDate() == null;
+       
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 }
