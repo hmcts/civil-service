@@ -309,8 +309,9 @@ public class BundleRequestMapper {
         }
         witnessStatmentsMap.forEach((witnessName, witnessEvidence) -> {
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-                String docName = generateWitnessDocName(displayName, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
-                                                        witnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1,
+                String docName = generateDocName(displayName,
+                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                                                 String.valueOf(witnessEvidence.indexOf(uploadEvidenceWitnessElement) + 1),
                                                  uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate());
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
                                                  .documentFileName(docName)
@@ -371,15 +372,6 @@ public class BundleRequestMapper {
             ));
         }
         return expertEvidence;
-    }
-
-    private String generateWitnessDocName(String displayName, String witnessOptionName, int index,
-                                          LocalDate witnessOptionUploadDate) {
-        StringBuilder displayFileName = new StringBuilder();
-        displayFileName.append(witnessOptionName);
-        displayFileName.append(" " + index + " ");
-        displayFileName.append(witnessOptionUploadDate);
-        return String.format(displayName, displayFileName);
     }
 
     private List<Element<UploadEvidenceWitness>> getSelfStatement(Map<String,
