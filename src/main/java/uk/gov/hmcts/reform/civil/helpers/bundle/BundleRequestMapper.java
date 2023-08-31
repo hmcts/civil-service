@@ -116,8 +116,8 @@ public class BundleRequestMapper {
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
             List<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
                                                                    caseData);
-            bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.EXPERT_REPORT, caseData,
-                                                                BundleFileNameList.EXPERT_EVIDENCE, allJointExpertsNames
+            bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.JOINT_STATEMENT, caseData,
+                                                                BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS, allJointExpertsNames
             ));
             bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
                                                                 BundleFileNameList.QUESTIONS_TO, allJointExpertsNames));
@@ -468,7 +468,7 @@ public class BundleRequestMapper {
                 ? PartyType.DEFENDANT1.getDisplayName() :
                     caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")
                         ? PartyType.DEFENDANT2.getDisplayName() : "";
-            String docName = String.format(generateDocName(docType, party,
+            String docName = String.format(generateDocName(docType, party, null,
                                                            caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()),
                                            caseDocumentElement.getValue().getCreatedDatetime());
             bundlingRequestDocuments.add(BundlingRequestDocument.builder()
@@ -612,7 +612,9 @@ public class BundleRequestMapper {
             }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
                 String docName = generateDocName(fileNamePrefix,
-                                                 isWitnessSelf ? party.getDisplayName() : uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                                                 isWitnessSelf ? party.getDisplayName() :
+                                                     uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                                                 null,
                                                  documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
                                                      ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
                                                      .getValue().getCreatedDatetime().toLocalDate());
@@ -630,11 +632,14 @@ public class BundleRequestMapper {
         return bundlingRequestDocuments;
     }
 
-    private String generateDocName(String fileName, String strParam, LocalDate date) {
+    private String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
         if (StringUtils.isBlank(strParam)) {
             return String.format(fileName, DateFormatHelper.formatLocalDate(date, "dd/MM/yyyy"));
+        } else if (StringUtils.isBlank(strParam2)) {
+            return String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, "dd/MM/yyyy"));
+        } else {
+            return String.format(fileName, strParam, strParam2, DateFormatHelper.formatLocalDate(date, "dd/MM/yyyy"));
         }
-        return String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, "dd/MM/yyyy"));
     }
 
     private List<BundlingRequestDocument> covertEvidenceUploadTypeToBundleRequestDocs(List<Element<UploadEvidenceDocumentType>> evidenceUploadDocList,
@@ -650,9 +655,9 @@ public class BundleRequestMapper {
                     uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName()
                     : fileNamePrefix.equals(DOC_FILE_NAME_WITH_DATE)
                     ?
-                    generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(), null,
+                    generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(), null, null,
                                     uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
-                    : generateDocName(fileNamePrefix, party.getDisplayName(),
+                    : generateDocName(fileNamePrefix, party.getDisplayName(), null,
                                                 documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
                                       ? uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :
                                                     uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate()
@@ -677,17 +682,22 @@ public class BundleRequestMapper {
 
         if (evidenceUploadExpert != null) {
             sortExpertListByDate(evidenceUploadExpert, false);
-            evidenceUploadExpert.forEach(uploadEvidenceDocumentTypeElement -> {
-                String docName = generateDocName(fileNamePrefix, uploadEvidenceDocumentTypeElement.getValue().getExpertOptionName(),
-                                                 uploadEvidenceDocumentTypeElement.getValue().getExpertOptionUploadDate()
+            evidenceUploadExpert.forEach(expertElement -> {
+                String docName = generateDocName(fileNamePrefix,
+                                                 expertElement.getValue().getExpertOptionName(),
+                                                 documentType.equals(EvidenceUploadFiles.EXPERT_REPORT)
+                                                     ? expertElement.getValue().getExpertOptionExpertise() :
+                                                     documentType.equals(EvidenceUploadFiles.JOINT_STATEMENT)
+                                                         ? expertElement.getValue().getExpertOptionExpertises() : null,
+                                                 expertElement.getValue().getExpertOptionUploadDate()
                 );
                 bundlingRequestDocuments.add(BundlingRequestDocument.builder()
                                                  .documentFileName(docName)
                                                  .documentType(documentType)
                                                  .documentLink(DocumentLink.builder()
-                                                                   .documentUrl(uploadEvidenceDocumentTypeElement.getValue().getExpertDocument().getDocumentUrl())
-                                                                   .documentBinaryUrl(uploadEvidenceDocumentTypeElement.getValue().getExpertDocument().getDocumentBinaryUrl())
-                                                                   .documentFilename(uploadEvidenceDocumentTypeElement.getValue()
+                                                                   .documentUrl(expertElement.getValue().getExpertDocument().getDocumentUrl())
+                                                                   .documentBinaryUrl(expertElement.getValue().getExpertDocument().getDocumentBinaryUrl())
+                                                                   .documentFilename(expertElement.getValue()
                                                                                          .getExpertDocument().getDocumentFileName()).build())
                                                  .build());
             });
@@ -716,7 +726,7 @@ public class BundleRequestMapper {
         if (systemGeneratedCaseDocuments != null) {
             systemGeneratedCaseDocuments.forEach(caseDocumentElement -> {
                 bundlingSystemGeneratedCaseDocs.add(BundlingRequestDocument.builder()
-                                                        .documentFileName(generateDocName(displayName, null,
+                                                        .documentFileName(generateDocName(displayName, null, null,
                                                                                           caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()))
                                                         .documentLink(DocumentLink.builder()
                                                                           .documentUrl(caseDocumentElement.getValue().getDocumentLink().getDocumentUrl())

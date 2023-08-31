@@ -29,7 +29,7 @@ public enum BundleFileNameList {
     EXPERT_EVIDENCE("Expert Evidence %s %s"),
     QUESTIONS_TO("Questions to %s %s"),
     REPLIES_FROM("Replies from %s %s"),
-    JOINT_STATEMENTS_OF_EXPERTS("Joint statements of experts/Single joint expert report");
+    JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s");
     String displayName;
 
     public String getDisplayName() {
