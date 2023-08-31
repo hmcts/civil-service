@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
+import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
@@ -220,6 +221,7 @@ public class JudgeFinalOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .solicitorReferences(null)
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
@@ -246,6 +248,7 @@ public class JudgeFinalOrderGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
@@ -279,7 +282,7 @@ public class JudgeFinalOrderGeneratorTest {
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
-            .finalOrderDateHeardComplex(OrderMade.builder().date(LocalDate.now()).build())
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList)
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
                 ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
