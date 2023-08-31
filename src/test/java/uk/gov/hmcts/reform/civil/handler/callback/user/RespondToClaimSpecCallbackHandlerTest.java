@@ -1972,6 +1972,28 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             verify(postcodeValidator).validate("postal code");
         }
+
+        @Test
+        void whenProvided_thenValidateCorrespondence2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .isRespondent1(YES)
+                .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
+                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder()
+                                                                   .postCode("postal code")
+                                                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
+            when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            verify(postcodeValidator).validate("postal code");
+        }
     }
 
     @Nested
