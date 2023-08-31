@@ -73,7 +73,7 @@ public class BundleRequestMapper {
         String respondentName = caseData.getApplicant1().isIndividual()
             ? caseData.getRespondent1().getIndividualLastName() : caseData.getRespondent1().getPartyName();
         return applicantName + "v" + respondentName +
-            "- Bundle" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
+            "-Bundle-" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
@@ -194,7 +194,7 @@ public class BundleRequestMapper {
                                                                                      party);
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(witnessStatementSelf,
                                                                                  BundleFileNameList.WITNESS_STATEMENT_DISPLAY_NAME.getDisplayName(),
-                                                                                 EvidenceUploadFiles.WITNESS_STATEMENT.name(), partyType));
+                                                                                 EvidenceUploadFiles.WITNESS_STATEMENT.name(), partyType, true));
         bundlingRequestDocuments.addAll(covertOtherWitnessEvidenceToBundleRequestDocs(witnessStatmentsMap,
                                                                                       BundleFileNameList.WITNESS_STATEMENT_OTHER_DISPLAY_NAME.getDisplayName(),
                                                                                       EvidenceUploadFiles.WITNESS_STATEMENT.name(),
@@ -203,12 +203,12 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType,
                                                                                                                 EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
                                                                                 BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
-                                                                                EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType));
+                                                                                EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType, false));
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType,
                                                                                                                  EvidenceUploadFiles.NOTICE_OF_INTENTION, caseData),
                                                                                  BundleFileNameList.HEARSAY_NOTICE.getDisplayName(),
                                                                                  EvidenceUploadFiles.NOTICE_OF_INTENTION.name(),
-                                                                                 partyType));
+                                                                                 partyType, false));
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial = getEvidenceUploadDocsByPartyAndDocType(partyType,
             EvidenceUploadFiles.DOCUMENTARY, caseData);
         if (documentEvidenceForTrial != null) {
@@ -539,7 +539,8 @@ public class BundleRequestMapper {
     private List<BundlingRequestDocument> covertWitnessEvidenceToBundleRequestDocs(List<Element<UploadEvidenceWitness>> witnessEvidence,
                                                                                    String fileNamePrefix,
                                                                                    String documentType,
-                                                                                   PartyType party) {
+                                                                                   PartyType party,
+                                                                                   boolean isWitnessSelf) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
             if (documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())) {
@@ -548,7 +549,8 @@ public class BundleRequestMapper {
                 sortWitnessListByDate(witnessEvidence, true);
             }
             witnessEvidence.forEach(uploadEvidenceWitnessElement -> {
-                String docName = generateDocName(fileNamePrefix, uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
+                String docName = generateDocName(fileNamePrefix,
+                                                 isWitnessSelf ? party.getDisplayName() : uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                  documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
                                                      ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
                                                      .getValue().getCreatedDatetime().toLocalDate());
