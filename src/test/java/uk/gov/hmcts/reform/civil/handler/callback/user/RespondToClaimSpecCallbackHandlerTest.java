@@ -1978,7 +1978,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .isRespondent1(YES)
+                .isRespondent2(YES)
                 .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
                 .specAoSRespondent2CorrespondenceAddressdetails(Address.builder()
                                                                    .postCode("postal code")
