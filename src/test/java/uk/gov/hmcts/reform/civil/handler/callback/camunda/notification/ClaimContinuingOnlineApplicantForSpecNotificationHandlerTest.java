@@ -253,10 +253,17 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                 .build();
 
             // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            handler.handle(params);
+
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
 
             // Then
-            assertThat(response.getData()).isNull();
+            verify(notificationService).sendMail(
+                APPLICANT_SOLICITOR_EMAIL,
+                TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
         }
 
         @Test
@@ -271,17 +278,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                 .build();
 
             // When
-            handler.handle(params);
-
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            verify(notificationService).sendMail(
-                APPLICANT_SOLICITOR_EMAIL,
-                TEMPLATE,
-                expectedProperties,
-                REFERENCE
-            );
+            assertThat(response.getData()).isNull();
         }
     }
 
