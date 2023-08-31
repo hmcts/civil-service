@@ -73,8 +73,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             getDefendantType = caseData.getRespondent2()::getType;
         }
 
-        if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && PEOPLE.contains(getDefendantType.get())) {
+        if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
 
             locationHelper.getClaimantRequestedCourt(caseData)
                     .filter(this::hasInfo)
