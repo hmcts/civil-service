@@ -154,6 +154,8 @@ class BundleRequestMapperTest {
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
                                                                             .documentFileName(TEST_FILE_NAME).build())
+                                                        .expertOptionExpertise("Test")
+                                                        .expertOptionExpertises("Test1 Test2")
                                                         .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
                                                         .expertOptionName("FirstName LastName").build()));
 
