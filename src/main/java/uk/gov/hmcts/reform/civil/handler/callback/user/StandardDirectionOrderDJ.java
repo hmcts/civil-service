@@ -122,6 +122,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(V_1, MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(MID, "create-order"), this::createOrderScreen)
+            .put(callbackKey(MID, "validateInputValue"), this::validateInputValue)
             .put(callbackKey(V_1, MID, "create-order"), this::createOrderScreen)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -802,5 +803,26 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             return null;
         }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
+        String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
+        List<String> errors = new ArrayList<>();
+        if (inputValue1 != null && inputValue2 != null) {
+            int number1 = Integer.parseInt(inputValue1);
+            int number2 = Integer.parseInt(inputValue2);
+            if (number1 < 0 || number2 < 0) {
+                errors.add("The number entered cannot be less than zero");
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 }

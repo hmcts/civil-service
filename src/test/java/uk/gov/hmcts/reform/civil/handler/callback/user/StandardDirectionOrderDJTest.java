@@ -778,5 +778,25 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                     .build());
         }
     }
+
+    @Nested
+    class MidEventNegativeNumberOfWitness {
+        private static final String PAGE_ID = "validateInputValue";
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atTrialHearingWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+    }
 }
 
