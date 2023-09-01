@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.PartyIdsUpdatedException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
@@ -59,5 +60,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> caseDataInvalidException(CaseDataInvalidException caseDataInvalidException) {
         log.error(caseDataInvalidException.getMessage());
         return new ResponseEntity<>("Submit claim unsuccessful, Invalid Case data", new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(UserNotFoundOnCaseException.class)
+    public ResponseEntity<Object> userNotFoundOnCaseException(UserNotFoundOnCaseException userNotFoundOnCaseException) {
+        log.error(userNotFoundOnCaseException.getMessage());
+        return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }
