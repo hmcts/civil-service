@@ -130,7 +130,9 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -1427,6 +1429,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent1DQ(
                 updatedData.build().getRespondent1DQ().toBuilder()
                     .respondent1DQExperts(Experts.builder()
+                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
                                               .details(wrapElements(expert))
                                               .build())
                     .build());
@@ -1438,16 +1441,23 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DQ(
                 updatedData.build().getRespondent2DQ().toBuilder()
                     .respondent2DQExperts(Experts.builder()
+                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
                                               .details(wrapElements(expert))
                                               .build())
                     .build());
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
+                                                                        toggleService.isUpdateContactDetailsEnabled());
 
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+        }
+
+        if (toggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(updatedData);
+            addEventAndDateAddedToRespondentWitnesses(updatedData);
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
