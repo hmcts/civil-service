@@ -131,7 +131,7 @@ public class BundleRequestMapper {
     private List<Element<BundlingRequestDocument>> mapCostBudgetDocs(CaseData caseData, PartyType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
-                                                                                                                           EvidenceUploadFiles.DOCUMENTS_FOR_DISCLOSURE, caseData),
+                                                                                                                           EvidenceUploadFiles.COSTS, caseData),
                                                                                     DOC_FILE_NAME_WITH_DATE,
                                                                                     EvidenceUploadFiles.COSTS.name(),
                                                                                     partyType));
