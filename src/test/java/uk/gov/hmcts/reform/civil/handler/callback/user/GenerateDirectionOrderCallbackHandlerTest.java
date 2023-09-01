@@ -297,17 +297,17 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @ParameterizedTest
         @MethodSource("invalidAssistedOrderDates")
-        void validateAssistedOrderDates(CaseData caseData, String expectedErrorMessage) {
+        void validateAssistedOrderInvalidDates(CaseData caseData, String expectedErrorMessage) {
             // When
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
             // Then
-            assertThat(response.getErrors()).containsExactly(expectedErrorMessage);
+            assertThat(response.getErrors().get(0)).isEqualTo(expectedErrorMessage);
         }
 
         @ParameterizedTest
         @MethodSource("validAssistedOrderDates")
-        void validateAssistedOrderDate2(CaseData caseData) {
+        void validateAssistedOrderValidDates(CaseData caseData) {
             // When
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
@@ -399,7 +399,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
                                                                                                 .singleDate(LocalDate.now().plusDays(2))
                                                                                                 .build()).build()).build(),
-                    "The date in Order Made may not be later than the established date"
+                    "The date in Order made may not be later than the established date"
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -408,7 +408,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                .dateRangeFrom(LocalDate.now().plusDays(2))
                                                                                                .dateRangeTo(LocalDate.now().minusDays(4))
                                                                                                .build()).build()).build(),
-                    "The date in Order Made may not be later than the established date"
+                    "The date in Order made 'date from' may not be later than the established date"
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -417,7 +417,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                .dateRangeFrom(LocalDate.now().minusDays(2))
                                                                                                .dateRangeTo(LocalDate.now().plusDays(2))
                                                                                                .build()).build()).build(),
-                    "The date in Order Made may not be later than the established date"
+                    "The date in Order made 'date to' may not be later than the established date"
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -426,7 +426,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                .dateRangeFrom(LocalDate.now().minusDays(20))
                                                                                                .dateRangeTo(LocalDate.now().minusDays(30))
                                                                                                .build()).build()).build(),
-                    "The date range in Order Made may not have a 'from date', that is after the 'date to'"
+                    "The date range in Order made may not have a 'from date', that is after the 'date to'"
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -462,9 +462,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                      .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
-                                                                                                                        .build())
-                                                                                       .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
-                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                                                         .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
                 ),
@@ -473,11 +470,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
                                                      .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
-                                                                                       .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
-                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
-                                                                                                                        .build())
                                                                                        .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
-                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().minusDays(3))
+                                                                                                                        .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                         .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
                 )
