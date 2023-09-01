@@ -5,23 +5,31 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.PaymentUponCourtOrder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(SpringExtension.class)
 class CcdClaimStatusDashboardFactoryTest {
@@ -43,6 +51,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnEligibleForCCJStatus() {
         CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .build();
 
@@ -142,19 +151,6 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_claimIsSentToCourt_whenGetStatus_thenReturnTransferred() {
-        CaseData claim = CaseData.builder()
-            .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
-
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
-        assertThat(status).isEqualTo(DashboardClaimStatus.TRANSFERRED);
-    }
-
-    @Test
     void given_claimantRequestedCountyCourtJudgement_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
@@ -196,6 +192,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_hearingNoticeDocumentIssued_whenGetStatus_thenReturnHearingFormGenerated() {
         CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
             .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))
@@ -203,6 +200,124 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
         assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
+    }
+
+    @Test
+    void given_hearingDateForSmallClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+                                                       CaseDocument.builder()
+                                                           .documentType(DocumentType.SDO_ORDER)
+                                                           .build());
+        CaseData claim = CaseData.builder()
+            .smallClaimsHearing(SmallClaimsHearing.builder()
+                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .build())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
+    }
+
+    @Test
+    void given_hearingDateForFastTrackClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
+        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+                                                       CaseDocument.builder()
+                                                           .documentType(DocumentType.SDO_ORDER)
+                                                           .build());
+        CaseData claim = CaseData.builder()
+            .fastTrackHearingTime(FastTrackHearingTime.builder()
+                                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .build())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
+    }
+
+    @Test
+    void given_mediation_whenGetSatus_mediationSuccessful() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .mediation(Mediation.builder()
+                           .mediationSuccessful(MediationSuccessful.builder()
+                                                    .mediationAgreement(MediationAgreementDocument.builder().build())
+                                                    .build())
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_SUCCESSFUL);
+    }
+
+    @Test
+    void given_mediation_whenGetStatus_mediationUnsuccessful() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .mediation(Mediation.builder()
+                           .unsuccessfulMediationReason("this is a reason")
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_UNSUCCESSFUL);
+    }
+
+    @Test
+    void given_mediation_whenGetStatus_mediationPending() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .ccdState(CaseState.IN_MEDIATION)
+            .mediation(Mediation.builder()
+                           .mediationSuccessful(MediationSuccessful.builder()
+                                                    .build())
+                           .build())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.IN_MEDIATION);
+    }
+
+    @Test
+    void given_court_whenGetStatus_courtReview() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndApplicantNotProceedsWithClaim_whenGetStatus_claimEnded() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1ResponseDate(LocalDateTime.now())
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_applicantRejectPartialAdmit_whenGetStatus_rejectOffer() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
 
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
@@ -215,4 +330,47 @@ class CcdClaimStatusDashboardFactoryTest {
         return claim;
     }
 
+    @Test
+    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired() {
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED);
+    }
+
+    @Test
+    void given_claimantNotRespondedWithInDeadLine_whenGetStatus_claimEnded() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+            .applicant1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_claimantRejectsDefendantsPaymentPlan() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
 }

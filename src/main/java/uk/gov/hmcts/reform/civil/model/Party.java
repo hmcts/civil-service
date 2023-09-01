@@ -17,6 +17,8 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
@@ -46,6 +48,7 @@ public class Party {
     private Address primaryAddress;
 
     private String partyName;
+    private String bulkClaimPartyName;
     private String partyTypeDisplayValue;
 
     private String partyEmail;
@@ -86,5 +89,15 @@ public class Party {
     @JsonIgnore
     public boolean isSoleTrader() {
         return SOLE_TRADER.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isCompany() {
+        return COMPANY.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isOrganisation() {
+        return ORGANISATION.equals(getType());
     }
 }

@@ -233,11 +233,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                 .builder()
                                                 .judgeNameTitle(judgeNameTitle)
-                                                .input(judgeNameTitle
-                                                           + ", Upon considering the claim form and "
-                                                           + "Particulars of Claim/statements of case"
-                                                           + " [and the directions questionnaires] "
-                                                           + "\n\nIT IS ORDERED that:-").build());
+                                                .input(judgeNameTitle + ","
+                                                ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
                                                         .builder()
@@ -372,11 +369,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                              .builder()
                                              .judgeNameTitle(judgeNameTitle)
-                                             .input(judgeNameTitle
-                                                        + ", has considered the statements of "
-                                                        + "the case and the information provided "
-                                                        + "by the parties, \n\n "
-                                                        + "IT IS ORDERED THAT:").build());
+                                             .input(judgeNameTitle + ","
+                                             ).build());
 
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
