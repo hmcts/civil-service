@@ -186,8 +186,8 @@ public class BundleFileNameHelper {
                         ? caseData.getDocumentCostsApp2() : null;
                     case DEFENDANT1 -> caseData.getDocumentCostsRes() != null
                         ? caseData.getDocumentCostsRes() : null;
-                    case DEFENDANT2 -> caseData.getDocumentCaseSummaryRes2() != null
-                        ? caseData.getDocumentCaseSummaryRes2() : null;
+                    case DEFENDANT2 -> caseData.getDocumentCostsRes2() != null
+                        ? caseData.getDocumentCostsRes2() : null;
                 };
             }
             default: return null;
