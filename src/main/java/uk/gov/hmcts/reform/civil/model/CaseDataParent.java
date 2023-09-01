@@ -697,10 +697,15 @@ public class CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
 
-    private FastTrackAllocation fastTrackAllocation;
+    private List<Element<UnavailableDate>> applicant1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
+
+    private FastTrackAllocation fastTrackAllocation;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

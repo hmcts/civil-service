@@ -58,6 +58,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(
         MANAGE_CONTACT_INFORMATION
     );
+
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final ObjectMapper objectMapper;
