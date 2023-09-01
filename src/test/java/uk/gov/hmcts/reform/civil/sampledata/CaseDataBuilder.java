@@ -466,9 +466,9 @@ public class CaseDataBuilder {
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private IdamUserDetails claimantUserDetails;
 
-    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private UpdateDetailsForm updateDetailsForm;
 
     protected String hearingReference;
