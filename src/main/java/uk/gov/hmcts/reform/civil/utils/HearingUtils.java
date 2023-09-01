@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
@@ -119,5 +120,20 @@ public class HearingUtils {
         } else {
             return null;
         }
+    }
+
+    public static String getClaimantVDefendant(CaseData caseData) {
+        StringBuilder name = new StringBuilder(getTypeUserLastName(caseData.getApplicant1()));
+        name.append(" v ").append(getTypeUserLastName(caseData.getRespondent1()));
+        return name.toString();
+    }
+
+    public static String getTypeUserLastName(Party party) {
+        return switch (party.getType()) {
+            case INDIVIDUAL -> party.getIndividualLastName();
+            case COMPANY -> party.getCompanyName();
+            case SOLE_TRADER -> party.getSoleTraderLastName();
+            default -> party.getOrganisationName();
+        };
     }
 }

@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum DisposalHearingFinalDisposalHearingTimeEstimate {
     THIRTY_MINUTES("30 minutes"),
-    FIFTEEN_MINUTES("15 minutes");
+    FIFTEEN_MINUTES("15 minutes"),
+    OTHER("Other");
 
     private final String label;
 

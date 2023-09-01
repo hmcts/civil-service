@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_UNAVAILABLE_DATES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
@@ -550,7 +552,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
-                        BUNDLE_CREATION_NOTIFICATION
+                        BUNDLE_CREATION_NOTIFICATION,
+                        ADD_UNAVAILABLE_DATES
                     }
                 ),
                 of(
@@ -703,7 +706,8 @@ class FlowStateAllowedEventServiceTest {
                     IN_MEDIATION,
                     new CaseEvent[]{
                         MEDIATION_SUCCESSFUL,
-                        MEDIATION_UNSUCCESSFUL
+                        MEDIATION_UNSUCCESSFUL,
+                        ADD_UNAVAILABLE_DATES
                     }
                 ),
                 of(
@@ -736,7 +740,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_RESPONDENT,
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
-                        BUNDLE_CREATION_NOTIFICATION
+                        BUNDLE_CREATION_NOTIFICATION,
+                        ADD_UNAVAILABLE_DATES
                     }
                 )
             );
@@ -1056,6 +1061,15 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
             .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
             .isEqualTo(true);
     }
 }

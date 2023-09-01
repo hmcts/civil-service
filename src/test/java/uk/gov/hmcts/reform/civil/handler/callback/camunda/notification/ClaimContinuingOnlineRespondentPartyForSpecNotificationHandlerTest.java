@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -148,7 +149,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                     LETTER_CONTENT,
                     caseData.getLegacyCaseReference(),
                     caseData.getLegacyCaseReference(),
-                    "first-contact-pack"
+                    "first-contact-pack",
+                    Arrays.asList(caseData.getRespondent1().getPartyName())
                 );
         }
 
