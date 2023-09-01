@@ -648,8 +648,8 @@ public class BundleRequestMapper {
                     : fileNamePrefix.equals(DOC_FILE_NAME_WITH_DATE)
                     ?
                     generateDocName(uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload().getDocumentFileName(), null, null,
-                                    documentType.equals(EvidenceUploadFiles.COSTS.name()) ?
-                                        uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :
+                                    documentType.equals(EvidenceUploadFiles.COSTS.name())
+                                        ? uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime().toLocalDate() :
                                         uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())
                     : generateDocName(fileNamePrefix, party.getDisplayName(), null,
                                                 documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
