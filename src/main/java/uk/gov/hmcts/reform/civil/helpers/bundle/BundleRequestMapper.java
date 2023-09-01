@@ -72,8 +72,8 @@ public class BundleRequestMapper {
             ? caseData.getApplicant1().getIndividualLastName() : caseData.getApplicant1().getPartyName();
         String respondentName = caseData.getApplicant1().isIndividual()
             ? caseData.getRespondent1().getIndividualLastName() : caseData.getRespondent1().getPartyName();
-        return applicantName + "v" + respondentName +
-            "-Bundle-" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
+        return applicantName + " v " + respondentName +
+            "-" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
@@ -413,21 +413,21 @@ public class BundleRequestMapper {
                                                                            .equals(DocumentType.SDO_ORDER)).collect(
                                                                            Collectors.toList()),
                                                                        BundleFileNameList.DIRECTIONS_ORDER.getDisplayName()));
-        if (caseData.getGeneralOrderDocument() != null) {
+        if (caseData.getGeneralOrderDocStaff() != null) {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(
-                caseData.getGeneralOrderDocument(),
+                caseData.getGeneralOrderDocStaff(),
                 BundleFileNameList.ORDER.getDisplayName()
             ));
         }
-        if (caseData.getDismissalOrderDocument() != null) {
+        if (caseData.getDismissalOrderDocStaff() != null) {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(
-                caseData.getDismissalOrderDocument(),
+                caseData.getDismissalOrderDocStaff(),
                 BundleFileNameList.ORDER.getDisplayName()
             ));
         }
-        if (caseData.getDirectionOrderDocument() != null) {
+        if (caseData.getDirectionOrderDocStaff() != null) {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(
-                caseData.getDirectionOrderDocument(),
+                caseData.getDirectionOrderDocStaff(),
                 BundleFileNameList.ORDER.getDisplayName()
             ));
         }
