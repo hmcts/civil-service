@@ -27,7 +27,7 @@ public class BundleFileNameHelper {
                     case DEFENDANT1 -> caseData.getDocumentWitnessStatementRes() != null
                         ? caseData.getDocumentWitnessStatementRes() : null;
                     case DEFENDANT2 -> caseData.getDocumentWitnessStatementRes2() != null
-                        ? caseData.getDocumentWitnessStatementRes() : null;
+                        ? caseData.getDocumentWitnessStatementRes2() : null;
                 };
             }
             case WITNESS_SUMMARY : {
