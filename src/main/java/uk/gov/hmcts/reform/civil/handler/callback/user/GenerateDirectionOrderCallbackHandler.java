@@ -218,15 +218,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                            .build()).build());
     }
 
-    private void validateDate(LocalDate date, String dateDescription,String errorMessage, List<String> errors, Boolean pastDate) {
+    private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
         if (pastDate) {
             if (nonNull(date) && date.isBefore(LocalDate.now())) {
                 errors.add(String.format(errorMessage, dateDescription));
             }
-        } else{
-            if (nonNull(date) && date.isAfter(LocalDate.now())) {
-                errors.add(String.format(errorMessage, dateDescription));
-            }
+        } else if (nonNull(date) && date.isAfter(LocalDate.now())) {
+            errors.add(String.format(errorMessage, dateDescription));
         }
     }
 
