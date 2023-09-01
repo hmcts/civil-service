@@ -64,9 +64,8 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         sb.append(" legal representative if you need details on how to pay")
             .append("<br><br>")
             .append("If you do not pay immediately, ").append(applicantName)
-            .append(" can either:")
+            .append(" can:")
             .append("<ul>")
-            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
             .append("<li>request a county court judgment against you</li>")
             .append("</ul>")
 
