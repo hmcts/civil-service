@@ -162,7 +162,7 @@ allprojects {
         entry 'groovy-all'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.78') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.13') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
