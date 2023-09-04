@@ -24,6 +24,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -107,8 +109,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         }
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = isCcNotification(callbackParams)
-                ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
-                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
+                ? getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+                    ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec1v1()
+                    : notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
+                : getMultiPartyScenario(caseData).equals(ONE_V_ONE)
+                    ? notificationsProperties.getRespondentSolicitorNotifyToProceedSpec1v1()
+                    : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
