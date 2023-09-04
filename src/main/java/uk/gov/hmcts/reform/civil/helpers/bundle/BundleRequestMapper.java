@@ -638,9 +638,13 @@ public class BundleRequestMapper {
                                                                                       String fileNamePrefix, String documentType,
                                                                                       PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        log.info("Filename : " + fileNamePrefix + "partyname :" + party.getDisplayName());
         if (evidenceUploadDocList != null) {
-            sortEvidenceUploadByDate(evidenceUploadDocList, false);
+            if (documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())) {
+                sortEvidenceUploadByDate(evidenceUploadDocList, true);
+            } else {
+                sortEvidenceUploadByDate(evidenceUploadDocList, false);
+            }
+
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
                 String docName = fileNamePrefix.equals(DOC_FILE_NAME)
                     ?
