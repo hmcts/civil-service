@@ -32,6 +32,7 @@ public class PartyBuilder {
     private String partyName;
     private String partyEmail;
     private String partyPhone;
+    private String legalRepHeading;
 
     public static PartyBuilder builder() {
         return new PartyBuilder();
@@ -147,6 +148,11 @@ public class PartyBuilder {
         return this;
     }
 
+    public PartyBuilder legalRepHeading() {
+        legalRepHeading = "Organisation name";
+        return this;
+    }
+
     public Party build() {
         return Party.builder()
             .type(type)
@@ -165,6 +171,7 @@ public class PartyBuilder {
             .soleTraderTradingAs(soleTraderTradingAs)
             .partyPhone(partyPhone)
             .partyEmail(partyEmail)
+            .legalRepHeading(legalRepHeading)
             .build();
     }
 }
