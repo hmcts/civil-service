@@ -56,7 +56,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
-        + "%n%n The defendant will be served the Default Judgment.";
+        + "%n%n The defendant will be served with the Default Judgment.";
     public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
     public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
         + "The claim will now progress offline (on paper)";
