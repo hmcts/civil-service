@@ -519,7 +519,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(localDateTime);
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA3.5");
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
         }
 
         @ParameterizedTest
