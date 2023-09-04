@@ -61,7 +61,7 @@ public class FeatureToggleService {
     }
 
     public boolean isFastTrackUpliftsEnabled() {
-        return flse;
+        return true;
     }
 
     public boolean isUpdateContactDetailsEnabled() {
