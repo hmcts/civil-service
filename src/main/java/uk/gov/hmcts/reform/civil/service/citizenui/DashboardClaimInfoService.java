@@ -60,9 +60,8 @@ public class DashboardClaimInfoService {
             Collections.emptyList();
         return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
     }
-    
-    public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId,
-                                                          int currentPage) {
+
+    public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId, int currentPage) {
         List<DashboardClaimInfo> ocmcClaims = getClaimsForClaimant(authorisation, claimantId);
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
         var ccdData = getCCDCasesForClaimant(authorisation, startIndex);
