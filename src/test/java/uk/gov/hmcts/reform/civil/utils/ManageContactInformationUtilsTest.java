@@ -20,6 +20,9 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
@@ -263,13 +266,42 @@ class ManageContactInformationUtilsTest {
         }
 
         @Test
-        void shouldHaveCorrectID_CLAIMANT_1_ADMIN_SOLE_TRADER() {
+        void shouldHaveCorrectID_CLAIMANT_2_ADMIN_SOLE_TRADER() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(SOLE_TRADER).build()).build();
+                .applicant2(Party.builder().type(SOLE_TRADER).build()).build();
 
-            String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
+            String result = appendUserAndType(CLAIMANT_TWO_ID, caseData, true);
 
-            assertThat(result).isEqualTo("CLAIMANT_1_ADMIN_SOLE_TRADER");
+            assertThat(result).isEqualTo("CLAIMANT_2_ADMIN_SOLE_TRADER");
+        }
+
+        @Test
+        void shouldHaveCorrectID_DEFENDANT_1_ADMIN_ORGANISATION() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder().type(ORGANISATION).build()).build();
+
+            String result = appendUserAndType(DEFENDANT_ONE_ID, caseData, true);
+
+            assertThat(result).isEqualTo("DEFENDANT_1_ADMIN_ORGANISATION");
+        }
+
+        @Test
+        void shouldHaveCorrectID_DEFENDANT_2_ADMIN_COMPANY() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(Party.builder().type(COMPANY).build()).build();
+
+            String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, true);
+
+            assertThat(result).isEqualTo("DEFENDANT_2_ADMIN_COMPANY");
+        }
+        @Test
+        void shouldHaveCorrectID_DEFENDANT_2_LR_INDIVIDUAL() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(Party.builder().type(INDIVIDUAL).build()).build();
+
+            String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, false);
+
+            assertThat(result).isEqualTo("DEFENDANT_2_LR_INDIVIDUAL");
         }
     }
 
