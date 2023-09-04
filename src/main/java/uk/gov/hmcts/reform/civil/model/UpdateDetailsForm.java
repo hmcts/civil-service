@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-
 import java.util.List;
 
 @Data
@@ -25,5 +24,4 @@ public class UpdateDetailsForm {
 
     @JsonProperty("hidePartyChoice")
     private YesOrNo hidePartyChoice;
-
 }
