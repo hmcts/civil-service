@@ -63,7 +63,6 @@ public class DashboardClaimInfoService {
 
 
     public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId,
-
                                                           int currentPage) {
         List<DashboardClaimInfo> ocmcClaims = getClaimsForClaimant(authorisation, claimantId);
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
