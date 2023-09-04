@@ -430,11 +430,6 @@ public class BundleRequestMapper {
                                                                            .equals(DocumentType.SEALED_CLAIM)).collect(
                                                                            Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
-        bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
-                                                                               .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                                   .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
-                                                                                   Collectors.toList()),
-                                                                           BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
