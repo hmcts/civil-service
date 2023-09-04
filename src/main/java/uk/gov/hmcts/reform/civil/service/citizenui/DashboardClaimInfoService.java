@@ -102,8 +102,7 @@ public class DashboardClaimInfoService {
             .sorted(Comparator.comparing(DashboardClaimInfo::getCreatedDate).reversed())
             .collect(Collectors.toList());
     }
-
-
+    
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
         return claims.getCases().stream().map(caseDetails -> translateCaseDataToDashboardClaimInfo(caseDetails))
             .collect(Collectors.toList());
