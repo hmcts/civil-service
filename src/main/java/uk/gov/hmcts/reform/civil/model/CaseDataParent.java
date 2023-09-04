@@ -531,6 +531,7 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
     private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
     private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
 

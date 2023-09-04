@@ -276,8 +276,8 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedApplicant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATIONFRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANT 1: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
@@ -288,8 +288,8 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedApplicant1OrgOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Test Inc"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSORG", "CLAIMANT 1: Individuals attending for the organisation"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANT 1: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_ORGANISATION_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the organisation"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANT 1: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANT 1: Experts"));
@@ -300,10 +300,10 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedApplicants2v1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("CLAIMANT_1", "CLAIMANT 1: Mr. John Rambo"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATIONFRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LITIGATION_FRIEND", "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend"));
         list.add(dynamicElementFromCode("CLAIMANT_2", "CLAIMANT 2: Mr. Jason Rambo"));
-        list.add(dynamicElementFromCode("CLAIMANT_2_LITIGATIONFRIEND", "CLAIMANT 2: Litigation Friend: Applicant Two Litigation Friend"));
-        list.add(dynamicElementFromCode("CLAIMANT_1_INDIVIDUALSSOLICITORORG", "CLAIMANTS: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("CLAIMANT_2_LITIGATION_FRIEND", "CLAIMANT 2: Litigation Friend: Applicant Two Litigation Friend"));
+        list.add(dynamicElementFromCode("CLAIMANT_1_LR_INDIVIDUALS", "CLAIMANTS: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("CLAIMANT_1_WITNESSES", "CLAIMANTS: Witnesses"));
             list.add(dynamicElementFromCode("CLAIMANT_1_EXPERTS", "CLAIMANTS: Experts"));
@@ -314,8 +314,8 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedDefendant1Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
-        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATIONFRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
-        list.add(dynamicElementFromCode("DEFENDANT_1_INDIVIDUALSSOLICITORORG", "DEFENDANT 1: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATION_FRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LR_INDIVIDUALS", "DEFENDANT 1: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("DEFENDANT_1_WITNESSES", "DEFENDANT 1: Witnesses"));
             list.add(dynamicElementFromCode("DEFENDANT_1_EXPERTS", "DEFENDANT 1: Experts"));
@@ -326,8 +326,8 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedDefendant2Options(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("DEFENDANT_2", "DEFENDANT 2: Mr. John Rambo"));
-        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATIONFRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
-        list.add(dynamicElementFromCode("DEFENDANT_2_INDIVIDUALSSOLICITORORG", "DEFENDANT 2: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATION_FRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_LR_INDIVIDUALS", "DEFENDANT 2: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("DEFENDANT_2_WITNESSES", "DEFENDANT 2: Witnesses"));
             list.add(dynamicElementFromCode("DEFENDANT_2_EXPERTS", "DEFENDANT 2: Experts"));
@@ -338,10 +338,10 @@ class ManageContactInformationUtilsTest {
     private List<DynamicListElement> expectedDefendants1v2SameSolicitorOptions(boolean withExpertsAndWitnesses, boolean isAdmin) {
         List<DynamicListElement> list = new ArrayList<>();
         list.add(dynamicElementFromCode("DEFENDANT_1", "DEFENDANT 1: Mr. Sole Trader"));
-        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATIONFRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LITIGATION_FRIEND", "DEFENDANT 1: Litigation Friend: Litigation Friend"));
         list.add(dynamicElementFromCode("DEFENDANT_2", "DEFENDANT 2: Mr. John Rambo"));
-        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATIONFRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
-        list.add(dynamicElementFromCode("DEFENDANT_1_INDIVIDUALSSOLICITORORG", "DEFENDANTS: Individuals attending for the legal representative"));
+        list.add(dynamicElementFromCode("DEFENDANT_2_LITIGATION_FRIEND", "DEFENDANT 2: Litigation Friend: Litigation Friend"));
+        list.add(dynamicElementFromCode("DEFENDANT_1_LR_INDIVIDUALS", "DEFENDANTS: Individuals attending for the legal representative"));
         if (withExpertsAndWitnesses || isAdmin) {
             list.add(dynamicElementFromCode("DEFENDANT_1_WITNESSES", "DEFENDANTS: Witnesses"));
             list.add(dynamicElementFromCode("DEFENDANT_1_EXPERTS", "DEFENDANTS: Experts"));

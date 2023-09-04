@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -69,8 +71,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::validateUserCanTriggerEvent)
             .put(callbackKey(MID, "show-party-field"), this::showPartyField)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
-            .put(callbackKey(SUBMITTED), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitChanges)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
@@ -182,12 +184,42 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
+
+    private CallbackResponse submitChanges(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+
+        // clear updateDetailsForm
+        builder.updateDetailsForm(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    // TODO: UPdate confirmation page
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
+            .build();
+    }
+
+    private String getHeader(CaseData caseData) {
+        return format("# Please now pay your claim fee%n# using the link below");
+    }
+
+    private String getBody(CaseData caseData) {
+        return "string";
+    }
+
     private boolean isAwaitingClaimantIntention(CaseData caseData) {
         return caseData.getCcdState().equals(AWAITING_APPLICANT_INTENTION);
     }
 
     private boolean isAdmin(String userAuthToken) {
-        return userService.getUserInfo(userAuthToken).getRoles()
-            .stream().anyMatch(ADMIN_ROLES::contains);
+    return userService.getUserInfo(userAuthToken).getRoles()
+        .stream().anyMatch(ADMIN_ROLES::contains);
     }
 }
