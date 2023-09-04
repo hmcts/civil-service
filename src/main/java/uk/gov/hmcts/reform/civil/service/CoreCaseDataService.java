@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CoreCaseDataService {
 
@@ -153,7 +155,8 @@ public class CoreCaseDataService {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
         return coreCaseDataApi.submitSupplementaryData(systemUpdateUser.getUserToken(), authTokenGenerator.generate(),
-                                                       caseId.toString(), supplementaryData);
+                                                       caseId.toString(), supplementaryData
+        );
     }
 
     public LocalDate getAgreedDeadlineResponseDate(Long caseId, String authorization) {
@@ -162,6 +165,20 @@ public class CoreCaseDataService {
             return caseData.getRespondent1ResponseDeadline().toLocalDate();
         }
         return null;
+    }
+
+    public SearchResult getCCDClaimsForLipClaimant(String authorization, int startIndex) {
+        log.info("-----------calling CCD lip claimant claims-------------");
+        SearchResult claims = getCCDDataBasedOnIndex(authorization, startIndex, "data.claimantUserDetails.email");
+        log.info("-----------total lip claimant claims received -------------" + claims.getCases().size());
+        return claims;
+    }
+
+    public SearchResult getCCDClaimsForLipDefendant(String authorization, int startIndex) {
+        log.info("-----------calling CCD lip defendant claims-------------");
+        SearchResult claims = getCCDDataBasedOnIndex(authorization, startIndex, "data.defendantUserDetails.email");
+        log.info("-----------total lip defendant claims received -------------" + claims.getCases().size());
+        return claims;
     }
 
     public SearchResult getCCDDataBasedOnIndex(String authorization, int startIndex, String userEmailField) {

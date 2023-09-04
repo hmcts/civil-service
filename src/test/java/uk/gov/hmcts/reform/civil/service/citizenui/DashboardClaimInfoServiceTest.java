@@ -88,7 +88,7 @@ public class DashboardClaimInfoServiceTest {
 
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
                             .applicant1(Party.builder()
@@ -128,6 +128,9 @@ public class DashboardClaimInfoServiceTest {
 
     @Test
     void shouldReturnClaimsForClaimantSuccessfully() {
+        List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
+        SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
+        given(coreCaseDataService.getCCDClaimsForLipClaimant(any(), eq(0))).willReturn(searchResult);
         DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
             "authorisation",
             "123",
@@ -256,7 +259,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
 
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -275,7 +278,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
 
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
 
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -292,7 +295,7 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(15).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
 
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -322,7 +325,7 @@ public class DashboardClaimInfoServiceTest {
         SearchResult searchResult = SearchResult.builder().total(caseDetailsList.size())
             .cases(caseDetailsList.subList(10, caseDetailsList.size())).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(10), any())).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(10))).willReturn(searchResult);
         //when
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
