@@ -626,7 +626,8 @@ public class FlowStateAllowedEventService {
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                NotSuitable_SDO
             )
         ),
         entry(
