@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
@@ -35,8 +35,10 @@ public class DashboardClaimInfoService {
     private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
     private static final int CASES_PER_PAGE = 10;
 
-    public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
-        return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
+    private List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
+        log.info("-----------calling ocmc claimant claims-------------");
+        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorisation, claimantId);
+        return ocmcClaims;
     }
 
     public List<DashboardClaimInfo> getOcmcDefendantClaims(String authorisation, String defendantId) {
@@ -46,8 +48,8 @@ public class DashboardClaimInfoService {
         return ocmcClaims;
     }
 
-    public DashboardDefendantResponse getDashboardDefendantResponse(String authorisation, String defendantId,
-                                                                    int currentPage) {
+    public DashboardResponse getDashboardDefendantResponse(String authorisation, String defendantId,
+                                                           int currentPage) {
         log.info("-----------Claims for Defendant started-------------");
         List<DashboardClaimInfo> ocmcClaims = getOcmcDefendantClaims(authorisation, defendantId);
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
@@ -56,7 +58,21 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
             ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData) :
             Collections.emptyList();
-        return DashboardDefendantResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+    }
+
+
+    public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId,
+
+                                                          int currentPage) {
+        List<DashboardClaimInfo> ocmcClaims = getClaimsForClaimant(authorisation, claimantId);
+        int startIndex = (currentPage - 1) * CASES_PER_PAGE;
+        var ccdData = getCCDCasesForClaimant(authorisation, startIndex);
+        int totalPages = getTotalPagesToBeListed(ccdData.getTotal() + ocmcClaims.size());
+        List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
+            ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData) :
+            Collections.emptyList();
+        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
     }
 
     private List<DashboardClaimInfo> getDashboardItemsForCurrentPage(List<DashboardClaimInfo> ocmcClaims,
@@ -92,7 +108,16 @@ public class DashboardClaimInfoService {
 
     private SearchResult getCCDCasesForDefendant(String authorisation, int startIndex) {
         log.info("-----------calling CCD claims-------------");
-        SearchResult claims = coreCaseDataService.getCCDDataBasedOnIndex(authorisation, startIndex);
+        SearchResult claims =
+            coreCaseDataService.getCCDDataBasedOnIndex(authorisation, startIndex, "data.defendantUserDetails.email");
+        log.info("-----------CCD claims received-------------total " + claims.getCases().size());
+        return claims;
+    }
+
+    private SearchResult getCCDCasesForClaimant(String authorisation, int startIndex) {
+        log.info("-----------calling CCD claims-------------");
+        SearchResult claims =
+            coreCaseDataService.getCCDDataBasedOnIndex(authorisation, startIndex, "data.claimantUserDetails.email");
         log.info("-----------CCD claims received-------------total " + claims.getCases().size());
         return claims;
     }

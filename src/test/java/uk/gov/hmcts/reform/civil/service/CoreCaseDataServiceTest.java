@@ -254,12 +254,31 @@ class CoreCaseDataServiceTest {
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
-                .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
+                .query(QueryBuilders.boolQuery()
+                           .must(QueryBuilders.termQuery("data.defendantUserDetails.email", userDetails.getEmail())))
                 .sort("data.submittedDate", SortOrder.DESC)
                 .from(0)
                 .size(RETURNED_NUMBER_OF_CASES).toString();
             //When
-            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0);
+            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
+            //Then
+            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
+        }
+
+        @Test
+        void shouldSearchCasesByClaimantUser_whenLipVLipEnabled() {
+            //Given
+            UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
+            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+            given(idamClient.getUserDetails(anyString())).willReturn(userDetails);
+            String query = new SearchSourceBuilder()
+                .query(QueryBuilders.boolQuery()
+                           .must(QueryBuilders.termQuery("data.claimantUserDetails.email", userDetails.getEmail())))
+                .sort("data.submittedDate", SortOrder.DESC)
+                .from(0)
+                .size(RETURNED_NUMBER_OF_CASES).toString();
+            //When
+            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.claimantUserDetails.email");
             //Then
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
         }
@@ -274,7 +293,7 @@ class CoreCaseDataServiceTest {
                 .from(0)
                 .size(RETURNED_NUMBER_OF_CASES).toString();
             //When
-            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0);
+            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
             //Then
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
             verify(idamClient, never()).getUserDetails(USER_AUTH_TOKEN);
