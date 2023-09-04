@@ -82,7 +82,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -511,9 +513,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
 
+        if (toggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(updatedData);
+            addEventAndDateAddedToRespondentWitnesses(updatedData);
+        }
+
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
+                                                                        toggleService.isUpdateContactDetailsEnabled());
 
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
