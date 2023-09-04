@@ -6,10 +6,8 @@ import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -45,10 +43,9 @@ class BundleRequestMapperTest {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = getExpertDocs();
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
-        ServedDocumentFiles servedDocumentFiles = setupParticularsOfClaimDocs();
         //Add all type of documents and other request details in case data
         CaseData caseData = getCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
-                                        systemGeneratedCaseDocuments, servedDocumentFiles);
+                                        systemGeneratedCaseDocuments);
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
@@ -62,39 +59,49 @@ class BundleRequestMapperTest {
     private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
                                  List<Element<UploadEvidenceExpert>> expertEvidenceDocs,
                                  List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs,
-                                 List<Element<CaseDocument>> systemGeneratedCaseDocuments,
-                                 ServedDocumentFiles servedDocumentFiles) {
+                                 List<Element<CaseDocument>> systemGeneratedCaseDocuments) {
         return CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(witnessEvidenceDocs)
-            .documentWitnessSummary(witnessEvidenceDocs)
-            .documentHearsayNotice(witnessEvidenceDocs)
-            .documentReferredInStatement(otherEvidenceDocs)
+            .documentWitnessStatementApp2(witnessEvidenceDocs)
             .documentWitnessStatementRes(witnessEvidenceDocs)
-            .documentWitnessSummaryRes(witnessEvidenceDocs)
-            .documentHearsayNoticeRes(witnessEvidenceDocs)
-            .documentReferredInStatementRes(otherEvidenceDocs)
             .documentWitnessStatementRes2(witnessEvidenceDocs)
+            .documentWitnessSummary(witnessEvidenceDocs)
+            .documentWitnessSummaryApp2(witnessEvidenceDocs)
+            .documentWitnessSummaryRes(witnessEvidenceDocs)
             .documentWitnessSummaryRes2(witnessEvidenceDocs)
+            .documentHearsayNotice(witnessEvidenceDocs)
+            .documentHearsayNoticeApp2(witnessEvidenceDocs)
+            .documentHearsayNoticeRes(witnessEvidenceDocs)
             .documentHearsayNoticeRes2(witnessEvidenceDocs)
+            .documentReferredInStatement(otherEvidenceDocs)
+            .documentReferredInStatementApp2(otherEvidenceDocs)
+            .documentReferredInStatementRes(otherEvidenceDocs)
             .documentReferredInStatementRes2(otherEvidenceDocs)
             .documentExpertReport(expertEvidenceDocs)
-            .documentJointStatement(expertEvidenceDocs)
-            .documentAnswers(expertEvidenceDocs)
-            .documentQuestions(expertEvidenceDocs)
+            .documentExpertReportApp2(expertEvidenceDocs)
             .documentExpertReportRes(expertEvidenceDocs)
-            .documentJointStatementRes(expertEvidenceDocs)
-            .documentAnswersRes(expertEvidenceDocs)
-            .documentQuestionsRes(expertEvidenceDocs)
             .documentExpertReportRes2(expertEvidenceDocs)
+            .documentJointStatement(expertEvidenceDocs)
+            .documentJointStatementApp2(expertEvidenceDocs)
+            .documentJointStatementRes(expertEvidenceDocs)
             .documentJointStatementRes2(expertEvidenceDocs)
+            .documentAnswers(expertEvidenceDocs)
+            .documentAnswersApp2(expertEvidenceDocs)
+            .documentAnswersRes(expertEvidenceDocs)
             .documentAnswersRes2(expertEvidenceDocs)
+            .documentQuestions(expertEvidenceDocs)
+            .documentQuestionsApp2(expertEvidenceDocs)
+            .documentQuestionsRes(expertEvidenceDocs)
             .documentQuestionsRes2(expertEvidenceDocs)
             .documentEvidenceForTrial(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialApp2(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialRes(getDocumentEvidenceForTrial())
+            .documentEvidenceForTrialRes2(getDocumentEvidenceForTrial())
             .orderSDODocumentDJ(Document.builder().documentFileName("DJ SDO Order")
                                     .documentBinaryUrl(TEST_URL).documentUrl(TEST_URL).build())
+            .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
+            .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
-            .servedDocumentFiles(servedDocumentFiles)
             .applicant1(Party.builder().individualLastName("lastname").partyName("applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").partyName("respondent1").type(Party.Type.INDIVIDUAL).build())
             .addApplicant2(YesOrNo.YES)
@@ -104,6 +111,17 @@ class BundleRequestMapperTest {
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
+    }
+
+    private List<Element<CaseDocument>> getOrderDoc(DocumentType docType) {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentDC =
+            CaseDocument.builder()
+                .documentType(docType)
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.now()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
+        return systemGeneratedCaseDocuments;
     }
 
     private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
@@ -130,13 +148,6 @@ class BundleRequestMapperTest {
                                                        .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         return otherEvidenceDocs;
-    }
-
-    private ServedDocumentFiles setupParticularsOfClaimDocs() {
-        List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
-        particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
