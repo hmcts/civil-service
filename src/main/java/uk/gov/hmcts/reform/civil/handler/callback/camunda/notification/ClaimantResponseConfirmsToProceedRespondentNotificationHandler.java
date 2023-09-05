@@ -108,13 +108,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            template = isCcNotification(callbackParams)
-                ? getMultiPartyScenario(caseData).equals(ONE_V_ONE)
-                    ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec1v1()
-                    : notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
-                : getMultiPartyScenario(caseData).equals(ONE_V_ONE)
-                    ? notificationsProperties.getRespondentSolicitorNotifyToProceedSpec1v1()
-                    : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
+            template = getTemplateForSpec(caseData, isCcNotification(callbackParams));
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
@@ -130,6 +124,20 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplateForSpec(CaseData caseData, boolean ccNotification) {
+        String template;
+        if (ccNotification && getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            template = notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec1v1();
+        } else if (ccNotification && !getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            template = notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec();
+        } else if (!ccNotification && getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            template = notificationsProperties.getRespondentSolicitorNotifyToProceedSpec1v1();
+        } else {
+            template = notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
+        }
+        return template;
     }
 
     @Override
