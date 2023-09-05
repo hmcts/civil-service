@@ -1509,8 +1509,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(NO)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
+                .respondent2Copy(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -1563,8 +1569,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
+                .respondent2Copy(PartyBuilder.builder()
+                                     .individual()
+                                     .legalRepHeading()
+                                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
