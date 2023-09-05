@@ -37,6 +37,8 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
+            representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                      ? "Name" : "Organisation name");
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
                 representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
@@ -59,6 +61,9 @@ public class RepresentativeService {
 
             var representativeBuilder = representative.toBuilder();
 
+            representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                      ? "Name" : "Organisation name");
+
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
 
@@ -80,6 +85,8 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
+        representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                                                  ? "Name" : "Organisation name");
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());

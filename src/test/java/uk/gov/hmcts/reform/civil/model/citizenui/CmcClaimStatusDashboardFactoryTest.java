@@ -315,6 +315,73 @@ public class CmcClaimStatusDashboardFactoryTest {
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLEMENT_SIGNED);
     }
 
+    @Test
+    void given_respondentFullDefenceAndClaimantReject_whenGetStatus_thenReturnClaimEnded() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
+            .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.REJECTION).build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantRejectOfferOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .type(StatementType.REJECTION)
+                                                         .build()))
+                            .build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_OFFER_OUT_OF_COURT);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnClaimantAcceptedOfferOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
+            .settlement(Settlement.builder()
+                            .partyStatements(List.of(PartyStatement.builder()
+                                                         .madeBy(MadeBy.CLAIMANT)
+                                                         .type(StatementType.ACCEPTATION)
+                                                         .build()))
+                            .build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_OFFER_OUT_OF_COURT);
+    }
+
+    @Test
+    void given_respondentFullDefenceAndSentToCourtAndClaimantAccept_whenGetStatus_thenReturnPartialRejected() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder().responseType(RespondentResponseType.PART_ADMISSION).build())
+            .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.REJECTION).build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
+    }
+
+    @Test
+    void given_respondentFullDefence_whenGetStatus_claimRejectedOfferSettleOutOfCourt() {
+        CmcClaim claim = CmcClaim.builder()
+            .response(Response.builder()
+                          .responseType(RespondentResponseType.FULL_DEFENCE)
+                          .build())
+            .settlement(Settlement.builder()
+                            .build())
+            .build();
+
+        DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT);
+    }
+
     private CmcClaim getFullAdmitClaim(PaymentOption paymentOption) {
         return CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
@@ -326,8 +393,4 @@ public class CmcClaimStatusDashboardFactoryTest {
                           .build())
             .build();
     }
-
 }
-
-
-

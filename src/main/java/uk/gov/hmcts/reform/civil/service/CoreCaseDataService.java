@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -31,12 +34,14 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 public class CoreCaseDataService {
 
     private final ObjectMapper mapper;
-    private static final Integer RETURNED_NUMBER_OF_CASES = 50;
+    private static final Integer RETURNED_NUMBER_OF_CASES = 10;
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
+    private final FeatureToggleService featureToggleService;
+    private final IdamClient idamClient;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -159,10 +164,24 @@ public class CoreCaseDataService {
         return null;
     }
 
-    public SearchResult getCasesUptoMaxsize(String authorization) {
-        String query = new SearchSourceBuilder().size(RETURNED_NUMBER_OF_CASES)
-            .query(QueryBuilders.matchAllQuery()).toString();
-
+    public SearchResult getCCDDataBasedOnIndex(String authorization, int startIndex) {
+        String query = createQuery(authorization, startIndex);
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    }
+
+    private String createQuery(String authorization, int startIndex) {
+        if (featureToggleService.isLipVLipEnabled()) {
+            UserDetails defendantInfo = idamClient.getUserDetails(authorization);
+            return new SearchSourceBuilder()
+                .query(QueryBuilders.boolQuery().must(QueryBuilders.termQuery("data.defendantUserDetails.email", defendantInfo.getEmail())))
+                .sort("data.submittedDate", SortOrder.DESC)
+                .from(startIndex)
+                .size(RETURNED_NUMBER_OF_CASES).toString();
+        }
+        return new SearchSourceBuilder()
+            .query(QueryBuilders.matchAllQuery())
+            .sort("data.submittedDate", SortOrder.DESC)
+            .from(startIndex)
+            .size(RETURNED_NUMBER_OF_CASES).toString();
     }
 }
