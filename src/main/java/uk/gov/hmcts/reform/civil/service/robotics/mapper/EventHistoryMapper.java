@@ -1943,13 +1943,8 @@ public class EventHistoryMapper {
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
-        List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
-        boolean isRespondent1;
         if (defendant1ResponseExists.test(caseData)) {
-            Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
             builder.receiptOfPartAdmission(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -1966,17 +1961,7 @@ public class EventHistoryMapper {
                                                   .miscText(miscText)
                                                   .build())
                                 .build());
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent1ResponseDate,
-                                                       RESPONDENT_ID,
-                                                       respondent1DQ,
-                                                       respondent1,
-                                                       true
-                ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                Party respondent2 = caseData.getRespondent2();
-                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
@@ -1996,21 +1981,10 @@ public class EventHistoryMapper {
                                                       .miscText(miscText)
                                                       .build())
                                     .build());
-                directionsQuestionnaireFiledEvents.add(
-                    buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                           respondent2ResponseDate,
-                                                           RESPONDENT2_ID,
-                                                           respondent2DQ,
-                                                           respondent2,
-                                                           true
-                    ));
             }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            Party respondent2 = caseData.getRespondent2();
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
             builder.receiptOfPartAdmission(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -2027,16 +2001,7 @@ public class EventHistoryMapper {
                                                   .miscText(miscText)
                                                   .build())
                                 .build());
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent2ResponseDate,
-                                                       RESPONDENT2_ID,
-                                                       respondent2DQ,
-                                                       respondent2,
-                                                       false
-                ));
         }
-        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
     }
 
     private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {

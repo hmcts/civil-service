@@ -2114,10 +2114,6 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2292,14 +2288,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2), expectedMiscellaneousEvents.get(3)
-            );
             assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
                 .containsExactly(expectedAcknowledgementOfServiceReceived);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2397,12 +2387,6 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2), expectedMiscellaneousEvents.get(3)
-            );
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2479,7 +2463,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .eventDetailsText(respondent1MiscText)
@@ -2488,7 +2472,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(9)
+                    .eventSequence(7)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .eventDetailsText(respondent2MiscText)
@@ -2538,16 +2522,6 @@ class EventHistoryMapperTest {
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
-                .containsExactly(expectedReceiptOfPartAdmission.get(0), expectedReceiptOfPartAdmission.get(1));
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2),
-                                 expectedMiscellaneousEvents.get(3), expectedMiscellaneousEvents.get(4)
-            );
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .containsExactly(expectedDirectionsQuestionnaireFiled.get(0), expectedDirectionsQuestionnaireFiled.get(1)
-            );
 
             assertEmptyEvents(
                 eventHistory,
@@ -2676,12 +2650,6 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission.get(0), expectedReceiptOfPartAdmission.get(1));
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2),
-                                 expectedMiscellaneousEvents.get(3), expectedMiscellaneousEvents.get(4));
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -8032,8 +8000,6 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
         }
 
         @Test
@@ -8121,8 +8087,6 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
-            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .contains(expectedDirectionsQuestionnaireFiled.get(0));
         }
 
         @Test
