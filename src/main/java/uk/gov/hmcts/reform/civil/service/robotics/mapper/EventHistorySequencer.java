@@ -30,8 +30,8 @@ public class EventHistorySequencer {
 
     private Comparator<Event> getComparator() {
         return (event1, event2) -> {
-            log.info(format("event1: %s, event2: %s", event1.getEventCode(), event2.getEventCode()));
-            log.info(format("event1: %s, event2: %s", event1.getDateReceived().toString(), event2.getDateReceived().toString()));
+            log.info(format("event1: {}, event2: {}", event1.getEventCode(), event2.getEventCode()));
+            log.info(format("event1: {}, event2: {}", event1.getDateReceived().toString(), event2.getDateReceived().toString()));
             if (event1.getDateReceived().isAfter(event2.getDateReceived())) {
                 return 1;
             } else if (event1.getDateReceived().isBefore(event2.getDateReceived())) {
@@ -167,7 +167,7 @@ public class EventHistorySequencer {
                          .eventSequence(sequence.getAndIncrement())
                          .build()
             ).collect(Collectors.toList());
-        log.info(format("Event sequence %s", eventAfter));
+        log.info(format("Event sequence {}}", eventAfter));
         return eventAfter;
     }
 
