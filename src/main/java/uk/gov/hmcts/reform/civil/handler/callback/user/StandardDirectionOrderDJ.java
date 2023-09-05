@@ -821,8 +821,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                     .build();
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return createOrderScreen(callbackParams);
     }
 }

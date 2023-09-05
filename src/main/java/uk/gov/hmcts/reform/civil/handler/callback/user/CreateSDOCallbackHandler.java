@@ -889,9 +889,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     .build();
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return generateSdoOrder(callbackParams);
     }
 
     private boolean validateNegativeWitness(List<String> errors, String inputValue1, String inputValue2) {
