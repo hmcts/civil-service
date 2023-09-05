@@ -26,5 +26,9 @@ public class DraftClaimForm implements MappableObject {
     private final List<EvidenceTemplateData> evidenceList;
     private final List<ClaimAmountBreakupDetails> claimAmount;
     private final String totalClaimAmount;
+    private final String breakdownInterestRate;
+    private final String totalInterestAmount;
+    private final String howTheInterestWasCalculated;
+    private final String interestRate;
 
 }
