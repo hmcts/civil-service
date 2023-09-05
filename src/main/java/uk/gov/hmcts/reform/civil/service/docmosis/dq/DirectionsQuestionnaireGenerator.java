@@ -323,6 +323,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private List<Party> getApplicants(CaseData caseData) {
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();
         var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
@@ -339,6 +340,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .legalRepHeading(legalRepHeading)
                                    .build(),
                                Party.builder()
                                    .name(applicant2.getPartyName())
@@ -350,6 +352,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .legalRepHeading(legalRepHeading)
                                    .build());
             }
         }
@@ -365,11 +368,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                    .orElse(""))
                            .phoneNumber(applicant.getPartyPhone())
                            .emailAddress(applicant.getPartyEmail())
+                           .legalRepHeading(legalRepHeading)
                            .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
-
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant2();
         var litigationFriend = caseData.getApplicant2LitigationFriend();
         var applicant2PartyBuilder = Party.builder()
@@ -397,12 +401,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                          .orElse(""))
             .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""));
+                                              .orElse(""))
+            .legalRepHeading(legalRepHeading);
+
         return applicant2PartyBuilder.build();
     }
 
     private Party getApplicant1DQParty(CaseData caseData) {
-
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var litigationFriend = caseData.getApplicant1LitigationFriend();
         var applicant1PartyBuilder = Party.builder()
@@ -430,7 +436,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                              .orElse(""))
             .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""));
+                                              .orElse(""))
+            .legalRepHeading(legalRepHeading);
         return applicant1PartyBuilder.build();
     }
 
@@ -667,10 +674,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
+
         if (isClaimantResponse(caseData)) {
 
             List<Party> respondents = new ArrayList<>();
-
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
                 if ((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
@@ -692,6 +700,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                             ofNullable(caseData.getRespondent1LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .legalRepHeading(legalRepHeading)
                                         .build());
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent2().getPartyName())
@@ -704,6 +713,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                             ofNullable(caseData.getRespondent2LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .legalRepHeading(legalRepHeading)
                                         .build());
                 } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
                     respondents.add(Party.builder()
@@ -717,6 +727,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                             ofNullable(caseData.getRespondent1LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .legalRepHeading(legalRepHeading)
                                         .build());
                 }
                 return respondents;
@@ -750,7 +761,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                      .orElse(""))
                     .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                                       .map(LitigationFriend::getEmailAddress)
-                                                      .orElse(""));
+                                                      .orElse(""))
+                    .legalRepHeading(legalRepHeading);
                 respondents.add(respondent1PartyBuilder.build());
             }
 
@@ -782,7 +794,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                      .orElse(""))
                     .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                                       .map(LitigationFriend::getEmailAddress)
-                                                      .orElse(""));
+                                                      .orElse(""))
+                    .legalRepHeading(legalRepHeading);
                 respondents.add(respondent2PartyBuilder.build());
             }
             return respondents;
@@ -814,7 +827,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                          .orElse(""))
                         .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
                                                       .map(LitigationFriend::getEmailAddress)
-                                                      .orElse(""));
+                                                      .orElse(""))
+                    .legalRepHeading(legalRepHeading);
 
                 var respondent2Party = Party.builder()
                         .name(caseData.getRespondent2().getPartyName())
@@ -840,7 +854,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                      .orElse(""))
                     .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
                                                       .map(LitigationFriend::getEmailAddress)
-                                                      .orElse(""));
+                                                      .orElse(""))
+                    .legalRepHeading(legalRepHeading);
 
                 return List.of(respondent1Party.build(), respondent2Party.build());
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -870,7 +885,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                          .orElse(""))
                             .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
                                                           .map(LitigationFriend::getEmailAddress)
-                                                          .orElse(""));
+                                                          .orElse(""))
+                        .legalRepHeading(legalRepHeading);
                     return List.of(respondent1Party.build());
                 } else if ("TWO".equals(defendantIdentifier)) {
                     var respondent2Party = Party.builder()
@@ -897,7 +913,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                          .orElse(""))
                         .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
                                                           .map(LitigationFriend::getEmailAddress)
-                                                          .orElse(""));
+                                                          .orElse(""))
+                        .legalRepHeading(legalRepHeading);
                     return List.of(respondent2Party.build());
                 }
             }
@@ -937,7 +954,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                              .orElse(""))
             .litigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""));
+                                              .orElse(""))
+            .legalRepHeading(legalRepHeading);
         return List.of(respondentParty.build());
     }
 
