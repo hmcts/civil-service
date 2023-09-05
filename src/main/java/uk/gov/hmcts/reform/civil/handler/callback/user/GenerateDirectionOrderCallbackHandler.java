@@ -12,14 +12,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
-import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
 import java.time.LocalDate;
@@ -49,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -72,9 +76,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + "\n ### Defendant 2 \n %s";
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
+    public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
+    private final DocumentHearingLocationHelper locationHelper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -95,13 +101,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsForDefaultJudgments(authToken));
-            caseDataBuilder = populateFields(caseDataBuilder, locations);
+            caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
         } else {
             caseDataBuilder = populateFreeFormFields(caseDataBuilder);
         }
@@ -148,28 +153,56 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                             .toList());
     }
 
+    private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
+        LocationRefData locationRefData;
+        if (hasSDOBeenMade(caseData.getCcdState())) {
+            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        } else {
+            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+        }
+        return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
+                                   .code("LOCATION_LIST")
+                                   .label(locationRefData.getSiteName())
+                                   .build(),
+                                                       DynamicListElement.builder()
+                                   .code("OTHER_LOCATION")
+                                   .label("Other location")
+                                   .build()))
+            .value(DynamicListElement.builder()
+                       .code("LOCATION_LIST")
+                       .label(locationRefData.getSiteName())
+                       .build())
+            .build();
+    }
+
+    private boolean hasSDOBeenMade(CaseState state) {
+        return !JUDICIAL_REFERRAL.equals(state);
+    }
+
     private CaseData.CaseDataBuilder<?, ?> populateFields(
-        CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations) {
+        CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
-        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders
+        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
                                                                                .build()).build())
-            .assistedOrderCostsDefendantPaySub(
-                AssistedOrderCostDetails.builder().defendantCostStandardDate(advancedDate).build())
-            .assistedOrderCostsClaimantPaySub(
-                AssistedOrderCostDetails.builder().claimantCostStandardDate(advancedDate).build())
-            .assistedOrderCostsDefendantSum(
-                AssistedOrderCostDetails.builder().defendantCostSummarilyDate(advancedDate).build())
-            .assistedOrderCostsClaimantSum(
-                AssistedOrderCostDetails.builder().claimantCostSummarilyDate(advancedDate).build())
             .finalOrderFurtherHearingComplex(
-                FinalOrderFurtherHearing.builder().alternativeHearingList(getLocationsFromList(locations)).build())
+                FinalOrderFurtherHearing.builder()
+                    .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
+                    .alternativeHearingList(getLocationsFromList(locations))
+                    .datesToAvoidDateDropdown(DatesFinalOrders.builder()
+                                           .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
             .orderMadeOnDetailsOrderCourt(
                 OrderMadeOnDetails.builder().ownInitiativeDate(
                     LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
                     LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .assistedOrderCostsFirstDropdownDate(advancedDate)
+                                                  .assistedOrderAssessmentThirdDropdownDate(advancedDate)
+                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .build())
+            .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
                                          .appealGranted(
                 AppealGrantedRefused.builder().appealDate(LocalDate.now().plusDays(21)).build())
@@ -179,18 +212,36 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
-        if (nonNull(caseData.getFinalOrderDateHeardComplex().getSingleDateSelection())
-            && caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate().isAfter(LocalDate.now())) {
-            errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
-        }
-        if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
-            && (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())
+        // validate order made dates
+        if (nonNull(caseData.getFinalOrderDateHeardComplex())) {
+            if (nonNull(caseData.getFinalOrderDateHeardComplex().getSingleDateSelection())
+                && caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate().isAfter(LocalDate.now())) {
+                errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
+            }
+            if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
+                && (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())
                 || caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo().isAfter(LocalDate.now()))) {
-            errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
-        } else if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
-                   && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
-            .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
-            errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order Made"));
+                errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
+            } else if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
+                && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
+                .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order Made"));
+            }
+        }
+        //validate further hearing dates
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())
+            && (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown())
+                && caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown().getDatesToAvoidDates()
+                .isBefore(LocalDate.now()))) {
+            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Further hearing"));
+        }
+        //validate make an order for costs dates
+        if (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && ((nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate().isBefore(LocalDate.now()))
+            || (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
+            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Make an order for detailed/summary costs"));
         }
     }
 
