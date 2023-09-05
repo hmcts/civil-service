@@ -22,9 +22,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -187,6 +189,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
                                                                                .build()).build())
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                          .typeRepresentationComplex(ClaimantAndDefendantHeard
+                                                                         .builder()
+                                                                         .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
+                                                                         .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
+                                                                         .build()).build())
             .finalOrderFurtherHearingComplex(
                 FinalOrderFurtherHearing.builder()
                     .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
