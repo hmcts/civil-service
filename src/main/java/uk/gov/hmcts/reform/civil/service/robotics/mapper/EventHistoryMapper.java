@@ -266,6 +266,7 @@ public class EventHistoryMapper {
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
+
         buildCcjEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
