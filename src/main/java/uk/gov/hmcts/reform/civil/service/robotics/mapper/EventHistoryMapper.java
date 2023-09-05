@@ -470,7 +470,7 @@ public class EventHistoryMapper {
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(LocalDateTime.now())
+                .dateReceived(setApplicant1ResponseDate(caseData))
                 .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
                 .eventDetails(EventDetails.builder()
                                   .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
@@ -511,7 +511,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
             .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(setApplicant1ResponseDate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
@@ -2247,7 +2247,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_REASON_MANUAL_DETERMINATION)
                     .eventDetails(EventDetails.builder()
                                       .miscText(RPA_REASON_MANUAL_DETERMINATION)
@@ -2267,7 +2267,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_IN_MEDIATION)
                     .eventDetails(EventDetails.builder()
                                       .miscText(RPA_IN_MEDIATION)
@@ -2326,5 +2326,13 @@ public class EventHistoryMapper {
                     false
                 ));
         }
+    }
+
+    private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        if (applicant1ResponseDate == null) {
+            applicant1ResponseDate = LocalDateTime.now();
+        }
+        return applicant1ResponseDate;
     }
 }
