@@ -1539,7 +1539,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-        updateCorrespondenceAddress(updatedData, caseData);
+        updateCorrespondenceAddress(callbackParams, updatedData, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -1547,13 +1547,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void updateCorrespondenceAddress(CaseData.CaseDataBuilder<?, ?> updatedCaseData, CaseData caseData) {
-        if (caseData.getIsRespondent1() == YesOrNo.YES
+    private void updateCorrespondenceAddress(CallbackParams callbackParams,
+                                             CaseData.CaseDataBuilder<?, ?> updatedCaseData,
+                                             CaseData caseData) {
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
             updatedCaseData.specRespondentCorrespondenceAddressdetails(
                     caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
                 .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
-        } else if (caseData.getIsRespondent2() == YesOrNo.YES
+        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
             updatedCaseData.specRespondent2CorrespondenceAddressdetails(
                     caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
