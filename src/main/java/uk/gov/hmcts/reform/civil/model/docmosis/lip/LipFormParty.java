@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.docmosis;
+package uk.gov.hmcts.reform.civil.model.docmosis.lip;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
