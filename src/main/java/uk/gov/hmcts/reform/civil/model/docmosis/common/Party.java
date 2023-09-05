@@ -21,4 +21,5 @@ public class Party {
     private final String soleTraderTradingAs;
     private final String litigationFriendPhoneNumber;
     private final String litigationFriendEmailAddress;
+    private final String legalRepHeading;
 }
