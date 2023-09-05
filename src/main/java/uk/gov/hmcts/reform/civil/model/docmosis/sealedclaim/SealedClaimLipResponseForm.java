@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
@@ -74,9 +74,9 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final RespondentResponseTypeSpec responseType;
     private final String whyReject;
     private final String freeTextWhyReject;
-    private final LipFormParty claimant1;
-    private final LipFormParty defendant1;
-    private final LipFormParty defendant2;
+    private final LipFormPartyDefence claimant1;
+    private final LipFormPartyDefence defendant1;
+    private final LipFormPartyDefence defendant2;
     private final List<EventTemplateData> timelineEventList;
     private final String timelineComments;
     private final List<EvidenceTemplateData> evidenceList;
@@ -112,12 +112,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .generationDate(LocalDate.now())
             .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimant1(LipFormParty.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipFormParty.toLipDefenceParty(
+            .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
+            .defendant1(LipFormPartyDefence.toLipDefenceParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1CorrespondanceAddress()
             ))
-            .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
+            .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())

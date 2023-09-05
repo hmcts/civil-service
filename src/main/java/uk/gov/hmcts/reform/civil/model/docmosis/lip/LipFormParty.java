@@ -1,49 +1,33 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.lip;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 @Builder
-public record LipFormParty(String name, boolean isIndividual,
+public record LipFormParty(String name, boolean isIndividual, boolean isSoleTrader, boolean isCompany,
+                           boolean isOrganisation, String soleTraderBusinessName, String contactPerson,
                            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
                            String phone, String email, Address primaryAddress, Address correspondenceAddress) {
 
-    @JsonIgnore
-    public static LipFormParty toLipDefenceParty(Party party) {
-        if (party == null) {
-            return null;
-        }
-        return getLipDefenceFormPartyBuilderWithPartyData(party).build();
-    }
-
-    @JsonIgnore
-    public static LipFormParty toLipDefenceParty(Party party, Address correspondenceAddress) {
-        if (party == null) {
-            return null;
-        }
-        LipFormPartyBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
-        builder.correspondenceAddress(correspondenceAddress);
-        return builder.build();
-    }
-
-    private static LipFormPartyBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
-        LipFormPartyBuilder builder = LipFormParty.builder()
+    public static LipFormParty toLipFormParty(Party party, Address correspondenceAddress, String respondent1LiPContactPerson) {
+        return LipFormParty.builder()
             .name(party.getPartyName())
             .phone(party.getPartyPhone())
             .email(party.getPartyEmail())
             .primaryAddress(party.getPrimaryAddress())
-            .isIndividual(party.isIndividual() || party.isSoleTrader());
-        Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
-            .filter(Objects::nonNull)
-            .findFirst()
-            .ifPresent(builder::dateOfBirth);
-        return builder;
+            .isIndividual(party.isIndividual())
+            .isSoleTrader(party.isSoleTrader())
+            .isOrganisation(party.isOrganisation())
+            .isCompany(party.isCompany())
+            .contactPerson(respondent1LiPContactPerson)
+            .soleTraderBusinessName(party.getSoleTraderTradingAs())
+            .dateOfBirth(Optional.ofNullable(party.getIndividualDateOfBirth()).orElse(party.getSoleTraderDateOfBirth()))
+            .correspondenceAddress(correspondenceAddress)
+            .build();
     }
 }
