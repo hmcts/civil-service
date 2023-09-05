@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Component
 public class EventHistorySequencer {
@@ -28,6 +29,8 @@ public class EventHistorySequencer {
 
     private Comparator<Event> getComparator() {
         return (event1, event2) -> {
+            log.info("event1: " + event1.getEventCodeInt() + " event2: " + event2.getEventCodeInt());
+            log.info("event1: " + event1.getDateReceived() + " event2: " + event2.getDateReceived());
             if (event1.getDateReceived().isAfter(event2.getDateReceived())) {
                 return 1;
             } else if (event1.getDateReceived().isBefore(event2.getDateReceived())) {
@@ -156,13 +159,15 @@ public class EventHistorySequencer {
 
     private List<Event> prepareSequenceId(List<Event> events) {
         AtomicInteger sequence = new AtomicInteger(1);
-        return events
+        List<Event> eventAfter = events
             .stream()
             .map(event ->
                      event.toBuilder()
                          .eventSequence(sequence.getAndIncrement())
                          .build()
             ).collect(Collectors.toList());
+        log.info("Event sequence " + eventAfter);
+        return eventAfter;
     }
 
     private List<Event> flatEvents(EventHistory eventHistory) {
