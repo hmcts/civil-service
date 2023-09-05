@@ -609,7 +609,7 @@ public class BundleRequestMapper {
         if (fileNamePrefix.equals(DOC_FILE_NAME)) {
             return uploadEvidence.getValue().getDocumentUpload().getDocumentFileName();
         } else if (fileNamePrefix.equals(DOC_FILE_NAME_WITH_DATE)) {
-            return generateDocName(uploadEvidence.getValue().getDocumentUpload().getDocumentFileName() + "%s", null,
+            return generateDocName(uploadEvidence.getValue().getDocumentUpload().getDocumentFileName() + " %s", null,
                                    null,
                             documentType.equals(EvidenceUploadFiles.COSTS.name())
                                 ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
