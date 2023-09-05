@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -30,5 +34,16 @@ public class DraftClaimForm implements MappableObject {
     private final String totalInterestAmount;
     private final String howTheInterestWasCalculated;
     private final String interestRate;
+    private final String interestExplanationText;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate interestFromDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate interestEndDate;
+    private final String interestEndDateDescription;
+    private final String interestAmount;
+    private final String claimFee;
+    private final String totalAmountOfClaim;
 
 }
