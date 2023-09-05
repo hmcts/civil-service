@@ -15,7 +15,8 @@ import java.util.List;
 @EqualsAndHashCode
 public class DraftClaimForm implements MappableObject {
 
-    private final LipFormParty lipFormParty;
+    private final LipFormParty claimant;
+    private final LipFormParty defendant;
     private final String descriptionOfClaim;
     private final List<EventTemplateData> timelineEvents;
     private final List<ClaimAmountBreakupDetails> claimAmount;
