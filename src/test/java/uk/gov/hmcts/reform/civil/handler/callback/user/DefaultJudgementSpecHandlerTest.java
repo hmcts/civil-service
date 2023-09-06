@@ -967,7 +967,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnJudgementRequestedResponse_whenInvokedBothDefendantWhen1v2() {
             String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
                 + "target=\"_blank\">Download  default judgment</a> "
-                + "%n%n The defendant will be served with the Default Judgment.";
+                + "%n%n The defendant will be served the Default Judgment.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .applicant1(PartyBuilder.builder().build())
                 .respondent1(PartyBuilder.builder().build())
