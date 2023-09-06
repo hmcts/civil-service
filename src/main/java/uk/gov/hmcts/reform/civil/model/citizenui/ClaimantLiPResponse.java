@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClaimantLiPResponse {
+    
     private DQExtraDetailsLip applicant1DQExtraDetails;
     private HearingSupportLip applicant1DQHearingSupportLip;
 }

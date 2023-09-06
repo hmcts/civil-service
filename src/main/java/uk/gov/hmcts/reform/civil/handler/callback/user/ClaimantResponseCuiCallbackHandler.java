@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDICIAL_REFERRAL;
 
 @Slf4j
 @Service
@@ -30,6 +31,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ObjectMapper objectMapper;
+    
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -51,6 +53,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.toMap(objectMapper))
+            .state(JUDICIAL_REFERRAL.name())
             .build();
     }
 
