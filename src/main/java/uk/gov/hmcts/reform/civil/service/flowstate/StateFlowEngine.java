@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.handler.callback.user.RespondToDefenceCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -279,7 +280,14 @@ public class StateFlowEngine {
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
-                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(isLipCase)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
+                    .set(flags -> {
+                        if (featureToggleService.isPinInPostEnabled()) {
+                            flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                        flags.put(FlowFlag.LIP_CASE.name(), true);
+                    })
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -397,7 +405,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                     .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)))
                 //Acknowledging Claim First
-                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged.and(not(isInHearingReadiness)))
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED)
                     .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
@@ -488,18 +496,22 @@ public class StateFlowEngine {
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation.and(allAgreedToLrMediationSpec.negate()))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
-            .set(flags -> {
+            .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                flags.put(FlowFlag.SDO_ENABLED.name(), RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(c));
             })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                         .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim))
-            .set(flags -> {
+            .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+                flags.put(FlowFlag.SDO_ENABLED.name(), RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(c));
             })
             .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()))
                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()))
+            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
+                               RespondToDefenceCallbackHandler::shouldMoveToJudicialReferral))
             .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
@@ -530,8 +542,10 @@ public class StateFlowEngine {
                 .onlyIf(applicantOutOfTime)
             .state(PART_ADMISSION)
                 .transitionTo(IN_MEDIATION).onlyIf(agreedToMediation)
-                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION).onlyIf(isClaimantNotSettlePartAdmitClaim
-                                                                              .and(not(agreedToMediation)))
+                .transitionTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+            .onlyIf(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)))
+            .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
+                               RespondToDefenceCallbackHandler::shouldMoveToJudicialReferral))
                 .transitionTo(PART_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(PART_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)

@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -19,10 +18,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
-
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -167,11 +163,9 @@ public class SdoGeneratorService {
 
         sdoDocumentBuilder
             .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
-        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
-            .map(DisposalHearingHearingTime::getTime)
-            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
-            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
+            .disposalHearingTime(caseData.getDisposalHearingHearingTime())
+            .disposalHearingTimeEstimate(SdoHelper.getDisposalHearingTimeLabel(caseData));
+
         if (caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson) {
             sdoDocumentBuilder.hearingLocation(
                 locationHelper.getHearingLocation(

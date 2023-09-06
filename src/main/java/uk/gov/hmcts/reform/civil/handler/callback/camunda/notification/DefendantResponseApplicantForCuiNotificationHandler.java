@@ -60,15 +60,24 @@ public class DefendantResponseApplicantForCuiNotificationHandler
 
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isLiPClaimant = caseData.isApplicantNotRepresented();
 
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getEmailTemplate(caseData),
-            addProperties(caseData),
+            isLiPClaimant ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            getEmailTemplate(caseData, isLiPClaimant),
+            isLiPClaimant ? addPropertiesForLipClaimant(caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private Map<String, String> addPropertiesForLipClaimant(CaseData caseData) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        return properties;
     }
 
     @Override
@@ -82,17 +91,22 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         return properties;
     }
 
-    public String getEmailTemplate(CaseData caseData) {
+    public String getEmailTemplate(CaseData caseData, boolean isLiPClaimant) {
         String emailTemplate;
-        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-            if (caseData.getResponseClaimMediationSpecRequired().equals(YES)) {
-                emailTemplate = notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate();
-            } else {
-                emailTemplate = notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate();
-            }
+        if (isLiPClaimant) {
+            emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         } else {
-            emailTemplate = notificationsProperties.getRespondentLipFullAdmitOrPartAdmitTemplate();
+            if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                if (caseData.getResponseClaimMediationSpecRequired().equals(YES)) {
+                    emailTemplate = notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate();
+                } else {
+                    emailTemplate = notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate();
+                }
+            } else {
+                emailTemplate = notificationsProperties.getRespondentLipFullAdmitOrPartAdmitTemplate();
+            }
         }
+
         return emailTemplate;
     }
 

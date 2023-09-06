@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -730,6 +731,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                       .build())
                     .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                         ExpertDetails.builder().build()).build())
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .build(),
                 ABOUT_TO_SUBMIT
             );
@@ -782,6 +784,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
                     .applicant2DQSmallClaimExperts()
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -803,6 +806,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var params = callbackParamsOf(
                 CaseDataBuilder.builder()
                     .applicant2DQSmallClaimExperts()
+                    .applicant2ResponseDate(LocalDateTime.now())
                     .atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -984,6 +988,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithFastTrackAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .responseClaimTrack(FAST_CLAIM.name())
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(

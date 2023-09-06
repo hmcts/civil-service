@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -625,7 +626,8 @@ public class FlowStateAllowedEventService {
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                CREATE_SDO
             )
         ),
         entry(
@@ -1041,8 +1043,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_CASE_NOTE,
-                ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_UNAVAILABLE_DATES
             )
         ),
 
@@ -1146,8 +1148,8 @@ public class FlowStateAllowedEventService {
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
                 CREATE_SDO,
-                ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_UNAVAILABLE_DATES
             )
         ),
         entry(
@@ -1179,8 +1181,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_UNAVAILABLE_DATES
             )
         ),
          entry(
@@ -1222,8 +1224,6 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
         if (caseEvent.equals(migrateCase)) {
             return true;
         }
@@ -1232,6 +1232,11 @@ public class FlowStateAllowedEventService {
             return true;
         }
 
+        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
+            return true;
+        }
+
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
             StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);

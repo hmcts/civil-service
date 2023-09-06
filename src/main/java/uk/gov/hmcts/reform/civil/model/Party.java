@@ -53,6 +53,7 @@ public class Party {
 
     private String partyEmail;
     private String partyPhone;
+    private String legalRepHeading;
 
     private List<Element<UnavailableDate>> unavailableDates;
 
