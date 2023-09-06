@@ -23,6 +23,7 @@ public class Representative {
     private final String dxAddress;
     private final String emailAddress;
     private final Address serviceAddress;
+    private final String legalRepHeading;
 
     public static Representative fromSolicitorOrganisationDetails(
         SolicitorOrganisationDetails solicitorOrganisationDetails) {
