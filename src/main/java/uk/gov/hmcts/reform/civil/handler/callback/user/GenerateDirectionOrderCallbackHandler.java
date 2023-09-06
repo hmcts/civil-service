@@ -237,13 +237,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        System.out.println("hhhhh" + scenario);
         if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            System.out.println("ONE V TWO");
+            System.out.println("shoulf hit");
+            System.out.println("name is " + caseData.getRespondent2().getPartyName());
             DEFENDANT_TWO_PARTY_NAME = caseData.getRespondent2().getPartyName();
         }
         if (scenario == TWO_V_ONE) {
-            System.out.println("TWO V ONE");
-            System.out.println(caseData.getApplicant2().getPartyName());
             CLAIMANT_TWO_PARTY_NAME = caseData.getApplicant2().getPartyName();
         }
     }
