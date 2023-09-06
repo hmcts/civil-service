@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
@@ -57,6 +58,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFI
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -81,6 +85,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
+    public static String DEFENDANT_TWO_PARTY_NAME = null;
+    public static String CLAIMANT_TWO_PARTY_NAME = null;
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -186,6 +192,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
+        populateClaimant2Defendant2PartyNames(caseData);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
                                                                                .build()).build())
@@ -194,6 +201,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                          .builder()
                                                                          .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
                                                                          .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
+                                                                         .typeRepresentationDefendantTwoDynamic(DEFENDANT_TWO_PARTY_NAME)
+                                                                         .typeRepresentationClaimantTwoDynamic(CLAIMANT_TWO_PARTY_NAME)
                                                                          .build()).build())
             .finalOrderFurtherHearingComplex(
                 FinalOrderFurtherHearing.builder()
@@ -224,6 +233,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                    .build())
                                                                            .build()).build());
+    }
+
+    private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            System.out.println("ONE V TWO");
+            DEFENDANT_TWO_PARTY_NAME = caseData.getRespondent2().getPartyName();
+        }
+        if (scenario == TWO_V_ONE) {
+            System.out.println("TWO V ONE");
+            System.out.println(caseData.getApplicant2().getPartyName());
+            CLAIMANT_TWO_PARTY_NAME = caseData.getApplicant2().getPartyName();
+        }
     }
 
     private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
