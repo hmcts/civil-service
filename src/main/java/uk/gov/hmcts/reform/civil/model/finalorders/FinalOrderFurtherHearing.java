@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class FinalOrderFurtherHearing {
 
     private LocalDate listFromDate;
@@ -23,4 +24,6 @@ public class FinalOrderFurtherHearing {
     private DynamicList alternativeHearingList;
     private HearingChannel hearingMethodList;
     private String hearingNotesText;
+    private DynamicList hearingLocationList;
+    private DatesFinalOrders datesToAvoidDateDropdown;
 }
