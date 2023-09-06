@@ -651,6 +651,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         DISMISS_CLAIM,
                         migrateCase,
+                        CREATE_SDO
+                        migrateCase,
                         NotSuitable_SDO
                     }
                 ),
