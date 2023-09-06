@@ -31,6 +31,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ObjectMapper objectMapper;
+    
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
