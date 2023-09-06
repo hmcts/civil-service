@@ -622,11 +622,9 @@ public class CaseDataParent implements MappableObject {
     private String finalOrderOrderedThatText;
     private AssistedCostTypesList assistedOrderCostList;
     private AssistedOrderCostDetails assistedOrderCostsReserved;
-    private AssistedOrderCostDetails assistedOrderCostsDefendantPaySub;
-    private AssistedOrderCostDetails assistedOrderCostsClaimantPaySub;
-    private AssistedOrderCostDetails assistedOrderCostsDefendantSum;
-    private AssistedOrderCostDetails assistedOrderCostsClaimantSum;
     private AssistedOrderCostDetails assistedOrderCostsBespoke;
+    private AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts;
+    private YesOrNo publicFundingCostsProtection;
     private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
     private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
     private HearingLengthFinalOrderList lengthList;
@@ -693,6 +691,14 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
+
+    private List<Element<UnavailableDate>> applicant1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+
+    @JsonUnwrapped
+    private final UpdateDetailsForm updateDetailsForm;
 
     private FastTrackAllocation fastTrackAllocation;
 
