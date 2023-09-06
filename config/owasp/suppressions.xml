@@ -33,8 +33,4 @@
 
   </suppress>
 
-  <suppress until="2023-10-04">
-    <cve>CVE-2023-41080</cve>
-  </suppress>
-
 </suppressions>
