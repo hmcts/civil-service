@@ -280,7 +280,14 @@ public class StateFlowEngine {
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
-                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(isLipCase)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
+                    .set(flags -> {
+                        if (featureToggleService.isPinInPostEnabled()) {
+                            flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                        flags.put(FlowFlag.LIP_CASE.name(), true);
+                    })
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
