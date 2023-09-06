@@ -77,6 +77,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final TrialHousingDisrepair trialHousingDisrepair;
     private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
 
     //additional data for hearings
     private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;

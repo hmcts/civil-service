@@ -69,6 +69,7 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final String disposalHearingMethodTelephoneHearing;
     private final String disposalHearingMethodVideoConferenceHearing;
     private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
 
     private final DisposalHearingBundle disposalHearingBundle;
     private final String disposalHearingBundleTypeText;
