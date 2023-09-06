@@ -51,6 +51,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.toMap(objectMapper))
+            .state(JUDICIAL_REFERRAL.name())
             .build();
     }
 
