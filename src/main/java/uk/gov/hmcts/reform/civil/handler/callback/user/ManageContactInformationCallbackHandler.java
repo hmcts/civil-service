@@ -35,9 +35,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
@@ -69,7 +72,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::validateUserCanTriggerEvent)
+            .put(callbackKey(ABOUT_TO_START), this::prepareEvent)
             .put(callbackKey(MID, "show-party-field"), this::showPartyField)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitChanges)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -83,6 +86,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse showPartyField(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         boolean isAdmin = isAdmin(authToken);
@@ -98,18 +102,24 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
         }
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().updateDetailsForm(
-            UpdateDetailsForm.builder()
-                .partyChosenId(partyChosen)
-                .partyChosenType(partyChosenType)
-                .build());
+//        prepareExperts(partyChosen, caseData);
+//        prepareWitnesses(partyChosen, caseData);
+
+        UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
+            .partyChosenId(partyChosen)
+            .partyChosenType(partyChosenType)
+//            .updateExpertsDetailsForm(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
+//            .updateWitnessesDetailsForm(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
+            .build().toBuilder();
+
+        builder.updateDetailsForm(formBuilder.build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
     }
 
-    private CallbackResponse validateUserCanTriggerEvent(CallbackParams callbackParams) {
+    private CallbackResponse prepareEvent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -184,10 +194,23 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private void prepareExperts(String partyId, CaseData caseData) {
+        if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
+            caseData.getUpdateDetailsForm().setExperts(caseData.getApplicant1DQ().getExperts().getDetails());
+        } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
+            caseData.getUpdateDetailsForm().setExperts(caseData.getRespondent1DQ().getExperts().getDetails());
+        } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
+            caseData.getUpdateDetailsForm().setExperts(caseData.getRespondent2DQ().getExperts().getDetails());
+        }
+    }
+
+    private void prepareWitnesses(String partyId, CaseData caseData) {
+        //add something here
+    }
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         // clear updateDetailsForm
         builder.updateDetailsForm(null);
@@ -197,21 +220,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    // TODO: UPdate confirmation page
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationHeader(format("# Contact information changed"))
+            .confirmationBody(format("### What happens next\nAny changes made to contact details have been updated in the Claim Details tab."))
             .build();
-    }
-
-    private String getHeader(CaseData caseData) {
-        return format("# Please now pay your claim fee%n# using the link below");
-    }
-
-    private String getBody(CaseData caseData) {
-        return "string";
     }
 
     private boolean isAwaitingClaimantIntention(CaseData caseData) {

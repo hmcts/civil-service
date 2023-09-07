@@ -38,8 +38,8 @@ public class ManageContactInformationUtils {
     private static final String CLAIMANT_ONE_LITIGATION_FRIEND_ID = "CLAIMANT_1_LITIGATION_FRIEND";
     private static final String CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "CLAIMANT_1_LR_INDIVIDUALS";
     private static final String CLAIMANT_ONE_ORG_INDIVIDUALS_ID = "CLAIMANT_1_ORGANISATION_INDIVIDUALS";
-    private static final String CLAIMANT_ONE_WITNESSES_ID = "CLAIMANT_1_WITNESSES";
-    private static final String CLAIMANT_ONE_EXPERTS_ID = "CLAIMANT_1_EXPERTS";
+    public static final String CLAIMANT_ONE_WITNESSES_ID = "CLAIMANT_1_WITNESSES";
+    public static final String CLAIMANT_ONE_EXPERTS_ID = "CLAIMANT_1_EXPERTS";
 
     public static final String CLAIMANT_TWO_ID = "CLAIMANT_2";
     private static final String CLAIMANT_TWO_LITIGATION_FRIEND_ID = "CLAIMANT_2_LITIGATION_FRIEND";
@@ -49,15 +49,15 @@ public class ManageContactInformationUtils {
     private static final String DEFENDANT_ONE_LITIGATION_FRIEND_ID = "DEFENDANT_1_LITIGATION_FRIEND";
     private static final String DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_1_LR_INDIVIDUALS";
     private static final String DEFENDANT_ONE_ORG_INDIVIDUALS_ID = "DEFENDANT_1_ORGANISATION_INDIVIDUALS";
-    private static final String DEFENDANT_ONE_WITNESSES_ID = "DEFENDANT_1_WITNESSES";
-    private static final String DEFENDANT_ONE_EXPERTS_ID = "DEFENDANT_1_EXPERTS";
+    public static final String DEFENDANT_ONE_WITNESSES_ID = "DEFENDANT_1_WITNESSES";
+    public static final String DEFENDANT_ONE_EXPERTS_ID = "DEFENDANT_1_EXPERTS";
 
     public static final String DEFENDANT_TWO_ID = "DEFENDANT_2";
     private static final String DEFENDANT_TWO_LITIGATION_FRIEND_ID = "DEFENDANT_2_LITIGATION_FRIEND";
     private static final String DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_2_LR_INDIVIDUALS";
     private static final String DEFENDANT_TWO_ORG_INDIVIDUALS_ID = "DEFENDANT_2_ORGANISATION_INDIVIDUALS";
-    private static final String DEFENDANT_TWO_WITNESSES_ID = "DEFENDANT_2_WITNESSES";
-    private static final String DEFENDANT_TWO_EXPERTS_ID = "DEFENDANT_2_EXPERTS";
+    public static final String DEFENDANT_TWO_WITNESSES_ID = "DEFENDANT_2_WITNESSES";
+    public static final String DEFENDANT_TWO_EXPERTS_ID = "DEFENDANT_2_EXPERTS";
 
     public static void addApplicant1Options(List<DynamicListElement> list, CaseData caseData, boolean isAdmin) {
         addApplicant1PartyOptions(list, caseData);
