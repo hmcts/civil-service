@@ -44,9 +44,9 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append("</ul>");
         if (caseData.getRespondent2() == null) {
             sb.append("<h3 class=\"govuk-heading-m\">If you do not pay: </h3>")
-            .append("<p>If you do not pay, the claimant can request a County Court Judgment against you.</p>");
+                .append("<p>If you do not pay, the claimant can request a County Court Judgment against you.</p>");
         }
-            sb.append("<p>Contact ")
+        sb.append("<p>Contact ")
             .append(applicantName);
         if (applicantName.endsWith("s")) {
             sb.append("'");
