@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.UUID;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
