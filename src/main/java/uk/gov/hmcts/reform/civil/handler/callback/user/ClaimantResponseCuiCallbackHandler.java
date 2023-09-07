@@ -31,7 +31,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ObjectMapper objectMapper;
-    
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -53,7 +53,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.toMap(objectMapper))
-            .state(JUDICIAL_REFERRAL.name())
+//            .state(JUDICIAL_REFERRAL.name())
             .build();
     }
 
