@@ -212,7 +212,7 @@ aac-manage-case-assignment:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
-    ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
+    ingressHost: manage-case-assignment-civil-service-staging-aat.service.core-compute-aat.internal
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
