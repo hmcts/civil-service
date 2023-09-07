@@ -441,9 +441,8 @@ public class BundleRequestMapper {
                 ? PartyType.DEFENDANT1.getDisplayName() :
                     caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")
                         ? PartyType.DEFENDANT2.getDisplayName() : "";
-            String docName = String.format(generateDocName(docType, party, null,
-                                                           caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()),
-                                           caseDocumentElement.getValue().getCreatedDatetime());
+            String docName = generateDocName(docType, party, null,
+                                                           caseDocumentElement.getValue().getCreatedDatetime().toLocalDate());
             bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, caseDocumentElement.getValue().getDocumentLink(), docType));
         });
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
@@ -459,6 +458,14 @@ public class BundleRequestMapper {
                                                                                .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
                                                                                Collectors.toList()),
                                                                        BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()));
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
+                                             TypeOfDocDocumentaryEvidenceOfTrial.SCHEDULE_OF_LOSS.getDisplayNames(), false),
+                BundleFileNameList.SCHEDULE_OF_LOSS_FILE_DISPLAY_NAME.getDisplayName(),
+                TypeOfDocDocumentaryEvidenceOfTrial.SCHEDULE_OF_LOSS.name(), partyType
+            ));
+        });
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -513,7 +520,12 @@ public class BundleRequestMapper {
                 BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME.getDisplayName(), TypeOfDocDocumentaryEvidenceOfTrial.TIMETABLE.name(), partyType
             ));
         });
-        log.info("Trial docs list : " + bundlingRequestDocuments.size());
+        Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
+            bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
+                getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.SKELETON_ARGUMENT, caseData),
+                BundleFileNameList.SKELETON_ARGUMENT.getDisplayName(), EvidenceUploadFiles.SKELETON_ARGUMENT.name(),
+                partyType));
+        });
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -607,15 +619,22 @@ public class BundleRequestMapper {
     private String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,
                                          String documentType, PartyType party) {
         if (fileNamePrefix.equals(DOC_FILE_NAME)) {
-            return uploadEvidence.getValue().getDocumentUpload().getDocumentFileName();
+            return uploadEvidence.getValue().getDocumentUpload().getDocumentFileName()
+                .substring(0, uploadEvidence.getValue().getDocumentUpload().getDocumentFileName().lastIndexOf("."));
         } else if (fileNamePrefix.equals(DOC_FILE_NAME_WITH_DATE)) {
-            return generateDocName(uploadEvidence.getValue().getDocumentUpload().getDocumentFileName() + " %s", null,
+            return generateDocName(uploadEvidence.getValue().getDocumentUpload().getDocumentFileName()
+                                       .substring(0, uploadEvidence.getValue().getDocumentUpload().getDocumentFileName().lastIndexOf(".")) + " %s", null,
                                    null,
                             documentType.equals(EvidenceUploadFiles.COSTS.name())
                                 ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
                                 uploadEvidence.getValue().getDocumentIssuedDate());
         } else {
-            return generateDocName(fileNamePrefix, party.getDisplayName(), null,
+            String partyName = party.getDisplayName();
+            if (fileNamePrefix.equals(BundleFileNameList.SCHEDULE_OF_LOSS_FILE_DISPLAY_NAME.getDisplayName())
+                && (party.equals(PartyType.DEFENDANT1) || party.equals(PartyType.DEFENDANT2))) {
+                partyName = partyName.concat(" counter");
+            }
+            return generateDocName(fileNamePrefix, partyName, null,
                             documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
                                 ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
                                 uploadEvidence.getValue().getDocumentIssuedDate());

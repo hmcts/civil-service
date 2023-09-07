@@ -4,19 +4,14 @@ public enum BundleFileNameList {
     CASE_SUMMARY_FILE_DISPLAY_NAME("%s Case summary %s"),
     CHRONOLOGY_FILE_DISPLAY_NAME("%s Chronology %s"),
     TRIAL_TIMETABLE_FILE_DISPLAY_NAME("%s Trial Timetable %s"),
+    SCHEDULE_OF_LOSS_FILE_DISPLAY_NAME("%s schedule of loss %s"),
     CLAIM_FORM("Claim Form %s"),
-    PARTICULARS_OF_CLAIM("Particulars of Claim"),
     DEFENCE("%s Defence %s"),
     CL_REPLY("CL's reply %s"),
     DF2_DEFENCE("DF 2 Defence"),
     REPLY_TO_PART_18("%s reply to part 18 request %s"),
     DIRECTIONS_QUESTIONNAIRE("Directions Questionnaire %s"),
-    CL_SCHEDULE_OF_LOSS("CL's schedule of loss"),
-    DF1_COUNTER_SCHEDULE_OF_LOSS("DF 1 counter schedule of loss"),
-    DF2_COUNTER_SCHEDULE_OF_LOSS("DF 2 counter schedule of loss"),
     DIRECTIONS_ORDER("Directions Order %s"),
-    ORDERS_TO_EXTEND_TIME("Order to Extend Time"),
-    ORDERS_FOR_SUMMARY_JUDGEMENT("Orders for summary judgement"),
     ORDER("Order %s"),
     WITNESS_STATEMENT_DISPLAY_NAME("%s - Statement %s"),
     WITNESS_STATEMENT_OTHER_DISPLAY_NAME("Witness Statement %s %s %s"),
@@ -29,7 +24,8 @@ public enum BundleFileNameList {
     EXPERT_EVIDENCE("Expert Evidence %s %s %s"),
     QUESTIONS_TO("Questions to %s %s"),
     REPLIES_FROM("Replies from %s %s"),
-    JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s");
+    JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s"),
+    SKELETON_ARGUMENT("%s Skeleton argument %s");
     String displayName;
 
     public String getDisplayName() {

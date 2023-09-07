@@ -190,6 +190,18 @@ public class BundleFileNameHelper {
                         ? caseData.getDocumentCostsRes2() : null;
                 };
             }
+            case SKELETON_ARGUMENT: {
+                return switch (partyType) {
+                    case CLAIMANT1 -> caseData.getDocumentSkeletonArgument() != null
+                        ? caseData.getDocumentSkeletonArgument() : null;
+                    case CLAIMANT2 -> caseData.getDocumentSkeletonArgumentApp2() != null
+                        ? caseData.getDocumentSkeletonArgumentApp2() : null;
+                    case DEFENDANT1 -> caseData.getDocumentSkeletonArgumentRes() != null
+                        ? caseData.getDocumentSkeletonArgumentRes() : null;
+                    case DEFENDANT2 -> caseData.getDocumentSkeletonArgumentRes2() != null
+                        ? caseData.getDocumentSkeletonArgumentRes2() : null;
+                };
+            }
             default: return null;
         }
     }

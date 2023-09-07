@@ -11,7 +11,8 @@ public enum TypeOfDocDocumentaryEvidenceOfTrial {
     TIMETABLE("timetable", "time table", "time-table"),
     PART18("Part 18", "Part18"),
     NOTICE_TO_ADMIT_FACTS("Notice to admit facts"),
-    RESPONSE("Response");
+    RESPONSE("Response"),
+    SCHEDULE_OF_LOSS("Schedule of loss");
     List<String> displayNames;
 
     public List<String> getDisplayNames() {
