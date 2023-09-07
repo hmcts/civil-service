@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class FinalOrderFurtherHearing {
 
     private LocalDate listFromDate;
