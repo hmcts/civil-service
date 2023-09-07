@@ -70,7 +70,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SPACE = " ";
     private static final String END = ".";
-    private static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     protected static final String APPLICANT_DISCLOSURE = "ApplicantDisclosure";
     protected static final String APPLICANT_TWO_DISCLOSURE = "ApplicantTwoDisclosure";

@@ -1324,23 +1324,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentWitnessSummaryRes().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 10-02-2023.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 2023-02-10.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 10-02-2023.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 2023-02-10.pdf");
         assertThat(updatedData.getDocumentExpertReportRes().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 2023-02-10.pdf");
         assertThat(updatedData.getDocumentJointStatementRes().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 2023-02-10.pdf");
         assertThat(updatedData.getDocumentQuestionsRes().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other question.pdf");
         assertThat(updatedData.getDocumentAnswersRes().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other answer.pdf");
         assertThat(updatedData.getDocumentForDisclosureRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 2023-02-10.pdf");
         assertThat(updatedData.getDocumentReferredInStatementRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 2023-02-10.pdf");
         assertThat(updatedData.getDocumentEvidenceForTrialRes().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 2023-02-10.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes().get(0).getValue()
@@ -1359,19 +1359,19 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
                     .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_WITNESS_SUMMARY);
             assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
-                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 10-02-2023.pdf");
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 2023-02-10.pdf");
             assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
                     .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_WITNESS_STATEMENT);
             assertThat(updatedData.getDocumentHearsayNoticeRes2().get(0).getValue()
-                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 10-02-2023.pdf");
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResOneWitness 2023-02-10.pdf");
             assertThat(updatedData.getDocumentHearsayNoticeRes2().get(0).getValue()
                     .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_WITNESS_HEARSAY);
             assertThat(updatedData.getDocumentExpertReportRes2().get(0).getValue()
-                    .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 2023-02-10.pdf");
             assertThat(updatedData.getDocumentExpertReportRes2().get(0).getValue()
                     .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_EXPERT_REPORT);
             assertThat(updatedData.getDocumentJointStatementRes2().get(0).getValue()
-                    .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
+                    .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 2023-02-10.pdf");
             assertThat(updatedData.getDocumentJointStatementRes2().get(0).getValue()
                     .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_EXPERT_JOINT_STATEMENT);
             assertThat(updatedData.getDocumentQuestionsRes2().get(0).getValue()
@@ -1383,15 +1383,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDocumentAnswersRes2().get(0).getValue()
                     .getExpertDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_EXPERT_ANSWERS);
             assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue()
-                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 2023-02-10.pdf");
             assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue()
                     .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_DISCLOSURE);
             assertThat(updatedData.getDocumentReferredInStatementRes2().get(0).getValue()
-                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 2023-02-10.pdf");
             assertThat(updatedData.getDocumentReferredInStatementRes2().get(0).getValue()
                     .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_WITNESS_REFERRED);
             assertThat(updatedData.getDocumentEvidenceForTrialRes2().get(0).getValue()
-                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
+                    .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 2023-02-10.pdf");
             assertThat(updatedData.getDocumentEvidenceForTrialRes2().get(0).getValue()
                     .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE);
             assertThat(updatedData.getDocumentDisclosureListRes2().get(0).getValue()
@@ -1457,23 +1457,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResTwoWitness.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResTwoWitness 10-02-2023.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResTwoWitness 2023-02-10.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes2().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResTwoWitness 10-02-2023.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Hearsay evidence ResTwoWitness 2023-02-10.pdf");
         assertThat(updatedData.getDocumentExpertReportRes2().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 10-02-2023.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Experts report expertName expertise 2023-02-10.pdf");
         assertThat(updatedData.getDocumentJointStatementRes2().get(0).getValue()
-                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 10-02-2023.pdf");
+                .getExpertDocument().getDocumentFileName()).isEqualTo("Joint report expertsName expertises 2023-02-10.pdf");
         assertThat(updatedData.getDocumentQuestionsRes2().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other question.pdf");
         assertThat(updatedData.getDocumentAnswersRes2().get(0).getValue()
                 .getExpertDocument().getDocumentFileName()).isEqualTo("expertName other answer.pdf");
         assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Document for disclosure typeDisclosure 2023-02-10.pdf");
         assertThat(updatedData.getDocumentReferredInStatementRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Referred Document typeReferred 2023-02-10.pdf");
         assertThat(updatedData.getDocumentEvidenceForTrialRes2().get(0).getValue()
-                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 10-02-2023.pdf");
+                .getDocumentUpload().getDocumentFileName()).isEqualTo("Documentary Evidence typeForTrial 2023-02-10.pdf");
         assertThat(updatedData.getDocumentDisclosureListRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCaseSummaryRes2().get(0).getValue()
