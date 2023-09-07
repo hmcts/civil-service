@@ -42,7 +42,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append("<li>keep proof of any payments you make</li>")
             .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
             .append("</ul>");
-        if (caseData.getRespondent2() != null) {
+        if (caseData.getRespondent2() == null) {
             sb.append("<h3 class=\"govuk-heading-m\">If you do not pay: </h3>")
             .append("<p>If you do not pay, the claimant can request a County Court Judgment against you.</p>");
         }
